@@ -17,11 +17,9 @@ return [
         'allowUpdates' => false,
         'devMode' => isset($_REQUEST['secret']) && $_REQUEST['secret'] === App::env('DEV_MODE_SECRET'),
         'omitScriptNameInUrls' => true,
-        'baseCpUrl' => App::env('URL_ID'),
-        'cpTrigger' => App::env('CRAFT_CP_TRIGGER'),
+        'baseCpUrl' => App::env('URL_CONSOLE'),
         'imageDriver' => 'gd',
         'preventUserEnumeration' => true,
-        'securityKey' => App::env('CRAFT_SECURITY_KEY'),
         'csrfTokenName' => 'CRAFTNET_CSRF_TOKEN',
         'phpSessionName' => 'CraftnetSessionId',
         'generateTransformsBeforePageLoad' => true,
@@ -51,7 +49,6 @@ return [
             '--exclude-table-data \'apilog.request_errors\' ' .
             '--exclude-table-data \'apilog.request_pluginlicenses\' ' .
             '--exclude-table-data \'apilog.requests\'',
-        'testToEmailAddress' => App::env('TEST_EMAIL') ?: null
     ],
     'prod' => [
         'runQueueAutomatically' => false,

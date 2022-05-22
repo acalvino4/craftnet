@@ -3,9 +3,7 @@
  * Craft web bootstrap file
  */
 
-use craft\helpers\App;
-
-switch ($_SERVER['HTTP_HOST']) {
+switch ($_SERVER['HTTP_HOST'] ?? null) {
     case 'api.craftcms.com':
     case 'api.craftcms.test':
     case 'api.craftcms.nitro':
@@ -41,18 +39,9 @@ define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
 // Composer autoloader
 require_once CRAFT_VENDOR_PATH . '/autoload.php';
 
-// dotenv
-if (class_exists('Dotenv\Dotenv') && file_exists(CRAFT_BASE_PATH.'/.env')) {
-    Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
+// Load dotenv?
+if (class_exists(Dotenv\Dotenv::class)) {
+    // By default, this will allow .env file values to override environment variables
+    // with matching names. Use `createUnsafeImmutable` to disable this.
+    Dotenv\Dotenv::createUnsafeMutable(CRAFT_BASE_PATH)->safeLoad();
 }
-
-if ($storagePath = App::env('CRAFT_STORAGE_PATH')) {
-    define('CRAFT_STORAGE_PATH', $storagePath);
-}
-if ($keyPath = App::env('LICENSE_KEY_PATH')) {
-    define('CRAFT_LICENSE_KEY_PATH', $keyPath);
-}
-
-define('CRAFT_ENVIRONMENT', App::env('CRAFT_ENV') ?: 'prod');
-
-return require CRAFT_VENDOR_PATH . '/craftcms/cms/bootstrap/web.php';
