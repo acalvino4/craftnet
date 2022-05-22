@@ -126,7 +126,7 @@ class PartnerQuery extends ElementQuery
     /**
      * @inheritdoc
      */
-    protected function statusCondition(string $status)
+    protected function statusCondition(string $status): mixed
     {
 //        if ($status === Plugin::STATUS_PENDING) {
 //            return ['elements.enabled' => false, 'craftnet_plugins.pendingApproval' => true];

@@ -414,7 +414,7 @@ class Module extends \yii\base\Module
             switch ($fieldLayout->type) {
                 case User::class:
                     $e->fields[] = [
-                        'class' => StandardTextField::class,
+                        'class' => \craft\fieldlayoutelements\TextField::class,
                         'attribute' => 'payPalEmail',
                         'label' => 'PayPal Email',
                         'mandatory' => true,

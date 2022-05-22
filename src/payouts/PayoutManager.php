@@ -233,6 +233,6 @@ class PayoutManager extends BaseObject
             'message' => $e->getMessage(),
             'data' => $e->getData(),
             'date' => Db::prepareDateForDb(new \DateTime()),
-        ], false);
+        ]);
     }
 }

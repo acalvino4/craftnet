@@ -32,6 +32,7 @@
     "codeception/module-phpbrowser": "^1.0.0",
     "codeception/module-rest": "^1.0.0",
     "codeception/module-yii2": "^1.0.0",
+    "craftcms/rector": "dev-main",
     "vlucas/phpdotenv": "^3.0"
   },
   "autoload": {

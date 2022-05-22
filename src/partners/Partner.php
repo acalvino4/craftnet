@@ -539,7 +539,7 @@ class Partner extends Element
      *
      * @inheritdoc
      */
-    public function afterValidate()
+    public function afterValidate(): void
     {
         if ($this->hasErrors('logoAssetId')) {
             // The only error is that it's required
@@ -563,7 +563,7 @@ class Partner extends Element
             }
         }
 
-        return parent::afterValidate();
+        parent::afterValidate();
     }
 
     /**

@@ -16,7 +16,7 @@ class CraftIdController extends BaseController
     /**
      * @inheritdoc
      */
-    public $allowAnonymous = true;
+    public array|int|bool $allowAnonymous = true;
 
     // Public Methods
     // =========================================================================

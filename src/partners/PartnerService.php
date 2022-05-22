@@ -487,7 +487,7 @@ class PartnerService
                     $partner->websiteSlug = $request->getBodyParam($property);
 
                     if (empty($partner->websiteSlug) && !empty($partner->businessName)) {
-                        $partner->websiteSlug = ElementHelper::createSlug($partner->businessName);
+                        $partner->websiteSlug = ElementHelper::normalizeSlug($partner->businessName);
                     }
                     break;
 

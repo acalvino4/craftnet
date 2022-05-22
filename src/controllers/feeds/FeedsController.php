@@ -30,7 +30,7 @@ class FeedsController extends Controller
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = true;
+    protected array|int|bool $allowAnonymous = true;
 
     /**
      * Returns a feed of newly added plugins.

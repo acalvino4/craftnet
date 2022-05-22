@@ -12,7 +12,7 @@ abstract class BaseApiController extends Controller
     /**
      * @inheritdoc
      */
-    public $allowAnonymous = true;
+    public array|int|bool $allowAnonymous = true;
 
     /**
      * @inheritdoc

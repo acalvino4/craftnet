@@ -3,10 +3,10 @@
 namespace craftnet\plugins;
 
 use craft\db\Query;
+use craft\db\Table as CraftTable;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use craftnet\db\Table;
-use craft\db\Table as CraftTable;
 use craftnet\Module;
 use yii\db\Connection;
 
@@ -316,7 +316,7 @@ class PluginQuery extends ElementQuery
     /**
      * @inheritdoc
      */
-    protected function statusCondition(string $status)
+    protected function statusCondition(string $status): mixed
     {
         switch ($status) {
             case Plugin::STATUS_PENDING:

@@ -54,12 +54,9 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     }
 
     /**
-     * @param array $sourceElements
-     * @param string $handle
-     *
-     * @return array|bool|false
+     * @inheritdoc
      */
-    public static function eagerLoadingMap(array $sourceElements, string $handle)
+    public static function eagerLoadingMap(array $sourceElements, string $handle): array|null|false
     {
         if ($handle === 'plugin') {
             $query = (new Query())

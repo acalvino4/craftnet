@@ -20,7 +20,7 @@ class ClaimLicensesController extends Controller
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = [
+    protected array|int|bool$allowAnonymous = [
         'verify',
     ];
 

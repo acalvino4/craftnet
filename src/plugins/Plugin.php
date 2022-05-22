@@ -86,7 +86,7 @@ class Plugin extends Element
      *
      * @return string
      */
-    public static function indexHtml(ElementQueryInterface $elementQuery, array $disabledElementIds = null, array $viewState, string $sourceKey = null, string $context = null, bool $includeContainer, bool $showCheckboxes): string
+    public static function indexHtml(ElementQueryInterface $elementQuery, ?array $disabledElementIds = null, array $viewState, ?string $sourceKey = null, ?string $context = null, bool $includeContainer, bool $showCheckboxes): string
     {
         /** @var PluginQuery $elementQuery */
         $elementQuery
@@ -97,12 +97,9 @@ class Plugin extends Element
     }
 
     /**
-     * @param array $sourceElements
-     * @param string $handle
-     *
-     * @return array|bool|false
+     * @inheritdoc
      */
-    public static function eagerLoadingMap(array $sourceElements, string $handle)
+    public static function eagerLoadingMap(array $sourceElements, string $handle): array|null|false
     {
         switch ($handle) {
             case 'editions':
@@ -891,7 +888,7 @@ class Plugin extends Element
     /**
      * @inheritdoc
      */
-    public function afterValidate()
+    public function afterValidate(): void
     {
         parent::afterValidate();
 

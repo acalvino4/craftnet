@@ -26,7 +26,7 @@ class Plugins extends BaseRelationField
     /**
      * @inheritdoc
      */
-    protected static function elementType(): string
+    public static function elementType(): string
     {
         return Plugin::class;
     }
