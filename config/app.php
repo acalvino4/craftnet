@@ -2,6 +2,11 @@
 
 use craft\helpers\App;
 use craftnet\services\Oauth;
+use MeadSteve\MonoSnag\BugsnagHandler;
+use Monolog\Logger;
+use samdark\log\PsrTarget;
+use yii\i18n\PhpMessageSource;
+use yii\web\HttpException;
 
 return [
     '*' => [
@@ -79,8 +84,12 @@ return [
                 'targets' => App::env('BUGSNAG_API_KEY') ? [
                     [
                         'class' => PsrTarget::class,
-                        'logger' => (new Monolog\Logger('bugsnag'))
-                            ->pushHandler(new BugsnagHandler(Client::make(App::env('BUGSNAG_API_KEY')))),
+                        'logger' => (new Logger('bugsnag'))
+                            ->pushHandler(new BugsnagHandler(Bugsnag\Client::make(App::env('BUGSNAG_API_KEY')))),
+                        'except' => [
+                            PhpMessageSource::class . ':*',
+                            HttpException::class . ':404',
+                        ]
                     ]
                 ] : [],
             ],
