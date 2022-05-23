@@ -1,6 +1,7 @@
 <?php
 
 use craft\helpers\App;
+use craft\log\Dispatcher;
 use craftnet\services\Oauth;
 use MeadSteve\MonoSnag\BugsnagHandler;
 use Monolog\Logger;
@@ -80,25 +81,40 @@ return [
                 'class' => omnilight\scheduling\Schedule::class,
                 'cliScriptName' => 'craft',
             ],
-            'log' => [
-                'targets' => App::env('BUGSNAG_API_KEY') ? [
-                    [
-                        'class' => PsrTarget::class,
-                        'logger' => (new Logger('bugsnag'))
-                            ->pushHandler(new BugsnagHandler(Bugsnag\Client::make(App::env('BUGSNAG_API_KEY')))),
-                        'except' => [
-                            PhpMessageSource::class . ':*',
-                            HttpException::class . ':404',
+            'log' => static function() {
+                if (YII_DEBUG) {
+                    $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING | yii\log\Logger::LEVEL_INFO | yii\log\Logger::LEVEL_TRACE | yii\log\Logger::LEVEL_PROFILE;
+                } else {
+                    $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING;
+                }
+
+                return Craft::createObject([
+                    'class' => Dispatcher::class,
+                    'targets' => [
+                        [
+                            'class' => craftnet\logs\DbTarget::class,
+                            'logTable' => 'apilog.logs',
+                            'levels' => $levels,
+                            'enabled' => App::env('CRAFT_ENVIRONMENT') === 'prod',
+                        ],
+                        [
+                            'class' => PsrTarget::class,
+                            'logger' => (new Logger('bugsnag'))
+                                ->pushHandler(new BugsnagHandler(Bugsnag\Client::make(App::env('BUGSNAG_API_KEY')))),
+                            'except' => [
+                                PhpMessageSource::class . ':*',
+                                HttpException::class . ':404',
+                            ],
+                            'enabled' => (bool) App::env('BUGSNAG_API_KEY')
                         ]
-                    ]
-                ] : [],
-            ],
+                    ],
+                ]);
+            },
         ],
     ],
     'prod' => [
         'bootstrap' => [
             'dlq',
-            '\superbig\bugsnag\Bootstrap',
         ],
         'components' => [
             'redis' => [
@@ -134,29 +150,6 @@ return [
                 $config['flashParam'] = $stateKeyPrefix . '__flash';
                 $config['authAccessParam'] = $stateKeyPrefix . '__auth_access';
                 return Craft::createObject($config);
-            },
-            'log' => function() {
-                $logFileName = Craft::$app->getRequest()->getIsConsoleRequest() ? 'console.log' : 'web.log';
-                if (!YII_DEBUG) {
-                    $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING;
-                } else {
-                    $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING | yii\log\Logger::LEVEL_INFO | yii\log\Logger::LEVEL_TRACE | yii\log\Logger::LEVEL_PROFILE;
-                }
-                return Craft::createObject([
-                    'class' => yii\log\Dispatcher::class,
-                    'targets' => [
-                        [
-                            'class' => craftnet\logs\DbTarget::class,
-                            'logTable' => 'apilog.logs',
-                            'levels' => $levels,
-                        ],
-                        [
-                            'class' => craft\log\FileTarget::class,
-                            'logFile' => App::env('CRAFT_STORAGE_PATH') . '/logs/' . $logFileName,
-                            'levels' => $levels,
-                        ],
-                    ],
-                ]);
             },
             'db' => function() {
                 // Get the default component config
