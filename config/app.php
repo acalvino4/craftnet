@@ -88,26 +88,29 @@ return [
                     $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING;
                 }
 
+                $targets = [
+                    [
+                        'class' => craftnet\logs\DbTarget::class,
+                        'logTable' => 'apilog.logs',
+                        'levels' => $levels,
+                        'enabled' => App::env('CRAFT_ENVIRONMENT') === 'prod',
+                    ]
+                ];
+
+                if ($bugsnagApiKey = App::env('BUGSNAG_API_KEY')) {
+                    $targets[] = [
+                        'class' => PsrTarget::class,
+                        'logger' => (new Logger('bugsnag'))
+                            ->pushHandler(new BugsnagHandler(Bugsnag\Client::make($bugsnagApiKey))),
+                        'except' => [
+                            PhpMessageSource::class . ':*',
+                            HttpException::class . ':404',
+                        ],
+                    ];
+                }
                 return Craft::createObject([
                     'class' => Dispatcher::class,
-                    'targets' => [
-                        [
-                            'class' => craftnet\logs\DbTarget::class,
-                            'logTable' => 'apilog.logs',
-                            'levels' => $levels,
-                            'enabled' => App::env('CRAFT_ENVIRONMENT') === 'prod',
-                        ],
-                        [
-                            'class' => PsrTarget::class,
-                            'logger' => (new Logger('bugsnag'))
-                                ->pushHandler(new BugsnagHandler(Bugsnag\Client::make(App::env('BUGSNAG_API_KEY')))),
-                            'except' => [
-                                PhpMessageSource::class . ':*',
-                                HttpException::class . ':404',
-                            ],
-                            'enabled' => (bool) App::env('BUGSNAG_API_KEY')
-                        ]
-                    ],
+                    'targets' => $targets,
                 ]);
             },
         ],
