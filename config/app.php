@@ -186,7 +186,7 @@ return [
         'components' => [
             'api' => function() {
                 $client = Craft::createGuzzleClient([
-                    'base_uri' => 'https://api.craftcms.test/v1/',
+                    'base_uri' => App::env('URL_API') . 'v1/',
                     'verify' => false,
                     'query' => ['XDEBUG_SESSION_START' => 14076],
                 ]);
