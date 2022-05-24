@@ -57,9 +57,4 @@ return [
         'allowUpdates' => true,
         'enableBasicHttpAuth' => true,
     ],
-    'next' => [
-        'devMode' => true,
-        'useCompressedJs' => false,
-        'allowUpdates' => true,
-    ]
 ];

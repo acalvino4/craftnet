@@ -49,7 +49,4 @@ return [
     'dev' => [
         'craftIdUrl' => App::env('URL_ID'),
     ],
-    'next' => [
-        'craftIdUrl' => 'https://id.craftcms.next',
-    ]
 ];
