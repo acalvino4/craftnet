@@ -17,7 +17,6 @@ return [
         'allowUpdates' => false,
         'devMode' => isset($_REQUEST['secret']) && $_REQUEST['secret'] === App::env('DEV_MODE_SECRET'),
         'omitScriptNameInUrls' => true,
-        'baseCpUrl' => App::env('URL_CONSOLE'),
         'imageDriver' => 'gd',
         'preventUserEnumeration' => true,
         'csrfTokenName' => 'CRAFTNET_CSRF_TOKEN',
