@@ -53,7 +53,6 @@ return [
     ],
     'dev' => [
         'devMode' => true,
-        'useCompressedJs' => false,
         'allowUpdates' => true,
         'enableBasicHttpAuth' => true,
     ],
