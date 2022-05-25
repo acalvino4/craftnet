@@ -36,5 +36,5 @@ ddev describe
 ddev exec php craft
 
 # Login to the CP
-open https://id.craftnet.ddev.site/negroni
+open https://console.craftnet.ddev.site/negroni
 ```
