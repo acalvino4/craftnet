@@ -68,7 +68,7 @@ class PluginLicense extends License
     /**
      * @inheritdoc
      */
-    public function extraFields()
+    public function extraFields(): array
     {
         return [
             'plugin',

@@ -130,7 +130,7 @@ class Partner extends Element
     /**
      * @var bool Whether the element is enabled
      */
-    public $enabled = false;
+    public bool $enabled = false;
 
     /**
      * @var int The owner’s user ID
@@ -387,21 +387,19 @@ class Partner extends Element
      * @return bool
      * @throws \yii\db\Exception
      */
-    public function afterDelete()
+    public function afterDelete(): void
     {
         parent::afterDelete();
 
         Craft::$app->getDb()->createCommand()
             ->delete(Table::PARTNERS, ['id' => $this->id])
             ->execute();
-
-        return true;
     }
 
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         switch ($this->getScenario()) {
             // Only save basic Partner (Craft ID)
@@ -595,7 +593,7 @@ class Partner extends Element
     /**
      * @return null|string
      */
-    public function getCpEditUrl()
+    public function getCpEditUrl(): ?string
     {
         /** @noinspection PhpUndefinedClassInspection */
         $slug = Inflector::slug($this->businessName);
@@ -860,7 +858,7 @@ class Partner extends Element
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->businessName ?? $this->getOwner()->getName();
     }

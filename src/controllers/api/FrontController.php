@@ -43,7 +43,7 @@ class FrontController extends BaseApiController
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = true;
+    protected array|int|bool $allowAnonymous = true;
 
     /**
      * @inheritdoc
@@ -56,7 +56,7 @@ class FrontController extends BaseApiController
     /**
      * @inheritdoc
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $this->_validateSecret();
         return parent::beforeAction($action);

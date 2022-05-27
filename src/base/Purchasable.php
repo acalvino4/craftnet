@@ -14,7 +14,7 @@ abstract class Purchasable extends CommercePurchasable implements PurchasableInt
     /**
      * @inheritdoc
      */
-    public function attributes()
+    public function attributes(): array
     {
         $names = parent::attributes();
         $names[] = 'type';

@@ -14,7 +14,7 @@ class PartnerSlugValidator extends SlugValidator
      * @param Partner $model the data model to be validated
      * @param string $attribute the name of the attribute to be validated.
      */
-    public function validateAttribute($model, $attribute)
+    public function validateAttribute($model, $attribute): void
     {
         parent::validateAttribute($model, $attribute);
 

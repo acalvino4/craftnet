@@ -17,7 +17,7 @@ class UpdatePartner extends BaseJob
     /**
      * @inheritdoc
      */
-    public function execute($queue)
+    public function execute($queue): void
     {
         Craft::createGuzzleClient()->post(App::env('CRAFTCOM_PARTNER_ENDPOINT'), [
             RequestOptions::HEADERS => [

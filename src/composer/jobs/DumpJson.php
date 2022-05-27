@@ -8,13 +8,13 @@ use craftnet\Module;
 
 class DumpJson extends BaseJob
 {
-    public function execute($queue)
+    public function execute($queue): void
     {
         Craft::info('Executing DumpJson job.', __METHOD__);
         Module::getInstance()->getJsonDumper()->dump();
     }
 
-    protected function defaultDescription()
+    protected function defaultDescription(): ?string
     {
         return 'Dump Composer repo JSON';
     }

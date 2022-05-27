@@ -173,7 +173,7 @@ abstract class BaseApiController extends Controller
     /**
      * @inheritdoc
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         // if the request is authenticated, set their identity
         if (($user = $this->getAuthUser()) !== null) {

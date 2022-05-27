@@ -68,7 +68,7 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         $data = [
             'id' => $this->id,
@@ -141,7 +141,7 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
     /**
      * @inheritdoc
      */
-    public function populateLineItem(LineItem $lineItem)
+    public function populateLineItem(LineItem $lineItem): void
     {
         OrderHelper::populateRenewalLineItem($lineItem, $this);
     }
@@ -149,7 +149,7 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
     /**
      * @inheritdoc
      */
-    public function afterOrderComplete(Order $order, LineItem $lineItem)
+    public function afterOrderComplete(Order $order, LineItem $lineItem): void
     {
         $this->_updateOrderLicense($order, $lineItem);
         parent::afterOrderComplete($order, $lineItem);

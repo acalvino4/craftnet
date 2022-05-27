@@ -12,7 +12,7 @@ use yii\web\Response;
 
 class PartnersController extends BaseApiController
 {
-    public function init()
+    public function init(): void
     {
         parent::init();
         $secret = $this->request->getHeaders()->get('X-Partner-Secret');

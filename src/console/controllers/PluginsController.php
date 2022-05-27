@@ -210,7 +210,7 @@ OUTPUT;
                     'openPulls',
                     'mergedPulls',
                     'dateUpdated',
-                ], $rows, false);
+                ], $rows);
 
                 $this->stdout("- Updated $plugin->name\n", Console::FG_GREEN);
             } catch (Throwable $e) {

@@ -89,7 +89,7 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return "Craft {$this->name}";
     }
@@ -137,7 +137,7 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         $data = [
             'id' => $this->id,
@@ -195,7 +195,7 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function populateLineItem(LineItem $lineItem)
+    public function populateLineItem(LineItem $lineItem): void
     {
         OrderHelper::populateEditionLineItem($lineItem, $this);
     }
@@ -203,7 +203,7 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function afterOrderComplete(Order $order, LineItem $lineItem)
+    public function afterOrderComplete(Order $order, LineItem $lineItem): void
     {
         $this->_updateOrderLicense($order, $lineItem);
         parent::afterOrderComplete($order, $lineItem);

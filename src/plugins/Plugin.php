@@ -272,57 +272,57 @@ class Plugin extends Element
     /**
      * @var bool Whether the element is enabled
      */
-    public $enabled = false;
+    public bool $enabled = false;
 
     /**
      * @var bool Whether the plugin has been published on the Plugin Store.
      */
-    public $published = false;
+    public bool $published = false;
 
     /**
      * @var int The developer’s user ID
      */
-    public $developerId;
+    public int $developerId;
 
     /**
      * @var int The Composer package ID
      */
-    public $packageId;
+    public int $packageId;
 
     /**
      * @var int|null The icon asset’s ID
      */
-    public $iconId;
+    public ?int $iconId;
 
     /**
      * @var string|null Composer package name
      */
-    public $packageName;
+    public ?string $packageName;
 
     /**
      * @var string The VCS repository URL
      */
-    public $repository;
+    public string $repository;
 
     /**
      * @var string The plugin name
      */
-    public $name;
+    public string $name;
 
     /**
      * @var string The plugin handle
      */
-    public $handle;
+    public string $handle;
 
     /**
      * @var string The license type ('mit', 'craft')
      */
-    public $license = 'craft';
+    public string $license = 'craft';
 
     /**
      * @var string|null The plugin’s short description
      */
-    public $shortDescription;
+    public ?string $shortDescription;
 
     /**
      * @var string|null The plugin’s long description
@@ -470,7 +470,7 @@ class Plugin extends Element
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->name;
     }
@@ -478,7 +478,7 @@ class Plugin extends Element
     /**
      * @inheritdoc
      */
-    public function attributes()
+    public function attributes(): array
     {
         $names = parent::attributes();
         ArrayHelper::removeValue($names, 'activeInstalls');
@@ -490,7 +490,7 @@ class Plugin extends Element
     /**
      * @inheritdoc
      */
-    public function extraFields()
+    public function extraFields(): array
     {
         $fields = parent::extraFields();
         $fields[] = 'icon';
@@ -512,7 +512,7 @@ class Plugin extends Element
      * @param string $handle
      * @param array $elements
      */
-    public function setEagerLoadedElements(string $handle, array $elements)
+    public function setEagerLoadedElements(string $handle, array $elements): void
     {
         switch ($handle) {
             case 'editions':
@@ -933,7 +933,7 @@ class Plugin extends Element
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         $packageManager = Module::getInstance()->getPackageManager();
         if ($packageManager->packageExists($this->packageName)) {
@@ -1126,7 +1126,7 @@ EOD;
     /**
      * @inheritdoc
      */
-    public function afterDelete()
+    public function afterDelete(): void
     {
         Module::getInstance()->getPackageManager()->removePackage($this->packageName);
         parent::afterDelete();
@@ -1137,7 +1137,7 @@ EOD;
      *
      * This should only be called once the plugin has any versions.
      */
-    public function publish()
+    public function publish(): void
     {
         if ($this->published) {
             return;
@@ -1157,7 +1157,7 @@ EOD;
     /**
      * @inheritdoc
      */
-    public function getThumbUrl(int $size)
+    public function getThumbUrl(int $size): ?string
     {
         if ($this->iconId) {
             return Craft::$app->getAssets()->getThumbUrl($this->getIcon(), $size, false);
@@ -1168,7 +1168,7 @@ EOD;
     /**
      * @inheritdoc
      */
-    public function getStatus()
+    public function getStatus(): ?string
     {
         if (!$this->enabled && $this->pendingApproval) {
             return self::STATUS_PENDING;
@@ -1180,7 +1180,7 @@ EOD;
     /**
      * @inheritdoc
      */
-    public function getCpEditUrl()
+    public function getCpEditUrl(): ?string
     {
         return UrlHelper::cpUrl("plugins/{$this->id}-{$this->handle}");
     }

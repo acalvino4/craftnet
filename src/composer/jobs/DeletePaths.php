@@ -12,7 +12,7 @@ class DeletePaths extends BaseJob
      */
     public $paths;
 
-    public function execute($queue)
+    public function execute($queue): void
     {
         foreach ($this->paths as $path) {
             if (file_exists($path)) {

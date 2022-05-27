@@ -31,7 +31,7 @@ abstract class PluginPurchasable extends Purchasable
     /**
      * @inheritdoc
      */
-    public function extraFields()
+    public function extraFields(): array
     {
         return [
             'plugin',

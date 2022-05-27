@@ -37,7 +37,7 @@ class DeveloperSupportController extends Controller
     // Public Methods
     // =========================================================================
 
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         $this->requireLogin();
         $this->_user = Craft::$app->getUser()->getIdentity();

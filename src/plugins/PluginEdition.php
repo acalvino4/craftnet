@@ -136,7 +136,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         try {
             return $this->getFullName();
@@ -148,7 +148,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -197,7 +197,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function attributes()
+    public function attributes(): array
     {
         $names = parent::attributes();
         $names[] = 'fullName';
@@ -217,7 +217,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function getThumbUrl(int $size)
+    public function getThumbUrl(int $size): ?string
     {
         return $this->getPlugin()->getThumbUrl($size);
     }
@@ -236,7 +236,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
      * @param string $handle
      * @param array $elements
      */
-    public function setEagerLoadedElements(string $handle, array $elements)
+    public function setEagerLoadedElements(string $handle, array $elements): void
     {
         if ($handle === 'plugin') {
             $this->setPlugin($elements[0] ?? null);
@@ -334,7 +334,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function afterSave(bool $isNew)
+    public function afterSave(bool $isNew): void
     {
         $data = [
             'id' => $this->id,
@@ -410,7 +410,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function populateLineItem(LineItem $lineItem)
+    public function populateLineItem(LineItem $lineItem): void
     {
         OrderHelper::populateEditionLineItem($lineItem, $this);
     }
@@ -418,7 +418,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * @inheritdoc
      */
-    public function afterOrderComplete(Order $order, LineItem $lineItem)
+    public function afterOrderComplete(Order $order, LineItem $lineItem): void
     {
         $this->_upgradeOrderLicense($order, $lineItem);
         parent::afterOrderComplete($order, $lineItem);

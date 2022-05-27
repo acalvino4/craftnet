@@ -201,7 +201,7 @@ class PackageRelease extends Model
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         if (is_string($this->source)) {
             $this->source = Json::decode($this->source);

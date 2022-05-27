@@ -407,7 +407,7 @@ class Module extends \yii\base\Module
             ];
         });
 
-        Event::on(FieldLayout::class, FieldLayout::EVENT_DEFINE_STANDARD_FIELDS, function(DefineFieldLayoutFieldsEvent $e) {
+        Event::on(FieldLayout::class, FieldLayout::EVENT_DEFINE_NATIVE_FIELDS, function(DefineFieldLayoutFieldsEvent $e) {
             /** @var FieldLayout $fieldLayout */
             $fieldLayout = $e->sender;
 

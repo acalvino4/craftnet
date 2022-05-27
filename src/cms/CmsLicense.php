@@ -75,7 +75,7 @@ class CmsLicense extends License
     /**
      * @inheritdoc
      */
-    public function extraFields()
+    public function extraFields(): array
     {
         return [
             'pluginLicenses',
