@@ -211,11 +211,11 @@ class LicensesController extends Controller
     private function _resolveOwnerKey(string $ownerKey): array
     {
         if ($usingOwnerId = (bool)preg_match('/^owner-(\d+)$/', $ownerKey, $matches)) {
-            $user = User::find()->id((int)$matches[1])->anyStatus()->one();
+            $user = User::find()->id((int)$matches[1])->status(null)->one();
             $email = $user->email;
         } else {
             $email = $ownerKey;
-            $user = User::find()->email($email)->anyStatus()->one();
+            $user = User::find()->email($email)->status(null)->one();
         }
 
         return [$email, $user, $usingOwnerId];

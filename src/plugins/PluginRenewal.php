@@ -101,7 +101,7 @@ class PluginRenewal extends PluginPurchasable implements RenewalInterface
         if ($this->editionId === null) {
             throw new InvalidConfigException('Plugin renewal is missing its edition ID');
         }
-        if (($edition = PluginEdition::find()->id($this->editionId)->anyStatus()->one()) === null) {
+        if (($edition = PluginEdition::find()->id($this->editionId)->status(null)->one()) === null) {
             throw new InvalidConfigException('Invalid edition ID: ' . $this->editionId);
         };
         return $edition;

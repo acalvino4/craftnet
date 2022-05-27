@@ -581,7 +581,7 @@ class Plugin extends Element
             ->pluginId($this->id);
 
         if ($anyStatus) {
-            $query->anyStatus();
+            $query->status(null);
         }
 
         $editions = $query->all();

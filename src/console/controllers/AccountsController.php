@@ -50,7 +50,7 @@ class AccountsController extends Controller
     {
         /** @var User|UserBehavior|null $user */
         if (is_numeric($username)) {
-            $user = User::find()->id($username)->anyStatus()->one();
+            $user = User::find()->id($username)->status(null)->one();
         } else {
             $user = Craft::$app->getUsers()->getUserByUsernameOrEmail($username);
         }
@@ -79,8 +79,8 @@ class AccountsController extends Controller
      */
     public function actionMerge(int $id1, int $id2): int
     {
-        $user1 = User::find()->id($id1)->anyStatus()->one();
-        $user2 = User::find()->id($id2)->anyStatus()->one();
+        $user1 = User::find()->id($id1)->status(null)->one();
+        $user2 = User::find()->id($id2)->status(null)->one();
 
         if (!$user1) {
             $this->stderr('No user exists with an ID of ' . $id1 . PHP_EOL, Console::FG_RED);
@@ -273,7 +273,7 @@ class AccountsController extends Controller
     {
         $plugins = Plugin::find()
             ->developerId($user->id)
-            ->anyStatus()
+            ->status(null)
             ->all();
 
         $totalPlugins = count($plugins);

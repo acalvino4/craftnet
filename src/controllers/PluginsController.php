@@ -553,7 +553,7 @@ JS;
                 ]),
             ];
         } else {
-            $currentEditions = ArrayHelper::index(PluginEdition::find()->pluginId($plugin->id)->anyStatus()->all(), 'id');
+            $currentEditions = ArrayHelper::index(PluginEdition::find()->pluginId($plugin->id)->status(null)->all(), 'id');
 
             // Include any disabled editions if this is a front-end request
             if (!$isCpRequest) {

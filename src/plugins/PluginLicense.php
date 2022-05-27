@@ -206,7 +206,7 @@ class PluginLicense extends License
 
         return PluginEdition::find()
             ->id($this->editionId)
-            ->anyStatus()
+            ->status(null)
             ->one();
     }
 

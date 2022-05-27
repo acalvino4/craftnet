@@ -165,7 +165,7 @@ class PluginLicensesController extends Controller
 
         getOldPluginHandle:
         $oldPluginHandle = $this->prompt('Old "pro" plugin handle:', ['required' => true, 'default' => $pluginHandle . '-pro']);
-        $oldPlugin = Plugin::find()->anyStatus()->handle($oldPluginHandle)->one();
+        $oldPlugin = Plugin::find()->status(null)->handle($oldPluginHandle)->one();
         if (!$oldPlugin) {
             $this->stdout('Invalid handle' . PHP_EOL, Console::FG_RED);
             goto getOldPluginHandle;

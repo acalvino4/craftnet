@@ -123,7 +123,7 @@ class CmsLicensesController extends Controller
         if ($license->ownerId) {
             $owner = User::find()
                 ->id($license->ownerId)
-                ->anyStatus()
+                ->status(null)
                 ->one();
 
             $this->info('Owner ID', $license->ownerId);
