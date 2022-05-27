@@ -400,9 +400,12 @@ class Module extends \yii\base\Module
         });
 
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $e) {
-            $e->permissions['Craftcom'] = [
-                'craftnet:managePlugins' => [
-                    'label' => 'Manage plugins',
+            $e->permissions[] = [
+                'heading' => 'Craftnet',
+                'permissions' => [
+                    'craftnet:managePlugins' => [
+                        'label' => 'Manage plugins',
+                    ],
                 ],
             ];
         });
