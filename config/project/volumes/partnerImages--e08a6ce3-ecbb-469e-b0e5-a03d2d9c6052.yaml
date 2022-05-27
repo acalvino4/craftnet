@@ -23,30 +23,17 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\AssetTitleField
+            type: craft\fieldlayoutelements\assets\AssetTitleField
+            uid: 003f35e4-3be2-4550-861d-43a361d96267
             warning: null
             width: 100
         name: Content
-        sortOrder: 1
+        uid: b8ca42c5-cc80-4817-bced-17f205432b99
+fs: partnerImages
 handle: partnerImages
-hasUrls: true
 name: 'Partner Images'
-settings:
-  addSubfolderToRootUrl: '1'
-  autoFocalPoint: ''
-  bucket: $S3_PARTNER_RESOURCES_BUCKET
-  bucketSelectionMode: manual
-  cfDistributionId: $S3_PARTNER_RESOURCES_CF_DIST_ID
-  cfPrefix: ''
-  expires: '604800 seconds'
-  keyId: $AWS_ACCESS_KEY_ID
-  makeUploadsPublic: '1'
-  region: $S3_BUCKET_REGION
-  secret: $AWS_SECRET_ACCESS_KEY
-  storageClass: ''
-  subfolder: images
 sortOrder: 4
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-type: craft\awss3\Volume
-url: $S3_PARTNER_RESOURCES_URL
+transformFs: null
+transformSubpath: ''

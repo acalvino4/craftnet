@@ -23,30 +23,17 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\AssetTitleField
+            type: craft\fieldlayoutelements\assets\AssetTitleField
+            uid: bfbb250d-1e4e-4551-983c-2691277061fd
             warning: null
             width: 100
         name: Content
-        sortOrder: 1
+        uid: 9e814788-70ce-4b73-8594-a8f3c30477e6
+fs: screenshots
 handle: screenshots
-hasUrls: true
 name: Screenshots
-settings:
-  addSubfolderToRootUrl: '1'
-  autoFocalPoint: ''
-  bucket: $S3_PLUGIN_SCREENSHOTS_BUCKET
-  bucketSelectionMode: manual
-  cfDistributionId: $S3_PLUGIN_SCREENSHOTS_CF_DIST_ID
-  cfPrefix: ''
-  expires: '604800 seconds'
-  keyId: $AWS_ACCESS_KEY_ID
-  makeUploadsPublic: '1'
-  region: $S3_BUCKET_REGION
-  secret: $AWS_SECRET_ACCESS_KEY
-  storageClass: ''
-  subfolder: ''
 sortOrder: 3
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-type: craft\awss3\Volume
-url: $S3_PLUGIN_SCREENSHOTS_URL
+transformFs: null
+transformSubpath: ''

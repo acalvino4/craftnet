@@ -23,30 +23,17 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\AssetTitleField
+            type: craft\fieldlayoutelements\assets\AssetTitleField
+            uid: 8ae77065-b27d-4695-8be7-b2216a4df992
             warning: null
             width: 100
         name: Content
-        sortOrder: 1
+        uid: 6f15b8cb-592a-4f86-b23f-1bd21551db00
+fs: avatars
 handle: avatars
-hasUrls: true
 name: Avatars
-settings:
-  addSubfolderToRootUrl: '1'
-  autoFocalPoint: ''
-  bucket: $S3_AVATARS_BUCKET
-  bucketSelectionMode: manual
-  cfDistributionId: $S3_AVATARS_CF_DIST_ID
-  cfPrefix: ''
-  expires: '604800 seconds'
-  keyId: $AWS_ACCESS_KEY_ID
-  makeUploadsPublic: '1'
-  region: $S3_BUCKET_REGION
-  secret: $AWS_SECRET_ACCESS_KEY
-  storageClass: ''
-  subfolder: ''
 sortOrder: 1
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-type: craft\awss3\Volume
-url: $S3_AVATARS_URL
+transformFs: null
+transformSubpath: ''

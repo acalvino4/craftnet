@@ -23,30 +23,17 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\AssetTitleField
+            type: craft\fieldlayoutelements\assets\AssetTitleField
+            uid: dc308b54-1f55-422f-a587-dacc6beae991
             warning: null
             width: 100
         name: Content
-        sortOrder: 1
+        uid: a6400b63-641d-43c4-a3ad-8e44eb555585
+fs: icons
 handle: icons
-hasUrls: true
 name: Icons
-settings:
-  addSubfolderToRootUrl: '1'
-  autoFocalPoint: ''
-  bucket: $S3_PLUGIN_ICONS_BUCKET
-  bucketSelectionMode: manual
-  cfDistributionId: $S3_PLUGIN_ICONS_CF_DIST_ID
-  cfPrefix: ''
-  expires: '604800 seconds'
-  keyId: $AWS_ACCESS_KEY_ID
-  makeUploadsPublic: '1'
-  region: $S3_BUCKET_REGION
-  secret: $AWS_SECRET_ACCESS_KEY
-  storageClass: ''
-  subfolder: ''
 sortOrder: 2
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-type: craft\awss3\Volume
-url: $S3_PLUGIN_ICONS_URL
+transformFs: null
+transformSubpath: ''

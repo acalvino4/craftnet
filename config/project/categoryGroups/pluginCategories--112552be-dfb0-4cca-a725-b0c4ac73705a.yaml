@@ -25,6 +25,7 @@ fieldLayouts:
             tip: null
             title: null
             type: craft\fieldlayoutelements\TitleField
+            uid: 9ede0d83-6c66-41b2-8b98-0dc9887ae7b4
             warning: null
             width: 100
           -
@@ -34,6 +35,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 497aebcf-7977-43bc-917f-05be854dda80
             warning: null
             width: 100
           -
@@ -43,10 +45,11 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 07928e58-6144-4061-93e6-bce55ed90204
             warning: null
             width: 100
         name: Content
-        sortOrder: 1
+        uid: 68d4a0a5-5724-41a5-bea1-adfe0c9fffb1
 handle: pluginCategories
 name: 'Plugin Categories'
 siteSettings:

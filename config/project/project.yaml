@@ -1,4 +1,37 @@
-dateModified: 1653335613
+dateModified: 1653621427
+elementSources:
+  craft\elements\Asset:
+    -
+      key: 'folder:183f7c35-5398-4ea7-ab27-b770089d0217'
+      tableAttributes:
+        - filename
+        - size
+        - dateModified
+      type: native
+    -
+      key: 'folder:cce0d2bb-ad2b-4b6c-be97-569f4a68f496'
+      tableAttributes:
+        - filename
+        - size
+        - dateModified
+        - link
+      type: native
+    -
+      key: 'folder:cc1d7ffa-5898-443f-8887-f27fe733f1d9'
+      tableAttributes:
+        - filename
+        - size
+        - dateModified
+      type: native
+    -
+      key: 'folder:11b0141d-ede9-4c36-90fd-2d0e1b768e83'
+      type: native
+    -
+      heading: ''
+      type: heading
+    -
+      key: 'folder:0fc223c5-f072-4d62-b283-8f78b1d08ad1'
+      type: native
 email:
   fromEmail: support@pixelandtonic.com
   fromName: 'Pixel & Tonic'
@@ -7,6 +40,83 @@ email:
   transportSettings:
     token: $POSTMARK_TOKEN
   transportType: craftcms\postmark\Adapter
+fs:
+  avatars:
+    hasUrls: true
+    name: Avatars
+    settings:
+      addSubfolderToRootUrl: true
+      autoFocalPoint: false
+      bucket: $S3_AVATARS_BUCKET
+      bucketSelectionMode: manual
+      cfDistributionId: $S3_AVATARS_CF_DIST_ID
+      cfPrefix: ''
+      expires: '604800 seconds'
+      keyId: $AWS_ACCESS_KEY_ID
+      makeUploadsPublic: true
+      region: $S3_BUCKET_REGION
+      secret: $AWS_SECRET_ACCESS_KEY
+      storageClass: ''
+      subfolder: ''
+    type: craft\awss3\Fs
+    url: $S3_AVATARS_URL
+  icons:
+    hasUrls: true
+    name: Icons
+    settings:
+      addSubfolderToRootUrl: true
+      autoFocalPoint: false
+      bucket: $S3_PLUGIN_ICONS_BUCKET
+      bucketSelectionMode: manual
+      cfDistributionId: $S3_PLUGIN_ICONS_CF_DIST_ID
+      cfPrefix: ''
+      expires: '604800 seconds'
+      keyId: $AWS_ACCESS_KEY_ID
+      makeUploadsPublic: true
+      region: $S3_BUCKET_REGION
+      secret: $AWS_SECRET_ACCESS_KEY
+      storageClass: ''
+      subfolder: ''
+    type: craft\awss3\Fs
+    url: $S3_PLUGIN_ICONS_URL
+  partnerImages:
+    hasUrls: true
+    name: 'Partner Images'
+    settings:
+      addSubfolderToRootUrl: true
+      autoFocalPoint: false
+      bucket: $S3_PARTNER_RESOURCES_BUCKET
+      bucketSelectionMode: manual
+      cfDistributionId: $S3_PARTNER_RESOURCES_CF_DIST_ID
+      cfPrefix: ''
+      expires: '604800 seconds'
+      keyId: $AWS_ACCESS_KEY_ID
+      makeUploadsPublic: true
+      region: $S3_BUCKET_REGION
+      secret: $AWS_SECRET_ACCESS_KEY
+      storageClass: ''
+      subfolder: images
+    type: craft\awss3\Fs
+    url: $S3_PARTNER_RESOURCES_URL
+  screenshots:
+    hasUrls: true
+    name: Screenshots
+    settings:
+      addSubfolderToRootUrl: true
+      autoFocalPoint: false
+      bucket: $S3_PLUGIN_SCREENSHOTS_BUCKET
+      bucketSelectionMode: manual
+      cfDistributionId: $S3_PLUGIN_SCREENSHOTS_CF_DIST_ID
+      cfPrefix: ''
+      expires: '604800 seconds'
+      keyId: $AWS_ACCESS_KEY_ID
+      makeUploadsPublic: true
+      region: $S3_BUCKET_REGION
+      secret: $AWS_SECRET_ACCESS_KEY
+      storageClass: ''
+      subfolder: ''
+    type: craft\awss3\Fs
+    url: $S3_PLUGIN_SCREENSHOTS_URL
 meta:
   __names__:
     0d6b333e-7fc4-4832-b4ed-e47af16e8d0c: Common # Common
@@ -88,7 +198,7 @@ plugins:
   aws-s3:
     enabled: true
     licenseKey: null
-    schemaVersion: '1.2'
+    schemaVersion: '2.0'
     settings: null
   bugsnag:
     edition: standard
@@ -98,7 +208,7 @@ plugins:
     edition: pro
     enabled: true
     licenseKey: $COMMERCE_LICENSE
-    schemaVersion: 3.4.13
+    schemaVersion: 4.0.1
     settings:
       activeCartDuration: PT1H
       allowEmptyCartOnCheckout: true
@@ -132,7 +242,7 @@ plugins:
   commerce-stripe:
     enabled: true
     licenseKey: null
-    schemaVersion: 2.4.1
+    schemaVersion: 3.0.0
     settings: null
   mix:
     enabled: true
@@ -157,5 +267,5 @@ system:
   edition: pro
   live: true
   name: Craftnet
-  schemaVersion: 3.7.33
+  schemaVersion: 4.0.0.9
   timeZone: UTC

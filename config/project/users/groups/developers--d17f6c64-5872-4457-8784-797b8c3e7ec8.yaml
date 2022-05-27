@@ -1,3 +1,5 @@
 description: null
 handle: developers
 name: Developers
+permissions:
+  - 'assignusergroup:d17f6c64-5872-4457-8784-797b8c3e7ec8' # Developers

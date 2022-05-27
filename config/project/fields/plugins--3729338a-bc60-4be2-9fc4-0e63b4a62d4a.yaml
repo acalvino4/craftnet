@@ -2,14 +2,15 @@ columnSuffix: null
 contentColumnType: string
 fieldGroup: a773b9fb-cbc5-423a-977f-8210c987176c # Store
 handle: plugins
-instructions: ''
+instructions: null
 name: Plugins
 searchable: true
 settings:
   allowSelfRelations: false
-  limit: ''
   localizeRelations: false
-  selectionLabel: ''
+  maxRelations: null
+  minRelations: null
+  selectionLabel: null
   showSiteMenu: true
   source: null
   sources: '*'

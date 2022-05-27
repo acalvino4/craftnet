@@ -2,7 +2,7 @@ columnSuffix: null
 contentColumnType: text
 fieldGroup: ec01a46c-7aae-4b10-95ce-6ae6648b9745 # Plugin
 handle: shortDescription
-instructions: ''
+instructions: null
 name: 'Short Description'
 searchable: true
 settings:
@@ -10,8 +10,8 @@ settings:
   charLimit: null
   code: false
   columnType: text
-  initialRows: '4'
-  multiline: ''
+  initialRows: 4
+  multiline: false
   placeholder: null
   uiMode: normal
 translationKeyFormat: null

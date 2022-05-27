@@ -3,4 +3,5 @@ handle: summit
 name: Summit
 permissions:
   - accesscp
+  - 'assignusergroup:c11bcd7d-378a-431e-912e-26ebc8f13545' # Summit
   - 'utility:sales-report'

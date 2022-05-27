@@ -2,7 +2,7 @@ columnSuffix: null
 contentColumnType: boolean
 fieldGroup: 4987fb8d-cf45-4b60-a94f-51c591336558 # License
 handle: autoRenew
-instructions: ''
+instructions: null
 name: 'Auto Renew'
 searchable: true
 settings:

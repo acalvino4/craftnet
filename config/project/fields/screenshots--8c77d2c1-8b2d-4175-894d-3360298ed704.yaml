@@ -2,30 +2,33 @@ columnSuffix: null
 contentColumnType: string
 fieldGroup: ec01a46c-7aae-4b10-95ce-6ae6648b9745 # Plugin
 handle: screenshots
-instructions: ''
+instructions: null
 name: Screenshots
 searchable: true
 settings:
   allowSelfRelations: false
+  allowSubfolders: false
   allowUploads: true
   allowedKinds: null
   defaultUploadLocationSource: 'volume:495fa280-74b9-49af-8737-986532450386' # Screenshots
-  defaultUploadLocationSubpath: ''
-  limit: ''
+  defaultUploadLocationSubpath: null
   localizeRelations: false
+  maxRelations: null
+  minRelations: null
   previewMode: full
-  restrictFiles: ''
-  selectionLabel: ''
+  restrictFiles: false
+  restrictLocation: false
+  restrictedDefaultUploadSubpath: null
+  restrictedLocationSource: 'volume:238dc7f2-e863-4b8f-96fa-805a3324dc5d' # Avatars
+  restrictedLocationSubpath: null
+  selectionLabel: null
   showSiteMenu: true
   showUnpermittedFiles: false
   showUnpermittedVolumes: true
-  singleUploadLocationSource: 'volume:238dc7f2-e863-4b8f-96fa-805a3324dc5d' # Avatars
-  singleUploadLocationSubpath: ''
   source: null
   sources:
     - 'volume:495fa280-74b9-49af-8737-986532450386' # Screenshots
   targetSiteId: null
-  useSingleFolder: false
   validateRelatedElements: false
   viewMode: list
 translationKeyFormat: null

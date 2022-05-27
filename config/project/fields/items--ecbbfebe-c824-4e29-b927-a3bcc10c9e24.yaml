@@ -2,14 +2,15 @@ columnSuffix: null
 contentColumnType: string
 fieldGroup: b1a59dd4-5d0c-4d32-925c-8a2349747691 # Order
 handle: items
-instructions: ''
+instructions: null
 name: Items
 searchable: true
 settings:
   allowSelfRelations: false
-  limit: ''
   localizeRelations: false
-  selectionLabel: ''
+  maxRelations: null
+  minRelations: null
+  selectionLabel: null
   showSiteMenu: true
   source: null
   sources:

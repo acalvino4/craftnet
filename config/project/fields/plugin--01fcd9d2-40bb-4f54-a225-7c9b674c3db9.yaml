@@ -2,14 +2,15 @@ columnSuffix: null
 contentColumnType: string
 fieldGroup: 4987fb8d-cf45-4b60-a94f-51c591336558 # License
 handle: plugin
-instructions: ''
+instructions: null
 name: Plugin
 searchable: true
 settings:
   allowSelfRelations: false
-  limit: '1'
   localizeRelations: false
-  selectionLabel: ''
+  maxRelations: 1
+  minRelations: null
+  selectionLabel: null
   showSiteMenu: true
   source: null
   sources: '*'

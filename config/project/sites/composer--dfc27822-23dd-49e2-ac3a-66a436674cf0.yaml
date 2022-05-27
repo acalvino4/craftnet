@@ -1,5 +1,5 @@
 baseUrl: $URL_COMPOSER
-enabled: true
+enabled: 'true'
 handle: composer
 hasUrls: true
 language: en-US

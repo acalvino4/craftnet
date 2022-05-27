@@ -2,13 +2,13 @@ columnSuffix: null
 contentColumnType: datetime
 fieldGroup: add7f1c8-5c4a-4d23-9398-8a9472f169e8 # User
 handle: supportPlanExpiryDate
-instructions: ''
+instructions: null
 name: 'Support Plan Expiry Date'
 searchable: false
 settings:
   max: null
   min: null
-  minuteIncrement: '30'
+  minuteIncrement: 30
   showDate: true
   showTime: false
   showTimeZone: false

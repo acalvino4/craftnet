@@ -1,5 +1,5 @@
 baseUrl: $URL_API
-enabled: true
+enabled: 'true'
 handle: api
 hasUrls: true
 language: en-US

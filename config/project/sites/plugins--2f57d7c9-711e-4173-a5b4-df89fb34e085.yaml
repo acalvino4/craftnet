@@ -1,5 +1,5 @@
 baseUrl: $URL_PS
-enabled: true
+enabled: 'true'
 handle: plugins
 hasUrls: true
 language: en-US

@@ -8,6 +8,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: d3676d0f-8523-4442-b82d-f2763745ff91
         warning: null
         width: 100
       -
@@ -17,6 +18,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: a8141e29-28f9-45b2-8f30-af697a6098ba
         warning: null
         width: 100
       -
@@ -26,6 +28,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 91d5294a-bc36-4f11-a240-e644ed4a0835
         warning: null
         width: 100
       -
@@ -35,6 +38,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 6b18d044-1783-4f52-ba12-1b47e6ab6916
         warning: null
         width: 100
       -
@@ -44,6 +48,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: a9fdeb85-6eb4-4ea6-b2d6-5080dcf0d0c2
         warning: null
         width: 100
       -
@@ -53,6 +58,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 99e4edc8-f184-4cf5-b619-6d87e751644d
         warning: null
         width: 100
       -
@@ -62,6 +68,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 1fe22080-2ee4-48ea-9ed5-bb53d080b3e8
         warning: null
         width: 100
       -
@@ -71,6 +78,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: a8d5b5b7-723b-4b33-978a-891fcc9d25fd
         warning: null
         width: 100
       -
@@ -80,6 +88,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 4518be61-2854-4d0e-ba37-271ed8883254
         warning: null
         width: 100
       -
@@ -89,6 +98,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: f3e12446-257e-4e04-968e-83a6882822ae
         warning: null
         width: 100
       -
@@ -98,6 +108,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 0971731e-2204-43fb-b239-df63d881814d
         warning: null
         width: 100
       -
@@ -107,6 +118,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 77454f06-4352-4d0a-a820-1d35ac08629c
         warning: null
         width: 100
       -
@@ -116,35 +128,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
-        warning: null
-        width: 100
-      -
-        attribute: payPalEmail
-        autocapitalize: true
-        autocomplete: false
-        autocorrect: true
-        autofocus: false
-        class: null
-        disabled: false
-        id: null
-        instructions: null
-        label: 'PayPal Email'
-        mandatory: true
-        max: null
-        maxlength: null
-        min: null
-        name: null
-        orientation: null
-        placeholder: null
-        readonly: false
-        requirable: false
-        required: false
-        size: null
-        step: null
-        tip: null
-        title: null
-        translatable: false
-        type: craft\fieldlayoutelements\StandardTextField
+        uid: 2d1f9a7b-9069-4763-8d27-795ea1186f50
         warning: null
         width: 100
       -
@@ -154,10 +138,11 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 4058b23d-74e6-48ee-839f-801bd152de8a
         warning: null
         width: 100
     name: Profile
-    sortOrder: 1
+    uid: 049a85ea-a6cd-4a1c-8ccd-beb29c3b030a
   -
     elements:
       -
@@ -167,6 +152,7 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: b833ec97-099b-4117-986d-42eca13aa812
         warning: null
         width: 100
       -
@@ -176,7 +162,8 @@ tabs:
         required: false
         tip: null
         type: craft\fieldlayoutelements\CustomField
+        uid: 97c0b014-13df-4e46-8935-bcebcadcbc0b
         warning: null
         width: 100
     name: Support
-    sortOrder: 2
+    uid: 62f9ddd3-839e-4f11-a112-8fcccbf1b059

@@ -23,7 +23,8 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\EntryTitleField
+            type: craft\fieldlayoutelements\entries\EntryTitleField
+            uid: e5d2d167-ab71-4ce5-ab17-8242dec5717c
             warning: null
             width: 100
           -
@@ -33,6 +34,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: de54c22f-8997-4732-b6f0-f148a54280b1
             warning: null
             width: 100
           -
@@ -42,6 +44,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: c37751f8-d40a-4639-af71-80cef4bc4d9d
             warning: null
             width: 100
           -
@@ -51,10 +54,11 @@ fieldLayouts:
             required: true
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 993093ab-bf60-4d89-9f7d-c4cac53f4e85
             warning: null
             width: 100
         name: Settings
-        sortOrder: 1
+        uid: bb46c110-6b5c-4638-b3f3-ea8efc1360e7
 handle: manual
 hasTitleField: true
 name: 'Manual Selection'

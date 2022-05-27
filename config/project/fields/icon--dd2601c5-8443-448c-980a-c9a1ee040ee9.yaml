@@ -2,30 +2,33 @@ columnSuffix: null
 contentColumnType: string
 fieldGroup: 0d6b333e-7fc4-4832-b4ed-e47af16e8d0c # Common
 handle: icon
-instructions: ''
+instructions: null
 name: Icon
 searchable: true
 settings:
   allowSelfRelations: false
+  allowSubfolders: false
   allowUploads: true
   allowedKinds: null
   defaultUploadLocationSource: 'volume:fc4f52d6-458d-44cb-a2fd-f0042d715d64' # Icons
-  defaultUploadLocationSubpath: ''
-  limit: '1'
+  defaultUploadLocationSubpath: null
   localizeRelations: false
+  maxRelations: 1
+  minRelations: null
   previewMode: full
-  restrictFiles: ''
-  selectionLabel: ''
+  restrictFiles: false
+  restrictLocation: false
+  restrictedDefaultUploadSubpath: null
+  restrictedLocationSource: 'volume:238dc7f2-e863-4b8f-96fa-805a3324dc5d' # Avatars
+  restrictedLocationSubpath: null
+  selectionLabel: null
   showSiteMenu: true
   showUnpermittedFiles: false
   showUnpermittedVolumes: true
-  singleUploadLocationSource: 'volume:238dc7f2-e863-4b8f-96fa-805a3324dc5d' # Avatars
-  singleUploadLocationSubpath: ''
   source: null
   sources:
     - 'volume:fc4f52d6-458d-44cb-a2fd-f0042d715d64' # Icons
   targetSiteId: null
-  useSingleFolder: false
   validateRelatedElements: false
   viewMode: list
 translationKeyFormat: null

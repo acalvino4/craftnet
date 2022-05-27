@@ -23,7 +23,8 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\EntryTitleField
+            type: craft\fieldlayoutelements\entries\EntryTitleField
+            uid: eb82ac8d-c951-44c9-abc7-72ffdfee8121
             warning: null
             width: 100
           -
@@ -33,10 +34,11 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 9ec6db4f-6596-4850-8992-778409ef0cd8
             warning: null
             width: 100
         name: Content
-        sortOrder: 1
+        uid: cacfe6ee-8bb8-45f5-9cd5-e9cec1ca1bd4
 handle: index
 hasTitleField: true
 name: Index

@@ -23,7 +23,8 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\EntryTitleField
+            type: craft\fieldlayoutelements\entries\EntryTitleField
+            uid: c0390fe4-4c57-4832-80c9-2f02d39e49e8
             warning: null
             width: 100
           -
@@ -33,6 +34,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 5bd3e1a6-91c9-4899-97ba-67dcc9438a1f
             warning: null
             width: 100
           -
@@ -42,6 +44,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 663535a9-e913-42d3-a000-9b5b3d883e09
             warning: null
             width: 100
           -
@@ -51,6 +54,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 033ffe30-91f3-470e-b253-1137f2dd6d89
             warning: null
             width: 100
           -
@@ -60,6 +64,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 5680e5eb-5375-43ec-992b-d318efcee460
             warning: null
             width: 100
           -
@@ -69,10 +74,11 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 760420d9-5ce3-4c32-bf75-f1e1471bfb4d
             warning: null
             width: 100
         name: Order
-        sortOrder: 1
+        uid: d6a98246-24a8-4d1f-af88-4cf98e28731e
 handle: orders
 hasTitleField: false
 name: Orders

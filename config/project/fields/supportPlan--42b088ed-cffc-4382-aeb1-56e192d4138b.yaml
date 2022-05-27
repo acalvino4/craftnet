@@ -2,11 +2,10 @@ columnSuffix: null
 contentColumnType: string
 fieldGroup: add7f1c8-5c4a-4d23-9398-8a9472f169e8 # User
 handle: supportPlan
-instructions: ''
+instructions: null
 name: 'Support Plan'
 searchable: false
 settings:
-  optgroups: true
   options:
     -
       __assoc__:

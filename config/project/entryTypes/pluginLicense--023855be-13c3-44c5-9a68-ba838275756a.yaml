@@ -23,7 +23,8 @@ fieldLayouts:
             step: null
             tip: null
             title: null
-            type: craft\fieldlayoutelements\EntryTitleField
+            type: craft\fieldlayoutelements\entries\EntryTitleField
+            uid: aee76664-a216-42a6-bd22-531044cd391e
             warning: null
             width: 100
           -
@@ -33,6 +34,7 @@ fieldLayouts:
             required: true
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 67a4f6cf-f552-44b1-b9a7-c13a215c358a
             warning: null
             width: 100
           -
@@ -42,6 +44,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: 16dbde20-2ce3-4cae-8b1a-ea0556a55698
             warning: null
             width: 100
           -
@@ -51,6 +54,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: fc4b1882-0375-4d58-be1c-b7cbc099461d
             warning: null
             width: 100
           -
@@ -60,6 +64,7 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: a9e2b971-563e-4c0d-83f3-b7dcff2d6861
             warning: null
             width: 100
           -
@@ -69,10 +74,11 @@ fieldLayouts:
             required: false
             tip: null
             type: craft\fieldlayoutelements\CustomField
+            uid: c8daa254-0b14-4d0c-aa0c-4c3bcc7f571b
             warning: null
             width: 100
         name: License
-        sortOrder: 1
+        uid: b201f2a3-032d-4672-84d9-b74e28e04917
 handle: pluginLicense
 hasTitleField: false
 name: 'Plugin License'

@@ -2,17 +2,18 @@ columnSuffix: null
 contentColumnType: string
 fieldGroup: ec01a46c-7aae-4b10-95ce-6ae6648b9745 # Plugin
 handle: categories
-instructions: ''
+instructions: null
 name: Categories
 searchable: true
 settings:
   allowLimit: false
   allowMultipleSources: false
   allowSelfRelations: false
-  branchLimit: ''
-  limit: null
+  branchLimit: null
   localizeRelations: false
-  selectionLabel: ''
+  maxRelations: null
+  minRelations: null
+  selectionLabel: null
   showSiteMenu: true
   source: 'group:112552be-dfb0-4cca-a725-b0c4ac73705a' # Plugin Categories
   sources: '*'

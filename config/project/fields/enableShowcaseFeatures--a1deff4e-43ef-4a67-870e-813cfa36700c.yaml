@@ -2,7 +2,7 @@ columnSuffix: null
 contentColumnType: boolean
 fieldGroup: add7f1c8-5c4a-4d23-9398-8a9472f169e8 # User
 handle: enableShowcaseFeatures
-instructions: ''
+instructions: null
 name: 'Enable showcase features'
 searchable: true
 settings:
