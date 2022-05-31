@@ -13,7 +13,7 @@ previewTargets:
         - '{url}'
 propagationMethod: all
 siteSettings:
-  8928c23a-7002-467d-af97-333694b8dad8: # Craft ID
+  8928c23a-7002-467d-af97-333694b8dad8: # Console
     enabledByDefault: true
     hasUrls: true
     template: orders/_entry

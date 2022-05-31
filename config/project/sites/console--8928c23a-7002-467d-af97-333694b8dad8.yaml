@@ -1,9 +1,9 @@
-baseUrl: $URL_ID
+baseUrl: $URL_CONSOLE
 enabled: true
-handle: craftId
+handle: console
 hasUrls: true
 language: en-US
-name: 'Craft ID'
+name: Console
 primary: true
 siteGroup: be77d03c-2f5a-45f6-8232-a906c3ce49f6 # API
 sortOrder: 1

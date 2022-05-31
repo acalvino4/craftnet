@@ -1,0 +1,9 @@
+baseUrl: $URL_ID
+enabled: '1'
+handle: craftId
+hasUrls: true
+language: en-US
+name: 'Craft ID'
+primary: false
+siteGroup: be77d03c-2f5a-45f6-8232-a906c3ce49f6 # API
+sortOrder: 7
