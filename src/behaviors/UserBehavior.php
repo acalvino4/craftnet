@@ -4,6 +4,7 @@ namespace craftnet\behaviors;
 
 use Craft;
 use craft\base\Element;
+use craft\db\Query;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
@@ -11,17 +12,23 @@ use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
+use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
+use DateTime;
 use yii\base\Behavior;
 use yii\base\Exception;
 
 /**
- * The Developer behavior extends users with plugin developer-related features.
+ * The Org behavior extends users with plugin org-related features.
  *
  * @property EmailVerifier $emailVerifier
  * @property FundsManager $fundsManager
  * @property User $owner
+ * @property-read string $developerName
+ * @property-read \craftnet\orgs\Org[] $orgs
+ * @property null|\craftnet\orgs\Org $org
+ * @property-read \craftnet\partners\Partner $partner
  * @property Plugin[] $plugins
  */
 class UserBehavior extends Behavior
@@ -29,37 +36,97 @@ class UserBehavior extends Behavior
     /**
      * @var string|null
      */
-    public $country;
+    public ?string $country;
 
     /**
      * @var string|null
      */
-    public $stripeAccessToken;
+    public ?string $stripeAccessToken;
 
     /**
      * @var string|null
      */
-    public $stripeAccount;
+    public ?string $stripeAccount;
 
     /**
      * @var string|null
      */
-    public $payPalEmail;
+    public ?string $payPalEmail;
 
     /**
      * @var string|null
      */
-    public $apiToken;
+    public ?string $apiToken;
+
+    /**
+     * @var string|null
+     */
+    public ?string $websiteSlug;
+
+    /**
+     * @var string|null
+     */
+    public ?string $displayName;
+
+    /**
+     * @var string|null
+     */
+    public ?string $websiteUrl;
+
+    /**
+     * @var string|null
+     */
+    public ?string $location;
+
+    /**
+     * @var string|null
+     */
+    public ?string $supportPlan;
+
+    /**
+     * @var DateTime|null
+     */
+    public ?DateTime $supportPlanExpiryDate;
+
+    /**
+     * @var null|bool
+     */
+    public ?bool $enableDeveloperFeatures = false;
+
+    /**
+     * @var bool
+     */
+    public bool $enablePartnerFeatures = false;
+
+    /**
+     * @var array|null
+     */
+    public ?array $billingAddress;
+
+    /**
+     * @var string|null
+     */
+    public ?string $vatId;
 
     /**
      * @var Plugin[]|null
      */
-    private $_plugins;
+    private ?array $_plugins;
+
+    /**
+     * @var Org|null
+     */
+    private ?Org $_org = null;
+
+    /**
+     * @var Org[]|null
+     */
+    private ?array $_orgs;
 
     /**
      * @inheritdoc
      */
-    public function events()
+    public function events(): array
     {
         return [
             Element::EVENT_BEFORE_VALIDATE => [$this, 'beforeValidate'],
@@ -93,6 +160,7 @@ class UserBehavior extends Behavior
 
     /**
      * @return string
+     * TODO: remove
      */
     public function getDeveloperName(): string
     {
@@ -131,7 +199,7 @@ class UserBehavior extends Behavior
     }
 
     /**
-     * Generates a new API token for the developer.
+     * Generates a new API token for the org.
      *
      * @return string the new API token
      */
@@ -139,7 +207,7 @@ class UserBehavior extends Behavior
     {
         $token = KeyHelper::generateApiToken();
         $this->apiToken = Craft::$app->getSecurity()->generatePasswordHash($token, 4);
-        $this->saveDeveloperInfo();
+        $this->saveOrgInfo();
         return $token;
     }
 
@@ -150,10 +218,10 @@ class UserBehavior extends Behavior
      */
     public function beforeValidate(): void
     {
-        // Only set the PayPal email if we're saving the current user and they are a developer
+        // Only set the PayPal email if we're saving the current user and they are an org
         if (
             (Craft::$app->getRequest()->getIsCpRequest() || $this->owner->getIsCurrent()) &&
-            $this->owner->isInGroup('developers') &&
+            $this->org &&
             ($payPalEmail = Craft::$app->getRequest()->getBodyParam('payPalEmail')) !== null
         ) {
             $this->payPalEmail = $payPalEmail ?: null;
@@ -174,7 +242,7 @@ class UserBehavior extends Behavior
     /**
      * Handles pre-user-save stuff
      */
-    public function beforeSave(ModelEvent $event)
+    public function beforeSave(ModelEvent $event): void
     {
         $currentUser = Craft::$app->getUser()->getIdentity();
         $isAdmin = $currentUser && ($currentUser->isInGroup('admins') || $currentUser->admin);
@@ -203,10 +271,11 @@ class UserBehavior extends Behavior
 
     /**
      * Handles post-user-save stuff
+     * Note: `enablePluginDeveloperFeatures` is not actually a field.
+     * TODO: do we even need to worry about the developer group any longer?
      */
-    public function afterSave()
+    public function afterSave(): void
     {
-        $isDeveloper = $this->owner->isInGroup('developers');
         $request = Craft::$app->getRequest();
         $currentUser = Craft::$app->getUser()->getIdentity();
 
@@ -217,7 +286,8 @@ class UserBehavior extends Behavior
             $request->getIsSiteRequest() &&
             $request->getIsPost() &&
             $request->getBodyParam('fields.enablePluginDeveloperFeatures') &&
-            !$isDeveloper
+            $this->org &&
+            !$this->enableDeveloperFeatures
         ) {
             // Get any existing group IDs.
             $userGroupsService = Craft::$app->getUserGroups();
@@ -232,21 +302,20 @@ class UserBehavior extends Behavior
             $groupIds[] = $userGroupsService->getGroupByHandle('developers')->id;
 
             Craft::$app->getUsers()->assignUserToGroups($currentUser->id, $groupIds);
-            $isDeveloper = true;
         }
 
-        if ($isDeveloper) {
-            $this->saveDeveloperInfo();
+        if ($this->org) {
+            $this->saveOrgInfo();
         }
     }
 
     /**
-     * Updates the developer data.
+     * Updates the org data.
      */
-    public function saveDeveloperInfo()
+    public function saveOrgInfo(): void
     {
         Craft::$app->getDb()->createCommand()
-            ->upsert(Table::DEVELOPERS, [
+            ->upsert(Table::ORGS, [
                 'id' => $this->owner->id,
             ], [
                 'country' => $this->country,
@@ -254,7 +323,56 @@ class UserBehavior extends Behavior
                 'stripeAccount' => $this->stripeAccount,
                 'payPalEmail' => $this->payPalEmail,
                 'apiToken' => $this->apiToken,
+                'websiteSlug' => $this->websiteSlug,
+                'displayName' => $this->displayName,
+                'websiteUrl' => $this->websiteUrl,
+                'location' => $this->location,
+                'supportPlan' => $this->supportPlan,
+                'supportPlanExpiryDate' => $this->supportPlanExpiryDate,
+                'enableDeveloperFeatures' => $this->enableDeveloperFeatures,
+                'enablePartnerFeatures' => $this->enablePartnerFeatures,
+                'billingAddress' => $this->billingAddress,
+                'vatId' => $this->vatId,
             ], [], false)
             ->execute();
+    }
+
+    /**
+     * @return Org|null
+     */
+    public function getOrg(): ?Org
+    {
+        if ($this->_org !== null) {
+            return $this->_org;
+        }
+
+        $isOrg = (new Query())
+            ->from(Table::ORGS)
+            ->where(['id' => $this->owner->id])
+            ->exists();
+
+        if (!$isOrg) {
+            return null;
+        }
+
+        return ($this->_org = new Org($this->owner));
+    }
+
+    public function getOrgs(): array
+    {
+        if ($this->_orgs !== null) {
+            return $this->_orgs;
+        }
+
+        return $this->_orgs = Craft::$app->getOrgs()->getOrgsByMemberUserId($this->owner->id);
+    }
+
+    /**
+     * @param Org|null $org
+     * @return void
+     */
+    public function setOrg(?Org $org): void
+    {
+        $this->_org = $org;
     }
 }

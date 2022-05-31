@@ -2,6 +2,7 @@
 
 use craft\helpers\App;
 use craft\log\Dispatcher;
+use craftnet\orgs\OrgsService;
 use craftnet\services\Oauth;
 use MeadSteve\MonoSnag\BugsnagHandler;
 use Monolog\Logger;
@@ -66,6 +67,9 @@ return [
                     ],
                     'saleManager' => [
                         'class' => craftnet\sales\SaleManager::class,
+                    ],
+                    'orgs' => [
+                        'class' => OrgsService::class
                     ]
                 ]
             ],

@@ -32,14 +32,23 @@ class UserQueryBehavior extends Behavior
         }
 
         $this->owner->query->addSelect([
-            'developers.country',
-            'developers.stripeAccessToken',
-            'developers.stripeAccount',
-            'developers.payPalEmail',
-            'developers.apiToken',
+            'orgs.country',
+            'orgs.stripeAccessToken',
+            'orgs.stripeAccount',
+            'orgs.payPalEmail',
+            'orgs.apiToken',
+            'orgs.displayName',
+            'orgs.websiteUrl',
+            'orgs.websiteSlug',
+            'orgs.location',
+            'orgs.supportPlan',
+            'orgs.supportPlanExpiryDate',
+            'orgs.enableDeveloperFeatures',
+            'orgs.enablePartnerFeatures',
+            'orgs.billingAddress',
+            'orgs.vatId',
         ]);
 
-        $this->owner->query->leftJoin(['developers' => Table::DEVELOPERS], '[[developers.id]] = [[users.id]]');
-        $this->owner->subQuery->leftJoin(['developers' => Table::DEVELOPERS], '[[developers.id]] = [[users.id]]');
-    }
+        $this->owner->query->leftJoin(['orgs' => Table::ORGS], '[[orgs.id]] = [[users.id]]');
+        $this->owner->subQuery->leftJoin(['orgs' => Table::ORGS], '[[orgs.id]] = [[users.id]]');    }
 }

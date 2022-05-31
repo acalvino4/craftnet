@@ -17,7 +17,8 @@ abstract class Table
     public const CMSRENEWALS = '{{%craftnet_cmsrenewals}}';
     public const CRAFT2PLUGINHITS = '{{%craftnet_craft2pluginhits}}';
     public const DEVELOPERLEDGER = '{{%craftnet_developerledger}}';
-    public const DEVELOPERS = '{{%craftnet_developers}}';
+    public const ORGS = '{{%craftnet_orgs}}';
+    public const ORGS_MEMBERS = '{{%craftnet_orgs_members}}';
     public const EMAILCODES = '{{%craftnet_emailcodes}}';
     public const INACTIVECMSLICENSES = '{{%craftnet_inactivecmslicenses}}';
     public const INSTALLEDPLUGINS = '{{%craftnet_installedplugins}}';
