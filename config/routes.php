@@ -65,7 +65,7 @@ return [
         'GET     front' => 'craftnet/api/front',
         'GET     front/get-license-info' => 'craftnet/api/front/get-license-info',
     ],
-    'craftId' => [
+    'console' => [
         'POST    queue/handle-message' => 'craftnet/queue/handle-message',
 
         'GET     v1/id' => 'craftnet/id/v1/id',
@@ -95,6 +95,10 @@ return [
 
         // Catch-all route for Vue when people reload the page.
         '<url:(?!setpassword$).*>' => 'craftnet/id/index',
+    ],
+    'craftId' => [
+        '/' => 'craftnet/id/index',
+        '<url:(.*)>' => 'craftnet/id/index',
     ],
     'plugins' => [
         '/' => 'craftnet/plugins/index/index',
