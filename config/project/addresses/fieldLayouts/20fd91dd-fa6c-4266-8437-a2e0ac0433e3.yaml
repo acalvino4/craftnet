@@ -1,0 +1,157 @@
+tabs:
+  -
+    elements:
+      -
+        autocapitalize: true
+        autocomplete: false
+        autocorrect: true
+        class: null
+        disabled: false
+        id: null
+        instructions: null
+        label: null
+        max: null
+        min: null
+        name: null
+        orientation: null
+        placeholder: null
+        readonly: false
+        requirable: false
+        size: null
+        step: null
+        tip: null
+        title: null
+        type: craft\fieldlayoutelements\addresses\LabelField
+        uid: e951eba6-cb09-41e4-a96c-982d8a9bf870
+        warning: null
+        width: 100
+      -
+        attribute: countryCode
+        id: null
+        instructions: null
+        label: null
+        orientation: null
+        requirable: false
+        tip: null
+        type: craft\fieldlayoutelements\addresses\CountryCodeField
+        uid: 31c3a89a-12b7-4df1-9c18-b50484d7b60c
+        warning: null
+        width: 100
+      -
+        instructions: null
+        label: null
+        required: false
+        tip: null
+        type: craft\fieldlayoutelements\addresses\AddressField
+        uid: 7a7a7390-f399-4870-be3f-3c33fec80dc3
+        warning: null
+      -
+        fieldUid: 7e55127b-d67b-4d6e-8737-e6370c3063fc # Attention
+        instructions: null
+        label: null
+        required: false
+        tip: null
+        type: craft\fieldlayoutelements\CustomField
+        uid: 62a7292d-efef-48e6-ab1a-a23fd4f6fde7
+        warning: null
+        width: 100
+      -
+        fieldUid: 2b0be654-6b0a-454b-939c-86f528888ade # Title
+        instructions: null
+        label: null
+        required: false
+        tip: null
+        type: craft\fieldlayoutelements\CustomField
+        uid: c57fafdf-3432-4e37-b08a-c2cbaaf34ae2
+        warning: null
+        width: 100
+      -
+        fieldUid: d94974be-5536-480a-b3c8-df3f7b634fc5 # Phone Number
+        instructions: null
+        label: null
+        required: false
+        tip: null
+        type: craft\fieldlayoutelements\CustomField
+        uid: 59746c88-6a45-4a5f-8d7d-04dff6a61c5a
+        warning: null
+        width: 100
+      -
+        attribute: fullName
+        autocapitalize: true
+        autocomplete: false
+        autocorrect: true
+        class: null
+        disabled: false
+        id: null
+        instructions: null
+        label: null
+        max: null
+        min: null
+        name: null
+        orientation: null
+        placeholder: null
+        readonly: false
+        requirable: true
+        required: false
+        size: null
+        step: null
+        tip: null
+        title: null
+        type: craft\fieldlayoutelements\FullNameField
+        uid: 066d7166-df80-42f9-bf2b-5b1b222dd034
+        warning: null
+        width: 100
+      -
+        attribute: organization
+        autocapitalize: true
+        autocomplete: false
+        autocorrect: true
+        class: null
+        disabled: false
+        id: null
+        instructions: null
+        label: null
+        max: null
+        min: null
+        name: null
+        orientation: null
+        placeholder: null
+        readonly: false
+        requirable: true
+        required: false
+        size: null
+        step: null
+        tip: null
+        title: null
+        type: craft\fieldlayoutelements\addresses\OrganizationField
+        uid: ffeed4b7-a890-42c4-b1e9-56ce6376e162
+        warning: null
+        width: 100
+      -
+        attribute: organizationTaxId
+        autocapitalize: true
+        autocomplete: false
+        autocorrect: true
+        class: null
+        disabled: false
+        id: null
+        instructions: null
+        label: null
+        max: null
+        min: null
+        name: null
+        orientation: null
+        placeholder: null
+        readonly: false
+        requirable: true
+        required: false
+        size: null
+        step: null
+        tip: null
+        title: null
+        type: craft\fieldlayoutelements\addresses\OrganizationTaxIdField
+        uid: f643ec51-b4f1-479e-926d-9487d67560d9
+        warning: null
+        width: 100
+    name: Content
+    uid: a4e0fd5e-f91d-4b00-96ed-8d177c70ef14
