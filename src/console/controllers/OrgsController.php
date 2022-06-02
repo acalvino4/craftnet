@@ -33,10 +33,9 @@ class OrgsController extends \yii\console\Controller
             ->unique()
             ->all();
 
-        $total = count($existingUserIds);
-        Console::output("Converting $total users to orgs ... ");
-
         User::find()
+            // TODO: replace with 'credentialed'
+            ->status(['active', 'pending'])
             ->id($existingUserIds)
             ->collect()
             ->each(function(User $existingUser) use($developerIds) {
@@ -44,8 +43,10 @@ class OrgsController extends \yii\console\Controller
                 $email = $existingUser->email;
                 $username = $existingUser->username;
 
+                $this->stdout("Converting existing user #{$existingUser->id} ({$existingUser->email}) to org ..." . PHP_EOL);
+
                 if (!Craft::$app->getUsers()->removeCredentials($existingUser)) {
-                    throw new Exception("Couldn't remove credentials from user \"{$existingUser->username}\": " . implode(', ', $existingUser->getFirstErrors()));
+                    throw new Exception("Couldn't remove credentials: " . implode(', ', $existingUser->getFirstErrors()));
                 }
 
                 // Save w/o user/email so new admin user can validate.
@@ -74,17 +75,17 @@ class OrgsController extends \yii\console\Controller
                 $existingUser->vatId = $existingUser->getFieldValue('businessVatId');
                 $existingUser->org = new Org($existingUser);
 
-                $this->stdout("Converting existing user “{$email}” to org ... ");
+                $this->stdout("    > Saving user as org ... ");
                 if (!Craft::$app->getElements()->saveElement($existingUser)) {
                     throw new Exception("Couldn't save user with id \"{$existingUser->id}\": " . implode(', ', $existingUser->getFirstErrors()));
                 }
                 $this->stdout('done' . PHP_EOL);
 
                 if ($existingUser->getOrg()->getAdminIds()) {
-                    $this->stdout("Org already has admin assigned, skipping.");
+                    $this->stdout("    > Org already has admin assigned, skipping.");
                 } else {
                     /** @var User|UserBehavior $orgAdmin */
-                    $this->stdout("Creating new admin user “{$email}” ... ");
+                    $this->stdout("    > Creating admin account ... ");
                     $orgAdmin = Craft::$app->getElements()->duplicateElement($existingUser, [
                         'email' => $email,
                         'username' => $username,
@@ -92,7 +93,7 @@ class OrgsController extends \yii\console\Controller
                     ]);
                     $this->stdout('done' . PHP_EOL);
 
-                    $this->stdout("Assigning admin user “{$email}” to org #{$existingUser->id} ... ");
+                    $this->stdout("    > Adding admin user to org ... ");
                     $existingUser->getOrg()->addAdmin($orgAdmin);
                     $this->stdout('done' . PHP_EOL);
                 }

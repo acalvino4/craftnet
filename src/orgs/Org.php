@@ -34,7 +34,6 @@ class Org extends BaseObject
             ->upsert(Table::ORGS_MEMBERS, [
                 'orgId' => $this->user->id,
                 'userId' => $user->id,
-            ], [
                 'admin' => true,
             ])
             ->execute();
