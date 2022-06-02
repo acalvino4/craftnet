@@ -1,5 +1,5 @@
 {% if not title is defined %}
-    {% set title = "Craft ID" %}
+    {% set title = "Craft Console" %}
 {% endif %}
 
 {% set bodyClass = (bodyClass is defined ? bodyClass~' ' : '') ~ craft.app.locale.getOrientation() -%}
@@ -9,7 +9,7 @@
     <title>{{ title }}</title>
     <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1.0" />
 </head>
-<body class="{{ bodyClass }}">
+<body class="{{ bodyClass }}" dir="ltr">
 
 {{ beginBody() }}
 {% block body %}{% endblock %}

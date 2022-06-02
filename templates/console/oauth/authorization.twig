@@ -1,0 +1,11 @@
+{% extends '_layouts/oauth-authorization' %}
+
+{% js at head %}
+window.oauthScopes = {{ scopes|json_encode|raw }};
+window.isSecureConnection = {{ craft.app.request.isSecureConnection|json_encode|raw }};
+window.redirect = {{ craft.app.request.url|hash|json_encode|raw }}
+{% endjs %}
+
+{% block content %}
+    <div id="oauth-authorization-app"></div>
+{% endblock %}

@@ -1,7 +1,5 @@
 {% extends "_layouts/base" %}
 
-{% set bodyClass = 'bg-light' %}
-
 {% set config = craft.app.config.getConfigFromFile('craftid') %}
 
 {% js at head %}
@@ -23,7 +21,7 @@
 
 {% block body %}
     {{ craft.twigpack.includeCssModule("chunk-vendors.css") }}
-    {{ craft.twigpack.includeCssModule("site.css") }}
+    {{ craft.twigpack.includeCssModule("oauth-authorization.css") }}
 
     <div id="site">
         <div id="notifications-wrapper">
@@ -43,6 +41,7 @@
         {% endblock %}
     </div>
 
-    {{ craft.twigpack.includeJsModule("chunk-vendors.js") }}
-    {{ craft.twigpack.includeJsModule("site.js") }}
+    {{ craft.twigpack.includeJsModule("chunk-vendors.js", true) }}
+    {{ craft.twigpack.includeJsModule("chunk-common.js", true) }}
+    {{ craft.twigpack.includeJsModule("oauth-authorization.js", true) }}
 {% endblock %}
