@@ -1,6 +1,6 @@
 <?php
 
-namespace craftnet\controllers\id;
+namespace craftnet\controllers\console;
 
 use Craft;
 use craft\commerce\models\Address;
@@ -64,6 +64,32 @@ class AccountController extends Controller
                 'hasApiToken' => $user->apiToken !== null,
                 'payPalEmail' => $user->payPalEmail,
             ],
+
+            // TODO: Implement organizations
+            'organizations' => [
+                [
+                    'id' => 1,
+                    'name' => "Pixel & Tonic",
+                    'userType' => 'owner',
+                    'avatar' => 'pt.svg',
+                    'members' => [
+                        ['name' => "Brandon", 'email' => "brandon@craftcms.com", 'avatar' => "brandon.png", 'role'=> "owner"],
+                        ['name' => "Brad", 'email' => "brad@craftcms.com", 'avatar' => "brad.png", 'role'=> "owner"],
+                        ['name' => "Andris", 'email' => "andris@craftcms.com", 'avatar' => "andris.png", 'role'=> "member"],
+                        ['name' => "Ben", 'email' => "ben@craftcms.com", 'avatar' => "ben.png", 'role'=> "member"],
+                    ],
+                ],
+                [
+                    'id' => 2,
+                    'name' => "nystudio107",
+                    'userType' => 'member',
+                    'avatar' => 'nystudio107.svg',
+                    'members' => [
+                        ['name' => "Brandon", 'email' => "brandon@craftcms.com", 'avatar' => null, 'role' => "member"],
+                    ]
+                ]
+
+            ]
         ]);
     }
 
@@ -175,25 +201,6 @@ class AccountController extends Controller
         } catch (Throwable $e) {
             return $this->asErrorJson($e->getMessage());
         }
-    }
-
-    /**
-     * Get the flash messages
-     *
-     * @return Response
-     * @throws BadRequestHttpException
-     * @throws ForbiddenHttpException
-     */
-    public function actionGetFlashMessages(): Response
-    {
-        $this->requireAcceptsJson();
-
-        $session = Craft::$app->getSession();
-
-        return $this->asJson([
-            'notice' => $session->getFlash('notice', null, true),
-            'error' => $session->getFlash('error', null, true)
-        ]);
     }
 
     /**

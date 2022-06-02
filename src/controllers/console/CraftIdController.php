@@ -1,6 +1,6 @@
 <?php
 
-namespace craftnet\controllers\id;
+namespace craftnet\controllers\console;
 
 use Craft;
 use yii\web\Response;
@@ -16,7 +16,7 @@ class CraftIdController extends BaseController
     /**
      * @inheritdoc
      */
-    public array|int|bool $allowAnonymous = true;
+    public $allowAnonymous = true;
 
     // Public Methods
     // =========================================================================

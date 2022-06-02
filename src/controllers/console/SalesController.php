@@ -1,6 +1,6 @@
 <?php
 
-namespace craftnet\controllers\id;
+namespace craftnet\controllers\console;
 
 use Craft;
 use craftnet\Module;
@@ -23,8 +23,8 @@ class SalesController extends BaseController
     {
         $user = Craft::$app->getUser()->getIdentity();
 
-        $filter = $this->request->getParam('filter');
-        $limit = $this->request->getParam('per_page', 10);
+        $filter = $this->request->getParam('query');
+        $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
 
         $data = Module::getInstance()->getSaleManager()->getSalesByPluginOwner($user, $filter, $limit, $page);
@@ -38,6 +38,7 @@ class SalesController extends BaseController
 
         return $this->asJson([
             'total' => $total,
+            'count' => $total,
             'per_page' => $limit,
             'current_page' => $page,
             'last_page' => $last_page,

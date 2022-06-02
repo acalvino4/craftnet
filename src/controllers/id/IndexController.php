@@ -28,20 +28,8 @@ class IndexController extends Controller
      */
     public function actionIndex(): Response
     {
-        $stripeAccessToken = null;
-        /** @var User|UserBehavior|null $user */
-        $user = Craft::$app->getUser()->getIdentity();
-
-        if ($user) {
-            $stripeAccessToken = $user->stripeAccessToken;
-        }
-
-        $craftIdConfig = Craft::$app->getConfig()->getConfigFromFile('craftid');
-        $stripePublicKey = $craftIdConfig['stripePublicKey'];
-
-        return $this->renderTemplate('index', [
-            'stripeAccessToken' => $stripeAccessToken,
-            'stripePublicKey' => $stripePublicKey,
-        ]);
+        $config = Craft::$app->getConfig()->getConfigFromFile('craftid');
+        $redirectUrl = $config['consoleUrl'] . Craft::$app->getRequest()->getUrl();
+        return $this->redirect($redirectUrl);
     }
 }

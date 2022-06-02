@@ -1,14 +1,11 @@
 <?php
 
-namespace craftnet\controllers\id;
+namespace craftnet\controllers\console;
 
 use Craft;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\Plugin as StripePlugin;
-use craft\helpers\App;
 use craft\helpers\DateTimeHelper;
-use craft\helpers\Json;
-use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use craftnet\Module;
 use Throwable;
@@ -31,7 +28,7 @@ class InvoicesController extends Controller
     {
         $user = Craft::$app->getUser()->getIdentity();
 
-        $filter = $this->request->getParam('filter');
+        $filter = $this->request->getParam('query');
         $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
@@ -56,6 +53,7 @@ class InvoicesController extends Controller
 
             return $this->asJson([
                 'total' => $total,
+                'count' => $total,
                 'per_page' => $limit,
                 'current_page' => $page,
                 'last_page' => $last_page,
@@ -119,56 +117,10 @@ class InvoicesController extends Controller
             $data['invoices'][] = [
                 'date' => DateTimeHelper::toDateTime($latestStart)->format('Y-m-d'),
                 'amount' => $invoiceData['total'] / 100,
-                'url' => UrlHelper::actionUrl('craftnet/id/invoices/download-subscription-invoice', ['id' => $invoiceData['id']]),
+                'url' => $invoiceData['invoice_pdf'],
             ];
         }
 
-        // Sort invoices in descending order by date
-        usort($data['invoices'], function($a, $b) {
-            return strtotime($b["date"]) - strtotime($a["date"]);
-        });
-
         return $this->asJson($data);
-    }
-
-    /**
-     * Downloads a subscription invoice from Stripe.
-     *
-     * @return Response
-     * @throws \yii\web\BadRequestHttpException
-     */
-    public function actionDownloadSubscriptionInvoice(): Response
-    {
-        $id = $this->request->getRequiredParam('id');
-
-        try {
-            $headers = ['headers' =>  [
-                'Authorization' => 'Bearer ' . App::env('STRIPE_API_KEY'),
-                'Accept'        => 'application/json',
-            ]];
-
-            $client = Craft::createGuzzleClient();
-
-            $response = $client->get('https://api.stripe.com/v1/invoices/'.$id, $headers);
-
-            if ($response->getStatusCode() !== 200) {
-                throw new \Exception('Could not connect to dev server.');
-            }
-
-            if (!$body = $response->getBody()) {
-                throw new \Exception('Response has no body.');
-            }
-
-            $contents = $body->getContents();
-            $json = Json::decode($contents);
-
-            if (isset($json['invoice_pdf']) && $json['invoice_pdf']) {
-                return $this->redirect($json['invoice_pdf']);
-            }
-
-            throw new \Exception('Could not find an invoice.');
-        } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
-        }
     }
 }

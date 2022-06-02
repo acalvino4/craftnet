@@ -1,6 +1,6 @@
 <?php
 
-namespace craftnet\controllers\id;
+namespace craftnet\controllers\console;
 
 use Craft;
 use craft\elements\User;
@@ -20,7 +20,7 @@ class ClaimLicensesController extends Controller
     /**
      * @inheritdoc
      */
-    protected array|int|bool$allowAnonymous = [
+    protected $allowAnonymous = [
         'verify',
     ];
 

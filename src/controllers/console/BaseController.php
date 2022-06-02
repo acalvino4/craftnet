@@ -1,6 +1,6 @@
 <?php
 
-namespace craftnet\controllers\id;
+namespace craftnet\controllers\console;
 
 use craft\helpers\ArrayHelper;
 use craft\web\Controller;

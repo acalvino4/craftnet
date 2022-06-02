@@ -1,6 +1,6 @@
 <?php
 
-namespace craftnet\controllers\id;
+namespace craftnet\controllers\console;
 
 use Craft;
 use craft\errors\UploadFailedException;
@@ -130,8 +130,8 @@ class CmsLicensesController extends BaseController
     {
         $user = Craft::$app->getUser()->getIdentity();
 
-        $filter = $this->request->getParam('filter');
-        $perPage = $this->request->getParam('per_page', 10);
+        $filter = $this->request->getParam('query');
+        $perPage = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
         $ascending = (bool)$this->request->getParam('ascending');
@@ -150,6 +150,7 @@ class CmsLicensesController extends BaseController
             return $this->asJson([
                 'total' => $totalLicenses,
                 'per_page' => $perPage,
+                'count' => $totalLicenses,
                 'current_page' => $page,
                 'last_page' => $lastPage,
                 'next_page_url' => $nextPageUrl,
