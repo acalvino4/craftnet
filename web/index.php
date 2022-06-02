@@ -10,11 +10,13 @@ switch ($_SERVER['HTTP_HOST']) {
     case 'api.craftcms.next':
     case 'staging.api.craftcms.com':
     case 'craftcmsapi.com':
+    case 'api.craftnet.ddev.site':
         define('CRAFT_SITE', 'api');
         break;
     case 'composer.craftcms.com':
     case 'composer.craftcms.test':
     case 'composer.craftcms.nitro':
+    case 'composer.craftnet.ddev.site':
         define('CRAFT_SITE', 'composer');
         break;
     case 'console.craftcms.com':
@@ -22,6 +24,7 @@ switch ($_SERVER['HTTP_HOST']) {
     case 'console.craftcms.nitro':
     case 'console.craftcms.next':
     case 'staging.console.craftcms.com':
+    case 'console.craftnet.ddev.site':
         define('CRAFT_SITE', 'console');
         break;
     case 'id.craftcms.com':
@@ -29,6 +32,7 @@ switch ($_SERVER['HTTP_HOST']) {
     case 'id.craftcms.nitro':
     case 'id.craftcms.next':
     case 'staging.id.craftcms.com':
+    case 'id.craftnet.ddev.site':
         define('CRAFT_SITE', 'craftId');
         break;
     case 'plugins.craftcms.com':
@@ -36,6 +40,7 @@ switch ($_SERVER['HTTP_HOST']) {
     case 'plugins.craftcms.test':
     case 'plugins.craftcms.nitro':
     case 'plugins.craftcms.next':
+    case 'plugins.craftnet.ddev.site':
         define('CRAFT_SITE', 'plugins');
         break;
 }
