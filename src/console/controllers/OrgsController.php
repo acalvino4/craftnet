@@ -70,7 +70,7 @@ class OrgsController extends \yii\console\Controller
                 $existingUser->supportPlanExpiryDate = $existingUser->getFieldValue('supportPlanExpiryDate');
                 $existingUser->enablePartnerFeatures = $existingUser->getFieldValue('enablePartnerFeatures');
                 $existingUser->enableDeveloperFeatures = $developerIds->contains($existingUser->id);
-                // $existingUser->billingAddress = count($billingAddress) ? $billingAddress : null;
+                $existingUser->billingAddress = count($billingAddress) ? $billingAddress : null;
                 $existingUser->vatId = $existingUser->getFieldValue('businessVatId');
                 $existingUser->org = new Org($existingUser);
 
