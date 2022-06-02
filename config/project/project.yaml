@@ -1,4 +1,4 @@
-dateModified: 1654100693
+dateModified: 1654192294
 elementSources:
   craft\elements\Asset:
     -
@@ -184,7 +184,7 @@ meta:
     d17f6c64-5872-4457-8784-797b8c3e7ec8: Developers # Developers
     d94974be-5536-480a-b3c8-df3f7b634fc5: 'Phone Number' # Phone Number
     db4da419-ca41-4a13-b4a4-9c3f59c217fd: 'Developer Name' # Developer Name
-    db86c368-a515-4a43-ab02-152bd51c9e9e: 'Craft ID'
+    db86c368-a515-4a43-ab02-152bd51c9e9e: 'Craft ID' # Craft ID
     db187b36-568c-470a-ac7c-127e3a42f8b6: 'Business City' # Business City
     dd2601c5-8443-448c-980a-c9a1ee040ee9: Icon # Icon
     ddeba8ad-70bf-49cf-8a64-72affe458a48: 'Package Name' # Package Name
@@ -211,7 +211,7 @@ plugins:
   commerce:
     edition: pro
     enabled: true
-    licenseKey: $COMMERCE_LICENSE
+    licenseKey: AX9Z8XL3CNFWOIA52P4CYXL4
     schemaVersion: 4.0.1
     settings:
       activeCartDuration: PT1H
