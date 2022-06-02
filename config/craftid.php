@@ -4,7 +4,8 @@ use craft\helpers\App;
 
 return [
     '*' => [
-        'craftIdUrl' => 'https://id.craftcms.com',
+        'craftIdUrl' => App::env('URL_ID'),
+        'consoleUrl' => App::env('URL_CONSOLE'),
         'stripePublicKey' => App::env('STRIPE_PUBLIC_KEY'),
         'stripeApiKey' => App::env('STRIPE_API_KEY'),
         'stripeClientId' => App::env('STRIPE_CLIENT_ID'),
@@ -12,7 +13,7 @@ return [
             'accessTokenExpiry' => 'PT1H',
             'refreshTokenExpiry' => 'P1M',
             'authCodeExpiry' => 'P1M',
-            'clientApprovalTemplate' => 'oauth/clientApproval',
+            'clientApprovalTemplate' => 'oauth/authorization',
             'enabledGrants' => [
                 'ClientCredentialsGrant',
                 'PasswordGrant',
@@ -44,9 +45,5 @@ return [
     ],
     'stage' => [
         'enablePluginStoreCache' => true,
-        'craftIdUrl' => 'https://staging-1750ml.id.craftcms.com/',
-    ],
-    'dev' => [
-        'craftIdUrl' => App::env('URL_ID'),
     ],
 ];
