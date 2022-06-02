@@ -1,0 +1,19 @@
+columnSuffix: wijbolkb
+contentColumnType: string
+fieldGroup: 0d6b333e-7fc4-4832-b4ed-e47af16e8d0c # Common
+handle: addressPhone
+instructions: null
+name: 'Phone Number'
+searchable: false
+settings:
+  byteLimit: null
+  charLimit: null
+  code: false
+  columnType: string
+  initialRows: 4
+  multiline: false
+  placeholder: null
+  uiMode: normal
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\PlainText

@@ -2,6 +2,36 @@ tabs:
   -
     elements:
       -
+        attribute: payPalEmail
+        autocapitalize: true
+        autocomplete: false
+        autocorrect: true
+        autofocus: false
+        class: null
+        disabled: false
+        id: null
+        instructions: null
+        label: 'PayPal Email'
+        mandatory: true
+        max: null
+        maxlength: null
+        min: null
+        name: null
+        orientation: null
+        placeholder: null
+        readonly: false
+        requirable: false
+        required: false
+        size: null
+        step: null
+        tip: null
+        title: null
+        translatable: false
+        type: craft\fieldlayoutelements\TextField
+        uid: 0fba25b0-56fb-4155-8b09-571ddbb9e97d
+        warning: null
+        width: 100
+      -
         fieldUid: db4da419-ca41-4a13-b4a4-9c3f59c217fd # Developer Name
         instructions: null
         label: null
@@ -167,3 +197,20 @@ tabs:
         width: 100
     name: Support
     uid: 62f9ddd3-839e-4f11-a112-8fcccbf1b059
+  -
+    elements:
+      -
+        attribute: addresses
+        id: null
+        instructions: null
+        label: null
+        orientation: null
+        requirable: false
+        required: false
+        tip: null
+        type: craft\fieldlayoutelements\users\AddressesField
+        uid: 627b63b9-f8fe-4175-a91e-fa453885008a
+        warning: null
+        width: 100
+    name: Addresses
+    uid: adfba2df-2fa2-4a6b-9801-5115cec56b3a
