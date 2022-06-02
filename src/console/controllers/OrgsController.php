@@ -3,11 +3,12 @@
 namespace craftnet\console\controllers;
 
 use Craft;
+use craft\commerce\Plugin as Commerce;
+use craft\db\Table;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\Console;
 use craftnet\behaviors\UserBehavior;
-use craftnet\db\Table;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
@@ -42,8 +43,10 @@ class OrgsController extends \yii\console\Controller
                 /** @var User|UserBehavior $existingUser */
                 $email = $existingUser->email;
                 $username = $existingUser->username;
+                $active = $existingUser->active;
+                $pending = $existingUser->pending;
 
-                $this->stdout("Converting existing user #{$existingUser->id} ({$existingUser->email}) to org ..." . PHP_EOL);
+                $this->stdout("Converting user #{$existingUser->id} ({$existingUser->email}) to org ..." . PHP_EOL);
 
                 if (!Craft::$app->getUsers()->removeCredentials($existingUser)) {
                     throw new Exception("Couldn't remove credentials: " . implode(', ', $existingUser->getFirstErrors()));
@@ -89,22 +92,38 @@ class OrgsController extends \yii\console\Controller
                     $orgAdmin = Craft::$app->getElements()->duplicateElement($existingUser, [
                         'email' => $email,
                         'username' => $username,
-                        'org' => null
+                        'org' => null,
+                        'active' => $active,
+                        'pending' => $pending,
                     ]);
                     $this->stdout('done' . PHP_EOL);
 
                     $this->stdout("    > Adding admin user to org ... ");
                     $existingUser->getOrg()->addAdmin($orgAdmin);
                     $this->stdout('done' . PHP_EOL);
+
+                    // TODO: Once this exists https://github.com/craftcms/commerce/pull/2801/files
+                    // $this->stdout("    > Migrating commerce data to org admin ... ");
+                    // Commerce::getInstance()->getCustomers()->moveCustomerDataToCustomer($existingUser, $orgAdmin);
+                    // $this->stdout('done' . PHP_EOL);
+
+                    $this->stdout("    > Migrating address data to org admin ... ");
+                    Craft::$app->getDb()->createCommand()
+                        ->update(Table::ADDRESSES, [
+                            'ownerId' => $orgAdmin->id,
+                        ], [
+                            'ownerId' => $existingUser->id,
+                        ])
+                        ->execute();
+                    $this->stdout('done' . PHP_EOL);
+
+                    $this->stdout("Done converting user #{$existingUser->id} with org admin #{$orgAdmin->id}" . PHP_EOL . PHP_EOL);
                 }
 
-                // TODO: make sure address are copied as part of duplicate
-                // TODO: migrate commerce data from $existingUser to $orgAdmin
             });
 
         // TODO: cleanup custom fields
 
         // TODO: permissions service, canFoo methods
-        Console::output("Done converting users to orgs.");
     }
 }
