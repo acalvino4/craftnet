@@ -16,7 +16,7 @@ class IndexController extends Controller
     // Properties
     // =========================================================================
 
-    protected $allowAnonymous = true;
+    protected array|int|bool $allowAnonymous = true;
 
     // Public Methods
     // =========================================================================
