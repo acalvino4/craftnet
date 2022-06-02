@@ -8,6 +8,7 @@ use craft\db\Query;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
+use craft\helpers\Json;
 use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
@@ -101,7 +102,7 @@ class UserBehavior extends Behavior
     /**
      * @var array|null
      */
-    public ?array $billingAddress;
+    private ?array $_billingAddress;
 
     /**
      * @var string|null
@@ -331,7 +332,7 @@ class UserBehavior extends Behavior
                 'supportPlanExpiryDate' => $this->supportPlanExpiryDate,
                 'enableDeveloperFeatures' => $this->enableDeveloperFeatures,
                 'enablePartnerFeatures' => $this->enablePartnerFeatures,
-                'billingAddress' => $this->billingAddress,
+                'billingAddress' => $this->_billingAddress,
                 'vatId' => $this->vatId,
             ], [], false)
             ->execute();
@@ -374,5 +375,21 @@ class UserBehavior extends Behavior
     public function setOrg(?Org $org): void
     {
         $this->_org = $org;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getBillingAddress(): ?array
+    {
+        return $this->_billingAddress;
+    }
+
+    /**
+     * @param string|array|null $billingAddress
+     */
+    public function setBillingAddress(string|array|null $billingAddress): void
+    {
+        $this->_billingAddress = Json::decodeIfJson($billingAddress);
     }
 }
