@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+
+@import "../../common/ui/sass/styles";
+
+@import '../../common/sass/basics';
+@import '../../common/sass/general';
+
+@tailwind utilities;

@@ -1,0 +1,125 @@
+@layer base {
+  /* Fix ring color broken by tailwindcss forms */
+  [type='text']:focus,
+  [type='email']:focus,
+  [type='url']:focus,
+  [type='password']:focus,
+  [type='number']:focus,
+  [type='date']:focus,
+  [type='datetime-local']:focus,
+  [type='month']:focus,
+  [type='search']:focus,
+  [type='tel']:focus,
+  [type='time']:focus,
+  [type='week']:focus,
+  [multiple]:focus,
+  textarea:focus,
+  select:focus,
+  :focus-visible {
+    --tw-ring-opacity: 0.75;
+    --tw-ring-offset-color: rgb(var(--craftui-backgroundcolor-primary));
+    --tw-ring-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
+    border-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
+  }
+
+  [type='checkbox']:focus,
+  [type='radio']:focus {
+    --tw-ring-opacity: 0.75;
+    --tw-ring-offset-color: rgb(var(--craftui-backgroundcolor-primary));
+    --tw-ring-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
+  }
+}
+
+/* Set the outline color */
+* {
+  outline-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
+  @apply focus:outline-none focus-visible:ring-2;
+}
+
+/* HTML Basics */
+
+* {
+  min-height: 0;
+}
+
+body {
+  @apply leading-normal text-black dark:text-white bg-primary;
+}
+
+a {
+  @apply text-blue-600 dark:text-blue-400 no-underline;
+
+  &:hover {
+    @apply text-blue-800 dark:text-blue-200 underline;
+    cursor: pointer;
+  }
+}
+
+abbr[title] {
+  @apply no-underline;
+}
+
+h1 {
+  @apply text-2xl text-black dark:text-white font-semibold;
+
+  a {
+    @apply text-gray-500;
+
+    &:hover {
+      @apply text-gray-800 no-underline;
+    }
+  }
+}
+
+h2 {
+  @apply text-lg font-bold;
+}
+
+/*
+h2 {
+  @apply text-xl mb-2 font-semibold;
+}
+
+h3 {
+  @apply text-xl mb-2 font-semibold;
+}
+
+h4 {
+  @apply text-xl mb-2 font-semibold;
+}
+
+h5 {
+  @apply text-lg mb-2 font-semibold;
+}
+
+h6 {
+  @apply text-base mb-2 font-semibold;
+}*/
+
+p {
+  @apply mt-0 mb-2;
+}
+
+hr {
+  @apply my-6 border-t;
+}
+
+form {
+  @apply m-0;
+}
+
+dl {
+  @apply mb-4;
+
+  dt {
+    @apply font-bold;
+  }
+
+  dd {
+    @apply mb-3;
+  }
+}
+
+th {
+  text-align: inherit;
+}

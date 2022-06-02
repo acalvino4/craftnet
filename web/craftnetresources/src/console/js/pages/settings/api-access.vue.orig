@@ -1,0 +1,104 @@
+<template>
+    <div>
+        <h1>API Access</h1>
+        <pane>
+            <form @submit.prevent="generateToken()">
+                <h4>API Token</h4>
+
+                <p v-if="notice">This is your new API token, <strong>keep it someplace safe</strong>.</p>
+
+                <div class="max-w-sm">
+                    <textbox id="apiToken" ref="apiTokenField" class="font-mono" :spellcheck="false" v-model="apiToken" :readonly="true"/>
+                </div>
+
+<<<<<<< HEAD:web/craftnetresources/id/src/js/pages/settings/api-access.vue
+                <btn class="mt-5" kind="primary" type="submit" :disabled="loading" :loading="loading">
+                    <template v-if="apiToken">Generate new API Token</template>
+                    <template v-else>Generate API Token</template>
+                </btn>
+            </form>
+        </pane>
+=======
+                    <p v-if="notice">This is your new API token, <strong>keep it someplace safe</strong>.</p>
+
+                    <div class="max-w-sm">
+                        <textbox id="apiToken" ref="apiTokenField" class="mono" :spellcheck="false" v-model="apiToken" :readonly="true"/>
+                    </div>
+
+                    <btn kind="primary" type="submit" :disabled="loading" :loading="loading">
+                        <template v-if="apiToken">Generate new API Token</template>
+                        <template v-else>Generate API Token</template>
+                    </btn>
+                </form>
+            </div>
+        </div>
+
+        <payout-settings></payout-settings>
+>>>>>>> develop:web/craftnetresources/id/src/js/pages/developer/settings.vue
+    </div>
+</template>
+
+<script>
+    import {mapState} from 'vuex'
+<<<<<<< HEAD:web/craftnetresources/id/src/js/pages/settings/api-access.vue
+=======
+    import ConnectedApps from '../../components/developer/connected-apps/ConnectedApps'
+    import PayoutSettings from '../../components/developer/PayoutSettings'
+>>>>>>> develop:web/craftnetresources/id/src/js/pages/developer/settings.vue
+
+    export default {
+        data() {
+            return {
+                apiToken: '',
+                loading: false,
+                notice: false,
+            }
+        },
+
+<<<<<<< HEAD:web/craftnetresources/id/src/js/pages/settings/api-access.vue
+=======
+        components: {
+            ConnectedApps,
+            PayoutSettings,
+        },
+
+>>>>>>> develop:web/craftnetresources/id/src/js/pages/developer/settings.vue
+        computed: {
+            ...mapState({
+                hasApiToken: state => state.account.hasApiToken,
+            }),
+        },
+
+        methods: {
+            generateToken() {
+                this.loading = true
+
+                this.$store.dispatch('account/generateApiToken')
+                    .then(response => {
+                        this.apiToken = response.data.apiToken
+
+                        const apiTokenInput = this.$refs.apiTokenField.$el.querySelector('input')
+
+                        this.$nextTick(() => {
+                            apiTokenInput.select()
+                        })
+
+                        this.notice = true
+                        this.loading = false
+                        this.$store.dispatch('app/displayNotice', 'API token generated.')
+                    })
+                    .catch(response => {
+                        this.loading = false
+                        const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t generate API token.'
+                        this.$store.dispatch('app/displayError', errorMessage)
+                    })
+            },
+        },
+
+        mounted() {
+            if (this.hasApiToken) {
+                this.apiToken = '****************************************'
+            }
+        }
+    }
+</script>

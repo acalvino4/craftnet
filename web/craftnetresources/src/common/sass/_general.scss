@@ -1,0 +1,139 @@
+/* Classes */
+
+.responsive-content {
+  overflow-x: auto;
+}
+
+.table {
+  @apply w-full leading-normal;
+  border-collapse: collapse;
+
+  th {
+    @apply px-4 py-2 uppercase text-xs font-medium text-gray-400 border-b;
+  }
+
+  td {
+    @apply border-b px-4 py-3;
+  }
+
+  th, td {
+    &.thin {
+      width: 0.01% !important;
+    }
+  }
+
+  td.icon-col {
+    width: 0.01% !important;
+
+    img {
+      width: 40px;
+      height: 40px;
+      max-width: none;
+    }
+  }
+
+  td.name-col {
+    min-width: 220px;
+  }
+
+  td.date-col {
+    min-width: 200px;
+  }
+}
+
+/* Notifications */
+
+#notifications-wrapper {
+  @apply fixed left-0 w-full pointer-events-none;
+  z-index: 101;
+
+  #notifications {
+    @apply text-center;
+
+    .notification {
+      @apply inline-block pointer-events-auto;
+
+      padding: 5px 10px;
+      border-radius: 0 0 3px 3px;
+      color: #fff !important;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-font-smoothing: antialiased;
+      font-weight: 600;
+      -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+      -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+
+      &.notice {
+        @apply bg-blue-500;
+      }
+
+      &.success {
+        @apply bg-blue-500;
+      }
+
+      &.error {
+        @apply bg-red-500;
+      }
+    }
+  }
+}
+
+
+/* Alerts */
+
+.alert {
+  @apply p-4 mb-4 rounded border border-blue-400 bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200;
+}
+
+.alert-info {
+  @apply bg-blue-200 dark:bg-blue-800 border-blue-400 text-blue-800 dark:text-blue-200;
+}
+
+.alert-warning {
+  @apply bg-yellow-200 dark:bg-yellow-800 border-yellow-400 text-yellow-800 dark:text-yellow-200;
+}
+
+.img-thumbnail {
+  @apply border border-solid border-separator p-1 rounded block w-full;
+}
+
+
+/* Vue Transitions */
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  @apply opacity-0;
+}
+
+.quick-fade-enter-active,
+.quick-fade-leave-active {
+  transition: opacity 0s;
+}
+
+.quick-fade-enter,
+.quick-fade-leave-to {
+  @apply opacity-0;
+}
+
+.fade {
+  @apply opacity-0;
+  transition: opacity .15s linear;
+}
+
+/* Semantic Colors */
+
+body   {
+  --console-color-super: 255 115 179;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --console-color-super: 2 82 204;
+  }
+}
+

@@ -1,0 +1,11 @@
+{
+  "baseUrl": "https://id.craftcms.next/",
+  "env": {
+    "SITE_URL": "https://id.craftcms.next/",
+    "CP_TRIGGER": "admin",
+    "CP_LOGIN": "admin",
+    "CP_PASSWORD": "password",
+    "ENABLE_LIGHTHOUSE": true,
+    "ENABLE_PA11Y": true
+  }
+}
