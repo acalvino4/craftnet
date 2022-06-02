@@ -68,25 +68,18 @@ return [
     'console' => [
         'POST    queue/handle-message' => 'craftnet/queue/handle-message',
 
-        'GET     v1/id' => 'craftnet/id/v1/id',
-        'GET     craft-id/countries' => 'craftnet/id/craft-id/countries',
-        'GET     apps/connect/<appTypeHandle:{handle}>' => 'craftnet/id/apps/connect',
-        'GET     apps/callback' => 'craftnet/id/apps/callback',
-        'GET     apps/disconnect/<appTypeHandle:{handle}>' => 'craftnet/id/apps/disconnect',
+        'GET     v1/id' => 'craftnet/console/v1/id',
+        'GET     craft-id/countries' => 'craftnet/console/craft-id/countries',
+        'GET     apps/connect/<appTypeHandle:{handle}>' => 'craftnet/console/apps/connect',
+        'GET     apps/callback' => 'craftnet/console/apps/callback',
+        'GET     apps/disconnect/<appTypeHandle:{handle}>' => 'craftnet/console/apps/disconnect',
 
-        'POST    v1/carts' => 'craftnet/api/v1/carts/create',
-        'GET     v1/carts/<orderNumber:.*>' => 'craftnet/api/v1/carts/get',
-        'POST    v1/carts/<orderNumber:.*>' => 'craftnet/api/v1/carts/update',
-        'DELETE  v1/carts/<orderNumber:.*>' => 'craftnet/api/v1/carts/delete',
-        'POST    v1/checkout' => 'craftnet/api/v1/checkout',
-        'POST    v1/payments' => 'craftnet/api/v1/payments/pay',
-
-        'GET     stripe/connect' => 'craftnet/id/stripe/connect',
-        'GET     stripe/account' => 'craftnet/id/stripe/account',
-        'POST    stripe/disconnect' => 'craftnet/id/stripe/disconnect',
-        'GET     stripe/customer' => 'craftnet/id/stripe/customer',
-        'POST    stripe/save-card' => 'craftnet/id/stripe/save-card',
-        'POST    stripe/remove-card' => 'craftnet/id/stripe/remove-card',
+        'GET     stripe/connect' => 'craftnet/console/stripe/connect',
+        'GET     stripe/account' => 'craftnet/console/stripe/account',
+        'POST    stripe/disconnect' => 'craftnet/console/stripe/disconnect',
+        'GET     stripe/customer' => 'craftnet/console/stripe/customer',
+        'POST    stripe/save-card' => 'craftnet/console/stripe/save-card',
+        'POST    stripe/remove-card' => 'craftnet/console/stripe/remove-card',
 
         'oauth/login' => 'oauth-server/oauth/login',
         'oauth/authorize' => 'oauth-server/oauth/authorize',
@@ -94,7 +87,7 @@ return [
         'oauth/revoke' => 'oauth-server/oauth/revoke',
 
         // Catch-all route for Vue when people reload the page.
-        '<url:(?!setpassword$).*>' => 'craftnet/id/index',
+        '<url:(?!setpassword$).*>' => 'craftnet/console/index',
     ],
     'craftId' => [
         '/' => 'craftnet/id/index',
