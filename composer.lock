@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "96d68c1efba2bfa19505f1b9307d9848",
+    "content-hash": "05795ded1c4cf3d327afcd929dd95df3",
     "packages": [
         {
             "name": "adam-paterson/oauth2-stripe",
@@ -13212,12 +13212,11 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
-        "nystudio107/craft-twigpack": 10,
         "craftcms/rector": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
