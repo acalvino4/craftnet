@@ -2,12 +2,12 @@
 
 namespace craftnet\controllers\api\v1;
 
+use CommerceGuys\Addressing\Exception\UnknownCountryException;
 use Craft;
 use craft\commerce\elements\Order;
-use craft\commerce\models\Address;
-use craft\commerce\models\Customer;
 use craft\commerce\models\LineItem;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\Address;
 use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
@@ -323,7 +323,9 @@ class CartsController extends BaseApiController
 
         // get the cart's current customer if it has one
         if ($cart->customerId) {
-            $currentCustomer = $customersService->getCustomerById($cart->customerId);
+            $currentCustomer = User::find()
+                ->id($cart->customerId)
+                ->one();
         }
 
         // if we don't know the user yet, see if we can find one with the given email
@@ -333,38 +335,33 @@ class CartsController extends BaseApiController
                 ->one();
         }
 
-        if ($user) {
-            // see if we have a customer record for them
-            $customer = $customersService->getCustomerByUserId($user->id);
-        }
-
         // if the cart is already set to the user's customer, then just leave it alone
-        if (isset($customer) && isset($currentCustomer) && $customer->id == $currentCustomer->id) {
+        if (isset($user, $currentCustomer) && $user->id == $currentCustomer->id) {
             return;
         }
 
         // is the cart currently set to an anonymous customer?
-        if (isset($currentCustomer) && !$currentCustomer->userId) {
+        // TODO: review for Commerce 4
+        if (isset($currentCustomer) && !$currentCustomer->id) {
             // if we still don't have a user, keep using it
             if ($user === null) {
-                $customer = $currentCustomer;
+                $user = $currentCustomer;
             } else {
                 // safe to delete it
-                $customersService->deleteCustomer($currentCustomer);
+                // TODO: Commerce 4 version?
+                // $customersService->deleteCustomer($currentCustomer);
             }
         }
 
         // do we need to create a new customer?
-        if (!isset($customer)) {
-            $customer = new Customer([
-                'userId' => $user->id ?? null,
-            ]);
-            if (!$customersService->saveCustomer($customer)) {
-                throw new Exception('Could not save the customer: ' . implode(' ', $customer->getErrorSummary(true)));
+        if (!isset($user)) {
+            $user = new User();
+            if (!Craft::$app->getElements()->saveElement($user)) {
+                throw new Exception('Could not save the customer: ' . implode(' ', $user->getErrorSummary(true)));
             }
         }
 
-        $cart->setCustomer($customer);
+        $cart->setCustomer($user);
 
         if ($email !== null) {
             $cart->setEmail($email);
@@ -382,21 +379,27 @@ class CartsController extends BaseApiController
     {
         $commerce = Commerce::getInstance();
         $addressErrors = [];
+        $country = null;
 
         // get the country
         if (!empty($billingAddress->country)) {
-            if (($country = $commerce->getCountries()->getCountryByIso($billingAddress->country)) === null) {
+            try {
+                $country = Craft::$app->getAddresses()->getCountryRepository()->get($billingAddress->country);
+            } catch (UnknownCountryException $e) {
                 $addressErrors[] = [
                     'param' => 'billingAddress.country',
                     'message' => 'Invalid country',
                     'code' => self::ERROR_CODE_INVALID,
                 ];
-            } else if (!empty($billingAddress->businessTaxId) && (new CountryInfo())->isEuMember($country->iso)) {
+            }
+
+            // TODO: is there a commerceguys/addressing way to do this?
+            if (!empty($billingAddress->organizationTaxId) && $country && (new CountryInfo())->isEuMember($country->getCountryCode())) {
                 // Make sure it looks like a valid VAT ID
-                $vatId = preg_replace('/[^A-Za-z0-9]/', '', $billingAddress->businessTaxId);
+                $vatId = preg_replace('/[^A-Za-z0-9]/', '', $billingAddress->organizationTaxId);
 
                 // Greece is EL inside the EU and GR everywhere else.
-                $iso = $country->iso === 'GR' ? 'EL' : $country->iso;
+                $iso = $country->getCountryCode() === 'GR' ? 'EL' : $country->getCountryCode();
 
                 // Make sure the VAT ID the user supplied starts with the correct country code.
                 $vatId = StringHelper::ensureLeft(StringHelper::toUpperCase($vatId), StringHelper::toUpperCase($iso));
@@ -412,16 +415,18 @@ class CartsController extends BaseApiController
             // get the state
             if ($country !== null && !empty($billingAddress->state)) {
                 // see if it's a valid state abbreviation
+                // TODO: Commerce 4 version
                 $state = $commerce->getStates()->getStateByAbbreviation($country->id, $billingAddress->state);
             } else {
                 $state = null;
             }
 
             // if the country requires a state, make sure they submitted a valid state
+            // TODO: Commerce 4 version
             if ($country !== null && $country->isStateRequired && $state === null) {
                 $addressErrors[] = [
                     'param' => 'billingAddress.state',
-                    'message' => "{$country->name} addresses must specify a valid state.",
+                    'message' => "{$country->getName()} addresses must specify a valid state.",
                     'code' => empty($billingAddress->state) ? self::ERROR_CODE_MISSING_FIELD : self::ERROR_CODE_INVALID,
                 ];
             }
@@ -430,6 +435,7 @@ class CartsController extends BaseApiController
         $address = new Address();
 
         // populate the address
+        // TODO: Commerce 4 version…are these still all valid?
         $addressConfig = [
             'firstName' => $billingAddress->firstName,
             'lastName' => $billingAddress->lastName,
@@ -437,8 +443,8 @@ class CartsController extends BaseApiController
             'title' => $billingAddress->title ?? null,
             'address1' => $billingAddress->address1 ?? null,
             'address2' => $billingAddress->address2 ?? null,
-            'city' => $billingAddress->city ?? null,
-            'zipCode' => $billingAddress->zipCode ?? null,
+            'locality' => $billingAddress->city ?? null,
+            'postalCode' => $billingAddress->zipCode ?? null,
             'phone' => $billingAddress->phone ?? null,
             'alternativePhone' => $billingAddress->alternativePhone ?? null,
             'businessName' => $billingAddress->businessName ?? null,
@@ -457,16 +463,18 @@ class CartsController extends BaseApiController
             return;
         }
 
-        $address->countryId = $country->id ?? null;
-        $address->stateId = $state->id ?? null;
+        // TODO: Commerce 4 versions
+        $address->ownerId = $cart->getCustomer();
+        $address->countryCode = $country->id ?? null;
+        $address->administrativeArea = $state->id ?? null;
         $address->stateName = $state->abbreviation ?? $billingAddress->state ?? null;
-        $address->setStateValue(null);
 
         // save the address
-        if (!$commerce->getCustomers()->saveAddress($address, $cart->getCustomer(), false)) {
+        if (!Craft::$app->getElements()->saveElement($address)) {
             throw new Exception('Could not save address: ' . implode(', ', $address->getErrorSummary(true)));
         }
 
+        // TODO: Commerce 4 versions
         if (!empty($billingAddress->makePrimary) && $address->id) {
             $cart->makePrimaryBillingAddress = true;
         }
@@ -559,7 +567,7 @@ class CartsController extends BaseApiController
             $options['autoRenew'] = $item->autoRenew;
         }
 
-        return Commerce::getInstance()->getLineItems()->resolveLineItem($cart->id, $edition->id, $options);
+        return Commerce::getInstance()->getLineItems()->resolveLineItem($cart, $edition->id, $options);
     }
 
     /**

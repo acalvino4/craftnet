@@ -64,7 +64,7 @@
 			{{ line(billingAddress.firstName ~ ' ' ~ billingAddress.lastName) }}
 			{{ line(order.email) }}
 			&nbsp;<br>
-			{{ line(billingAddress.businessName) }}
+			{{ line(billingAddress.organization) }}
 			{{ line(billingAddress.address1) }}
 			{{ line(billingAddress.address2) }}
 			{{ line(billingAddress.city) }}
@@ -74,9 +74,9 @@
 			{% if countryText != 'Unknown' %}
 				{{ line(billingAddress.getCountryText()) }}
 			{% endif %}
-			{{ line(billingAddress.businessTaxId) }}
+			{{ line(billingAddress.organizationTaxId) }}
 			{{ line(order.lineItems[0].note) }}
-		</td>
+		</td>c
 		<td>
 			<strong>Pixel &amp; Tonic</strong><br>
 

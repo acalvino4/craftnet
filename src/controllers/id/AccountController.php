@@ -3,8 +3,8 @@
 namespace craftnet\controllers\id;
 
 use Craft;
-use craft\commerce\models\Address;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\Address;
 use craft\elements\Asset;
 use craft\elements\User;
 use craft\errors\UploadFailedException;
@@ -207,12 +207,13 @@ class AccountController extends Controller
         $this->requireLogin();
         $this->requirePostRequest();
 
+        // TODO: Commerce 4
         $address = new Address();
         $address->id = $this->request->getBodyParam('id');
         $address->firstName = $this->request->getBodyParam('firstName');
         $address->lastName = $this->request->getBodyParam('lastName');
-        $address->businessName = $this->request->getBodyParam('businessName');
-        $address->businessTaxId = $this->request->getBodyParam('businessTaxId');
+        $address->organization = $this->request->getBodyParam('businessName');
+        $address->organizationTaxId = $this->request->getBodyParam('businessTaxId');
         $address->address1 = $this->request->getBodyParam('address1');
         $address->address2 = $this->request->getBodyParam('address2');
         $address->city = $this->request->getBodyParam('city');

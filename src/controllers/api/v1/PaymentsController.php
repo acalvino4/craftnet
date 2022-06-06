@@ -51,6 +51,7 @@ class PaymentsController extends CartsController
     {
         $payload = $this->getPayload('payment-request');
 
+        // TODO: should these refs be changed to `number`?
         try {
             $cart = $this->getCart($payload->orderNumber);
         } catch (UserException $e) {
