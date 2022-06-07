@@ -222,8 +222,7 @@ class Module extends \yii\base\Module
         });
 
         // provide custom order receipt PDF generation
-        Event::on(Pdfs::class, Pdfs::EVENT_BEFORE_RENDER_PDF, function(PdfEvent $e) {
-            // TODO: Upgrade Review
+        Event::on(Pdfs::class, Pdfs::EVENT_BEFORE_RENDER_PDF, function(PdfRenderEvent $e) {
             $e->pdf = (new PdfRenderer())->render($e->order);
         });
 
