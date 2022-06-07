@@ -29,11 +29,11 @@ fieldLayouts:
             width: 100
         name: Content
         uid: a6400b63-641d-43c4-a3ad-8e44eb555585
-fs: icons
+fs: $FS_ICONS
 handle: icons
 name: Icons
 sortOrder: 2
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-transformFs: null
+transformFs: ''
 transformSubpath: ''

@@ -5,7 +5,7 @@ import FormDataHelper from '../helpers/form-data';
 
 export default {
     getRemainingSessionTime(config) {
-        return axios.get(Craft.actionUrl + '/users/get-remaining-session-time', config)
+        return axios.get(Craft.actionUrl + '/users/session-info', config)
     },
 
     login(formData) {
