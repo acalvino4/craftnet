@@ -6,6 +6,7 @@ use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\events\MatchLineItemEvent;
 use craft\commerce\events\PdfEvent;
+use craft\commerce\events\PdfRenderEvent;
 use craft\commerce\models\Discount;
 use craft\commerce\services\Discounts;
 use craft\commerce\services\OrderAdjustments;
@@ -186,8 +187,7 @@ class Module extends \yii\base\Module
         });
 
         Event::on(Discounts::class, Discounts::EVENT_DISCOUNT_MATCHES_LINE_ITEM, function(MatchLineItemEvent $e) {
-            // TODO: Commerce 4 review
-            if ($e->discount->codes[0] == 'FREEFORM') {
+            if ($e->discount->id == 667) {
 
                 $sku = $e->lineItem->getSku();
 
