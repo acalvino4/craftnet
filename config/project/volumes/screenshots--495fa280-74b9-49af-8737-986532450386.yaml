@@ -29,11 +29,11 @@ fieldLayouts:
             width: 100
         name: Content
         uid: 9e814788-70ce-4b73-8594-a8f3c30477e6
-fs: screenshots
+fs: $FS_SCREENSHOTS
 handle: screenshots
 name: Screenshots
 sortOrder: 3
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-transformFs: null
+transformFs: ''
 transformSubpath: ''
