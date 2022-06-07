@@ -3,7 +3,6 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
-use craft\commerce\Plugin as Commerce;
 use craftnet\controllers\api\BaseApiController;
 use Moccalotto\Eu\CountryInfo;
 use yii\web\Response;
@@ -13,8 +12,8 @@ use yii\web\Response;
  */
 class CountriesController extends BaseApiController
 {
-    const COUNTRY_CACHE_KEY = 'countryListData';
-    const COUNTRY_CACHE_DURATION = 60 * 60 * 24 * 7;
+    protected const COUNTRY_CACHE_KEY = 'countryListData';
+    protected const COUNTRY_CACHE_DURATION = 60 * 60 * 24 * 7;
 
     protected $checkCraftHeaders = false;
 
@@ -45,37 +44,27 @@ class CountriesController extends BaseApiController
             return $cache->get(self::COUNTRY_CACHE_KEY);
         }
 
-        $commerce = Commerce::getInstance();
-
-        $countries = $commerce->getCountries()->getAllCountries();
-        $states = $commerce->getStates()->getAllStates();
-
-        $sortedStates = [];
-
-        foreach ($states as $state) {
-            if (!array_key_exists($state->countryId, $sortedStates)) {
-                $sortedStates[$state->countryId] = [];
-            }
-
-            $sortedStates[$state->countryId][$state->abbreviation] = $state->name;
-        }
-
+        // TODO: @luke should I be using commerce.getStore().store.getCountriesList?
+        $countries = Craft::$app->getAddresses()->getCountryRepository()->getAll();
         $countryList = [];
-
         $countryInfo = new CountryInfo();
 
         foreach ($countries as $country) {
+
+            // TODO: @luke, this is how we did $isStateRequired elsewhere, please review all this :)
+            $administrativeAreas = Craft::$app->getAddresses()->getSubdivisionRepository()->getList([$country->getCountryCode()]);
+            $isStateRequired = !empty($administrativeAreas);
             $countryData = [
-                'name' => $country->name,
-                'euMember' => $countryInfo->isEuMember($country->iso),
-                'stateRequired' => (bool)$country->isStateRequired,
+                'name' => $country->getName(),
+                'euMember' => $countryInfo->isEuMember($country->getCountryCode()),
+                'stateRequired' => $isStateRequired,
             ];
 
-            if (array_key_exists($country->id, $sortedStates)) {
-                $countryData['states'] = $sortedStates[$country->id];
+            if (!empty($administrativeAreas)) {
+                $countryData['states'] = $administrativeAreas;
             }
 
-            $countryList[$country->iso] = $countryData;
+            $countryList[$country->getCountryCode()] = $countryData;
         }
 
         $cache->set(self::COUNTRY_CACHE_KEY, $countryList, self::COUNTRY_CACHE_DURATION);
