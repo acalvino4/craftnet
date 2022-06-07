@@ -326,13 +326,8 @@ class AccountController extends Controller
      */
     private function getBillingAddress(User $user): ?array
     {
-        $customer = Commerce::getInstance()->getCustomers()->getCustomerByUserId($user->id);
-
-        if (!$customer) {
-            return null;
-        }
-
-        $primaryBillingAddress = $customer->getPrimaryBillingAddress();
+        // TODO: Commerce 4…getPrimaryShippingAddressId?
+        $primaryBillingAddress = $user->getPrimaryBillingAddress();
 
         if (!$primaryBillingAddress) {
             return null;
