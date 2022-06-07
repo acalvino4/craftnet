@@ -119,6 +119,7 @@ class ClaimLicensesController extends Controller
             }
 
             // claim guest orders
+            // TODO: @luke
             $commerce = Commerce::getInstance();
             foreach ($uniqueEmails as $email) {
                 if (!empty($orders = $commerce->getOrders()->getOrdersByEmail($email))) {

@@ -3,6 +3,7 @@
 namespace craftnet\console\controllers;
 
 use Craft;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\elements\Order;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
@@ -263,8 +264,9 @@ class LicensesController extends Controller
         try {
             // Make sure they have a Commerce customer record
             $commerce = Commerce::getInstance();
-            $customer = $commerce->getCustomers()->getCustomerByUserId($user->id);
-            if ($customer === null || !$customer->primaryBillingAddressId) {
+
+            /** @var User|CustomerBehavior $user */
+            if (!$user->primaryBillingAddressId) {
                 return false;
             }
 
@@ -283,7 +285,7 @@ class LicensesController extends Controller
                 'paymentCurrency' => 'USD',
                 'gatewayId' => App::env('STRIPE_GATEWAY_ID'),
                 'orderLanguage' => Craft::$app->language,
-                'customerId' => $customer->id,
+                'customerId' => $user->id,
                 'email' => $user->email,
             ]);
 
@@ -297,7 +299,7 @@ class LicensesController extends Controller
             $lineItemsService = $commerce->getLineItems();
             foreach ($licenses as $license) {
                 $renewalId = $license->getEdition()->getRenewal()->getId();
-                $lineItem = $lineItemsService->resolveLineItem($order->id, $renewalId, [
+                $lineItem = $lineItemsService->resolveLineItem($order, $renewalId, [
                     'licenseKey' => $license->getKey(),
                     'lockedPrice' => $license->getRenewalPrice(),
                     'expiryDate' => '1y', // set to expire a year later, regardless of the original expiry date

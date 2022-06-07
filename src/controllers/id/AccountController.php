@@ -3,6 +3,7 @@
 namespace craftnet\controllers\id;
 
 use Craft;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
 use craft\elements\Asset;
@@ -55,9 +56,9 @@ class AccountController extends Controller
                 'developerName' => $user->developerName,
                 'developerUrl' => $user->developerUrl,
                 'location' => $user->location,
-                'enablePluginDeveloperFeatures' => $user->isInGroup('developers') ? true : false,
-                'enableShowcaseFeatures' => $user->enableShowcaseFeatures == 1 ? true : false,
-                'enablePartnerFeatures' => $user->enablePartnerFeatures == 1 ? true : false,
+                'enablePluginDeveloperFeatures' => $user->isInGroup('developers'),
+                'enableShowcaseFeatures' => (bool) $user->enableShowcaseFeatures,
+                'enablePartnerFeatures' => (bool) $user->enablePartnerFeatures,
                 'groups' => $user->getGroups(),
                 'photoId' => $user->getPhoto() ? $user->getPhoto()->getId() : null,
                 'photoUrl' => $photoUrl,
@@ -214,39 +215,41 @@ class AccountController extends Controller
         $address->lastName = $this->request->getBodyParam('lastName');
         $address->organization = $this->request->getBodyParam('businessName');
         $address->organizationTaxId = $this->request->getBodyParam('businessTaxId');
-        $address->address1 = $this->request->getBodyParam('address1');
-        $address->address2 = $this->request->getBodyParam('address2');
-        $address->city = $this->request->getBodyParam('city');
-        $address->zipCode = $this->request->getBodyParam('zipCode');
+        $address->addressLine1 = $this->request->getBodyParam('address1');
+        $address->addressLine2 = $this->request->getBodyParam('address2');
+        $address->locality = $this->request->getBodyParam('city');
+        $address->postalCode = $this->request->getBodyParam('zipCode');
 
         $countryIso = $this->request->getBodyParam('country');
         $stateAbbr = $this->request->getBodyParam('state');
 
         if ($countryIso) {
-            $country = Commerce::getInstance()->getCountries()->getCountryByIso($countryIso);
+            // TODO: @luke a bit confused about why/how we're juggling code vs iso or if there is a difference…or maybe just validating?
+            $country = Craft::$app->getAddresses()->getCountryRepository()->get($countryIso);
 
             if ($country) {
-                $address->countryId = $country->id;
+                $address->countryCode = $country->getCountryCode();
 
                 if (!empty($stateAbbr)) {
-                    $state = Commerce::getInstance()->getStates()->getStateByAbbreviation($country->id, $stateAbbr);
-                    $address->stateId = $state ? $state->id : null;
+                    $address->administrativeArea = Craft::$app->getAddresses()->getSubdivisionRepository()->get($stateAbbr, [$address->countryCode]);
                 }
             }
         }
 
         try {
             // save the address
-            $customerService = Commerce::getInstance()->getCustomers();
-            if (!$customerService->saveAddress($address)) {
+            if (!Craft::$app->getElements()->saveElement($address)) {
                 $errors = implode(', ', $address->getErrorSummary(false));
                 throw new UserException($errors ?: 'An error occurred saving the billing address.');
             }
 
             // set this as the user's primary billing address
-            $customer = $customerService->getCustomer();
+
+            /** @var User|CustomerBehavior $customer */
+            $customer = Craft::$app->getUser()->getIdentity();
             $customer->primaryBillingAddressId = $address->id;
-            if (!$customerService->saveCustomer($customer)) {
+
+            if (!Craft::$app->getElements()->saveElement($customer)) {
                 $errors = implode(', ', $customer->getErrorSummary(false));
                 throw new UserException($errors ?: 'An error occurred saving the billing address.');
             }
@@ -326,7 +329,7 @@ class AccountController extends Controller
      */
     private function getBillingAddress(User $user): ?array
     {
-        // TODO: Commerce 4…getPrimaryShippingAddressId?
+        /** @var User|CustomerBehavior $user */
         $primaryBillingAddress = $user->getPrimaryBillingAddress();
 
         if (!$primaryBillingAddress) {
@@ -334,19 +337,15 @@ class AccountController extends Controller
         }
 
         $billingAddress = $primaryBillingAddress->toArray();
+        $billingAddress['country'] = $primaryBillingAddress->getCountryCode();
 
-        $country = $primaryBillingAddress->getCountry();
 
-        $billingAddress['country'] = '';
-
-        if ($country) {
-            $billingAddress['country'] = $country->iso;
-        }
-
-        $state = $primaryBillingAddress->getState();
+        // TODO: @luke, how should I get the state abbr from the Address element, or should
+        // I just pass back the administrativeArea?
+        $state = $primaryBillingAddress->getAdministrativeArea();
 
         if ($state) {
-            $billingAddress['state'] = $state->abbreviation;
+            $billingAddress['state'] = $state;
         }
 
         return $billingAddress;
