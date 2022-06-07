@@ -129,6 +129,8 @@ class ClaimLicensesController extends Controller
         } else {
             $num = $this->module->getCmsLicenseManager()->claimLicenses($user);
             $num += $this->module->getPluginLicenseManager()->claimLicenses($user);
+
+            // TODO: @luke
             Commerce::getInstance()->getCustomers()->consolidateOrdersToUser($user);
         }
 

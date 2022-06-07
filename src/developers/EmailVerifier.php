@@ -131,6 +131,7 @@ class EmailVerifier extends BaseObject
         $num += $module->getPluginLicenseManager()->claimLicenses($this->user, $email);
 
         // claim guest orders
+        // TODO: @luke
         $commerce = Commerce::getInstance();
         if (!empty($orders = $commerce->getOrders()->getOrdersByEmail($email))) {
             $commerce->getCustomers()->consolidateOrdersToUser($this->user, $orders);
