@@ -8,6 +8,7 @@ use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
 use craftnet\controllers\api\BaseApiController;
 use craftnet\controllers\api\RateLimiterTrait;
+use craftnet\helpers\Address as AddressHelper;
 use yii\helpers\Json;
 use yii\web\Response;
 use yii\web\UnauthorizedHttpException;
@@ -75,10 +76,7 @@ class AccountController extends BaseApiController
         $billingAddressArray = null;
 
         if ($billingAddress = $user->getPrimaryBillingAddress()) {
-            // TODO: these property names will change and need to be normalized
-            $billingAddressArray = $billingAddress->toArray();
-            $billingAddressArray['country'] = $billingAddress->getCountryCode();
-            $billingAddressArray['state'] = $billingAddress->getAdministrativeArea();
+            $billingAddressArray = AddressHelper::toV1Array($billingAddress);
         }
 
         return $this->asJson([

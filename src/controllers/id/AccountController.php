@@ -15,6 +15,7 @@ use craft\helpers\Json;
 use craft\web\Controller;
 use craft\web\UploadedFile;
 use craftnet\behaviors\UserBehavior;
+use craftnet\helpers\Address as AddressHelper;
 use Throwable;
 use yii\base\UserException;
 use yii\web\BadRequestHttpException;
@@ -207,9 +208,11 @@ class AccountController extends Controller
     {
         $this->requireLogin();
         $this->requirePostRequest();
+        /** @var User|CustomerBehavior $customer */
+        $customer = Craft::$app->getUser()->getIdentity(false);
 
-        // TODO: Commerce 4
         $address = new Address();
+        $address->title = 'Billing Address';
         $address->id = $this->request->getBodyParam('id');
         $address->firstName = $this->request->getBodyParam('firstName');
         $address->lastName = $this->request->getBodyParam('lastName');
@@ -219,49 +222,25 @@ class AccountController extends Controller
         $address->addressLine2 = $this->request->getBodyParam('address2');
         $address->locality = $this->request->getBodyParam('city');
         $address->postalCode = $this->request->getBodyParam('zipCode');
-
-        $countryIso = $this->request->getBodyParam('country');
-        $stateAbbr = $this->request->getBodyParam('state');
-
-        if ($countryIso) {
-            // TODO: @luke a bit confused about why/how we're juggling code vs iso or if there is a difference…or maybe just validating?
-            $country = Craft::$app->getAddresses()->getCountryRepository()->get($countryIso);
-
-            if ($country) {
-                $address->countryCode = $country->getCountryCode();
-
-                if (!empty($stateAbbr)) {
-                    $address->administrativeArea = Craft::$app->getAddresses()->getSubdivisionRepository()->get($stateAbbr, [$address->countryCode]);
-                }
-            }
-        }
+        $address->countryCode = $this->request->getBodyParam('country');
+        $address->administrativeArea = $this->request->getBodyParam('state');
+        $address->ownerId = $customer->id;
 
         try {
-            // save the address
             if (!Craft::$app->getElements()->saveElement($address)) {
                 $errors = implode(', ', $address->getErrorSummary(false));
                 throw new UserException($errors ?: 'An error occurred saving the billing address.');
             }
 
             // set this as the user's primary billing address
-
-            /** @var User|CustomerBehavior $customer */
-            $customer = Craft::$app->getUser()->getIdentity();
             $customer->primaryBillingAddressId = $address->id;
-
             if (!Craft::$app->getElements()->saveElement($customer)) {
                 $errors = implode(', ', $customer->getErrorSummary(false));
                 throw new UserException($errors ?: 'An error occurred saving the billing address.');
             }
 
-            // return the address info
-            $addressArray = $address->toArray();
-            if ($countryIso) {
-                $addressArray['country'] = $countryIso;
-            }
-            if ($stateAbbr) {
-                $addressArray['state'] = $stateAbbr;
-            }
+            $addressArray = AddressHelper::toV1Array($address);
+
             return $this->asJson([
                 'success' => true,
                 'address' => $addressArray,
@@ -336,18 +315,6 @@ class AccountController extends Controller
             return null;
         }
 
-        $billingAddress = $primaryBillingAddress->toArray();
-        $billingAddress['country'] = $primaryBillingAddress->getCountryCode();
-
-
-        // TODO: @luke, how should I get the state abbr from the Address element, or should
-        // I just pass back the administrativeArea?
-        $state = $primaryBillingAddress->getAdministrativeArea();
-
-        if ($state) {
-            $billingAddress['state'] = $state;
-        }
-
-        return $billingAddress;
+        return AddressHelper::toV1Array($primaryBillingAddress);
     }
 }

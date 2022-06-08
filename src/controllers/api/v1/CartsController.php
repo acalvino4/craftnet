@@ -152,10 +152,17 @@ class CartsController extends BaseApiController
      */
     protected function cartArray(Order $cart): array
     {
-        return $cart->toArray([], [
-            'billingAddress',
+        $address = null;
+        if ($billingAddress = $cart->getBillingAddress()) {
+            $address = \craftnet\helpers\Address::toV1Array($billingAddress);
+        }
+        $cart = $cart->toArray([], [
             'lineItems.purchasable.plugin',
         ]);
+
+        $cart['billingAddress'] = $address;
+
+        return $cart;
     }
 
     // Private Methods
@@ -408,7 +415,7 @@ class CartsController extends BaseApiController
             'organizationTaxId' => $billingAddress->businessTaxId ?? null,
             'addressPhone' => $billingAddress->phone ?? null,
             'addressAttention' => $billingAddress->attention ?? null,
-            'title' => $billingAddress->title ?? null,
+            'title' => $billingAddress->title ?? 'Billing Address',
         ];
 
         Craft::configure($address, $addressConfig);
