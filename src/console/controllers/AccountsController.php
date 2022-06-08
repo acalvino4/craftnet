@@ -4,7 +4,6 @@ namespace craftnet\console\controllers;
 
 use Craft;
 use craft\commerce\elements\Order;
-use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
 use craft\i18n\Formatter;
 use craftnet\behaviors\UserBehavior;
@@ -13,8 +12,6 @@ use craftnet\plugins\Plugin;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\helpers\Console;
-use craftnet\db\Table;
-use craft\commerce\db\Table as CommerceTable;
 
 /**
  * Show information about accounts
@@ -66,89 +63,6 @@ class AccountsController extends Controller
         $this->cmsLicenses($user);
         $this->pluginLicenses($user);
         $this->plugins($user);
-
-        return ExitCode::OK;
-    }
-
-    /**
-     * Reassigns orders, licenses, and plugins from one account to another, and deletes the first account
-     *
-     * @param int $id1 The account ID to be deleted
-     * @param int $id2 The account ID to be preserved
-     * @return int
-     */
-    public function actionMerge(int $id1, int $id2): int
-    {
-        // TODO: @luke…
-        $user1 = User::find()->id($id1)->status(null)->one();
-        $user2 = User::find()->id($id2)->status(null)->one();
-
-        if (!$user1) {
-            $this->stderr('No user exists with an ID of ' . $id1 . PHP_EOL, Console::FG_RED);
-            return ExitCode::UNSPECIFIED_ERROR;
-        }
-
-        if (!$user2) {
-            $this->stderr('No user exists with an ID of ' . $id2 . PHP_EOL, Console::FG_RED);
-            return ExitCode::UNSPECIFIED_ERROR;
-        }
-
-        /** @var Commerce $commerce */
-        $commerce = Commerce::getInstance();
-        $db = Craft::$app->getDb();
-
-        $customerTables = [
-            CommerceTable::CUSTOMER_DISCOUNTUSES,
-            CommerceTable::CUSTOMERS_ADDRESSES,
-            CommerceTable::ORDERHISTORIES,
-            CommerceTable::ORDERS,
-        ];
-
-        $userTables = [
-            CommerceTable::PAYMENTSOURCES,
-            CommerceTable::SUBSCRIPTIONS,
-            CommerceTable::TRANSACTIONS,
-            Table::CMSLICENSES => 'ownerId',
-            Table::PLUGINLICENSES => 'ownerId',
-            Table::PLUGINS => 'developerId',
-            Table::DEVELOPERLEDGER => 'developerId',
-            Table::PACKAGES => 'developerId',
-        ];
-
-        $customer1 = $commerce->getCustomers()->getCustomerByUserId($id1);
-        $customer2 = $commerce->getCustomers()->getCustomerByUserId($id2);
-
-        if ($customer1 && $customer2) {
-            foreach ($customerTables as $table) {
-                $this->stdout("Updating {$table} ... ");
-                $rows = $db->createCommand()
-                    ->update($table, ['customerId' => $customer2->id], ['customerId' => $customer1->id], [], false)
-                    ->execute();
-                $this->stdout("done ({$rows} rows)" . PHP_EOL, Console::FG_GREEN);
-            }
-
-            $this->stdout("Deleting customer {$customer1->id} ... ");
-            $commerce->getCustomers()->deleteCustomer($customer1);
-            $this->stdout('done' . PHP_EOL . PHP_EOL, Console::FG_GREEN);
-        } else if ($customer1) {
-            $userTables[] = CommerceTable::CUSTOMERS;
-        }
-
-        foreach ($userTables as $table => $column) {
-            if (is_numeric($table)) {
-                $table = $column;
-                $column = 'userId';
-            }
-            $this->stdout("Updating {$table} ... ");
-            $rows = $db->createCommand()
-                ->update($table, [$column => $id2], [$column => $id1], [], false)
-                ->execute();
-            $this->stdout("done ({$rows} rows)" . PHP_EOL, Console::FG_GREEN);
-        }
-
-        $this->stdout("Deleting user {$id1} ... ");
-        Craft::$app->getElements()->deleteElement($user1);
-        $this->stdout('done' . PHP_EOL . PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }
