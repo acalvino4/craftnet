@@ -548,7 +548,7 @@ class PluginLicenseManager extends Component
 
     /**
      * Finds unclaimed licenses that are associated with orders placed by the given user's email,
-     * and and assigns them to the user.
+     * and assigns them to the user.
      *
      * @param User $user
      * @param string|null $email the email to look for (defaults to the user's email)
