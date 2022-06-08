@@ -44,14 +44,11 @@ class CountriesController extends BaseApiController
             return $cache->get(self::COUNTRY_CACHE_KEY);
         }
 
-        // TODO: @luke should I be using commerce.getStore().store.getCountriesList?
         $countries = Craft::$app->getAddresses()->getCountryRepository()->getAll();
         $countryList = [];
         $countryInfo = new CountryInfo();
 
         foreach ($countries as $country) {
-
-            // TODO: @luke, this is how we did $isStateRequired elsewhere, please review all this :)
             $administrativeAreas = Craft::$app->getAddresses()->getSubdivisionRepository()->getList([$country->getCountryCode()]);
             $isStateRequired = !empty($administrativeAreas);
             $countryData = [
