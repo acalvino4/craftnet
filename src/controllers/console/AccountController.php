@@ -3,8 +3,9 @@
 namespace craftnet\controllers\console;
 
 use Craft;
-use craft\commerce\models\Address;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\Address;
 use craft\elements\Asset;
 use craft\elements\User;
 use craft\errors\UploadFailedException;
@@ -14,6 +15,7 @@ use craft\helpers\Json;
 use craft\web\Controller;
 use craft\web\UploadedFile;
 use craftnet\behaviors\UserBehavior;
+use craftnet\helpers\Address as AddressHelper;
 use Throwable;
 use yii\base\UserException;
 use yii\web\BadRequestHttpException;
@@ -55,9 +57,9 @@ class AccountController extends Controller
                 'developerName' => $user->developerName,
                 'developerUrl' => $user->developerUrl,
                 'location' => $user->location,
-                'enablePluginDeveloperFeatures' => $user->isInGroup('developers') ? true : false,
-                'enableShowcaseFeatures' => $user->enableShowcaseFeatures == 1 ? true : false,
-                'enablePartnerFeatures' => $user->enablePartnerFeatures == 1 ? true : false,
+                'enablePluginDeveloperFeatures' => $user->isInGroup('developers'),
+                'enableShowcaseFeatures' => (bool) $user->enableShowcaseFeatures,
+                'enablePartnerFeatures' => (bool) $user->enablePartnerFeatures,
                 'groups' => $user->getGroups(),
                 'photoId' => $user->getPhoto() ? $user->getPhoto()->getId() : null,
                 'photoUrl' => $photoUrl,
@@ -213,58 +215,39 @@ class AccountController extends Controller
     {
         $this->requireLogin();
         $this->requirePostRequest();
+        /** @var User|CustomerBehavior $customer */
+        $customer = Craft::$app->getUser()->getIdentity(false);
 
         $address = new Address();
+        $address->title = 'Billing Address';
         $address->id = $this->request->getBodyParam('id');
         $address->firstName = $this->request->getBodyParam('firstName');
         $address->lastName = $this->request->getBodyParam('lastName');
-        $address->businessName = $this->request->getBodyParam('businessName');
-        $address->businessTaxId = $this->request->getBodyParam('businessTaxId');
-        $address->address1 = $this->request->getBodyParam('address1');
-        $address->address2 = $this->request->getBodyParam('address2');
-        $address->city = $this->request->getBodyParam('city');
-        $address->zipCode = $this->request->getBodyParam('zipCode');
-
-        $countryIso = $this->request->getBodyParam('country');
-        $stateAbbr = $this->request->getBodyParam('state');
-
-        if ($countryIso) {
-            $country = Commerce::getInstance()->getCountries()->getCountryByIso($countryIso);
-
-            if ($country) {
-                $address->countryId = $country->id;
-
-                if (!empty($stateAbbr)) {
-                    $state = Commerce::getInstance()->getStates()->getStateByAbbreviation($country->id, $stateAbbr);
-                    $address->stateId = $state ? $state->id : null;
-                }
-            }
-        }
+        $address->organization = $this->request->getBodyParam('businessName');
+        $address->organizationTaxId = $this->request->getBodyParam('businessTaxId');
+        $address->addressLine1 = $this->request->getBodyParam('address1');
+        $address->addressLine2 = $this->request->getBodyParam('address2');
+        $address->locality = $this->request->getBodyParam('city');
+        $address->postalCode = $this->request->getBodyParam('zipCode');
+        $address->countryCode = $this->request->getBodyParam('country');
+        $address->administrativeArea = $this->request->getBodyParam('state');
+        $address->ownerId = $customer->id;
 
         try {
-            // save the address
-            $customerService = Commerce::getInstance()->getCustomers();
-            if (!$customerService->saveAddress($address)) {
+            if (!Craft::$app->getElements()->saveElement($address)) {
                 $errors = implode(', ', $address->getErrorSummary(false));
                 throw new UserException($errors ?: 'An error occurred saving the billing address.');
             }
 
             // set this as the user's primary billing address
-            $customer = $customerService->getCustomer();
             $customer->primaryBillingAddressId = $address->id;
-            if (!$customerService->saveCustomer($customer)) {
+            if (!Craft::$app->getElements()->saveElement($customer)) {
                 $errors = implode(', ', $customer->getErrorSummary(false));
                 throw new UserException($errors ?: 'An error occurred saving the billing address.');
             }
 
-            // return the address info
-            $addressArray = $address->toArray();
-            if ($countryIso) {
-                $addressArray['country'] = $countryIso;
-            }
-            if ($stateAbbr) {
-                $addressArray['state'] = $stateAbbr;
-            }
+            $addressArray = AddressHelper::toV1Array($address);
+
             return $this->asJson([
                 'success' => true,
                 'address' => $addressArray,
@@ -332,34 +315,13 @@ class AccountController extends Controller
      */
     private function getBillingAddress(User $user): ?array
     {
-        $customer = Commerce::getInstance()->getCustomers()->getCustomerByUserId($user->id);
-
-        if (!$customer) {
-            return null;
-        }
-
-        $primaryBillingAddress = $customer->getPrimaryBillingAddress();
+        /** @var User|CustomerBehavior $user */
+        $primaryBillingAddress = $user->getPrimaryBillingAddress();
 
         if (!$primaryBillingAddress) {
             return null;
         }
 
-        $billingAddress = $primaryBillingAddress->toArray();
-
-        $country = $primaryBillingAddress->getCountry();
-
-        $billingAddress['country'] = '';
-
-        if ($country) {
-            $billingAddress['country'] = $country->iso;
-        }
-
-        $state = $primaryBillingAddress->getState();
-
-        if ($state) {
-            $billingAddress['state'] = $state->abbreviation;
-        }
-
-        return $billingAddress;
+        return AddressHelper::toV1Array($primaryBillingAddress);
     }
 }

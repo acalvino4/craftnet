@@ -3,7 +3,7 @@
     "adam-paterson/oauth2-stripe": "^2.0.0",
     "aws/aws-sdk-php": "^3.71",
     "craftcms/aws-s3": "^2.0.0",
-    "craftcms/cms": "^4.0.0",
+    "craftcms/cms": "^4.0.3",
     "craftcms/commerce": "^4.0.0",
     "craftcms/commerce-stripe": "^3.0.0",
     "craftcms/postmark": "^3.0.0",
@@ -40,6 +40,8 @@
       "craftnet\\": "src/"
     }
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "config": {
     "optimize-autoloader": true,
     "sort-packages": true,

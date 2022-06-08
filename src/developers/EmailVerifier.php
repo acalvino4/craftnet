@@ -130,12 +130,6 @@ class EmailVerifier extends BaseObject
         $num = $module->getCmsLicenseManager()->claimLicenses($this->user, $email);
         $num += $module->getPluginLicenseManager()->claimLicenses($this->user, $email);
 
-        // claim guest orders
-        $commerce = Commerce::getInstance();
-        if (!empty($orders = $commerce->getOrders()->getOrdersByEmail($email))) {
-            $commerce->getCustomers()->consolidateOrdersToUser($this->user, $orders);
-        }
-
         // remove all verification codes for this user + email
         $db->createCommand()
             ->delete(Table::EMAILCODES, $condition)

@@ -189,14 +189,14 @@ class PaymentsController extends CartsController
 
         $customerData = [
             'address' => [
-                'line1' => $address->address1,
-                'line2' => $address->address2,
-                'country' => $address->getCountry()->iso ?? null,
-                'city' => $address->city,
-                'postal_code' => $address->zipCode,
-                'state' => $address->getState(),
+                'line1' => $address?->addressLine1,
+                'line2' => $address?->addressLine2,
+                'country' => $address?->getCountryCode(),
+                'city' => $address?->getLocality(),
+                'postal_code' => $address?->getPostalCode(),
+                'state' => $address?->getAdministrativeArea(),
             ],
-            'name' => $address->fullName,
+            'name' => $address?->fullName,
             'email' => $cart->getEmail(),
         ];
 

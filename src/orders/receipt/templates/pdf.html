@@ -61,20 +61,21 @@
 
 			<strong>Sold to</strong><br>
 
-			{{ line(billingAddress.firstName ~ ' ' ~ billingAddress.lastName) }}
+			{{ line(billingAddress.fullName) }}
 			{{ line(order.email) }}
 			&nbsp;<br>
-			{{ line(billingAddress.businessName) }}
-			{{ line(billingAddress.address1) }}
-			{{ line(billingAddress.address2) }}
-			{{ line(billingAddress.city) }}
-			{{ line(billingAddress.getStateText()) }}
-			{{ line(billingAddress.zipCode) }}
-			{% set countryText = billingAddress.getCountryText() %}
-			{% if countryText != 'Unknown' %}
-				{{ line(billingAddress.getCountryText()) }}
+			{{ line(billingAddress.organization) }}
+			{{ line(billingAddress.addressLine1) }}
+			{{ line(billingAddress.addressLine2) }}
+			{{ line(billingAddress.locality) }}
+			{{ line(billingAddress.getAdministrativeArea()) }}
+			{{ line(billingAddress.postalCode) }}
+
+			{% set country = craft.app.getAddresses().getCountryRepository().get(billingAddress.getCountryCode()) %}
+			{% if country %}
+				{{ line(country.name) }}
 			{% endif %}
-			{{ line(billingAddress.businessTaxId) }}
+			{{ line(billingAddress.organizationTaxId) }}
 			{{ line(order.lineItems[0].note) }}
 		</td>
 		<td>

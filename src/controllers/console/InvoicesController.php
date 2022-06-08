@@ -35,15 +35,13 @@ class InvoicesController extends Controller
         $ascending = $this->request->getParam('ascending');
 
         try {
-            $customer = Commerce::getInstance()->getCustomers()->getCustomerByUserId($user->id);
-
             $invoices = [];
 
-            if ($customer) {
-                $invoices = Module::getInstance()->getInvoiceManager()->getInvoices($customer, $filter, $limit, $page, $orderBy, $ascending);
+            if ($user) {
+                $invoices = Module::getInstance()->getInvoiceManager()->getInvoices($user, $filter, $limit, $page, $orderBy, $ascending);
             }
 
-            $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($customer, $filter);
+            $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($user, $filter);
 
             $last_page = ceil($total / $limit);
             $next_page_url = '?next';
@@ -80,9 +78,7 @@ class InvoicesController extends Controller
         $number = $this->request->getRequiredParam('number');
 
         try {
-            $customer = Commerce::getInstance()->getCustomers()->getCustomerByUserId($user->id);
-
-            $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($customer, $number);
+            $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($user, $number);
 
             return $this->asJson($invoice);
         } catch (Throwable $e) {

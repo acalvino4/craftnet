@@ -3,10 +3,10 @@
 namespace craftnet;
 
 use Craft;
-use craft\awss3\Volume as S3Volume;
 use craft\commerce\elements\Order;
 use craft\commerce\events\MatchLineItemEvent;
 use craft\commerce\events\PdfEvent;
+use craft\commerce\events\PdfRenderEvent;
 use craft\commerce\models\Discount;
 use craft\commerce\services\Discounts;
 use craft\commerce\services\OrderAdjustments;
@@ -30,7 +30,6 @@ use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\UserEvent;
-use craft\fieldlayoutelements\StandardTextField;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craft\models\FieldLayout;
@@ -42,7 +41,6 @@ use craft\services\UserPermissions;
 use craft\services\Users;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
-use craft\volumes\Local as LocalVolume;
 use craft\web\Request;
 use craft\web\twig\variables\Cp;
 use craft\web\UrlManager;
@@ -189,7 +187,7 @@ class Module extends \yii\base\Module
         });
 
         Event::on(Discounts::class, Discounts::EVENT_DISCOUNT_MATCHES_LINE_ITEM, function(MatchLineItemEvent $e) {
-            if ($e->discount->code == 'FREEFORM') {
+            if ($e->discount->id == 667) {
 
                 $sku = $e->lineItem->getSku();
 
@@ -224,7 +222,7 @@ class Module extends \yii\base\Module
         });
 
         // provide custom order receipt PDF generation
-        Event::on(Pdfs::class, Pdfs::EVENT_BEFORE_RENDER_PDF, function(PdfEvent $e) {
+        Event::on(Pdfs::class, Pdfs::EVENT_BEFORE_RENDER_PDF, function(PdfRenderEvent $e) {
             $e->pdf = (new PdfRenderer())->render($e->order);
         });
 
@@ -249,30 +247,6 @@ class Module extends \yii\base\Module
                 $this->_initSiteRequest($request);
             }
         }
-
-        // use Local volumes in dev for web requests
-        if (\Craft::$app->env === 'dev' && !Craft::$app->getRequest()->getIsConsoleRequest()) {
-            \Craft::$container->set(S3Volume::class, function($container, $params, $config) {
-                if (empty($config['id'])) {
-                    return new S3Volume($config);
-                }
-
-                return new LocalVolume([
-                    'id' => $config['id'],
-                    'uid' => $config['uid'],
-                    'name' => $config['name'],
-                    'handle' => $config['handle'],
-                    'hasUrls' => $config['hasUrls'],
-                    'url' => "@web/local-volumes/{$config['handle']}",
-                    'path' => "@webroot/local-volumes/{$config['handle']}",
-                    'sortOrder' => $config['sortOrder'],
-                    'dateCreated' => $config['dateCreated'],
-                    'dateUpdated' => $config['dateUpdated'],
-                    'fieldLayoutId' => $config['fieldLayoutId'],
-                ]);
-            });
-        }
-
 
         parent::init();
     }

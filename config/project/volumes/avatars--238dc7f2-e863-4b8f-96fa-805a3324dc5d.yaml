@@ -29,11 +29,11 @@ fieldLayouts:
             width: 100
         name: Content
         uid: 6f15b8cb-592a-4f86-b23f-1bd21551db00
-fs: avatars
+fs: $FS_AVATARS
 handle: avatars
 name: Avatars
 sortOrder: 1
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-transformFs: null
+transformFs: ''
 transformSubpath: ''

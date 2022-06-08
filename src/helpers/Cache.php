@@ -4,9 +4,7 @@ namespace craftnet\helpers;
 
 use Craft;
 use craft\helpers\StringHelper;
-use craftnet\Module;
 use craftnet\plugins\Plugin;
-use yii\caching\FileDependency;
 use yii\caching\TagDependency;
 
 abstract class Cache

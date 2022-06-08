@@ -1,4 +1,4 @@
-dateModified: 1654192294
+dateModified: 1654605505
 elementSources:
   craft\elements\Asset:
     -
@@ -60,6 +60,13 @@ fs:
       subfolder: ''
     type: craft\awss3\Fs
     url: $S3_AVATARS_URL
+  avatarsLocal:
+    hasUrls: true
+    name: 'Avatars (local)'
+    settings:
+      path: '@webroot/local-volumes/avatars'
+    type: craft\fs\Local
+    url: '@web/local-volumes/avatars'
   icons:
     hasUrls: true
     name: Icons
@@ -79,6 +86,13 @@ fs:
       subfolder: ''
     type: craft\awss3\Fs
     url: $S3_PLUGIN_ICONS_URL
+  iconsLocal:
+    hasUrls: true
+    name: 'Icons (local)'
+    settings:
+      path: '@webroot/local-volumes/icons'
+    type: craft\fs\Local
+    url: '@web/local-volumes/icons'
   partnerImages:
     hasUrls: true
     name: 'Partner Images'
@@ -98,6 +112,13 @@ fs:
       subfolder: images
     type: craft\awss3\Fs
     url: $S3_PARTNER_RESOURCES_URL
+  partnerImagesLocal:
+    hasUrls: true
+    name: 'Partner Images (local)'
+    settings:
+      path: '@webroot/local-volumes/partnerImages'
+    type: craft\fs\Local
+    url: '@web/local-volumes/partnerImages'
   screenshots:
     hasUrls: true
     name: Screenshots
@@ -117,6 +138,13 @@ fs:
       subfolder: ''
     type: craft\awss3\Fs
     url: $S3_PLUGIN_SCREENSHOTS_URL
+  screenshotsLocal:
+    hasUrls: true
+    name: 'Screenshots (local)'
+    settings:
+      path: '@webroot/local-volumes/screenshots'
+    type: craft\fs\Local
+    url: '@web/local-volumes/screenshots'
 meta:
   __names__:
     0d6b333e-7fc4-4832-b4ed-e47af16e8d0c: Common # Common

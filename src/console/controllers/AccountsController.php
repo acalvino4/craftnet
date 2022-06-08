@@ -79,6 +79,7 @@ class AccountsController extends Controller
      */
     public function actionMerge(int $id1, int $id2): int
     {
+        // TODO: @luke…
         $user1 = User::find()->id($id1)->status(null)->one();
         $user2 = User::find()->id($id2)->status(null)->one();
 

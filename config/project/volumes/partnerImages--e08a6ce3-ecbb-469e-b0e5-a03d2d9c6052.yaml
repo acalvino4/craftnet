@@ -29,11 +29,11 @@ fieldLayouts:
             width: 100
         name: Content
         uid: b8ca42c5-cc80-4817-bced-17f205432b99
-fs: partnerImages
+fs: $FS_PARTNER_IMAGES
 handle: partnerImages
 name: 'Partner Images'
 sortOrder: 4
 titleTranslationKeyFormat: null
 titleTranslationMethod: site
-transformFs: null
+transformFs: ''
 transformSubpath: ''
