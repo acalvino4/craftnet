@@ -34,9 +34,7 @@ class AccountController extends BaseApiController
             throw new UnauthorizedHttpException('Not Authorized');
         }
 
-
         // Purchased plugins
-
         $purchasedPlugins = [];
 
         // TODO: @tim ask about this
@@ -50,7 +48,6 @@ class AccountController extends BaseApiController
 
 
         // Credit cards
-
         $card = null;
         $cardToken = null;
         $paymentSources = Commerce::getInstance()->getPaymentSources()->getAllPaymentSourcesByCustomerId($user->id);
