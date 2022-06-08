@@ -3,6 +3,7 @@
 namespace craftnet\console\controllers;
 
 use Craft;
+use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
@@ -117,22 +118,18 @@ class ClaimLicensesController extends Controller
             foreach ($pluginLicenseEmails as $email) {
                 $pluginLicenseManager->claimLicenses($user, $email);
             }
-
-            // claim guest orders
-            // TODO: @luke
-            $commerce = Commerce::getInstance();
             foreach ($uniqueEmails as $email) {
-                if (!empty($orders = $commerce->getOrders()->getOrdersByEmail($email))) {
-                    $commerce->getCustomers()->consolidateOrdersToUser($user, $orders);
+                $orders = Order::find()->email($email)->limit(null)->find();
+                foreach ($orders as $order) {
+                    $order->setEmail($user->email); // This will change the customer/user of the order
+                    Craft::$app->getElements()->saveElement($order, false, false, true);
                 }
             }
+
             $num = $totalCmsLicenses + $totalPluginLicenses;
         } else {
             $num = $this->module->getCmsLicenseManager()->claimLicenses($user);
             $num += $this->module->getPluginLicenseManager()->claimLicenses($user);
-
-            // TODO: @luke
-            Commerce::getInstance()->getCustomers()->consolidateOrdersToUser($user);
         }
 
         $this->stdout("{$num} licenses claimed" . PHP_EOL, Console::FG_GREEN);
