@@ -71,7 +71,6 @@
 			{{ line(billingAddress.getAdministrativeArea()) }}
 			{{ line(billingAddress.postalCode) }}
 
-			{# TODO: Is this the best way to get the country name?#}
 			{% set country = craft.app.getAddresses().getCountryRepository().get(billingAddress.getCountryCode()) %}
 			{% if country %}
 				{{ line(country.name) }}
