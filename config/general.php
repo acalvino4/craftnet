@@ -55,5 +55,8 @@ return [
         'devMode' => true,
         'allowUpdates' => true,
         'enableBasicHttpAuth' => true,
+
+        // Required to make Playwright tests work
+        'requireMatchingUserAgentForSession' => false,
     ],
 ];
