@@ -9,7 +9,7 @@ module.exports = async config => {
     });
 
     // https://api.craftcms.next/v1/carts/db5dfc3352c9257a98c8ad2d4da0de1a
-    page.waitForResponse(response => response.url().includes('//api.craftcms.next/v1/carts'))
+    page.waitForResponse(response => response.url().includes(process.env.PLAYWRIGHT_API_URL + '/carts'))
 
     await page.goto(baseURL + '/login');
 
