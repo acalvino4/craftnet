@@ -1,3 +1,5 @@
+/* global VUE_APP_CRAFT_API_ENDPOINT */
+
 import axios from 'axios'
 
 export default {
@@ -12,7 +14,7 @@ export default {
     axios() {
         if (!this._axios) {
             this._axios = axios.create({
-                baseURL: process.env.VUE_APP_CRAFT_API_ENDPOINT + '/',
+                baseURL: VUE_APP_CRAFT_API_ENDPOINT + '/',
                 // params: {XDEBUG_SESSION_START: 16433}
             })
         }

@@ -1,3 +1,5 @@
+/* global VUE_APP_NODE_ENV, VUE_APP_BASE_URL, VUE_APP_CRAFT_PLUGINS_URL */
+
 import get from 'lodash/get'
 import update from 'lodash/update'
 import {parseDate} from "../filters/date.js";
@@ -62,8 +64,8 @@ export default {
          * @returns {String}
          */
         staticImageUrl(url) {
-            if (process.env.NODE_ENV === 'development' && process.env.BASE_URL) {
-                return process.env.BASE_URL + 'img/static/' + url;
+            if (VUE_APP_NODE_ENV === 'development' && VUE_APP_BASE_URL) {
+                return VUE_APP_BASE_URL + 'img/static/' + url;
             }
 
             return '/craftnetresources/dist/img/static/' + url;
@@ -75,7 +77,7 @@ export default {
          * @returns {String}
          */
         craftPluginsUrl() {
-            return process.env.VUE_APP_CRAFT_PLUGINS_URL;
+            return VUE_APP_CRAFT_PLUGINS_URL;
         },
 
         expiresSoon(license) {
