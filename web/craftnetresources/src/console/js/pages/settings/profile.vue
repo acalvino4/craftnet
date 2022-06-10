@@ -44,7 +44,7 @@
                                      :disabled="loading.deletePhoto"
                                      :loading="loading.deletePhoto"
                                      @click="deletePhoto">
-                                    <icon icon="x"/>
+                                    <icon icon="x" class="w-4 h-4" />
                                     Delete
                                 </btn>
                             </div>

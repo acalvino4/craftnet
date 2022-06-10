@@ -1,7 +1,5 @@
 <template>
-    <component class="inline-block" :class="{
-        [`w-${computedSize} h-${computedSize}`]: this.computedSize,
-    }" :is="computedIcon"></component>
+    <component class="inline-block" :is="computedIcon"></component>
 </template>
 
 <script>
@@ -16,10 +14,6 @@ export default {
             type: String,
             default: 'outline',
         },
-        size: {
-            type: [String, Number],
-            default: 'base'
-        }
     },
 
     computed: {
@@ -40,35 +34,6 @@ export default {
             }
 
             return null
-        },
-
-        computedSize() {
-            if (!this.size) {
-                return null
-            }
-
-            if (Number.isInteger(this.size)) {
-                return this.size
-            }
-
-            const predefinedSizes = {
-                sm: 3,
-                base: 4,
-                lg: 5,
-                xl: 6,
-                '2xl': 8,
-                '3xl': 10,
-                '4xl': 12,
-                '5xl': 16,
-            }
-
-            let size = this.size
-
-            if (predefinedSizes[this.size]) {
-                size = predefinedSizes[this.size]
-            }
-
-            return size
         },
     }
 }

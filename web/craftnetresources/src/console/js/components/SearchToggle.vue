@@ -2,7 +2,7 @@
     <button class="text-gray-500 flex flex-1 rounded-md py-1 px-2"
             @click="showModal = true">
         <icon icon="search"
-              class="mr-4 text-gray-500 md:text-gray-400 w-6 h-6"/>
+              class="mr-4 text-gray-500 md:text-gray-400 w-6 h-6" />
 
         <div class="flex">
             <div class="mr-3 hidden md:block">

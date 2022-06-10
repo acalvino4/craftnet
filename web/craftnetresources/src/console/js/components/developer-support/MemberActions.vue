@@ -1,7 +1,7 @@
 <template>
     <Menu as="div" class="relative inline-block text-left">
         <MenuButton>
-            <icon icon="dots-horizontal"/>
+            <icon icon="dots-horizontal" class="w-4 h-4" />
         </MenuButton>
 
         <MenuItems

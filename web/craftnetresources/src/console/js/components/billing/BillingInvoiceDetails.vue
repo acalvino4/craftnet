@@ -20,7 +20,7 @@
 
             <div v-if="!showForm">
                 <btn small @click="editInvoiceDetails()">
-                    <icon icon="pencil" size="sm"/>
+                    <icon icon="pencil" class="w-3 h-3" />
                     Edit
                 </btn>
             </div>

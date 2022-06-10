@@ -14,7 +14,7 @@
 
                 <template v-if="partner.projects.length < 8">
                     <btn class="mt-3 sm:mt-0" @click="onAddProjectClick">
-                        <icon icon="plus"/>
+                        <icon icon="plus" class="w-4 h-4" />
                         Add a Project
                     </btn>
                 </template>

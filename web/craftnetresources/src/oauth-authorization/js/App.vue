@@ -34,11 +34,11 @@
             <div class="flex justify-between items-center">
                 <div class="text-sm text-light flex items-center">
                     <template v-if="!isSecureConnection">
-                        <icon class="mr-1" :size="4" icon="lock-closed"/>
+                        <icon class="mr-1 w-4 h-4" icon="lock-closed"/>
                         Your connection is secure
                     </template>
                     <template v-else>
-                        <icon class="mr-1" :size="4" icon="lock-open"/>
+                        <icon class="mr-1 w-4 h-4" icon="lock-open"/>
                         Your connection is insecure
                     </template>
                 </div>

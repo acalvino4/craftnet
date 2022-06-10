@@ -1,5 +1,5 @@
 <template>
-    <pane>
+    <pane class="activity">
         <h2>Activity</h2>
 
         <table v-if="history.length" class="table mt-4">

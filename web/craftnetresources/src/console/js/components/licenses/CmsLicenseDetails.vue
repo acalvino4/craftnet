@@ -1,6 +1,6 @@
 <template>
     <div class="space-y-6">
-        <pane>
+        <pane class="license-details">
             <h2 class="mb-4">License Details</h2>
             <template v-if="license">
                 <div class="md:flex -mx-4">
@@ -26,7 +26,7 @@
                                     <div class="buttons">
                                         <btn small
                                              @click="domainEditing = true">
-                                            <icon icon="pencil" :size="null"
+                                            <icon icon="pencil"
                                                   class="w-3 h-3"/>
                                             Change Domain
                                         </btn>
@@ -80,7 +80,7 @@
 
                                     <div class="buttons">
                                         <btn @click="notesEditing = true">
-                                            <icon icon="pencil" :size="null"
+                                            <icon icon="pencil"
                                                   class="w-3 h-3"/>
                                             Edit
                                         </btn>
@@ -105,7 +105,7 @@
             </template>
         </pane>
 
-        <pane v-if="license.expirable && license.expiresOn">
+        <pane class="auto-renew" v-if="license.expirable && license.expiresOn">
             <h2>Auto-Renew</h2>
 
             <template v-if="licenseDraft.autoRenew">
@@ -135,7 +135,7 @@
             </div>
         </pane>
 
-        <pane>
+        <pane class="updates">
             <h2>Updates</h2>
             <license-update-message :license="license"/>
             <template v-if="license.expirable && license.expiresOn">

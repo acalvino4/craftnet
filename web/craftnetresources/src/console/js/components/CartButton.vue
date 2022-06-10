@@ -6,11 +6,16 @@
             'hover:bg-black dark:hover:bg-white hover:bg-opacity-5': context === 'app'
         }"
         to="/cart">
-        <icon set="solid" icon="shopping-cart" class="w-5 h-5"
-              :class="{
+        <icon
+            set="solid"
+            icon="shopping-cart"
+            class="w-5 h-5"
+            :class="{
                 'text-blue-600 dark:text-blue-400': context !== 'app',
                 'text-gray-500': context === 'app'
-              }"/>
+              }"
+            :size="null"
+        />
 
         <div
             class="cart-badge rounded-full leading-3 absolute text-white text-center top-0 right-0 px-1.5 py-0.5 text-xs -mt-0.5"

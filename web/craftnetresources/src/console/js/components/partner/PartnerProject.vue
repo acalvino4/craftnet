@@ -3,7 +3,7 @@
         <div v-show="!isEditing">
             <div class="flex">
                 <div class="mr-6">
-                    <icon icon="grip-vertical" class="text-light mt-1.5"/>
+                    <icon icon="grip-vertical" class="w-4 h-4 text-light mt-1.5"/>
                 </div>
                 <ul class="flex-1">
                     <li v-if="draftProject.name" class="mb-3"><strong
@@ -88,7 +88,7 @@
                                     <btn kind="danger" :small="true"
                                          @click="removeScreenshot(index)"
                                          class="">
-                                        <icon icon="x"/>
+                                        <icon icon="x" class="w-4 h-4" />
                                         Remove
                                     </btn>
                                 </div>
@@ -107,7 +107,7 @@
                         <btn small :disabled="isUploading"
                              @click="$refs.screenshotFiles.click()">
                             <template v-if="!isUploading">
-                                <icon icon="plus"/>
+                                <icon icon="plus" class="w-4 h-4" />
                             </template>
                             <span v-show="!isUploading"> Add screenshots</span>
                             <span v-show="isUploading && uploadProgress < 100">Uploading: {{

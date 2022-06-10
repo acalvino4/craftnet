@@ -5,7 +5,7 @@
 
             <div>
                 <btn kind="primary" to="/developer/add-plugin">
-                    <icon icon="plus"/>
+                    <icon icon="plus" class="w-4 h-4" />
                     New plugin
                 </btn>
             </div>
@@ -96,8 +96,7 @@
             <empty v-else>
                 <empty>
                     <icon icon="plug"
-                          :size="12"
-                          class="inline-block mb-4 text-blue-500"/>
+                          class="w-12 h-12 inline-block mb-4 text-blue-500"/>
 
                     <div class="font-bold">No plugins</div>
                     <div class="mt-2">

@@ -247,7 +247,7 @@
                                         <button
                                             class="text-black dark:text-white-inverse bg-red-500 hover:bg-red-600 p-1.5 absolute -top-1 -right-1 rounded-full transform -translate-y-2 translate-x-2"
                                             @click="removeScreenshot(index);">
-                                            <icon icon="minus"/>
+                                            <icon icon="minus" class="w-4 h-4" />
                                         </button>
                                     </div>
                                 </template>
@@ -321,8 +321,8 @@
                                                 <td class="w-10 text-center">
                                                     <a @click.prevent="removeFeature(editionKey, featureKey)">
                                                         <icon icon="x"
-                                                              class="text-red-500"
-                                                              size="lg"/>
+                                                              class="w-5 h-5 text-red-500"
+                                                              />
                                                     </a>
                                                 </td>
                                             </tr>
@@ -332,7 +332,7 @@
                                         <div>
                                             <btn
                                                 @click="addFeature(editionKey)">
-                                                <icon icon="plus"/>
+                                                <icon icon="plus" class="w-4 h-4" />
                                                 Add a feature
                                             </btn>
                                         </div>

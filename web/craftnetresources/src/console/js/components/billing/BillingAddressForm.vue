@@ -48,7 +48,7 @@
 
             <div v-if="!showForm">
                 <btn small @click="edit()">
-                    <icon icon="pencil" size="sm"/>
+                    <icon icon="pencil" class="w-3 h-3" />
                     Edit
                 </btn>
             </div>

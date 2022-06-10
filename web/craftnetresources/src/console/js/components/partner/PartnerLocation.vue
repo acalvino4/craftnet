@@ -27,7 +27,7 @@
             </div>
             <div>
                 <btn class="mt-3 sm:mt-0" @click="$emit('edit', index)">
-                    <icon icon="pencil" size="sm"/>
+                    <icon icon="pencil" class="w-3 h-3" />
                     Edit
                 </btn>
             </div>

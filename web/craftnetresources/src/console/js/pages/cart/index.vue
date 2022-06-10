@@ -46,8 +46,8 @@
                 <div v-else>
                     <!-- Empty cart -->
                     <empty>
-                        <icon set="outline" icon="shopping-cart" :size="12"
-                              class="mb-4 text-blue-500"/>
+                        <icon set="outline" icon="shopping-cart"
+                              class="w-12 h-12 mb-4 text-blue-500"/>
 
                         <div class="font-bold">Your cart is empty</div>
                         <div class="mt-2">

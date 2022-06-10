@@ -12,7 +12,7 @@
                     <template v-if="!isEditing">
                         <btn class="mt-3 sm:mt-0"
                              @click="onEditClick">
-                            <icon icon="pencil" size="sm"/>
+                            <icon icon="pencil" class="w-3 h-3" />
                             Edit
                         </btn>
                     </template>
@@ -120,7 +120,7 @@
                              :small="true"
                              @click="draft.logo = {id: null, url: null}"
                              class="mt-6 mb-4">
-                            <icon icon="x"/>
+                            <icon icon="x" class="w-4 h-4" />
                             Remove
                         </btn>
                         <input v-if="!draft.logo.url" accept=".svg" type="file"

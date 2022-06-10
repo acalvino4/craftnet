@@ -72,8 +72,7 @@
                                         <div>
                                             <div class="flex items-center">
                                                 <icon icon="exclamation"
-                                                      :size="12"
-                                                      class="text-gray-400 mr-2"/>
+                                                      class="w-12 h-12 text-gray-400 mr-2"/>
                                                 <div>
                                                     Your session will expire in
                                                     {{
@@ -141,8 +140,8 @@
                                         class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-primary shadow-xl rounded-2xl"
                                     >
                                         <div class="flex space-x-4">
-                                            <icon icon="exclamation" :size="12"
-                                                  class="text-gray-400"/>
+                                            <icon icon="exclamation"
+                                                  class="w-12 h-12 text-gray-400"/>
                                             <form class="flex-1"
                                                   @submit.prevent="login">
                                                 <h6 class="font-bold">Your

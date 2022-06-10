@@ -44,7 +44,7 @@
                     </template>
                     <template v-else>
                         <btn small @click="editing = true">
-                            <icon icon="plus"/>
+                            <icon icon="plus" class="w-4 h-4" />
                             Add a card
                         </btn>
                     </template>
@@ -52,7 +52,7 @@
 
                 <p v-if="card">
                     <btn kind="danger" small @click="removeCard()">
-                        <icon icon="x"/>
+                        <icon icon="x" class="w-4 h-4" />
                         Remove
                     </btn>
                     <spinner v-if="removeCardLoading"></spinner>

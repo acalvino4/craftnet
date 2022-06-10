@@ -13,7 +13,7 @@
             >
                 {{ result.label }}
 
-                <icon icon="arrow-turn-down-left" :class="{
+                <icon icon="arrow-turn-down-left" class="w-4 h-4" :class="{
                         'text-gray-500 group-hover:text-gray-500': resultKey !== active,
                         'text-white': resultKey === active,
                     }"/>

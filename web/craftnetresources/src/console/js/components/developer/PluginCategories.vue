@@ -21,7 +21,7 @@
                                     <div class="ml-3 mt-1">
                                         <a @click.prevent="unselectCategory(element)">
                                             <icon icon="x"
-                                                  class="text-red-500"/>
+                                                  class="w-4 h-4 text-red-500"/>
                                         </a>
                                     </div>
                                 </div>
@@ -39,7 +39,7 @@
                         <btn class="mb-2 mr-2"
                              :disabled="pluginDraftCategoryIds.length >= maxCategories"
                              outline @click="selectCategory(category.id)">
-                            <icon icon="plus"/>
+                            <icon icon="plus" class="w-4 h-4" />
                             {{ category.title }}
                         </btn>
                     </div>

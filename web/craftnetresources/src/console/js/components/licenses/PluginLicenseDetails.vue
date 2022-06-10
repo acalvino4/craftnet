@@ -89,7 +89,7 @@
 
                                     <div class="buttons">
                                         <btn small @click="notesEditing = true">
-                                            <icon icon="pencil" size="sm"/>
+                                            <icon icon="pencil" class="w-3 h-3" />
                                             Edit
                                         </btn>
                                     </div>

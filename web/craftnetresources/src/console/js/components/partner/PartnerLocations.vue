@@ -11,7 +11,7 @@
                 <!-- Multiple locations not currently enabled -->
                 <template v-if="draftLocations.length === 0">
                     <btn class="mt-3 sm:mt-0" @click="onAddLocationClick">
-                        <icon icon="plus"/>
+                        <icon icon="plus" class="w-4 h-4" />
                         Add a Location
                     </btn>
                 </template>

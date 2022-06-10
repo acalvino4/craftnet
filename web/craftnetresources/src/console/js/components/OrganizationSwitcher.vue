@@ -21,8 +21,8 @@
                                         <img :src="user.photoUrl"/>
                                     </template>
                                     <template v-else>
-                                        <icon icon="user" size="sm"
-                                              class="text-gray-500"/>
+                                        <icon icon="user"
+                                              class="w-3 h-3 text-gray-500"/>
                                     </template>
                                 </div>
                             </template>
@@ -33,7 +33,7 @@
                     </div>
 
                     <icon icon="chevron-down"
-                          class="ml-1 mt-0.5 text-gray-700 dark:text-gray-400"/>
+                          class="w-4 h-4 ml-1 mt-0.5 text-gray-700 dark:text-gray-400"/>
                 </MenuButton>
 
                 <MenuItems
@@ -52,8 +52,8 @@
                                             <img :src="user.photoUrl"/>
                                         </template>
                                         <template v-else>
-                                            <icon icon="user" size="sm"
-                                                  class="text-gray-500"/>
+                                            <icon icon="user"
+                                                  class="w-3 h-3 text-gray-500"/>
                                         </template>
                                     </div>
 
@@ -67,7 +67,7 @@
                                 </div>
 
                                 <icon v-if="!currentOrganization"
-                                      class="text-light" icon="check"/>
+                                      class="w-4 h-4 text-light" icon="check"/>
                             </button>
                         </MenuItem>
 
@@ -88,7 +88,7 @@
 
                                     <icon
                                         v-if="currentOrganization && currentOrganization.id === organization.id"
-                                        class="text-light" icon="check"/>
+                                        class="w-4 h-4 text-light" icon="check"/>
                                 </button>
                             </MenuItem>
                         </template>

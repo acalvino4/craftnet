@@ -10,7 +10,7 @@
                 <div>
                     <template v-if="!isEditing">
                         <btn class="mt-3 sm:mt-0" @click="onEditClick">
-                            <icon icon="pencil" size="sm"/>
+                            <icon icon="pencil" class="w-3 h-3" />
                             Edit
                         </btn>
                     </template>

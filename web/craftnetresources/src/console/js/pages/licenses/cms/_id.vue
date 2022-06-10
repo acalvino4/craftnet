@@ -20,7 +20,7 @@
                     <cms-license-details
                         v-model:license="license"></cms-license-details>
 
-                    <pane>
+                    <pane class="plugin-licenses">
                         <h2>Plugin Licenses</h2>
 
                         <template v-if="license.pluginLicenses.length > 0">
@@ -49,7 +49,7 @@
 
                     <license-history :history="license.history"/>
 
-                    <pane class="border border-red-500 mb-3">
+                    <pane class="danger-zone border border-red-500 mb-3">
                         <template v-slot:header>
                             <h2 class="text-red-600">Danger Zone</h2>
                         </template>
