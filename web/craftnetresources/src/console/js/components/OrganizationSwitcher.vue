@@ -1,8 +1,5 @@
 <template>
-    <div v-if="user" class="header-left md:w-64 text-center md:text-left flex"
-         :class="[{
-        'md:border-r md:border-gray-300 dark:md:border-black': true
-    }]">
+    <div v-if="user" class="header-left flex">
         <div class="inline-block flex-1">
             <Menu as="div" class="header-brand relative">
                 <MenuButton
