@@ -34,13 +34,13 @@
                 </MenuButton>
 
                 <MenuItems
-                    class="absolute z-10 left-4 w-56 origin-top-right bg-white dark:bg-gray-800 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-10 dark:ring-white dark:ring-opacity-20 focus:outline-none">
+                    class="absolute z-10 left-4 w-56 origin-top-right bg-white dark:bg-gray-700 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-10 dark:ring-white dark:ring-opacity-20 focus:outline-none">
                     <div class="px-2 py-1">
                         <MenuItem v-if="user" v-slot="{active}">
                             <button :class="[{
                                     'bg-gray-200 dark:bg-gray-700': active,
                                 }]"
-                                    class="truncate w-full flex items-center justify-between cursor-pointer rounded text-sm my-1 px-3 py-1 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-700"
+                                    class="truncate w-full flex items-center justify-between cursor-pointer rounded text-sm my-1 px-3 py-1 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-600"
                                     @click="selectOrganization(null)">
                                 <div class="flex items-center">
                                     <div
@@ -75,7 +75,7 @@
                                 <button :class="[{
                                     'bg-gray-200 dark:bg-gray-700': active,
                                 }]"
-                                        class="truncate w-full flex items-center justify-between cursor-pointer rounded text-sm my-1 px-3 py-1 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-700"
+                                        class="truncate w-full flex items-center justify-between cursor-pointer rounded text-sm my-1 px-3 py-1 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-600"
                                         @click="selectOrganization(organization)">
                                     <div class="flex items-center">
                                         <img class="w-7 h-7 rounded mr-2"
@@ -90,13 +90,13 @@
                             </MenuItem>
                         </template>
 
-                        <hr class="my-2 mx-3 border-separator"/>
+                        <hr class="my-2 mx-3 border-t dark:border-gray-600"/>
 
                         <MenuItem class="truncate" v-slot="{active}">
                             <button :class="[{
                                     'bg-gray-200 dark:bg-gray-800': active,
                                 }]"
-                                    class="w-full cursor-pointer rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-200 hover:no-underline"
+                                    class="w-full cursor-pointer rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-200 hover:no-underline"
                                     @click="newOrganization"
                             >
                                 <icon icon="plus"
