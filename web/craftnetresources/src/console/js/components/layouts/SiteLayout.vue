@@ -3,7 +3,7 @@
         <template v-if="$route.meta.centerContent">
             <div class="polkadots">
                 <div class="polkadot opacity-50 dark:opacity-20 absolute transform -translate-x-1/2 -translate-y-1/3 top-0 left-0 bg-purple-300 dark:bg-purple-900 rounded-full"></div>
-                <div class="polkadot opacity-50 dark:opacity-20 absolute top-0 right-0  transform translate-x-1/2 -translate-y-1/3 bg-lightBlue-300 dark:bg-lightBlue-900 rounded-full"></div>
+                <div class="polkadot opacity-50 dark:opacity-20 absolute top-0 right-0  transform translate-x-1/2 -translate-y-1/3 bg-blue-300 dark:bg-blue-900 rounded-full"></div>
                 <div class="polkadot opacity-50 dark:opacity-20 absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-red-300 dark:bg-red-900 rounded-full"></div>
             </div>
         </template>
