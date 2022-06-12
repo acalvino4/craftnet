@@ -254,7 +254,7 @@ class PaymentsController extends CartsController
 
         // save it for Commerce
         $paymentSource = new PaymentSource([
-            'userId' => $user->id,
+            'customerId' => $user->id,
             'gatewayId' => $gateway->id,
             'token' => $stripeResponse->id,
             'response' => $stripeResponse->jsonSerialize(),
