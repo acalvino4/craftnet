@@ -257,7 +257,7 @@ class PaymentsController extends CartsController
             'customerId' => $user->id,
             'gatewayId' => $gateway->id,
             'token' => $stripeResponse->id,
-            'response' => $stripeResponse->jsonSerialize(),
+            'response' => $stripeResponse->toJSON(),
             'description' => 'Default Source',
         ]);
 
