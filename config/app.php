@@ -167,9 +167,9 @@ return [
 
                 // Define the default config for replica DB connections
                 $config['slaveConfig'] = [
-                    'username' => App::env('DB_USER'),
-                    'password' => App::env('DB_PASSWORD'),
-                    'tablePrefix' => App::env('DB_TABLE_PREFIX'),
+                    'username' => App::env('CRAFT_DB_USER'),
+                    'password' => App::env('CRAFT_DB_PASSWORD'),
+                    'tablePrefix' => App::env('CRAFT_DB_TABLE_PREFIX'),
                     'attributes' => [
                         // Use a smaller connection timeout
                         PDO::ATTR_TIMEOUT => 10,
