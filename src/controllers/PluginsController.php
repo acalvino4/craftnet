@@ -233,7 +233,7 @@ JS;
     }
 
     /**
-     * @return Response
+     * @return Response|null
      * @throws Exception
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
@@ -653,7 +653,7 @@ JS;
                     $folder = $assetsService->getFolderById($folderId);
                 }
 
-                foreach ($plugin->screenshots as $screenshot) {
+                foreach ($plugin->getScreenshots() as $screenshot) {
                     if (!$assetsService->moveAsset($screenshot, $folder)) {
                         throw new Exception('Could not save screenshot asset: ' . implode(', ', $screenshot->getErrorSummary(true)));
                     }
@@ -718,6 +718,7 @@ JS;
     public function actionDelete()
     {
         $pluginId = $this->request->getBodyParam('pluginId');
+        /** @var Plugin|null $plugin */
         $plugin = Plugin::find()->id($pluginId)->status(null)->one();
 
         if (!$plugin) {
@@ -734,7 +735,7 @@ JS;
 
         // Delete screenshots
 
-        foreach ($plugin->screenshots as $screenshot) {
+        foreach ($plugin->getScreenshots() as $screenshot) {
             Craft::$app->getElements()->deleteElement($screenshot);
         }
 

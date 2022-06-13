@@ -247,6 +247,7 @@ class PaymentsController extends CartsController
         }
 
         // Set it as the customer default for subscriptions
+        /** @phpstan-ignore-next-line */
         $stripeCustomer->invoice_settings = [
             'default_payment_method' => $paymentForm->paymentMethodId,
         ];

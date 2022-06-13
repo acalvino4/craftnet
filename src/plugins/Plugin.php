@@ -627,7 +627,9 @@ class Plugin extends Element
         if ($this->developerId === null) {
             throw new InvalidConfigException('Plugin is missing its developer ID');
         }
-        if (($user = User::find()->id($this->developerId)->status(null)->one()) === null) {
+        /** @var User|null $user */
+        $user = User::find()->id($this->developerId)->status(null)->one();
+        if ($user === null) {
             throw new InvalidConfigException('Invalid developer ID: ' . $this->developerId);
         }
         return $this->_developer = $user;
@@ -668,10 +670,9 @@ class Plugin extends Element
             if ($this->iconId === null) {
                 return null;
             }
-            if (($this->_icon = Asset::find()->id($this->iconId)->one()) === null) {
-                // It's probably soft-deleted
-                $this->_icon = false;
-            }
+            /** @var Asset|null $icon */
+            $icon = Asset::find()->id($this->iconId)->one();
+            $this->_icon = $icon ?? false;
         }
 
         return $this->_icon ?: null;
@@ -685,7 +686,8 @@ class Plugin extends Element
         if ($this->_categories !== null) {
             return $this->_categories;
         }
-        return $this->_categories = Category::find()
+        /** @var Category[] $categories */
+        $categories = Category::find()
             ->innerJoin(['pc' => Table::PLUGINCATEGORIES], [
                 'and',
                 '[[pc.categoryId]] = [[categories.id]]',
@@ -693,6 +695,7 @@ class Plugin extends Element
             ])
             ->orderBy(['pc.sortOrder' => SORT_ASC])
             ->all();
+        return $this->_categories = $categories;
     }
 
     /**
@@ -711,7 +714,8 @@ class Plugin extends Element
         if ($this->_screenshots !== null) {
             return $this->_screenshots;
         }
-        return $this->_screenshots = Asset::find()
+        /** @var Asset[] $screenshots */
+        $screenshots = Asset::find()
             ->innerJoin(['ps' => Table::PLUGINSCREENSHOTS], [
                 'and',
                 '[[ps.assetId]] = [[assets.id]]',
@@ -719,6 +723,7 @@ class Plugin extends Element
             ])
             ->orderBy(['ps.sortOrder' => SORT_ASC])
             ->all();
+        return $this->_screenshots = $screenshots;
     }
 
     /**

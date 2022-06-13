@@ -97,9 +97,11 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
         if ($this->editionId === null) {
             throw new InvalidConfigException('CMS renewal is missing its edition ID');
         }
-        if (($edition = CmsEdition::findOne($this->editionId)) === null) {
+        /** @var CmsEdition|null $edition */
+        $edition = CmsEdition::findOne($this->editionId);
+        if ($edition === null) {
             throw new InvalidConfigException('Invalid edition ID: ' . $this->editionId);
-        };
+        }
         return $edition;
     }
 
@@ -108,7 +110,7 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
      */
     public function getIsAvailable(): bool
     {
-        return $this->price;
+        return (bool)$this->price;
     }
 
     /**
@@ -124,7 +126,7 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
      */
     public function getPrice(): float
     {
-        return (float)$this->price;
+        return $this->price;
     }
 
     /**

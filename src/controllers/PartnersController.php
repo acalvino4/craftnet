@@ -234,7 +234,7 @@ class PartnersController extends Controller
     /**
      * TODO: Implement user permissions for editing partners
      *
-     * @return Response
+     * @return Response|null
      * @throws Exception
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException

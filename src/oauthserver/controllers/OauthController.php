@@ -33,12 +33,12 @@ class OauthController extends Controller
     // =========================================================================
 
     /**
-     * @var bool
+     * @inheritdoc
      */
     public $enableCsrfValidation = false;
 
     /**
-     * @var bool
+     * @inheritdoc
      */
     protected array|int|bool $allowAnonymous = true;
 

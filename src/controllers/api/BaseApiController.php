@@ -242,11 +242,13 @@ abstract class BaseApiController extends Controller
             }
 
             if (!empty($this->pluginVersions)) {
-                $this->plugins = Plugin::find()
+                /** @var Plugin[] $plugins */
+                $plugins = Plugin::find()
                     ->handle(array_keys($this->pluginVersions))
                     ->with(['editions'])
                     ->indexBy('handle')
                     ->all();
+                $this->plugins = $plugins;
             }
         }
 

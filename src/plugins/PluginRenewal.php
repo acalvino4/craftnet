@@ -98,9 +98,11 @@ class PluginRenewal extends PluginPurchasable implements RenewalInterface
         if ($this->editionId === null) {
             throw new InvalidConfigException('Plugin renewal is missing its edition ID');
         }
-        if (($edition = PluginEdition::find()->id($this->editionId)->status(null)->one()) === null) {
+        /** @var PluginEdition|null $edition */
+        $edition = PluginEdition::find()->id($this->editionId)->status(null)->one();
+        if ($edition === null) {
             throw new InvalidConfigException('Invalid edition ID: ' . $this->editionId);
-        };
+        }
         return $edition;
     }
 
@@ -109,7 +111,7 @@ class PluginRenewal extends PluginPurchasable implements RenewalInterface
      */
     public function getIsAvailable(): bool
     {
-        return $this->price;
+        return (bool)$this->price;
     }
 
     /**
@@ -125,7 +127,7 @@ class PluginRenewal extends PluginPurchasable implements RenewalInterface
      */
     public function getPrice(): float
     {
-        return (float)$this->price;
+        return $this->price;
     }
 
     /**

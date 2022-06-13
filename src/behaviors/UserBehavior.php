@@ -78,6 +78,7 @@ class UserBehavior extends Behavior
      */
     public function getPartner(): Partner
     {
+        /** @var Partner|null $partner */
         $partner = Partner::find()
             ->ownerId($this->owner->id)
             ->status(null)
@@ -111,10 +112,12 @@ class UserBehavior extends Behavior
             return $this->_plugins;
         }
 
-        return $this->_plugins = Plugin::find()
+        /** @var Plugin[] $plugins */
+        $plugins = Plugin::find()
             ->developerId($this->owner->id)
             ->status(null)
             ->all();
+        return $this->_plugins = $plugins;
     }
 
     /**

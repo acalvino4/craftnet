@@ -420,6 +420,7 @@ class PluginStoreController extends BaseApiController
      */
     private function _createFeaturedSectionQuery(): EntryQuery
     {
+        /** @var EntryQuery */
         return Entry::find()
             ->section('featuredPlugins')
             ->site('craftId');

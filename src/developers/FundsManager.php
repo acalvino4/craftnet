@@ -40,7 +40,7 @@ class FundsManager extends BaseObject
     private $_lockName;
 
     /**
-     * @var bool
+     * @var int
      * @see _lockFunds()
      * @see _unlockFunds()
      */
@@ -352,6 +352,6 @@ SQL;
             'dateCreated' => Db::prepareDateForDb(new \DateTime()),
         ])->execute();
 
-        return $db->getLastInsertID(Table::DEVELOPERLEDGER);
+        return (int)$db->getLastInsertID(Table::DEVELOPERLEDGER);
     }
 }

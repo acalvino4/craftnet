@@ -235,6 +235,8 @@ class DeveloperSupportController extends Controller
                 /** @var SwitchPlans $switchPlansForm */
                 $switchPlansForm = $gateway->getSwitchPlansFormModel();
                 $switchPlansForm->prorate = true;
+                // todo: fix this
+                /** @phpstan-ignore-next-line  */
                 $switchPlansForm->billingCycleAnchor = 'now';
                 $switchResult = $subscriptionService->switchSubscriptionPlan($proSubscription, $commerce->getPlans()->getPlanByHandle(self::PLAN_PREMIUM), $switchPlansForm);
 

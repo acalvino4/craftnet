@@ -77,7 +77,7 @@ class Package extends Model
     public $webhookSecret;
 
     /**
-     * @var BaseVcs|null
+     * @var VcsInterface|null
      */
     private $_vcs;
 
@@ -129,11 +129,12 @@ class Package extends Model
         }
 
         if ($this->_plugin === null) {
-            $this->_plugin = Plugin::find()
-                    ->packageId($this->id)
-                    ->status(null)
-                    ->one()
-                ?? false;
+            /** @var Plugin|null $plugin */
+            $plugin = Plugin::find()
+                ->packageId($this->id)
+                ->status(null)
+                ->one();
+            $this->_plugin = $plugin ?? false;
         }
 
         return $this->_plugin ?: null;

@@ -133,7 +133,7 @@ class PayoutManager extends BaseObject
      */
     public function updateInProgressPayouts(): array
     {
-        /* @var Payout[] $payoutRecords */
+        /** @var Payout[] $payoutRecords */
         $payoutRecords = Payout::find()
             ->where([
                 'status' => ['PENDING', 'PROCESSING'],
