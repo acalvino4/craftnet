@@ -40,7 +40,7 @@ class SupportController extends BaseApiController
         $body = $this->request->getRequiredBodyParam('message');
 
         $info = [];
-        /** @var CmsLicense $cmsLicense */
+        /** @var CmsLicense|null $cmsLicense */
         $cmsLicense = reset($this->cmsLicenses) ?: null;
         $formatter = Craft::$app->getFormatter();
         if ($this->cmsEdition !== null || $this->cmsVersion !== null) {

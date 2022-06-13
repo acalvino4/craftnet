@@ -240,7 +240,7 @@ class DeveloperSupportController extends Controller
                 break;
         }
 
-        return $this->asJson($this->_getSubscriptionData(true));
+        return $this->asJson($this->_getSubscriptionData());
     }
 
     /**

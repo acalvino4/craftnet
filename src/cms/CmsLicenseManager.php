@@ -755,7 +755,7 @@ class CmsLicenseManager extends Component
      */
     private function _createLicenseQueryForOwner(User $owner, string $searchQuery = null)
     {
-        $query = $this->_createLicenseQuery($searchQuery)
+        $query = $this->_createLicenseQuery()
             ->where(['l.ownerId' => $owner->id]);
 
 

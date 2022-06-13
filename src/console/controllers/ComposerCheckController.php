@@ -30,7 +30,6 @@ class ComposerCheckController extends Controller
         $cache = Craft::$app->getCache();
         $packageManager = $this->module->getPackageManager();
         $processedPlugins = $cache->get($cacheKey) ?: [];
-        $failures = [];
         $plugins = Plugin::find()->all();
 
         $testPath = dirname(CRAFT_BASE_PATH) . '/test';
@@ -88,13 +87,6 @@ class ComposerCheckController extends Controller
         }
 
         $this->stdout("\nFinished processing plugins\n\n", Console::FG_GREEN);
-
-        if (!empty($failures)) {
-            $this->stdout("Failed packages:\n", Console::FG_RED);
-            foreach ($failures as $failure) {
-                $this->stdout("- $failure\n", Console::FG_RED);
-            }
-        }
 
         return ExitCode::OK;
     }
