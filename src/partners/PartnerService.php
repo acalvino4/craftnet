@@ -563,7 +563,7 @@ class PartnerService
 
             /** @var Volume $volume */
             $volume = $volumesService->getVolumeByHandle('partnerImages');
-            $volumeId = $volumesService->ensureTopFolder($volume);
+            $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
             $subpath = '/' . $handle;
 
@@ -678,7 +678,7 @@ class PartnerService
 
         /** @var Volume $volume */
         $volume = $volumesService->getVolumeByHandle('partnerImages');
-        $volumeId = $volumesService->ensureTopFolder($volume);
+        $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
         $subpath = '/' . $handle;
 

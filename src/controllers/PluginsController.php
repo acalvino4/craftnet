@@ -376,7 +376,7 @@ JS;
 
                     // Save as an asset
                     $volume = $volumesService->getVolumeByHandle('icons');
-                    $folderId = $volumesService->ensureTopFolder($volume);
+                    $folderId = $volumesService->ensureTopFolder($volume)->id;
                     $targetFilename = "$plugin->handle.svg";
 
                     if (!$newPlugin) {
@@ -472,7 +472,7 @@ JS;
                     // Save as an asset
                     $volumesService = Craft::$app->getVolumes();
                     $volume = $volumesService->getVolumeByHandle('screenshots');
-                    $volumeId = $volumesService->ensureTopFolder($volume);
+                    $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
                     $subpath = '/' . $plugin->handle;
 
@@ -631,7 +631,7 @@ JS;
             // Screenshots
             if ($newHandle) {
                 $volume = $volumesService->getVolumeByHandle('screenshots');
-                $volumeId = $volumesService->ensureTopFolder($volume);
+                $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
                 $subpath = '/' . $plugin->handle;
 
@@ -929,7 +929,7 @@ JS;
         // Save as an asset
         $volumesService = Craft::$app->getVolumes();
         $volume = $volumesService->getVolumeByHandle('icons');
-        $folderId = $volumesService->ensureTopFolder($volume);
+        $folderId = $volumesService->ensureTopFolder($volume)->id;
 
         $icon = new Asset([
             'title' => $name,
