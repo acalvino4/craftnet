@@ -573,7 +573,7 @@ class PartnerService
             ]);
 
             if (!$folder) {
-                $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+                $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
             } else {
                 $folderId = $folder->id;
             }
@@ -688,7 +688,7 @@ class PartnerService
         ]);
 
         if (!$folder) {
-            $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+            $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
         } else {
             $folderId = $folder->id;
         }

@@ -482,7 +482,7 @@ JS;
                     ]);
 
                     if (!$folder) {
-                        $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+                        $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
                     } else {
                         $folderId = $folder->id;
                     }
@@ -490,6 +490,7 @@ JS;
                     $targetFilename = $screenshotFile->name;
 
                     $screenshot = new Asset([
+                        'filename' => $targetFilename,
                         'title' => $plugin->name,
                         'tempFilePath' => $tempPath,
                         'newLocation' => "{folder:{$folderId}}" . $targetFilename,
@@ -641,7 +642,7 @@ JS;
                 ]);
 
                 if (!$folder) {
-                    $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+                    $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
                     $folder = $assetsService->getFolderById($folderId);
                 }
 
