@@ -563,7 +563,7 @@ class PartnerService
 
             /** @var Volume $volume */
             $volume = $volumesService->getVolumeByHandle('partnerImages');
-            $volumeId = $volumesService->ensureTopFolder($volume);
+            $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
             $subpath = '/' . $handle;
 
@@ -573,7 +573,7 @@ class PartnerService
             ]);
 
             if (!$folder) {
-                $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+                $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
             } else {
                 $folderId = $folder->id;
             }
@@ -678,7 +678,7 @@ class PartnerService
 
         /** @var Volume $volume */
         $volume = $volumesService->getVolumeByHandle('partnerImages');
-        $volumeId = $volumesService->ensureTopFolder($volume);
+        $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
         $subpath = '/' . $handle;
 
@@ -688,7 +688,7 @@ class PartnerService
         ]);
 
         if (!$folder) {
-            $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+            $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
         } else {
             $folderId = $folder->id;
         }
