@@ -430,8 +430,12 @@ class CartsController extends BaseApiController
         }
 
         $address->ownerId = $cart->id;
-        $address->countryCode = $country->getCountryCode();
-        $address->administrativeArea = $state ? $state->getIsoCode() : '';
+
+        if ($country) {
+            $address->countryCode = $country->getCountryCode();
+        }
+
+        $address->administrativeArea = $state?->getIsoCode();
 
         // save the address
         if (!Craft::$app->getElements()->saveElement($address)) {
