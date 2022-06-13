@@ -36,73 +36,66 @@
                 <MenuItems
                     class="absolute z-10 left-4 w-56 origin-top-right bg-white dark:bg-gray-700 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-10 dark:ring-white dark:ring-opacity-20 focus:outline-none">
                     <div class="px-2 py-1">
-                        <MenuItem v-if="user" v-slot="{active}">
-                            <button :class="[{
-                                    'bg-gray-200 dark:bg-gray-700': active,
-                                }]"
-                                    class="truncate w-full flex items-center justify-between cursor-pointer rounded text-sm my-1 px-3 py-1 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-600"
-                                    @click="selectOrganization(null)">
-                                <div class="flex items-center">
-                                    <div
-                                        class="w-7 h-7 bg-gray-100 rounded overflow-hidden mr-2 flex items-center justify-center">
-                                        <template v-if="user.photoUrl">
-                                            <img :src="user.photoUrl"/>
-                                        </template>
-                                        <template v-else>
-                                            <icon icon="user"
-                                                  class="w-3 h-3 text-gray-500"/>
-                                        </template>
-                                    </div>
+                      <MenuItem v-if="user" v-slot="{active}">
+                        <organization-switcher-menu-item
+                          :active="active"
+                          :checked="!currentOrganization"
+                          @click="selectOrganization(null)"
+                        >
+                          <div class="flex items-center">
+                            <div
+                              class="w-7 h-7 bg-gray-100 rounded overflow-hidden mr-2 flex items-center justify-center">
+                              <template v-if="user.photoUrl">
+                                <img :src="user.photoUrl"/>
+                              </template>
+                              <template v-else>
+                                <icon icon="user"
+                                      class="w-3 h-3 text-gray-500"/>
+                              </template>
+                            </div>
 
-                                    <template
-                                        v-if="user.firstName || user.lastName">
-                                        {{ user.firstName }} {{ user.lastName }}
-                                    </template>
-                                    <template v-else-if="user.developerName">
-                                        {{ user.developerName }}
-                                    </template>
-                                </div>
-
-                                <icon v-if="!currentOrganization"
-                                      class="w-4 h-4 text-light" icon="check"/>
-                            </button>
-                        </MenuItem>
+                            <template
+                              v-if="user.firstName || user.lastName">
+                              {{ user.firstName }} {{ user.lastName }}
+                            </template>
+                            <template v-else-if="user.developerName">
+                              {{ user.developerName }}
+                            </template>
+                          </div>
+                        </organization-switcher-menu-item>
+                      </MenuItem>
 
                         <template
                             v-for="(organization, organizationKey) in organizations"
                             :key="'org-hud-item-' + organizationKey">
                             <MenuItem v-slot="{active}">
-                                <button :class="[{
-                                    'bg-gray-200 dark:bg-gray-700': active,
-                                }]"
-                                        class="truncate w-full flex items-center justify-between cursor-pointer rounded text-sm my-1 px-3 py-1 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-600"
-                                        @click="selectOrganization(organization)">
-                                    <div class="flex items-center">
+                                <organization-switcher-menu-item
+                                    :active="active"
+                                    :checked="currentOrganization && currentOrganization.id === organization.id"
+                                    @click="selectOrganization(organization)"
+                                >
+                                    <div class="flex items-center min-w-0">
                                         <img class="w-7 h-7 rounded mr-2"
                                              :src="staticImageUrl('avatars/' + organization.avatar)"/>
-                                        {{ organization.name }}
+                                        <div class="truncate">
+                                            {{ organization.name }}
+                                        </div>
                                     </div>
-
-                                    <icon
-                                        v-if="currentOrganization && currentOrganization.id === organization.id"
-                                        class="w-4 h-4 text-light" icon="check"/>
-                                </button>
+                                </organization-switcher-menu-item>
                             </MenuItem>
                         </template>
 
                         <hr class="my-2 mx-3 border-t dark:border-gray-600"/>
 
                         <MenuItem class="truncate" v-slot="{active}">
-                            <button :class="[{
-                                    'bg-gray-200 dark:bg-gray-800': active,
-                                }]"
-                                    class="w-full cursor-pointer rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent hover:border-interactive-nav-active-background hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:hover:text-gray-200 hover:no-underline"
-                                    @click="newOrganization"
+                            <organization-switcher-menu-item
+                                :active="active"
+                                @click="newOrganization"
                             >
                                 <icon icon="plus"
                                       class="w-5 h-5 inline-block mr-2"/>
                                 Add an organization
-                            </button>
+                            </organization-switcher-menu-item>
                         </MenuItem>
                     </div>
                 </MenuItems>
@@ -115,11 +108,13 @@
 import {Menu, MenuButton, MenuItems, MenuItem} from '@headlessui/vue'
 import {mapState} from 'vuex';
 import helpers from '@/console/js/mixins/helpers.js';
+import OrganizationSwitcherMenuItem from './OrganizationSwitcherMenuItem';
 
 export default {
     mixins: [helpers],
 
     components: {
+      OrganizationSwitcherMenuItem,
         Menu,
         MenuButton,
         MenuItems,
