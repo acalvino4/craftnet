@@ -1,34 +1,42 @@
 <template>
-    <div class="border-t py-12 flex">
-        <item-quantity :item="item" :item-key="itemKey"></item-quantity>
+  <div class="border-t py-12 flex">
+    <item-quantity
+      :item="item"
+      :item-key="itemKey"></item-quantity>
 
-        <item-icon :item="item"></item-icon>
+    <item-icon :item="item"></item-icon>
 
-        <div class="flex-1">
-            <div>
-                <div class="flex justify-between">
-                    <item-description :item="item" :item-key="itemKey"></item-description>
+    <div class="flex-1">
+      <div>
+        <div class="flex justify-between">
+          <item-description
+            :item="item"
+            :item-key="itemKey"></item-description>
 
-                    <div class="text-right">
-                        <!-- Subtotal -->
-                        <strong
-                            class="block text-xl">
-                            {{
-                                $filters.currency(item.lineItem.subtotal)
-                            }}
-                        </strong>
+          <div class="text-right">
+            <!-- Subtotal -->
+            <strong
+              class="block text-xl">
+              {{
+                $filters.currency(item.lineItem.subtotal)
+              }}
+            </strong>
 
-                        <!-- Remove button -->
-                        <a @click="removeFromCart(itemKey)">Remove</a>
-                    </div>
-                </div>
-
-                <item-updates :item="item" :item-key="itemKey"></item-updates>
-            </div>
-
-            <item-adjustments :item="item" :item-key="itemKey"></item-adjustments>
+            <!-- Remove button -->
+            <a @click="removeFromCart(itemKey)">Remove</a>
+          </div>
         </div>
+
+        <item-updates
+          :item="item"
+          :item-key="itemKey"></item-updates>
+      </div>
+
+      <item-adjustments
+        :item="item"
+        :item-key="itemKey"></item-adjustments>
     </div>
+  </div>
 </template>
 
 <script>
@@ -40,23 +48,23 @@ import ItemAdjustments from '@/console/js/components/cart/ItemAdjustments';
 import {mapActions} from 'vuex';
 
 export default {
-    props: {
-        item: Object,
-        itemKey: Number,
-    },
+  props: {
+    item: Object,
+    itemKey: Number,
+  },
 
-    components: {
-        ItemIcon,
-        ItemDescription,
-        ItemQuantity,
-        ItemUpdates,
-        ItemAdjustments,
-    },
+  components: {
+    ItemIcon,
+    ItemDescription,
+    ItemQuantity,
+    ItemUpdates,
+    ItemAdjustments,
+  },
 
-    methods: {
-        ...mapActions({
-            removeFromCart: 'cart/removeFromCart',
-        }),
-    }
+  methods: {
+    ...mapActions({
+      removeFromCart: 'cart/removeFromCart',
+    }),
+  }
 }
 </script>

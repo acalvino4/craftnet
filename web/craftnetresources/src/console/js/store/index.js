@@ -15,23 +15,23 @@ import stripe from './modules/stripe'
 import organizations from './modules/organizations'
 
 const store = createStore({
-    strict: true,
-    modules: {
-        account,
-        app,
-        apps,
-        cart,
-        cmsLicenses,
-        craftId,
-        developerSupport,
-        invoices,
-        partner,
-        pluginLicenses,
-        plugins,
-        pluginStore,
-        stripe,
-        organizations,
-    }
+  strict: true,
+  modules: {
+    account,
+    app,
+    apps,
+    cart,
+    cmsLicenses,
+    craftId,
+    developerSupport,
+    invoices,
+    partner,
+    pluginLicenses,
+    plugins,
+    pluginStore,
+    stripe,
+    organizations,
+  }
 })
 
 export default store

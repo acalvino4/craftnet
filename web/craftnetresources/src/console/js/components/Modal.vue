@@ -1,70 +1,88 @@
 <template>
-    <transition :name="transition" @enter="$emit('enter')"
-                @after-enter="$emit('after-enter')" @leave="$emit('leave')">
-        <div v-if="show" class="modal" tabindex="-1" role="dialog"
-             aria-labelledby="modalLabel" aria-hidden="true"
-             @click="onBackgroundClick" @keydown.esc="$emit('close')">
-            <div class="modal-dialog" :class="modalTypeClass" role="document">
-                <div class="modal-content">
-                    <div v-if="$slots.header" class="modal-header">
-                        <h5 class="modal-title" id="modalLabel">
-                            <slot name="header"></slot>
-                        </h5>
-                    </div>
-                    <div class="modal-body">
-                        <slot name="body"></slot>
-                    </div>
+  <transition
+    :name="transition"
+    @enter="$emit('enter')"
+    @after-enter="$emit('after-enter')"
+    @leave="$emit('leave')">
+    <div
+      v-if="show"
+      class="modal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="modalLabel"
+      aria-hidden="true"
+      @click="onBackgroundClick"
+      @keydown.esc="$emit('close')">
+      <div
+        class="modal-dialog"
+        :class="modalTypeClass"
+        role="document">
+        <div class="modal-content">
+          <div
+            v-if="$slots.header"
+            class="modal-header">
+            <h5
+              class="modal-title"
+              id="modalLabel">
+              <slot name="header"></slot>
+            </h5>
+          </div>
+          <div class="modal-body">
+            <slot name="body"></slot>
+          </div>
 
-                    <div v-if="$slots.footer" class="modal-footer">
-                        <slot name="footer"></slot>
-                    </div>
-                </div>
-            </div>
+          <div
+            v-if="$slots.footer"
+            class="modal-footer">
+            <slot name="footer"></slot>
+          </div>
         </div>
-    </transition>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script>
 export default {
-    props: {
-        show: {
-            type: Boolean
-        },
-        transition: {
-            type: String
-        },
-        modalType: {default: 'dialog'}
+  props: {
+    show: {
+      type: Boolean
     },
-
-    computed: {
-        modalTypeClass() {
-            // 'dialog' (default) or 'wide' - see `.modal` styles
-            return 'modal-' + this.modalType
-        }
+    transition: {
+      type: String
     },
+    modalType: {default: 'dialog'}
+  },
 
-    methods: {
-        onBackgroundClick($ev) {
-            if ($ev.target.classList.contains('modal')) {
-                this.$emit('close')
-            }
-        }
+  computed: {
+    modalTypeClass() {
+      // 'dialog' (default) or 'wide' - see `.modal` styles
+      return 'modal-' + this.modalType
     }
+  },
+
+  methods: {
+    onBackgroundClick($ev) {
+      if ($ev.target.classList.contains('modal')) {
+        this.$emit('close')
+      }
+    }
+  }
 }
 </script>
 
 <style lang="scss">
 .modal {
-    @apply fixed inset-0 block z-10 flex items-center content-center justify-center p-8;
-    background: rgba(0, 0, 0, 0.7);
+  @apply fixed inset-0 block z-10 flex items-center content-center justify-center p-8;
+  background: rgba(0, 0, 0, 0.7);
 
-    .modal-wide {
-        @apply w-full max-w-lg;
-    }
+  .modal-wide {
+    @apply w-full max-w-lg;
+  }
 
-    .modal-content {
-        @apply flex flex-col bg-primary rounded p-8 max-h-full overflow-auto;
-        border: 1px solid rgba(0, 0, 0, .2);
-    }
+  .modal-content {
+    @apply flex flex-col bg-primary rounded p-8 max-h-full overflow-auto;
+    border: 1px solid rgba(0, 0, 0, .2);
+  }
 }
 </style>

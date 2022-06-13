@@ -16,23 +16,24 @@ Vue.filter('capitalize', capitalize)
 Vue.use(require('vue-moment'))
 
 import Vuelidate from 'vuelidate'
+
 Vue.use(Vuelidate)
 
 window.craftIdApp = new Vue({
-    store,
+  store,
 
-    render: h => h(App),
+  render: h => h(App),
 
-    methods: {
-        /**
-         * Connect app callback.
-         *
-         * @param apps
-         */
-        connectAppCallback(apps) {
-            this.$store.dispatch('apps/connectAppCallback', apps)
+  methods: {
+    /**
+     * Connect app callback.
+     *
+     * @param apps
+     */
+    connectAppCallback(apps) {
+      this.$store.dispatch('apps/connectAppCallback', apps)
 
-            this.$store.dispatch('app/displayNotice', 'App connected.')
-        },
+      this.$store.dispatch('app/displayNotice', 'App connected.')
     },
+  },
 }).$mount('#app')

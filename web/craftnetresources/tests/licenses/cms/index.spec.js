@@ -12,8 +12,8 @@ const waitForDiscoverPage = async ({page}) => {
     ]);
 }*/
 
-test('Shoud show the Craft CMS licenses page', async ({ page, baseURL }) => {
-    await page.goto(baseURL + '/licenses/cms');
-    const title = page.locator('h1');
-    await expect(title).toHaveText('Craft CMS');
+test('Shoud show the Craft CMS licenses page', async ({page, baseURL}) => {
+  await page.goto(baseURL + '/licenses/cms');
+  const title = page.locator('h1');
+  await expect(title).toHaveText('Craft CMS');
 });

@@ -1,34 +1,34 @@
 <template>
-    <div>
-        <page-header>
-            <h1>Billing</h1>
-        </page-header>
+  <div>
+    <page-header>
+      <h1>Billing</h1>
+    </page-header>
 
-        <div class="space-y-6">
-            <pane>
-                <billing-payment></billing-payment>
-            </pane>
+    <div class="space-y-6">
+      <pane>
+        <billing-payment></billing-payment>
+      </pane>
 
-            <pane>
-                <billing-address-form></billing-address-form>
-            </pane>
+      <pane>
+        <billing-address-form></billing-address-form>
+      </pane>
 
-            <pane>
-                <billing-invoice-details></billing-invoice-details>
-            </pane>
+      <pane>
+        <billing-invoice-details></billing-invoice-details>
+      </pane>
 
-            <pane>
-                <h2>Invoices</h2>
+      <pane>
+        <h2>Invoices</h2>
 
-                <invoices-table class="mt-4"></invoices-table>
-            </pane>
+        <invoices-table class="mt-4"></invoices-table>
+      </pane>
 
-            <pane>
-                <h2>Subscription Invoices</h2>
-                <subscription-invoices-table class="mt-4"></subscription-invoices-table>
-            </pane>
-        </div>
+      <pane>
+        <h2>Subscription Invoices</h2>
+        <subscription-invoices-table class="mt-4"></subscription-invoices-table>
+      </pane>
     </div>
+  </div>
 </template>
 
 <script>
@@ -40,13 +40,13 @@ import SubscriptionInvoicesTable from '../../../components/billing/SubscriptionI
 import PageHeader from '@/console/js/components/PageHeader'
 
 export default {
-    components: {
-        BillingPayment,
-        BillingInvoiceDetails,
-        BillingAddressForm,
-        InvoicesTable,
-        SubscriptionInvoicesTable,
-        PageHeader,
-    },
+  components: {
+    BillingPayment,
+    BillingInvoiceDetails,
+    BillingAddressForm,
+    InvoicesTable,
+    SubscriptionInvoicesTable,
+    PageHeader,
+  },
 }
 </script>

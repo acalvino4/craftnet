@@ -1,63 +1,65 @@
 <template>
-    <div class="c-spinner text-black dark:text-white text-opacity-50" :class="{
+  <div
+    class="c-spinner text-black dark:text-white text-opacity-50"
+    :class="{
         'inline-block': true,
         [size]: true,
     }">
-        <div class="animation"></div>
-    </div>
+    <div class="animation"></div>
+  </div>
 </template>
 
 <script>
-    export default {
-        props: {
-            /**
-             * 'base' or 'lg'
-             */
-            size: {
-                type: String,
-                default: 'base',
-            },
-        },
-    }
+export default {
+  props: {
+    /**
+     * 'base' or 'lg'
+     */
+    size: {
+      type: String,
+      default: 'base',
+    },
+  },
+}
 </script>
 
 <style lang="scss">
-    .c-spinner {
-        & > .animation {
-            animation: rotator .7s linear infinite;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border-width: 2px;
-            border-style: solid;
-            border-color: currentColor;
-            border-top-color: transparent !important;
-            border-left-color: transparent !important;
-        }
+.c-spinner {
+  & > .animation {
+    animation: rotator .7s linear infinite;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border-width: 2px;
+    border-style: solid;
+    border-color: currentColor;
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+  }
 
-        &.sm {
-            & > .animation {
-                width: 16px;
-                height: 16px;
-            }
-        }
-
-        &.lg {
-            & > .animation {
-                width: 32px;
-                height: 32px;
-                border-width: 3px;
-            }
-        }
+  &.sm {
+    & > .animation {
+      width: 16px;
+      height: 16px;
     }
+  }
 
-    @keyframes rotator {
-        0% {
-            transform: rotate(0)
-        }
-
-        to {
-            transform: rotate(1turn)
-        }
+  &.lg {
+    & > .animation {
+      width: 32px;
+      height: 32px;
+      border-width: 3px;
     }
+  }
+}
+
+@keyframes rotator {
+  0% {
+    transform: rotate(0)
+  }
+
+  to {
+    transform: rotate(1turn)
+  }
+}
 </style>

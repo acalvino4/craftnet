@@ -1,5 +1,5 @@
 <template>
-    <component :is="computedComponent"></component>
+  <component :is="computedComponent"></component>
 </template>
 
 <script>
@@ -8,23 +8,23 @@ import PersonalIndex from './_personal'
 import OrganizationIndex from './_organization'
 
 export default {
-    components: {
-        PersonalIndex,
-        OrganizationIndex,
-    },
-    computed: {
-        ...mapState({
-            currentOrganization: state => state.organizations.currentOrganization,
-        }),
+  components: {
+    PersonalIndex,
+    OrganizationIndex,
+  },
+  computed: {
+    ...mapState({
+      currentOrganization: state => state.organizations.currentOrganization,
+    }),
 
-        computedComponent() {
-            if (this.currentOrganization) {
-                return OrganizationIndex
-            }
+    computedComponent() {
+      if (this.currentOrganization) {
+        return OrganizationIndex
+      }
 
-            return PersonalIndex
-        }
-    },
+      return PersonalIndex
+    }
+  },
 }
 </script>
 

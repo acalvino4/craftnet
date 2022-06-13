@@ -1,17 +1,17 @@
 <template>
-    <div :class="'edition-badge' + (type ? ' badge-' + type : '')">
-        <slot></slot>
-    </div>
+  <div :class="'edition-badge' + (type ? ' badge-' + type : '')">
+    <slot></slot>
+  </div>
 </template>
 
 <script>
 export default {
-    props: ['type']
+  props: ['type']
 }
 </script>
 
 <style lang="scss">
 .edition-badge {
-    @apply border border-solid border-separator text-gray-800 dark:text-gray-200 inline-block px-2 py-1 rounded text-xs uppercase;
+  @apply border border-solid border-separator text-gray-800 dark:text-gray-200 inline-block px-2 py-1 rounded text-xs uppercase;
 }
 </style>

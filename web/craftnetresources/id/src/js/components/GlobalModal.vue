@@ -1,31 +1,36 @@
 <template>
-    <modal :show="showGlobalModal" @close="close()">
-        <template slot="body">
-            <component v-if="globalModalComponent" :is="globalModalComponent" @close="close()"></component>
-        </template>
-    </modal>
+  <modal
+    :show="showGlobalModal"
+    @close="close()">
+    <template slot="body">
+      <component
+        v-if="globalModalComponent"
+        :is="globalModalComponent"
+        @close="close()"></component>
+    </template>
+  </modal>
 </template>
 
 <script>
-    import {mapState} from 'vuex'
-    import Modal from './Modal'
+import {mapState} from 'vuex'
+import Modal from './Modal'
 
-    export default {
-        components: {
-            Modal,
-        },
+export default {
+  components: {
+    Modal,
+  },
 
-        computed: {
-            ...mapState({
-                globalModalComponent: state => state.app.globalModalComponent,
-                showGlobalModal: state => state.app.showGlobalModal,
-            }),
-        },
+  computed: {
+    ...mapState({
+      globalModalComponent: state => state.app.globalModalComponent,
+      showGlobalModal: state => state.app.showGlobalModal,
+    }),
+  },
 
-        methods: {
-            close() {
-                this.$store.commit('app/updateShowGlobalModal', false)
-            }
-        }
+  methods: {
+    close() {
+      this.$store.commit('app/updateShowGlobalModal', false)
     }
+  }
+}
 </script>

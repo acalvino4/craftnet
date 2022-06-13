@@ -5,8 +5,8 @@ const scheme = server === 'https' ? "https" : "http";
 const publicPath = process.env.DEV_SERVER_PUBLIC || `${scheme}://${host}:${port}/`;
 
 module.exports = {
-    server,
-    host,
-    port,
-    publicPath
+  server,
+  host,
+  port,
+  publicPath
 }

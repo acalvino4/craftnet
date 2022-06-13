@@ -4,65 +4,65 @@ import axios from 'axios'
 import FormDataHelper from '../helpers/form-data.js';
 
 export default {
-    getRemainingSessionTime(config) {
-        return axios.get(Craft.actionUrl + '/users/session-info', config)
-    },
+  getRemainingSessionTime(config) {
+    return axios.get(Craft.actionUrl + '/users/session-info', config)
+  },
 
-    login(formData) {
-        return axios.post(Craft.actionUrl + '/users/login', formData, {
-            headers: {
-                'X-CSRF-Token': Craft.csrfTokenValue,
-            }
-        })
-    },
+  login(formData) {
+    return axios.post(Craft.actionUrl + '/users/login', formData, {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
 
-    logout() {
-        return axios.get(Craft.actionUrl + '/users/logout')
-    },
+  logout() {
+    return axios.get(Craft.actionUrl + '/users/logout')
+  },
 
-    registerUser(formData) {
-        return axios.post(Craft.actionUrl + '/users/save-user', formData, {
-            headers: {
-                'X-CSRF-Token': Craft.csrfTokenValue,
-            }
-        })
-    },
+  registerUser(formData) {
+    return axios.post(Craft.actionUrl + '/users/save-user', formData, {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
 
-    saveUser(user) {
-        const formData = new FormData();
+  saveUser(user) {
+    const formData = new FormData();
 
-        for (const attribute in user) {
-            switch (attribute) {
-                case 'id':
-                    FormDataHelper.append(formData, 'userId', user[attribute]);
-                    break;
-                case 'email':
-                case 'username':
-                case 'firstName':
-                case 'lastName':
-                case 'password':
-                case 'newPassword':
-                case 'photo':
-                case 'payPalEmail':
-                    FormDataHelper.append(formData, attribute, user[attribute]);
-                    break;
-                default:
-                    FormDataHelper.append(formData, 'fields[' + attribute + ']', user[attribute]);
-            }
-        }
+    for (const attribute in user) {
+      switch (attribute) {
+        case 'id':
+          FormDataHelper.append(formData, 'userId', user[attribute]);
+          break;
+        case 'email':
+        case 'username':
+        case 'firstName':
+        case 'lastName':
+        case 'password':
+        case 'newPassword':
+        case 'photo':
+        case 'payPalEmail':
+          FormDataHelper.append(formData, attribute, user[attribute]);
+          break;
+        default:
+          FormDataHelper.append(formData, 'fields[' + attribute + ']', user[attribute]);
+      }
+    }
 
-        return axios.post(Craft.actionUrl + '/users/save-user', formData, {
-            headers: {
-                'X-CSRF-Token': Craft.csrfTokenValue,
-            }
-        })
-    },
+    return axios.post(Craft.actionUrl + '/users/save-user', formData, {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
 
-    sendPasswordResetEmail(formData) {
-        return axios.post(Craft.actionUrl + '/users/send-password-reset-email', formData, {
-            headers: {
-                'X-CSRF-Token': Craft.csrfTokenValue,
-            }
-        })
-    },
+  sendPasswordResetEmail(formData) {
+    return axios.post(Craft.actionUrl + '/users/send-password-reset-email', formData, {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
 }

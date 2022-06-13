@@ -1,6 +1,6 @@
 <template>
     <span
-            :class="[{
+      :class="[{
                 'inline-flex items-center rounded font-medium': true,
                 'px-2 py-0.5 leading-4 text-xs': !large,
                 'px-2.5 py-0.5 leading-5 text-sm': large,
@@ -17,22 +17,22 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            /**
-             * 'default', 'success', 'info', 'warning', or 'danger'
-             */
-            type: {
-                type: String,
-                default: 'default',
-            },
-            /**
-             * Larger version of badge if set to `true`.
-             */
-            large: {
-                type: Boolean,
-                default: false,
-            },
-        },
-    }
+export default {
+  props: {
+    /**
+     * 'default', 'success', 'info', 'warning', or 'danger'
+     */
+    type: {
+      type: String,
+      default: 'default',
+    },
+    /**
+     * Larger version of badge if set to `true`.
+     */
+    large: {
+      type: Boolean,
+      default: false,
+    },
+  },
+}
 </script>

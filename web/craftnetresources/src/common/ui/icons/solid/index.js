@@ -4,8 +4,8 @@ import ShoppingCart from './ShoppingCart.vue'
 import User from './User.vue'
 
 export default {
-    'exclamation': Exclamation,
-    'grip-vertical': GripVertical,
-    'shopping-cart': ShoppingCart,
-    'user': User,
+  'exclamation': Exclamation,
+  'grip-vertical': GripVertical,
+  'shopping-cart': ShoppingCart,
+  'user': User,
 }

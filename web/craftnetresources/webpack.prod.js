@@ -4,16 +4,16 @@ const {getWebpackConfigs} = require("./webpack-utils/getWebpackConfig")
 process.env.NODE_ENV = process.env.NODE_ENV || 'production'
 
 module.exports = getWebpackConfigs(
-    'app',
-    'clean',
-    'dotenv',
-    'copy-images',
-    'code-splitting',
-    'file-loader',
-    'babel-loader',
-    'postcss-loader',
-    'vue-loader',
-    'mini-css-extract',
-    'minimize',
-    'manifest',
+  'app',
+  'clean',
+  'dotenv',
+  'copy-images',
+  'code-splitting',
+  'file-loader',
+  'babel-loader',
+  'postcss-loader',
+  'vue-loader',
+  'mini-css-extract',
+  'minimize',
+  'manifest',
 )

@@ -17,20 +17,20 @@ import stripe from './modules/stripe'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-    strict: true,
-    modules: {
-        account,
-        app,
-        apps,
-        cart,
-        cmsLicenses,
-        craftId,
-        developerSupport,
-        invoices,
-        partner,
-        pluginLicenses,
-        plugins,
-        pluginStore,
-        stripe,
-    }
+  strict: true,
+  modules: {
+    account,
+    app,
+    apps,
+    cart,
+    cmsLicenses,
+    craftId,
+    developerSupport,
+    invoices,
+    partner,
+    pluginLicenses,
+    plugins,
+    pluginStore,
+    stripe,
+  }
 })

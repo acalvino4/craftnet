@@ -10,12 +10,15 @@
   >
     <div class="min-w-0">
       <div class="truncate">
-        <slot />*
+        <slot />
+        *
       </div>
     </div>
 
-    <icon v-if="checked"
-          class="w-4 h-4 text-light" icon="check"/>
+    <icon
+      v-if="checked"
+      class="w-4 h-4 text-light"
+      icon="check" />
   </button>
 </template>
 
