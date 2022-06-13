@@ -4,6 +4,7 @@ namespace craftnet\plugins;
 
 use Craft;
 use craft\db\Query;
+use craft\helpers\Db;
 use craftnet\db\Table;
 use yii\base\BaseObject;
 use yii\base\NotSupportedException;
@@ -40,13 +41,11 @@ class PluginHistory extends BaseObject implements \IteratorAggregate, \ArrayAcce
      */
     public function push(string $note, string $devComments = null)
     {
-        Craft::$app->getDb()->createCommand()
-            ->insert(Table::PLUGINHISTORY, [
-                'pluginId' => $this->_plugin->id,
-                'note' => $note,
-                'devComments' => $devComments,
-            ])
-            ->execute();
+        Db::insert(Table::PLUGINHISTORY, [
+            'pluginId' => $this->_plugin->id,
+            'note' => $note,
+            'devComments' => $devComments,
+        ]);
 
         // Clear the memoized history
         $this->_history = null;

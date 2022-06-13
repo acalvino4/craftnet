@@ -4,6 +4,7 @@ namespace craftnet\controllers;
 
 use Craft;
 use craft\base\Element;
+use craft\behaviors\CustomFieldBehavior;
 use craft\elements\Asset;
 use craft\elements\Category;
 use craft\errors\AssetDisallowedExtensionException;
@@ -16,6 +17,7 @@ use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\UploadedFile;
+use craft\web\UrlManager;
 use craftnet\errors\InvalidSvgException;
 use craftnet\helpers\Cache;
 use craftnet\Module;
@@ -179,6 +181,7 @@ class PluginsController extends Controller
     {
         if ($plugin === null) {
             if ($pluginId !== null) {
+                /** @var Plugin|null $plugin */
                 $plugin = Plugin::find()->id($pluginId)->status(null)->one();
                 if ($plugin === null) {
                     throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
@@ -242,6 +245,7 @@ JS;
         $newPlugin = false;
 
         if ($pluginId = $this->request->getBodyParam('pluginId')) {
+            /** @var Plugin|CustomFieldBehavior|null $plugin */
             $plugin = Plugin::find()->id($pluginId)->status(null)->one();
             if ($plugin === null) {
                 throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
@@ -251,6 +255,7 @@ JS;
                 throw new ForbiddenHttpException('User is not permitted to perform this action');
             }
         } else {
+            /** @var Plugin|CustomFieldBehavior $plugin */
             $plugin = new Plugin();
             $newPlugin = true;
         }
@@ -545,7 +550,6 @@ JS;
 
         $editions = [];
 
-        /** @var PluginEdition[] $currentEditions */
         if ($newPlugin) {
             $currentEditions = [
                 'new' => new PluginEdition([
@@ -554,6 +558,7 @@ JS;
                 ]),
             ];
         } else {
+            /** @var PluginEdition[] $currentEditions */
             $currentEditions = ArrayHelper::index(PluginEdition::find()->pluginId($plugin->id)->status(null)->all(), 'id');
 
             // Include any disabled editions if this is a front-end request
@@ -600,7 +605,9 @@ JS;
             }
 
             Craft::$app->getSession()->setError('Couldn’t save plugin.');
-            Craft::$app->getUrlManager()->setRouteParams([
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
                 'plugin' => $plugin,
             ]);
             return null;
@@ -757,6 +764,7 @@ JS;
     public function actionSubmit()
     {
         $pluginId = $this->request->getBodyParam('pluginId');
+        /** @var Plugin|null $plugin */
         $plugin = Plugin::find()->id($pluginId)->status(null)->one();
 
         if (!$plugin) {
@@ -788,7 +796,9 @@ JS;
             }
 
             Craft::$app->getSession()->setError('Couldn’t submit plugin for approval.');
-            Craft::$app->getUrlManager()->setRouteParams([
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
                 'plugin' => $plugin,
             ]);
             return null;

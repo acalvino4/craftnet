@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Element;
 use craft\elements\User;
 use craft\web\Controller;
+use craft\web\UrlManager;
 use craftnet\behaviors\UserBehavior;
 use craftnet\Module;
 use craftnet\partners\Partner;
@@ -294,7 +295,9 @@ class PartnersController extends Controller
             }
 
             Craft::$app->getSession()->setError('Couldn’t save partner.');
-            Craft::$app->getUrlManager()->setRouteParams([
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
                 'partner' => $partner,
             ]);
             return null;

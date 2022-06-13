@@ -27,7 +27,7 @@ class ClaimLicensesController extends Controller
     public $defaultAction = 'claim';
 
     /**
-     * @param string|null The domain that licenses should be owned by, if consolidating.
+     * @var string|null The domain that licenses should be owned by, if consolidating.
      */
     public $domain;
 
@@ -119,7 +119,8 @@ class ClaimLicensesController extends Controller
                 $pluginLicenseManager->claimLicenses($user, $email);
             }
             foreach ($uniqueEmails as $email) {
-                $orders = Order::find()->email($email)->limit(null)->find();
+                /** @var Order[] $orders */
+                $orders = Order::find()->email($email)->limit(null)->all();
                 foreach ($orders as $order) {
                     $order->setEmail($user->email); // This will change the customer/user of the order
                     Craft::$app->getElements()->saveElement($order, false, false, true);

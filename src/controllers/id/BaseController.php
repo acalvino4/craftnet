@@ -2,8 +2,10 @@
 
 namespace craftnet\controllers\id;
 
+use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\web\Controller;
+use craftnet\behaviors\UserBehavior;
 use craftnet\plugins\Plugin;
 use yii\helpers\Markdown;
 
@@ -26,6 +28,7 @@ abstract class BaseController extends Controller
     protected function pluginTransformer(Plugin $plugin): array
     {
         $icon = $plugin->getIcon();
+        /** @var User|UserBehavior $developer */
         $developer = $plugin->getDeveloper();
 
         // Screenshots
@@ -63,8 +66,8 @@ abstract class BaseController extends Controller
 
         // Latest version
         $latestVersion = Plugin::find()
-            ->id($plugin->id)
             ->withLatestReleaseInfo()
+            ->id($plugin->id)
             ->select(['latestVersion'])
             ->asArray()
             ->scalar();

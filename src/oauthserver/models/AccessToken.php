@@ -5,6 +5,8 @@ namespace craftnet\oauthserver\models;
 use craft\base\Model;
 use craft\helpers\Json;
 use craftnet\oauthserver\Module as OauthServer;
+use DateTime;
+use League\OAuth2\Server\Entities\ScopeEntityInterface;
 
 /**
  * Class AccessToken
@@ -15,57 +17,57 @@ class AccessToken extends Model
     // =========================================================================
 
     /**
-     * @var
+     * @var int|null
      */
     public $id;
 
     /**
-     * @var
+     * @var int|null
      */
     public $clientId;
 
     /**
-     * @var
+     * @var int|null
      */
     public $userId;
 
     /**
-     * @var
+     * @var string|null
      */
     public $identifier;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     public $expiryDate;
 
     /**
-     * @var
+     * @var mixed
      */
     public $userIdentifier;
 
     /**
-     * @var
+     * @var ScopeEntityInterface[]|string|null
      */
     public $scopes;
 
     /**
-     * @var
+     * @var bool|null
      */
     public $isRevoked;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateCreated;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateUpdated;
 
     /**
-     * @var
+     * @var string|null
      */
     public $uid;
 
@@ -119,7 +121,7 @@ class AccessToken extends Model
      */
     public function hasExpired()
     {
-        $now = new \DateTime();
+        $now = new DateTime();
 
         return $now->getTimestamp() >= $this->expiryDate->getTimestamp();
     }

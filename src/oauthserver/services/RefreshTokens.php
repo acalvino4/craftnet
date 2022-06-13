@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\services;
 
 use Craft;
+use craft\helpers\Db;
 use craftnet\oauthserver\models\RefreshToken;
 use craftnet\oauthserver\records\RefreshToken as RefreshTokenRecord;
 use yii\base\Component;
@@ -94,10 +95,7 @@ class RefreshTokens extends Component
             return false;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_refresh_tokens}}', ['id' => $refreshTokenId])
-            ->execute();
-
+        Db::delete('{{%oauthserver_refresh_tokens}}', ['id' => $refreshTokenId]);
         return true;
     }
 
@@ -106,10 +104,7 @@ class RefreshTokens extends Component
      */
     public function clearRefreshTokens()
     {
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_refresh_tokens}}')
-            ->execute();
-
+        Db::delete('{{%oauthserver_refresh_tokens}}');
         return true;
     }
 

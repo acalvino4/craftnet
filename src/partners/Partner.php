@@ -9,19 +9,20 @@ use craft\elements\Asset;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\App;
 use craft\helpers\DateTimeHelper;
+use craft\helpers\Db;
 use craft\helpers\Queue;
 use craft\helpers\UrlHelper;
 use craftnet\db\Table;
 use craftnet\partners\jobs\UpdatePartner;
 use craftnet\partners\validators\ModelsValidator;
 use craftnet\partners\validators\PartnerSlugValidator;
+use DateTime;
 use yii\helpers\Inflector;
 
 /**
  * Class Partner
  *
- * @property $slug string
- * @property $verificationStartTime \DateTime
+ * @property-read DateTime $verificationStartTime
  * @package craftnet\partners
  */
 class Partner extends Element
@@ -384,16 +385,12 @@ class Partner extends Element
     }
 
     /**
-     * @return bool
      * @throws \yii\db\Exception
      */
     public function afterDelete(): void
     {
         parent::afterDelete();
-
-        Craft::$app->getDb()->createCommand()
-            ->delete(Table::PARTNERS, ['id' => $this->id])
-            ->execute();
+        Db::delete(Table::PARTNERS, ['id' => $this->id]);
     }
 
     /**
@@ -474,20 +471,14 @@ class Partner extends Element
         $db = Craft::$app->getDb();
 
         if ($isNew) {
-            $db->createCommand()
-                ->insert(Table::PARTNERS, $partnerData)
-                ->execute();
+            Db::insert(Table::PARTNERS, $partnerData);
         } else {
-            $db->createCommand()
-                ->update(Table::PARTNERS, $partnerData, ['id' => $this->id])
-                ->execute();
+            Db::update(Table::PARTNERS, $partnerData, ['id' => $this->id]);
         }
 
         // Capabilities
 
-        $db->createCommand()
-            ->delete(Table::PARTNERS_PARTNERCAPABILITIES, ['partnerId' => $this->id])
-            ->execute();
+        Db::delete(Table::PARTNERS_PARTNERCAPABILITIES, ['partnerId' => $this->id]);
 
         if (is_array($this->_capabilities) && count($this->_capabilities) > 0) {
             $partnerId = $this->id;
@@ -497,14 +488,7 @@ class Partner extends Element
                 $rows[] = [$partnerId, $id];
             }
 
-            $db->createCommand()
-                ->batchInsert(
-                    Table::PARTNERS_PARTNERCAPABILITIES,
-                    ['partnerId', 'partnercapabilitiesId'],
-                    $rows,
-                    false
-                )
-                ->execute();
+            Db::batchInsert(Table::PARTNERS_PARTNERCAPABILITIES, ['partnerId', 'partnercapabilitiesId'], $rows);
         }
     }
 
@@ -772,9 +756,7 @@ class Partner extends Element
                     $data['sortOrder'] = $key;
                 }
 
-                $db->createCommand()
-                    ->insert($table, $data)
-                    ->execute();
+                Db::insert($table, $data);
 
                 $model->id = (int)$db->getLastInsertID();
                 $savedIds[] = $model->id;
@@ -785,9 +767,7 @@ class Partner extends Element
                     $data['sortOrder'] = $key;
                 }
 
-                $db->createCommand()
-                    ->update($table, $data, 'id=:id', [':id' => $data['id']], true)
-                    ->execute();
+                Db::update($table, $data, ['id' => $data['id']]);
 
                 $savedIds[] = $model->id;
             }
@@ -802,9 +782,7 @@ class Partner extends Element
                 $condition[] = ['not in', 'id', $savedIds];
             }
 
-            $db->createCommand()
-                ->delete($table, $condition)
-                ->execute();
+            Db::delete($table, $condition);
         }
     }
 
@@ -817,7 +795,7 @@ class Partner extends Element
     }
 
     /**
-     * @param string|int|array|null The value that should be converted to a DateTime object.
+     * @param string|int|array|null $value The value that should be converted to a DateTime object.
      * @throws \Exception
      */
     public function setVerificationStartDate($value)
@@ -835,9 +813,7 @@ class Partner extends Element
     {
         $db = Craft::$app->getDb();
 
-        $db->createCommand()
-            ->delete(Table::PARTNERPROJECTSCREENSHOTS, ['projectId' => $project->id])
-            ->execute();
+        Db::delete(Table::PARTNERPROJECTSCREENSHOTS, ['projectId' => $project->id]);
 
         if (count($project->screenshots) === 0) {
             return;
@@ -850,9 +826,7 @@ class Partner extends Element
             $rows[] = [$project->id, $assetId, $key];
         }
 
-        $db->createCommand()
-            ->batchInsert(Table::PARTNERPROJECTSCREENSHOTS, $columns, $rows)
-            ->execute();
+        Db::batchInsert(Table::PARTNERPROJECTSCREENSHOTS, $columns, $rows);
     }
 
     /**

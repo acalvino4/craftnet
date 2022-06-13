@@ -11,7 +11,7 @@ class KeyHelper
      */
     public static function generateCmsKey(): string
     {
-        return static::key(250, '!#$%^&*=+/');
+        return self::key(250, '!#$%^&*=+/');
     }
 
     /**
@@ -21,7 +21,7 @@ class KeyHelper
      */
     public static function generatePluginKey(): string
     {
-        return static::key(24);
+        return self::key(24);
     }
 
     /**
@@ -31,7 +31,7 @@ class KeyHelper
      */
     public static function generateApiToken(): string
     {
-        return strtolower(static::key(40));
+        return strtolower(self::key(40));
     }
 
     /**

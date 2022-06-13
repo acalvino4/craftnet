@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\services;
 
 use Craft;
+use craft\helpers\Db;
 use craftnet\errors\ExpiredTokenException;
 use craftnet\oauthserver\models\AccessToken;
 use craftnet\oauthserver\Module;
@@ -159,9 +160,7 @@ class AccessTokens extends Component
             return false;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_access_tokens}}', ['id' => $accessTokenId])
-            ->execute();
+        Db::delete('{{%oauthserver_access_tokens}}', ['id' => $accessTokenId]);
 
         return true;
     }
@@ -171,10 +170,7 @@ class AccessTokens extends Component
      */
     public function clearAccessTokens()
     {
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_access_tokens}}')
-            ->execute();
-
+        Db::delete('{{%oauthserver_access_tokens}}');
         return true;
     }
 

@@ -2,6 +2,7 @@
 
 namespace craftnet\helpers;
 
+use craft\behaviors\CustomFieldBehavior;
 use craft\elements\Address as AddressElement;
 
 abstract class Address
@@ -14,6 +15,7 @@ abstract class Address
      */
     public static function toV1Array(AddressElement $address): array
     {
+        /** @var AddressElement|CustomFieldBehavior $address */
         return [
             'firstName' => $address->getGivenName(),
             'lastName' => $address->getFamilyName(),

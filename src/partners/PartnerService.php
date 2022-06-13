@@ -3,7 +3,6 @@
 namespace craftnet\partners;
 
 use Craft;
-use craft\base\Volume;
 use craft\db\Query;
 use craft\elements\Asset;
 use craft\errors\AssetDisallowedExtensionException;
@@ -11,6 +10,7 @@ use craft\errors\ImageException;
 use craft\helpers\ConfigHelper;
 use craft\helpers\ElementHelper;
 use craft\helpers\StringHelper;
+use craft\models\Volume;
 use craft\web\Request;
 use craft\web\UploadedFile;
 use craftnet\db\Table;

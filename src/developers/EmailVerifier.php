@@ -50,14 +50,12 @@ class EmailVerifier extends BaseObject
         $securityService = Craft::$app->getSecurity();
         $code = $securityService->generateRandomString(32);
 
-        Craft::$app->getDb()->createCommand()
-            ->insert(Table::EMAILCODES, [
-                'userId' => $this->user->id,
-                'email' => $email,
-                'code' => $securityService->hashPassword($code),
-                'dateIssued' => Db::prepareDateForDb(new \DateTime('now', new \DateTimeZone('UTC'))),
-            ], false)
-            ->execute();
+        Db::insert(Table::EMAILCODES, [
+            'userId' => $this->user->id,
+            'email' => $email,
+            'code' => $securityService->hashPassword($code),
+            'dateIssued' => Db::prepareDateForDb(new \DateTime('now', new \DateTimeZone('UTC'))),
+        ]);
 
         // send the verification email
         $path = Craft::$app->getConfig()->getGeneral()->actionTrigger . '/craftnet/id/claim-licenses/verify';
@@ -96,9 +94,7 @@ class EmailVerifier extends BaseObject
         // first delete all codes that have expired
         $interval = DateTimeHelper::secondsToInterval(Craft::$app->getConfig()->getGeneral()->verificationCodeDuration);
         $minCodeIssueDate = (new \DateTime('now', new \DateTimeZone('UTC')))->sub($interval);
-        $db->createCommand()
-            ->delete(Table::EMAILCODES, ['<', 'dateIssued', Db::prepareDateForDb($minCodeIssueDate)])
-            ->execute();
+        Db::delete(Table::EMAILCODES, ['<', 'dateIssued', Db::prepareDateForDb($minCodeIssueDate)]);
 
         // get all the codes for this user and email
         $condition = ['userId' => $this->user->id, 'email' => $email];
@@ -131,9 +127,7 @@ class EmailVerifier extends BaseObject
         $num += $module->getPluginLicenseManager()->claimLicenses($this->user, $email);
 
         // remove all verification codes for this user + email
-        $db->createCommand()
-            ->delete(Table::EMAILCODES, $condition)
-            ->execute();
+        Db::delete(Table::EMAILCODES, $condition);
 
         return $num;
     }

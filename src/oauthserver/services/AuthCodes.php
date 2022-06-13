@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\services;
 
 use Craft;
+use craft\helpers\Db;
 use craftnet\oauthserver\models\AuthCode;
 use craftnet\oauthserver\records\AuthCode as AuthCodeRecord;
 use yii\base\Component;
@@ -114,10 +115,7 @@ class AuthCodes extends Component
             return false;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_auth_codes}}', ['id' => $id])
-            ->execute();
-
+        Db::delete('{{%oauthserver_auth_codes}}', ['id' => $id]);
         return true;
     }
 
@@ -126,10 +124,7 @@ class AuthCodes extends Component
      */
     public function clearAuthCodes()
     {
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_auth_codes}}')
-            ->execute();
-
+        Db::delete('{{%oauthserver_auth_codes}}');
         return true;
     }
 

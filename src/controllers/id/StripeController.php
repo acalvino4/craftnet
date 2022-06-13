@@ -128,7 +128,7 @@ class StripeController extends BaseController
     /**
      * Saves a new credit card and sets it as default source for the Stripe customer.
      *
-     * @return Response|null
+     * @return Response
      * @throws \Throwable if something went wrong when adding the payment source
      */
     public function actionSaveCard(): Response
@@ -156,7 +156,7 @@ class StripeController extends BaseController
         }
 
         // Remove existing payment sources
-        $existingPaymentSources = $paymentSources->getAllGatewayPaymentSourcesByUserId($gateway->id, $userId);
+        $existingPaymentSources = $paymentSources->getAllPaymentSourcesByCustomerId($userId);
         foreach ($existingPaymentSources as $paymentSource) {
             $paymentSources->deletePaymentSourceById($paymentSource->id);
         }

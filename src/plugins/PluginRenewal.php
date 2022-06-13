@@ -6,6 +6,7 @@ use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\models\LineItem;
 use craft\elements\db\ElementQueryInterface;
+use craft\helpers\Db;
 use craftnet\base\RenewalInterface;
 use craftnet\db\Table;
 use craftnet\errors\LicenseNotFoundException;
@@ -78,13 +79,9 @@ class PluginRenewal extends PluginPurchasable implements RenewalInterface
         ];
 
         if ($isNew) {
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::PLUGINRENEWALS, $data, false)
-                ->execute();
+            Db::insert(Table::PLUGINRENEWALS, $data);
         } else {
-            Craft::$app->getDb()->createCommand()
-                ->update(Table::PLUGINRENEWALS, $data, ['id' => $this->id], [], false)
-                ->execute();
+            Db::update(Table::PLUGINRENEWALS, $data, ['id' => $this->id], updateTimestamp: false);
         }
 
         parent::afterSave($isNew);
@@ -186,12 +183,10 @@ class PluginRenewal extends PluginPurchasable implements RenewalInterface
             }
 
             // relate the license to the line item
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::PLUGINLICENSES_LINEITEMS, [
-                    'licenseId' => $license->id,
-                    'lineItemId' => $lineItem->id,
-                ], false)
-                ->execute();
+            Db::insert(Table::PLUGINLICENSES_LINEITEMS, [
+                'licenseId' => $license->id,
+                'lineItemId' => $lineItem->id,
+            ]);
 
             // update the license history
             $expiryStr = OrderHelper::expiryObj2Str($license->expiresOn);

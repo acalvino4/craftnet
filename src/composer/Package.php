@@ -22,7 +22,7 @@ use Github\Client as GithubClient;
 class Package extends Model
 {
     /**
-     * @var
+     * @var int|null
      */
     public $id;
 
@@ -32,17 +32,17 @@ class Package extends Model
     public $developerId;
 
     /**
-     * @var
+     * @var string|null
      */
     public $name;
 
     /**
-     * @var
+     * @var string|null
      */
     public $type;
 
     /**
-     * @var
+     * @var string|null
      */
     public $repository;
 
@@ -57,7 +57,7 @@ class Package extends Model
     public $abandoned = false;
 
     /**
-     * @var
+     * @var string|null
      */
     public $replacementPackage;
 
@@ -67,12 +67,12 @@ class Package extends Model
     public $latestVersion;
 
     /**
-     * @var
+     * @var int|null
      */
     public $webhookId;
 
     /**
-     * @var
+     * @var string|null
      */
     public $webhookSecret;
 

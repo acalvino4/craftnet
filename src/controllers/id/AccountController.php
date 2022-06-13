@@ -37,12 +37,11 @@ class AccountController extends Controller
     {
         /** @var User|UserBehavior $user */
         $user = Craft::$app->getUser()->getIdentity();
-        $photo = $user->getPhoto();
-        $photoUrl = $photo ? Craft::$app->getAssets()->getAssetUrl($photo, [
+        $photoUrl = $user->getPhoto()?->getUrl([
             'mode' => 'crop',
             'width' => 200,
             'height' => 200,
-        ], true) : null;
+        ], true);
 
         return $this->asJson([
             'billingAddress' => $this->getBillingAddress($user),
@@ -96,12 +95,11 @@ class AccountController extends Controller
             move_uploaded_file($file->tempName, $fileLocation);
             Craft::$app->getUsers()->saveUserPhoto($fileLocation, $user, $file->name);
 
-            $photo = $user->getPhoto();
-            $photoUrl = $photo ? Craft::$app->getAssets()->getAssetUrl($photo, [
+            $photoUrl = $user->getPhoto()?->getUrl([
                 'mode' => 'crop',
                 'width' => 200,
                 'height' => 200,
-            ], true) : null;
+            ], true);
 
             return $this->asJson([
                 'photoId' => $user->photoId,

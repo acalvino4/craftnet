@@ -231,7 +231,7 @@ class PaymentsController extends CartsController
         }
 
         // We get this far if this is an existing source OR user wants to make it primary
-        $existingPaymentSources = $paymentSourcesService->getAllGatewayPaymentSourcesByUserId($gateway->id, $user->id);
+        $existingPaymentSources = $paymentSourcesService->getAllPaymentSourcesByCustomerId($user->id);
 
         // delete any existing payment sources
         // todo: remove this if we ever add support for multiple cards

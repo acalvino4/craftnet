@@ -551,62 +551,52 @@ abstract class BaseApiController extends Controller
         // should we update our installed plugin records?
         if ($this->cmsVersion !== null && $cmsLicense !== null) {
             // delete any cmslicense_plugins rows for this license
-            $db->createCommand()
-                ->delete(Table::CMSLICENSE_PLUGINS, [
-                    'licenseId' => $cmsLicense->id,
-                ])
-                ->execute();
+            Db::delete(Table::CMSLICENSE_PLUGINS, [
+                'licenseId' => $cmsLicense->id,
+            ]);
 
             $licensePluginsData = [];
             foreach ($this->plugins as $plugin) {
                 $licensePluginsData[] = [$cmsLicense->id, $plugin->id, $timestamp];
             }
             try {
-                $db->createCommand()
-                    ->batchInsert(Table::CMSLICENSE_PLUGINS, ['licenseId', 'pluginId', 'timestamp'], $licensePluginsData, false)
-                    ->execute();
+                Db::batchInsert(Table::CMSLICENSE_PLUGINS, ['licenseId', 'pluginId', 'timestamp'], $licensePluginsData);
             } catch (\Throwable $exception) {
                 // don't let that ruin our day
             }
         }
 
         // log the request
-        $db->createCommand()
-            ->insert('apilog.requests', [
-                'method' => $this->request->getMethod(),
-                'uri' => $this->request->getUrl(),
-                'ip' => $this->request->getUserIP(),
-                'action' => $this->getUniqueId() . '/' . $id,
-                'body' => $this->request->getRawBody(),
-                'system' => $requestHeaders->get('X-Craft-System'),
-                'platform' => $requestHeaders->get('X-Craft-Platform'),
-                'host' => $requestHeaders->get('X-Craft-Host'),
-                'userEmail' => $requestHeaders->get('X-Craft-User-Email'),
-                'userIp' => $requestHeaders->get('X-Craft-User-Ip'),
-                'timestamp' => $timestamp,
-                'responseCode' => $response->getStatusCode(),
-            ], false)
-            ->execute();
+        Db::insert('apilog.requests', [
+            'method' => $this->request->getMethod(),
+            'uri' => $this->request->getUrl(),
+            'ip' => $this->request->getUserIP(),
+            'action' => $this->getUniqueId() . '/' . $id,
+            'body' => $this->request->getRawBody(),
+            'system' => $requestHeaders->get('X-Craft-System'),
+            'platform' => $requestHeaders->get('X-Craft-Platform'),
+            'host' => $requestHeaders->get('X-Craft-Host'),
+            'userEmail' => $requestHeaders->get('X-Craft-User-Email'),
+            'userIp' => $requestHeaders->get('X-Craft-User-Ip'),
+            'timestamp' => $timestamp,
+            'responseCode' => $response->getStatusCode(),
+        ]);
 
         // get the request ID
         $this->requestId = (int)$db->getLastInsertID('apilog.requests');
 
         // log any licenses associated with the request
         foreach ($this->cmsLicenses as $cmsLicense) {
-            $db->createCommand()
-                ->insert('apilog.request_cmslicenses', [
-                    'requestId' => $this->requestId,
-                    'licenseId' => $cmsLicense->id,
-                ], false)
-                ->execute();
+            Db::insert('apilog.request_cmslicenses', [
+                'requestId' => $this->requestId,
+                'licenseId' => $cmsLicense->id,
+            ]);
         }
         foreach ($this->pluginLicenses as $pluginLicense) {
-            $db->createCommand()
-                ->insert('apilog.request_pluginlicenses', [
-                    'requestId' => $this->requestId,
-                    'licenseId' => $pluginLicense->id,
-                ], false)
-                ->execute();
+            Db::insert('apilog.request_pluginlicenses', [
+                'requestId' => $this->requestId,
+                'licenseId' => $pluginLicense->id,
+            ]);
         }
 
         // if there was an exception, log it and return the error response
@@ -657,14 +647,12 @@ EOL;
                     $errorJson = null;
                 }
 
-                $db->createCommand()
-                    ->insert('apilog.request_errors', [
-                        'requestId' => $this->requestId,
-                        'type' => $exceptionType,
-                        'message' => $logException->getMessage() . ($errorJson ? "\n\n" . $errorJson : ''),
-                        'stackTrace' => $stackTrace,
-                    ], false)
-                    ->execute();
+                Db::insert('apilog.request_errors', [
+                    'requestId' => $this->requestId,
+                    'type' => $exceptionType,
+                    'message' => $logException->getMessage() . ($errorJson ? "\n\n" . $errorJson : ''),
+                    'stackTrace' => $stackTrace,
+                ]);
 
                 if ($sendErrorEmail) {
                     $body .= <<<EOL
@@ -859,6 +847,7 @@ EOL;
     protected function transformPlugin(Plugin $plugin, bool $fullDetails = true): array
     {
         $icon = $plugin->getIcon();
+        /** @var User|UserBehavior $developer */
         $developer = $plugin->getDeveloper();
 
         // Return data
@@ -930,8 +919,8 @@ EOL;
                     $latestCmsVersion = $packageManager->getLatestVersion('craftcms/cms', 'dev', $cmsConstraint);
                     if ($latestCmsVersion) {
                         $compatible = Plugin::find()
-                            ->id($plugin->id)
                             ->withLatestReleaseInfo(cmsVersion: $latestCmsVersion)
+                            ->id($plugin->id)
                             ->exists();
                         if ($compatible) {
                             $compatibleCmsVersions[] = $cmsVersionLabel;

@@ -88,6 +88,7 @@ class FundsController extends Controller
      */
     public function actionCredit(string $username = null): int
     {
+        /** @var User|UserBehavior $account */
         $account = $this->_account($username);
         $fm = $account->getFundsManager();
         $balance = $fm->getBalance();
@@ -124,6 +125,7 @@ class FundsController extends Controller
      */
     public function actionDebit(string $username = null): int
     {
+        /** @var User|UserBehavior $account */
         $account = $this->_account($username);
         $fm = $account->getFundsManager();
         $balance = $fm->getBalance();
@@ -263,7 +265,7 @@ class FundsController extends Controller
 
     /**
      * @param string|null $username
-     * @return User|UserBehavior
+     * @return User
      */
     protected function _account(string $username = null): User
     {

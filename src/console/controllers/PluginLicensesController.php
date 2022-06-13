@@ -8,6 +8,7 @@ use craft\commerce\models\LineItem;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
+use craft\helpers\Db;
 use craftnet\db\Table;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\helpers\KeyHelper;
@@ -123,12 +124,10 @@ class PluginLicensesController extends Controller
             }
             $key = $this->select('Which line item?', $lineItemOptions);
             $lineItem = $lineItems[$key];
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::PLUGINLICENSES_LINEITEMS, [
-                    'licenseId' => $license->id,
-                    'lineItemId' => $lineItem->id,
-                ], false)
-                ->execute();
+            Db::insert(Table::PLUGINLICENSES_LINEITEMS, [
+                'licenseId' => $license->id,
+                'lineItemId' => $lineItem->id,
+            ]);
         }
 
         if ($this->confirm('Create a history record for the license?', true)) {

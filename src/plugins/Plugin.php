@@ -199,20 +199,11 @@ class Plugin extends Element
         $assetsService = Craft::$app->getAssets();
 
         foreach ($categories as $category) {
-            $source = [
+            $sources[] = [
                 'key' => 'category:' . $category->id,
                 'label' => $category->title,
                 'criteria' => ['categoryId' => $category->id],
             ];
-
-            if (!empty($category->icon)) {
-                try {
-                    $source['icon'] = $assetsService->getThumbPath($category->icon[0], 16);
-                } catch (\Throwable $e) {
-                }
-            }
-
-            $sources[] = $source;
         }
 
         return $sources;
@@ -625,7 +616,7 @@ class Plugin extends Element
     }
 
     /**
-     * @return User|UserBehavior
+     * @return User
      * @throws InvalidConfigException
      */
     public function getDeveloper(): User
@@ -662,7 +653,9 @@ class Plugin extends Element
      */
     public function getDeveloperName(): string
     {
-        return $this->getDeveloper()->getDeveloperName();
+        /** @var User|UserBehavior $developer */
+        $developer = $this->getDeveloper();
+        return $developer->getDeveloperName();
     }
 
     /**
@@ -1001,31 +994,19 @@ class Plugin extends Element
 
         if ($isNew) {
             // Save a new row in the plugins table
-            $db->createCommand()
-                ->insert(Table::PLUGINS, $pluginData)
-                ->execute();
+            Db::insert(Table::PLUGINS, $pluginData);
         } else {
             // Update the plugins table row
-            $db->createCommand()
-                ->update(Table::PLUGINS, $pluginData, ['id' => $this->id])
-                ->execute();
+            Db::update(Table::PLUGINS, $pluginData, ['id' => $this->id]);
 
             // Also delete any existing category/screenshot relations
-            $db->createCommand()
-                ->delete(Table::PLUGINCATEGORIES, ['pluginId' => $this->id])
-                ->execute();
-            $db->createCommand()
-                ->delete(Table::PLUGINSCREENSHOTS, ['pluginId' => $this->id])
-                ->execute();
+            Db::delete(Table::PLUGINCATEGORIES, ['pluginId' => $this->id]);
+            Db::delete(Table::PLUGINSCREENSHOTS, ['pluginId' => $this->id]);
         }
 
         // Save the new category/screenshot relations
-        $db->createCommand()
-            ->batchInsert(Table::PLUGINCATEGORIES, ['pluginId', 'categoryId', 'sortOrder'], $categoryData)
-            ->execute();
-        $db->createCommand()
-            ->batchInsert(Table::PLUGINSCREENSHOTS, ['pluginId', 'assetId', 'sortOrder'], $screenshotData)
-            ->execute();
+        Db::batchInsert(Table::PLUGINCATEGORIES, ['pluginId', 'categoryId', 'sortOrder'], $categoryData);
+        Db::batchInsert(Table::PLUGINSCREENSHOTS, ['pluginId', 'assetId', 'sortOrder'], $screenshotData);
 
         // Save the editions
         $elementsService = Craft::$app->getElements();
@@ -1143,9 +1124,7 @@ EOD;
             return;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->update(Table::PLUGINS, ['published' => true], ['id' => $this->id])
-            ->execute();
+        Db::update(Table::PLUGINS, ['published' => true], ['id' => $this->id]);
 
         $this->published = true;
 

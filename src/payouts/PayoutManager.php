@@ -191,7 +191,7 @@ class PayoutManager extends BaseObject
                 // If we're finished with the batch, see if there was an issue with this payment
                 if ($isComplete && in_array($itemRecord->transactionStatus, ['FAILED', 'BLOCKED'])) {
                     // Re-credit the developers' balance
-                    /* @var User|UserBehavior $user */
+                    /** @var User|UserBehavior $user */
                     $user = User::findOne($itemRecord->developerId);
                     $user->getFundsManager()->credit("Unsuccessful PayPal payout $payoutRecord->id", $itemRecord->amount, null, FundsManager::TXN_TYPE_PAYPAL_PAYOUT);
                 }

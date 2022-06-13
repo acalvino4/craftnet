@@ -5,6 +5,7 @@ namespace craftnet\partners;
 use Craft;
 use craft\base\Model;
 use craft\db\Query;
+use craft\helpers\Db;
 use craftnet\db\Table;
 use JsonSerializable;
 use yii\helpers\ArrayHelper;
@@ -37,9 +38,7 @@ class PartnerHistory extends Model implements JsonSerializable
 
     public static function deleteById(int $id)
     {
-        return Craft::$app->getDb()->createCommand()
-            ->delete(self::$table, 'id=:id', [':id' => $id])
-            ->execute();
+        Db::delete(self::$table, ['id' => $id]);
     }
 
     /**
@@ -184,18 +183,11 @@ class PartnerHistory extends Model implements JsonSerializable
 
         if (!$this->id) {
             $data = $this->getAttributes(['partnerId', 'authorId', 'message']);
-
-            $this->db->createCommand()
-                ->insert(self::$table, $data)
-                ->execute();
-
+            Db::insert(self::$table, $data);
             $this->id = (int)$this->db->getLastInsertID();
         } else {
             $data = $this->getAttributes(['id', 'partnerId', 'authorId', 'message']);
-
-            $this->db->createCommand()
-                ->update(self::$table, $data, 'id=:id', [':id' => $data['id']], true)
-                ->execute();
+            Db::update(self::$table, $data, ['id' => $data['id']]);
         }
 
         // Refresh

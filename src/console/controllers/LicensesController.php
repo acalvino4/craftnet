@@ -212,6 +212,7 @@ class LicensesController extends Controller
     private function _resolveOwnerKey(string $ownerKey): array
     {
         if ($usingOwnerId = (bool)preg_match('/^owner-(\d+)$/', $ownerKey, $matches)) {
+            /** @var User $user */
             $user = User::find()->id((int)$matches[1])->status(null)->one();
             $email = $user->email;
         } else {
@@ -272,7 +273,7 @@ class LicensesController extends Controller
 
             // Make sure they have a payment source
             /** @var PaymentSource|null $paymentSource */
-            $paymentSource = ArrayHelper::firstValue($commerce->getPaymentSources()->getAllGatewayPaymentSourcesByUserId(App::env('STRIPE_GATEWAY_ID'), $user->id));
+            $paymentSource = ArrayHelper::firstValue($commerce->getPaymentSources()->getAllPaymentSourcesByCustomerId($user->id));
             if ($paymentSource === null) {
                 return false;
             }

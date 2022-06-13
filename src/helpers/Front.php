@@ -3,6 +3,7 @@
 namespace craftnet\helpers;
 
 use Craft;
+use craft\behaviors\CustomFieldBehavior;
 use craft\commerce\elements\Subscription;
 use craft\elements\User;
 use craft\helpers\App;
@@ -37,6 +38,7 @@ abstract class Front
      */
     public static function plan(string $email): string
     {
+        /** @var User|CustomFieldBehavior|null $user */
         $user = User::find()
             ->andWhere(new Expression('lower([[email]]) = :email', [':email' => $email]))
             ->one();

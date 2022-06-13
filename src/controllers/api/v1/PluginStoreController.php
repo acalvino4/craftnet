@@ -3,6 +3,7 @@
 namespace craftnet\controllers\api\v1;
 
 use Composer\Semver\Semver;
+use craft\behaviors\CustomFieldBehavior;
 use craft\db\Query;
 use craft\elements\Asset;
 use craft\elements\Category;
@@ -268,6 +269,7 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
+            /** @var PluginQuery $query */
             $query = $this->_createPluginQuery()
                 ->orderBy([Table::PLUGINS . '.abandoned' => SORT_ASC])
                 ->limit($perPage);
@@ -419,8 +421,8 @@ class PluginStoreController extends BaseApiController
     private function _createFeaturedSectionQuery(): EntryQuery
     {
         return Entry::find()
-            ->site('craftId')
-            ->section('featuredPlugins');
+            ->section('featuredPlugins')
+            ->site('craftId');
     }
 
     /**
@@ -449,6 +451,7 @@ class PluginStoreController extends BaseApiController
             $data = [];
 
             /** @var Category[] $categories */
+            /** @phpstan-var array<Category|CustomFieldBehavior> $categories */
             $categories = Category::find()
                 ->group('pluginCategories')
                 ->with('icon')
@@ -513,6 +516,7 @@ class PluginStoreController extends BaseApiController
      */
     private function _createFeaturedPluginQuery(Entry $entry): PluginQuery
     {
+        /** @var Entry|CustomFieldBehavior $entry */
         $type = $entry->getType();
 
         switch ($type->handle) {
@@ -586,10 +590,6 @@ class PluginStoreController extends BaseApiController
         Cache::set($key, $value, $this->_cacheTags());
     }
 
-    /**
-     * @param array string|null ...$tags
-     * @return array
-     */
     private function _cacheTags(?string ...$tags): array
     {
         $tags[] = Cache::TAG_PACKAGES;

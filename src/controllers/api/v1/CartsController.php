@@ -343,7 +343,7 @@ class CartsController extends BaseApiController
         $country = null;
         $state = null;
 
-        /** @var $customer User|CustomerBehavior */
+        /** @var User|CustomerBehavior $customer */
         $customer = $cart->getCustomer();
 
         // get the country

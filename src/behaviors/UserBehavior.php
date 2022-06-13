@@ -4,9 +4,11 @@ namespace craftnet\behaviors;
 
 use Craft;
 use craft\base\Element;
+use craft\behaviors\CustomFieldBehavior;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
+use craft\helpers\Db;
 use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
@@ -23,6 +25,7 @@ use yii\base\Exception;
  * @property FundsManager $fundsManager
  * @property User $owner
  * @property Plugin[] $plugins
+ * @mixin CustomFieldBehavior
  */
 class UserBehavior extends Behavior
 {
@@ -176,6 +179,7 @@ class UserBehavior extends Behavior
      */
     public function beforeSave(ModelEvent $event)
     {
+        /** @var User|self $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
         $isAdmin = $currentUser && ($currentUser->isInGroup('admins') || $currentUser->admin);
         $request = Craft::$app->getRequest();
@@ -245,16 +249,14 @@ class UserBehavior extends Behavior
      */
     public function saveDeveloperInfo()
     {
-        Craft::$app->getDb()->createCommand()
-            ->upsert(Table::DEVELOPERS, [
-                'id' => $this->owner->id,
-            ], [
-                'country' => $this->country,
-                'stripeAccessToken' => $this->stripeAccessToken,
-                'stripeAccount' => $this->stripeAccount,
-                'payPalEmail' => $this->payPalEmail,
-                'apiToken' => $this->apiToken,
-            ], [], false)
-            ->execute();
+        Db::upsert(Table::DEVELOPERS, [
+            'id' => $this->owner->id,
+        ], [
+            'country' => $this->country,
+            'stripeAccessToken' => $this->stripeAccessToken,
+            'stripeAccount' => $this->stripeAccount,
+            'payPalEmail' => $this->payPalEmail,
+            'apiToken' => $this->apiToken,
+        ], updateTimestamp: false);
     }
 }

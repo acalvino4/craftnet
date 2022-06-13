@@ -305,15 +305,9 @@ class FundsManager extends BaseObject
         }
 
         if ($adjustment !== false) {
-            $db->createCommand()
-                ->update(Table::DEVELOPERS,
-                    [
-                        'balance' => new Expression("[[balance]] {$operator} :adjustment", [':adjustment' => $adjustment]),
-                    ],
-                    [
-                        'id' => $this->developer->id,
-                    ], [], false)
-                ->execute();
+            Db::update(Table::DEVELOPERS, [
+                'balance' => new Expression("[[balance]] {$operator} :adjustment", [':adjustment' => $adjustment]),
+            ], ['id' => $this->developer->id], updateTimestamp: false);
         }
 
         $ledgerSql = <<<SQL
