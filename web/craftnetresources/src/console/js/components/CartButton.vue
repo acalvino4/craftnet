@@ -2,8 +2,8 @@
     <router-link
         :class="{
             'cart-button relative block header-toggle px-3 py-2 rounded-md': true,
-            'hover:bg-white dark:hover:bg-black hover:bg-opacity-30': context !== 'app',
-            'hover:bg-black dark:hover:bg-white hover:bg-opacity-5': context === 'app'
+            'hover:bg-white dark:hover:bg-black hover:bg-opacity-30 dark:hover:bg-opacity-30': context !== 'app',
+            'hover:bg-black dark:hover:bg-white hover:bg-opacity-5 dark:hover:bg-opacity-5': context === 'app'
         }"
         to="/cart">
         <icon
