@@ -1,7 +1,7 @@
 <template>
     <Menu as="div" class="">
         <MenuButton
-            class="block header-toggle px-3 py-2 flex items-center justify-center hover:bg-black dark:hover:bg-white hover:bg-opacity-5 rounded-md">
+            class="block header-toggle px-3 py-2 flex items-center justify-center hover:bg-black dark:hover:bg-white hover:bg-opacity-5 dark:hover:bg-opacity-5 rounded-md">
             <icon icon="user" class="w-4 h-4 text-gray-500"/>
         </MenuButton>
         <MenuItems
