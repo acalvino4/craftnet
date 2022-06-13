@@ -125,7 +125,7 @@ class RefundController extends Controller
             }
 
             $key = $this->select('Which line item?', $lineItemOptions);
-            unset($lineItemOptions[$key]);
+            unset($lineItemOptions[(int)$key]);
 
             $returnKeys[] = $key;
             $lineItem = $lineItems[$key];

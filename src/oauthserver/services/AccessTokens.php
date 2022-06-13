@@ -64,7 +64,7 @@ class AccessTokens extends Component
     /**
      * @param $id
      *
-     * @return AccessToken
+     * @return AccessToken|null
      */
     public function getAccessTokenById($id)
     {
@@ -75,6 +75,8 @@ class AccessTokens extends Component
                 return new AccessToken($record->getAttributes());
             }
         }
+
+        return null;
     }
 
     /**

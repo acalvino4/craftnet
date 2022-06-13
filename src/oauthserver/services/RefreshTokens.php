@@ -34,7 +34,7 @@ class RefreshTokens extends Component
     /**
      * @param $id
      *
-     * @return RefreshToken
+     * @return RefreshToken|null
      */
     public function getRefreshTokenById($id)
     {
@@ -45,12 +45,14 @@ class RefreshTokens extends Component
                 return new RefreshToken($record->getAttributes());
             }
         }
+
+        return null;
     }
 
     /**
      * @param $identifier
      *
-     * @return RefreshToken
+     * @return RefreshToken|null
      */
     public function getRefreshTokenByIdentifier($identifier)
     {
@@ -59,12 +61,14 @@ class RefreshTokens extends Component
         if ($record) {
             return new RefreshToken($record->getAttributes());
         }
+
+        return null;
     }
 
     /**
      * @param $id
      *
-     * @return RefreshToken
+     * @return RefreshToken|null
      */
     public function getRefreshTokenByAccessTokenId($id)
     {
@@ -73,6 +77,8 @@ class RefreshTokens extends Component
         if ($record) {
             return new RefreshToken($record->getAttributes());
         }
+
+        return null;
     }
 
     /**

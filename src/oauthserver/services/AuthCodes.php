@@ -41,7 +41,7 @@ class AuthCodes extends Component
     /**
      * @param $id
      *
-     * @return AuthCode
+     * @return AuthCode|null
      */
     public function getAuthCodeById($id)
     {
@@ -52,12 +52,14 @@ class AuthCodes extends Component
                 return new AuthCode($record->getAttributes());
             }
         }
+
+        return null;
     }
 
     /**
      * @param $identifier
      *
-     * @return AuthCode
+     * @return AuthCode|null
      */
     public function getAuthCodeByIdentifier($identifier)
     {
@@ -66,6 +68,8 @@ class AuthCodes extends Component
         if ($record) {
             return new AuthCode($record->getAttributes());
         }
+
+        return null;
     }
 
     /**

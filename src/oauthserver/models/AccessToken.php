@@ -95,13 +95,15 @@ class AccessToken extends Model
     }
 
     /**
-     * @return Client
+     * @return Client|null
      */
     public function getClient()
     {
         if ($this->clientId) {
             return OauthServer::getInstance()->getClients()->getClientById($this->clientId);
         }
+
+        return null;
     }
 
     /**

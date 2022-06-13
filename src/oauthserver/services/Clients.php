@@ -34,7 +34,7 @@ class Clients extends Component
     /**
      * @param $id
      *
-     * @return Client
+     * @return Client|null
      */
     public function getClientById($id)
     {
@@ -45,12 +45,14 @@ class Clients extends Component
                 return new Client($record->getAttributes());
             }
         }
+
+        return null;
     }
 
     /**
      * @param $identifier
      *
-     * @return Client
+     * @return Client|null
      */
     public function getClientByIdentifier($identifier)
     {
@@ -59,6 +61,8 @@ class Clients extends Component
         if ($record) {
             return new Client($record->getAttributes());
         }
+
+        return null;
     }
 
     /**
