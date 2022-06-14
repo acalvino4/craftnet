@@ -80,6 +80,7 @@
             this.getCountries()
                 .then(() => {
                     this.loading = false
+                    this.billingInfo.country = 'US';
                 })
                 .catch(() => {
                     this.loading = false

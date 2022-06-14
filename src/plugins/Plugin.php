@@ -199,20 +199,11 @@ class Plugin extends Element
         $assetsService = Craft::$app->getAssets();
 
         foreach ($categories as $category) {
-            $source = [
+            $sources[] = [
                 'key' => 'category:' . $category->id,
                 'label' => $category->title,
                 'criteria' => ['categoryId' => $category->id],
             ];
-
-            if (!empty($category->icon)) {
-                try {
-                    $source['icon'] = $assetsService->getThumbPath($category->icon[0], 16);
-                } catch (\Throwable $e) {
-                }
-            }
-
-            $sources[] = $source;
         }
 
         return $sources;
@@ -625,7 +616,7 @@ class Plugin extends Element
     }
 
     /**
-     * @return User|UserBehavior
+     * @return User
      * @throws InvalidConfigException
      */
     public function getDeveloper(): User
@@ -636,7 +627,9 @@ class Plugin extends Element
         if ($this->developerId === null) {
             throw new InvalidConfigException('Plugin is missing its developer ID');
         }
-        if (($user = User::find()->id($this->developerId)->status(null)->one()) === null) {
+        /** @var User|null $user */
+        $user = User::find()->id($this->developerId)->status(null)->one();
+        if ($user === null) {
             throw new InvalidConfigException('Invalid developer ID: ' . $this->developerId);
         }
         return $this->_developer = $user;
@@ -662,7 +655,9 @@ class Plugin extends Element
      */
     public function getDeveloperName(): string
     {
-        return $this->getDeveloper()->getDeveloperName();
+        /** @var User|UserBehavior $developer */
+        $developer = $this->getDeveloper();
+        return $developer->getDeveloperName();
     }
 
     /**
@@ -675,10 +670,9 @@ class Plugin extends Element
             if ($this->iconId === null) {
                 return null;
             }
-            if (($this->_icon = Asset::find()->id($this->iconId)->one()) === null) {
-                // It's probably soft-deleted
-                $this->_icon = false;
-            }
+            /** @var Asset|null $icon */
+            $icon = Asset::find()->id($this->iconId)->one();
+            $this->_icon = $icon ?? false;
         }
 
         return $this->_icon ?: null;
@@ -692,7 +686,8 @@ class Plugin extends Element
         if ($this->_categories !== null) {
             return $this->_categories;
         }
-        return $this->_categories = Category::find()
+        /** @var Category[] $categories */
+        $categories = Category::find()
             ->innerJoin(['pc' => Table::PLUGINCATEGORIES], [
                 'and',
                 '[[pc.categoryId]] = [[categories.id]]',
@@ -700,6 +695,7 @@ class Plugin extends Element
             ])
             ->orderBy(['pc.sortOrder' => SORT_ASC])
             ->all();
+        return $this->_categories = $categories;
     }
 
     /**
@@ -718,7 +714,8 @@ class Plugin extends Element
         if ($this->_screenshots !== null) {
             return $this->_screenshots;
         }
-        return $this->_screenshots = Asset::find()
+        /** @var Asset[] $screenshots */
+        $screenshots = Asset::find()
             ->innerJoin(['ps' => Table::PLUGINSCREENSHOTS], [
                 'and',
                 '[[ps.assetId]] = [[assets.id]]',
@@ -726,6 +723,7 @@ class Plugin extends Element
             ])
             ->orderBy(['ps.sortOrder' => SORT_ASC])
             ->all();
+        return $this->_screenshots = $screenshots;
     }
 
     /**
@@ -1001,31 +999,19 @@ class Plugin extends Element
 
         if ($isNew) {
             // Save a new row in the plugins table
-            $db->createCommand()
-                ->insert(Table::PLUGINS, $pluginData)
-                ->execute();
+            Db::insert(Table::PLUGINS, $pluginData);
         } else {
             // Update the plugins table row
-            $db->createCommand()
-                ->update(Table::PLUGINS, $pluginData, ['id' => $this->id])
-                ->execute();
+            Db::update(Table::PLUGINS, $pluginData, ['id' => $this->id]);
 
             // Also delete any existing category/screenshot relations
-            $db->createCommand()
-                ->delete(Table::PLUGINCATEGORIES, ['pluginId' => $this->id])
-                ->execute();
-            $db->createCommand()
-                ->delete(Table::PLUGINSCREENSHOTS, ['pluginId' => $this->id])
-                ->execute();
+            Db::delete(Table::PLUGINCATEGORIES, ['pluginId' => $this->id]);
+            Db::delete(Table::PLUGINSCREENSHOTS, ['pluginId' => $this->id]);
         }
 
         // Save the new category/screenshot relations
-        $db->createCommand()
-            ->batchInsert(Table::PLUGINCATEGORIES, ['pluginId', 'categoryId', 'sortOrder'], $categoryData)
-            ->execute();
-        $db->createCommand()
-            ->batchInsert(Table::PLUGINSCREENSHOTS, ['pluginId', 'assetId', 'sortOrder'], $screenshotData)
-            ->execute();
+        Db::batchInsert(Table::PLUGINCATEGORIES, ['pluginId', 'categoryId', 'sortOrder'], $categoryData);
+        Db::batchInsert(Table::PLUGINSCREENSHOTS, ['pluginId', 'assetId', 'sortOrder'], $screenshotData);
 
         // Save the editions
         $elementsService = Craft::$app->getElements();
@@ -1143,9 +1129,7 @@ EOD;
             return;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->update(Table::PLUGINS, ['published' => true], ['id' => $this->id])
-            ->execute();
+        Db::update(Table::PLUGINS, ['published' => true], ['id' => $this->id]);
 
         $this->published = true;
 

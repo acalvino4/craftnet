@@ -4,10 +4,12 @@ namespace craftnet\controllers\feeds;
 
 use Craft;
 use craft\db\Query;
+use craft\elements\User;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
 use craft\db\Table as CraftTable;
 use craftnet\Module;
@@ -48,14 +50,16 @@ class FeedsController extends Controller
             ->all();
 
         return $this->_asFeed('New Plugins', array_map(function(Plugin $plugin): array {
+            /** @var User|UserBehavior $developer */
+            $developer = $plugin->getDeveloper();
             return [
                 'id' => $plugin->handle,
                 'title' => $plugin->name,
                 'link' => "https://plugins.craftcms.com/$plugin->handle",
                 'updated' => $plugin->dateApproved,
                 'author' => [
-                    'name' => $plugin->getDeveloper()->getDeveloperName(),
-                    'url' => $plugin->getDeveloper()->developerUrl,
+                    'name' => $developer->getDeveloperName(),
+                    'url' => $developer->developerUrl,
                 ],
                 'summary' => $plugin->shortDescription,
             ];
@@ -64,14 +68,27 @@ class FeedsController extends Controller
 
     public function actionReleases(): Response
     {
-        return $this->_asReleaseFeed('Plugin Releases');
+        return $this->_asReleaseFeed('All Releases');
     }
 
     public function actionCritical(): Response
     {
-        return $this->_asReleaseFeed('Critical Plugin Releases', function(Query $query): void {
+        return $this->_asReleaseFeed('Critical Releases', function(Query $query): void {
             $query->andWhere(['pv.critical' => true]);
         });
+    }
+
+    public function actionCms(): Response
+    {
+        return $this->_asReleaseFeed('Craft CMS Releases', function(Query $query): void {
+            $query->andWhere(['p.name' => 'craftcms/cms']);
+        }, [
+            'link' => 'https://craftcms.com',
+            'author' => [
+                'name' => 'Pixel & Tonic',
+                'url' => 'https://pixelandtonic.com',
+            ],
+        ]);
     }
 
     public function actionPlugin(string $handle): Response
@@ -84,13 +101,16 @@ class FeedsController extends Controller
             throw new NotFoundHttpException("Invalid plugin handle: $handle");
         }
 
+        /** @var User|UserBehavior $developer */
+        $developer = $plugin->getDeveloper();
+
         return $this->_asReleaseFeed("$plugin->name Releases", function(Query $query) use ($plugin): void {
             $query->andWhere(['p.id' => $plugin->packageId]);
         }, [
             'link' => "https://plugins.craftcms.com/$plugin->handle",
             'author' => [
-                'name' => $plugin->getDeveloper()->getDeveloperName(),
-                'url' => $plugin->getDeveloper()->developerUrl,
+                'name' => $developer->getDeveloperName(),
+                'url' => $developer->developerUrl,
             ],
             'icon' => $plugin->icon->url ?? null,
         ]);
@@ -106,6 +126,7 @@ class FeedsController extends Controller
                 'pv.date',
                 'pv.critical',
                 'pv.notes',
+                'pluginId' => 'pl.id',
                 'pluginName' => 'pl.name',
                 'pluginHandle' => 'pl.handle',
                 'developerName' => 'dc.field_developerName',
@@ -114,11 +135,15 @@ class FeedsController extends Controller
                 'u.lastName',
                 'u.username',
             ])
-            ->innerJoin(['pl' => Table::PLUGINS], '[[pl.packageId]] = [[p.id]]')
-            ->innerJoin(['dc' => CraftTable::CONTENT], '[[dc.elementId]] = [[pl.developerId]]')
-            ->innerJoin(['u' => CraftTable::USERS], '[[u.id]] = [[pl.developerId]]')
+            ->leftJoin(['pl' => Table::PLUGINS], '[[pl.packageId]] = [[p.id]]')
+            ->leftJoin(['dc' => CraftTable::CONTENT], ['and', ['not', ['pl.id' => null]], '[[dc.elementId]] = [[pl.developerId]]'])
+            ->leftJoin(['u' => CraftTable::USERS], ['and', ['not', ['pl.id' => null]], '[[u.id]] = [[pl.developerId]]'])
             ->andWhere(['not', ['pv.time' => null]])
-            ->andWhere(['not', ['pl.dateApproved' => null]])
+            ->andWhere([
+                'or',
+                ['p.name' => 'craftcms/cms'],
+                ['not', ['pl.dateApproved' => null]]
+            ])
             ->orderBy(['pv.time' => SORT_DESC])
             ->limit(20);
 
@@ -127,22 +152,33 @@ class FeedsController extends Controller
         }
 
         return $this->_asFeed($title, array_map(function(array $release): array {
-            $developerName = $release['developerName'];
-            if (!$developerName) {
-                if ($release['firstName']) {
-                    $developerName = $release['firstName'] . $release['lastName'] ? " {$release['lastName']}" : '';
-                } else {
-                    $developerName = $release['username'];
+            if (!empty($release['pluginId'])) {
+                $name = $release['pluginName'];
+                $developerName = $release['developerName'];
+                $link = "https://plugins.craftcms.com/{$release['pluginHandle']}";
+                if (!$developerName) {
+                    if ($release['firstName']) {
+                        $developerName = $release['firstName'] . $release['lastName'] ? " {$release['lastName']}" : '';
+                    } else {
+                        $developerName = $release['username'];
+                    }
                 }
+                $developerUrl = $release['developerUrl'];
+            } else {
+                $name = 'Craft CMS';
+                $developerName = 'Pixel & Tonic';
+                $developerUrl = 'https://pixelandtonic.com';
+                $link = 'https://craftcms.com';
             }
+
             return [
                 'id' => $release['id'],
-                'title' => "{$release['pluginName']} {$release['version']}" . ($release['critical'] ? ' [CRITICAL]' : ''),
-                'link' => "https://plugins.craftcms.com/{$release['pluginHandle']}",
+                'title' => "$name {$release['version']}" . ($release['critical'] ? ' [CRITICAL]' : ''),
+                'link' => $link,
                 'updated' => $release['date'] ?? $release['time'],
                 'author' => [
                     'name' => $developerName,
-                    'url' => $release['developerUrl'],
+                    'url' => $developerUrl,
                 ],
                 'content' => $release['notes'],
             ];

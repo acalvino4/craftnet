@@ -343,7 +343,7 @@ class CartsController extends BaseApiController
         $country = null;
         $state = null;
 
-        /** @var $customer User|CustomerBehavior */
+        /** @var User|CustomerBehavior $customer */
         $customer = $cart->getCustomer();
 
         // get the country
@@ -430,8 +430,12 @@ class CartsController extends BaseApiController
         }
 
         $address->ownerId = $cart->id;
-        $address->countryCode = $country->getCountryCode();
-        $address->administrativeArea = $state ? $state->getIsoCode() : '';
+
+        if ($country) {
+            $address->countryCode = $country->getCountryCode();
+        }
+
+        $address->administrativeArea = $state?->getIsoCode();
 
         // save the address
         if (!Craft::$app->getElements()->saveElement($address)) {

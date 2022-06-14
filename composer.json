@@ -32,6 +32,7 @@
     "codeception/module-phpbrowser": "^1.0.0",
     "codeception/module-rest": "^1.0.0",
     "codeception/module-yii2": "^1.0.0",
+    "craftcms/phpstan": "dev-main",
     "craftcms/rector": "dev-main",
     "yiisoft/yii2-shell": "^2.0"
   },
@@ -52,5 +53,8 @@
       "yiisoft/yii2-composer": true,
       "craftcms/plugin-installer": true
     }
+  },
+  "scripts": {
+    "phpstan": "phpstan --memory-limit=1G"
   }
 }

@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\models;
 
 use craft\base\Model;
+use DateTime;
 
 /**
  * Class RefreshToken
@@ -13,37 +14,37 @@ class RefreshToken extends Model
     // =========================================================================
 
     /**
-     * @var
+     * @var int|null
      */
     public $id;
 
     /**
-     * @var
+     * @var int|null
      */
     public $accessTokenId;
 
     /**
-     * @var
+     * @var string|null
      */
     public $identifier;
 
     /**
-     * @var \DateTime
+     * @var DateTime|null
      */
     public $expiryDate;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateCreated;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateUpdated;
 
     /**
-     * @var
+     * @var string|null
      */
     public $uid;
 

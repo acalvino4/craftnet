@@ -5,6 +5,8 @@ namespace craftnet\oauthserver\models;
 use Craft;
 use craft\base\Model;
 use craftnet\oauthserver\Module;
+use DateTime;
+use League\OAuth2\Server\Entities\ScopeEntityInterface;
 
 /**
  * Class AuthCode
@@ -15,47 +17,47 @@ class AuthCode extends Model
     // =========================================================================
 
     /**
-     * @var
+     * @var int|null
      */
     public $id;
 
     /**
-     * @var
+     * @var int|null
      */
     public $clientId;
 
     /**
-     * @var
+     * @var int|null
      */
     public $userId;
 
     /**
-     * @var
+     * @var string|null
      */
     public $identifier;
 
     /**
-     * @var \DateTime
+     * @var DateTime|null
      */
     public $expiryDate;
 
     /**
-     * @var
+     * @var ScopeEntityInterface[]|null
      */
     public $scopes;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateCreated;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateUpdated;
 
     /**
-     * @var
+     * @var string|null
      */
     public $uid;
 

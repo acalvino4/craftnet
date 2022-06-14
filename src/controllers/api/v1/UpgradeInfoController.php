@@ -3,6 +3,8 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
+use craft\elements\User;
+use craftnet\behaviors\UserBehavior;
 use craftnet\composer\PackageManager;
 use craftnet\controllers\api\BaseApiController;
 use craftnet\plugins\Plugin;
@@ -46,9 +48,10 @@ class UpgradeInfoController extends BaseApiController
         Craft::$app->getElements()->eagerLoadElements(Plugin::class, $this->plugins, ['icon', 'developer', 'replacement']);
 
         // Get the plugins which are compatible with the target Craft version
+        /** @var Plugin[] $compatiblePlugins */
         $compatiblePlugins = Plugin::find()
-            ->id(array_map(fn(Plugin $plugin) => $plugin->id, $this->plugins))
             ->withLatestReleaseInfo(cmsVersion: $cmsVersion)
+            ->id(array_map(fn(Plugin $plugin) => $plugin->id, $this->plugins))
             ->indexBy('id')
             ->all();
 
@@ -61,6 +64,7 @@ class UpgradeInfoController extends BaseApiController
         $pluginInfo = [];
 
         foreach ($this->plugins as $plugin) {
+            /** @var User|UserBehavior $developer */
             $developer = $plugin->getDeveloper();
             $compatiblePlugin = $compatiblePlugins[$plugin->id] ?? null;
 

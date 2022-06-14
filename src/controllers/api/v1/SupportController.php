@@ -40,7 +40,7 @@ class SupportController extends BaseApiController
         $body = $this->request->getRequiredBodyParam('message');
 
         $info = [];
-        /** @var CmsLicense $cmsLicense */
+        /** @var CmsLicense|null $cmsLicense */
         $cmsLicense = reset($this->cmsLicenses) ?: null;
         $formatter = Craft::$app->getFormatter();
         if ($this->cmsEdition !== null || $this->cmsVersion !== null) {
@@ -58,7 +58,7 @@ class SupportController extends BaseApiController
                 'created on ' . $formatter->asDate($cmsLicense->dateCreated, Locale::LENGTH_SHORT),
             ];
             if ($cmsLicense->expirable && $cmsLicense->expiresOn) {
-                $licenseInfo[] .= ($cmsLicense->expired ? 'expired on' : 'expires on') .
+                $licenseInfo[] = ($cmsLicense->expired ? 'expired on' : 'expires on') .
                     ' ' . $formatter->asDate($cmsLicense->expiresOn, Locale::LENGTH_SHORT);
             }
             if ($cmsLicense->domain) {

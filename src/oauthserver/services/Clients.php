@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\services;
 
 use Craft;
+use craft\helpers\Db;
 use craftnet\oauthserver\models\Client;
 use craftnet\oauthserver\records\Client as ClientRecord;
 use yii\base\Component;
@@ -32,9 +33,9 @@ class Clients extends Component
     }
 
     /**
-     * @param $id
+     * @param int|null $id
      *
-     * @return Client
+     * @return Client|null
      */
     public function getClientById($id)
     {
@@ -45,12 +46,14 @@ class Clients extends Component
                 return new Client($record->getAttributes());
             }
         }
+
+        return null;
     }
 
     /**
      * @param $identifier
      *
-     * @return Client
+     * @return Client|null
      */
     public function getClientByIdentifier($identifier)
     {
@@ -59,6 +62,8 @@ class Clients extends Component
         if ($record) {
             return new Client($record->getAttributes());
         }
+
+        return null;
     }
 
     /**
@@ -114,10 +119,7 @@ class Clients extends Component
             return false;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_clients}}', ['id' => $clientId])
-            ->execute();
-
+        Db::delete('{{%oauthserver_clients}}', ['id' => $clientId]);
         return true;
     }
 
@@ -125,7 +127,7 @@ class Clients extends Component
     // =========================================================================
 
     /**
-     * @param null $id
+     * @param int|null $id
      *
      * @return ClientRecord|static
      * @throws \Exception

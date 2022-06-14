@@ -135,10 +135,9 @@ class CmsLicensesController extends BaseController
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
         $ascending = (bool)$this->request->getParam('ascending');
-        $byColumn = $this->request->getParam('byColumn');
 
         try {
-            $licenses = Module::getInstance()->getCmsLicenseManager()->getLicensesByOwner($user, $filter, $perPage, $page, $orderBy, $ascending, $byColumn);
+            $licenses = Module::getInstance()->getCmsLicenseManager()->getLicensesByOwner($user, $filter, $perPage, $page, $orderBy, $ascending);
             $totalLicenses = Module::getInstance()->getCmsLicenseManager()->getTotalLicensesByOwner($user, $filter);
 
             $lastPage = ceil($totalLicenses / $perPage);

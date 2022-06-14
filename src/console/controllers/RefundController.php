@@ -125,7 +125,7 @@ class RefundController extends Controller
             }
 
             $key = $this->select('Which line item?', $lineItemOptions);
-            unset($lineItemOptions[$key]);
+            unset($lineItemOptions[(int)$key]);
 
             $returnKeys[] = $key;
             $lineItem = $lineItems[$key];
@@ -133,7 +133,7 @@ class RefundController extends Controller
 
             $total = $lineItem->getTotal();
             $refundAmount += $total;
-            $refundNote .= ($refundNote ? ', ' : '') . $lineItemDescriptions[$key];
+            $refundNote .= ($refundNote ? ', ' : '') . $lineItemDescriptions[(int)$key];
 
             if ($license instanceof PluginLicense) {
                 /** @var PluginEdition $purchasable */

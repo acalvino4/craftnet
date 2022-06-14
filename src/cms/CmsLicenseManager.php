@@ -375,9 +375,7 @@ class CmsLicenseManager extends Component
         ];
 
         if (!$license->id) {
-            $success = (bool)Craft::$app->getDb()->createCommand()
-                ->insert(Table::CMSLICENSES, $data)
-                ->execute();
+            $success = (bool)Db::insert(Table::CMSLICENSES, $data);
 
             // set the ID an UID on the model
             $license->id = (int)Craft::$app->getDb()->getLastInsertID(Table::CMSLICENSES);
@@ -385,9 +383,7 @@ class CmsLicenseManager extends Component
             if ($attributes !== null) {
                 $data = ArrayHelper::filter($data, array_keys($attributes));
             }
-            $success = (bool)Craft::$app->getDb()->createCommand()
-                ->update(Table::CMSLICENSES, $data, ['id' => $license->id])
-                ->execute();
+            $success = (bool)Db::update(Table::CMSLICENSES, $data, ['id' => $license->id]);
         }
 
         if (!$success) {
@@ -406,13 +402,11 @@ class CmsLicenseManager extends Component
      */
     public function addHistory(int $licenseId, string $note, string $timestamp = null)
     {
-        Craft::$app->getDb()->createCommand()
-            ->insert(Table::CMSLICENSEHISTORY, [
-                'licenseId' => $licenseId,
-                'note' => $note,
-                'timestamp' => $timestamp ?? Db::prepareDateForDb(new \DateTime()),
-            ], false)
-            ->execute();
+        Db::insert(Table::CMSLICENSEHISTORY, [
+            'licenseId' => $licenseId,
+            'note' => $note,
+            'timestamp' => $timestamp ?? Db::prepareDateForDb(new \DateTime()),
+        ]);
     }
 
     /**
@@ -472,15 +466,13 @@ class CmsLicenseManager extends Component
      */
     public function claimLicenses(User $user, string $email = null): int
     {
-        return Craft::$app->getDb()->createCommand()
-            ->update(Table::CMSLICENSES, [
-                'ownerId' => $user->id,
-            ], [
-                'and',
-                ['ownerId' => null],
-                new Expression('lower([[email]]) = :email', [':email' => strtolower($email ?? $user->email)]),
-            ], [], false)
-            ->execute();
+        return Db::update(Table::CMSLICENSES, [
+            'ownerId' => $user->id,
+        ], [
+            'and',
+            ['ownerId' => null],
+            new Expression('lower([[email]]) = :email', [':email' => strtolower($email ?? $user->email)]),
+        ], updateTimestamp: false);
     }
 
     /**
@@ -676,9 +668,7 @@ class CmsLicenseManager extends Component
             throw new LicenseNotFoundException($key, $e->getMessage(), 0, $e);
         }
 
-        $rows = Craft::$app->getDb()->createCommand()
-            ->delete(Table::CMSLICENSES, ['key' => $key])
-            ->execute();
+        $rows = Db::delete(Table::CMSLICENSES, ['key' => $key]);
 
         if ($rows === 0) {
             throw new LicenseNotFoundException($key);
@@ -755,7 +745,7 @@ class CmsLicenseManager extends Component
      */
     private function _createLicenseQueryForOwner(User $owner, string $searchQuery = null)
     {
-        $query = $this->_createLicenseQuery($searchQuery)
+        $query = $this->_createLicenseQuery()
             ->where(['l.ownerId' => $owner->id]);
 
 

@@ -45,10 +45,11 @@ class AccountsController extends Controller
      */
     public function actionInfo(string $username): int
     {
-        /** @var User|UserBehavior|null $user */
         if (is_numeric($username)) {
+            /** @var User|UserBehavior|null $user */
             $user = User::find()->id($username)->status(null)->one();
         } else {
+            /** @var User|UserBehavior|null $user */
             $user = Craft::$app->getUsers()->getUserByUsernameOrEmail($username);
         }
 
@@ -69,6 +70,7 @@ class AccountsController extends Controller
 
     protected function user(User $user)
     {
+        /** @var User|UserBehavior|null $user */
         $formatter = Craft::$app->getFormatter();
 
         $this->stdout('ID: ', Console::FG_CYAN);
@@ -186,6 +188,7 @@ class AccountsController extends Controller
 
     protected function plugins(User $user)
     {
+        /** @var Plugin[] $plugins */
         $plugins = Plugin::find()
             ->developerId($user->id)
             ->status(null)
