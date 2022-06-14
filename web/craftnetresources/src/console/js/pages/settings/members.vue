@@ -12,7 +12,7 @@
       </div>
     </div>
 
-    <div class="mt-6 overflow-x-auto">
+    <div class="mt-6 pb-24">
       <table class="w-full">
         <thead>
         <tr>
