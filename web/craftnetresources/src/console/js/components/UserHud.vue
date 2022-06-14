@@ -14,15 +14,13 @@
         <MenuItem
           class="truncate"
           v-slot="{active}">
-          <button
-            class="block w-full text-left rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:text-gray-200 hover:border-interactive-nav-active-background hover:bg-gray-200 dark:bg-gray-700 hover:no-underline"
-            :class="[{
-                                    'bg-gray-200 dark:bg-gray-700': active,
-                                }]"
+          <hud-menu-item
+            :active="active"
             :title="user.email"
-            @click="$store.dispatch('organizations/saveCurrentOrganization', null);$router.push({path: '/settings/account'})">
+            @click="$store.dispatch('organizations/saveCurrentOrganization', null);$router.push({path: '/settings/account'})"
+          >
             {{ user.email }}
-          </button>
+          </hud-menu-item>
         </MenuItem>
 
         <hr class="my-2 mx-3 border-separator" />
@@ -30,12 +28,12 @@
         <MenuItem
           class="truncate"
           v-slot="{active}">
-          <a
+          <hud-menu-item
+            :active="active"
             href="/logout"
-            class="block rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:text-gray-200 hover:border-interactive-nav-active-background hover:bg-gray-200 dark:bg-gray-700 hover:no-underline"
-            :class="[{
-                            'bg-gray-200 dark:bg-gray-700': active,
-                        }]">Logout</a>
+          >
+            Logout
+          </hud-menu-item>
         </MenuItem>
       </div>
     </MenuItems>
@@ -78,9 +76,11 @@
 <script>
 import {Menu, MenuButton, MenuItems, MenuItem} from '@headlessui/vue'
 import {mapState} from 'vuex';
+import HudMenuItem from './HudMenuItem';
 
 export default {
   components: {
+    HudMenuItem,
     Menu,
     MenuButton,
     MenuItems,
