@@ -25,7 +25,7 @@
         </MenuItem>
         <MenuItem v-slot="{active}">
           <button
-            class="block w-full text-left rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent text-red-500 hover:text-gray-800 dark:text-gray-200 hover:border-interactive-nav-active-background hover:bg-gray-200 dark:bg-gray-700 hover:no-underline"
+            class="block w-full text-left rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent text-red-500 hover:text-red-500 dark:text-gray-200 hover:border-interactive-nav-active-background hover:bg-gray-200 dark:bg-gray-700 hover:no-underline"
             :class="[
                       active ? 'bg-gray-100' : '',
                       'group flex rounded-md items-center w-full px-2 py-2 text-sm',
