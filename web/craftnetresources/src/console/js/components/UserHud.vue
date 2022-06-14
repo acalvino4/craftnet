@@ -20,7 +20,7 @@
                                     'bg-gray-200 dark:bg-gray-700': active,
                                 }]"
             :title="user.email"
-            @click="$store.commit('organizations/updateCurrentOrganization', null);$router.push({path: '/settings/account'})">
+            @click="$store.dispatch('organizations/saveCurrentOrganization', null);$router.push({path: '/settings/account'})">
             {{ user.email }}
           </button>
         </MenuItem>
