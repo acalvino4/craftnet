@@ -8,35 +8,32 @@
         icon="user"
         class="w-4 h-4 text-gray-500" />
     </MenuButton>
-    <MenuItems
-      class="absolute z-10 -right-2 mt-2 w-56 origin-top-right bg-white dark:bg-gray-800 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black dark:ring-white ring-opacity-10 dark:ring-opacity-20 focus:outline-none">
-      <div class="px-2 py-1">
-        <MenuItem
-          class="truncate"
-          v-slot="{active}">
-          <hud-menu-item
-            :active="active"
-            :title="user.email"
-            @click="$store.dispatch('organizations/saveCurrentOrganization', null);$router.push({path: '/settings/account'})"
-          >
-            {{ user.email }}
-          </hud-menu-item>
-        </MenuItem>
+    <hud-menu-items>
+      <MenuItem
+        class="truncate"
+        v-slot="{active}">
+        <hud-menu-item
+          :active="active"
+          :title="user.email"
+          @click="$store.dispatch('organizations/saveCurrentOrganization', null);$router.push({path: '/settings/account'})"
+        >
+          {{ user.email }}
+        </hud-menu-item>
+      </MenuItem>
 
-        <hr class="my-2 mx-3 border-separator" />
+      <hr class="my-2 mx-3 border-separator" />
 
-        <MenuItem
-          class="truncate"
-          v-slot="{active}">
-          <hud-menu-item
-            :active="active"
-            href="/logout"
-          >
-            Logout
-          </hud-menu-item>
-        </MenuItem>
-      </div>
-    </MenuItems>
+      <MenuItem
+        class="truncate"
+        v-slot="{active}">
+        <hud-menu-item
+          :active="active"
+          href="/logout"
+        >
+          Logout
+        </hud-menu-item>
+      </MenuItem>
+    </hud-menu-items>
   </Menu>
 
   <div
@@ -77,9 +74,11 @@
 import {Menu, MenuButton, MenuItems, MenuItem} from '@headlessui/vue'
 import {mapState} from 'vuex';
 import HudMenuItem from './HudMenuItem';
+import HudMenuItems from './HudMenuItems';
 
 export default {
   components: {
+    HudMenuItems,
     HudMenuItem,
     Menu,
     MenuButton,

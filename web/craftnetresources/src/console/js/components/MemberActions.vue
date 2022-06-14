@@ -8,43 +8,41 @@
         class="w-4 h-4" />
     </MenuButton>
 
-    <MenuItems
-      class="absolute z-10 right-0 w-56 mt-2 origin-top-right bg-white dark:bg-gray-800 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-      <div class="px-2 py-1">
-        <MenuItem v-slot="{active}">
-          <button
-            class="block w-full text-left rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent text-gray-800 dark:text-gray-200 hover:text-gray-800 dark:text-gray-200 hover:border-interactive-nav-active-background hover:bg-gray-200 dark:bg-gray-700 hover:no-underline"
-            :class="[
-                      active ? 'bg-gray-100' : '',
-                      'group flex rounded-md items-center w-full px-2 py-2 text-sm',
-                    ]"
-            @click="$emit('changeRole')"
-          >
-            Change role
-          </button>
-        </MenuItem>
-        <MenuItem v-slot="{active}">
-          <button
-            class="block w-full text-left rounded text-sm my-1 px-3 py-2 leading-5 border border-transparent text-red-500 hover:text-red-500 dark:text-gray-200 hover:border-interactive-nav-active-background hover:bg-gray-200 dark:bg-gray-700 hover:no-underline"
-            :class="[
-                      active ? 'bg-gray-100' : '',
-                      'group flex rounded-md items-center w-full px-2 py-2 text-sm',
-                    ]"
-            @click="removeMember"
-          >
+    <hud-menu-items>
+      <MenuItem v-slot="{active}">
+        <hud-menu-item
+          :active="active"
+          @click="$emit('changeRole')"
+        >
+          Change role
+        </hud-menu-item>
+      </MenuItem>
+
+      <hr class="my-2 mx-3 border-separator" />
+
+      <MenuItem v-slot="{active}">
+        <hud-menu-item
+          :active="active"
+          @click="removeMember"
+        >
+          <div class="text-red-500">
             Remove
-          </button>
-        </MenuItem>
-      </div>
-    </MenuItems>
+          </div>
+        </hud-menu-item>
+      </MenuItem>
+    </hud-menu-items>
   </Menu>
 </template>
 
 <script>
 import {Menu, MenuButton, MenuItems, MenuItem} from "@headlessui/vue";
+import HudMenuItems from './HudMenuItems';
+import HudMenuItem from './HudMenuItem';
 
 export default {
   components: {
+    HudMenuItem,
+    HudMenuItems,
     Menu,
     MenuButton,
     MenuItems,
