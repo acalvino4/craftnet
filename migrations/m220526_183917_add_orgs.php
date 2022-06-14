@@ -28,8 +28,6 @@ class m220526_183917_add_orgs extends Migration
         $this->addColumn(Table::ORGS, 'supportPlanExpiryDate', $fields->getFieldByHandle('supportPlanExpiryDate')->getContentColumnType());
         $this->addColumn(Table::ORGS, 'enablePartnerFeatures', $this->boolean()->defaultValue(false)->notNull());
         $this->addColumn(Table::ORGS, 'enableDeveloperFeatures', $this->boolean()->defaultValue(false)->notNull());
-        $this->addColumn(Table::ORGS, 'billingAddress', $this->json());
-        $this->addColumn(Table::ORGS, 'vatId', $fields->getFieldByHandle('businessVatId')->getContentColumnType());
 
         // TODO: investigate field usage: purchasedPlugins
 

@@ -54,15 +54,6 @@ class OrgsController extends \yii\console\Controller
 
                 // Save w/o user/email so new admin user can validate.
                 $partner = Partner::find()->ownerId($existingUser->id)->one();
-                $billingAddress = array_filter([
-                    'businessName' => $existingUser->getFieldValue('businessName'),
-                    'address1' => $existingUser->getFieldValue('businessAddressLine1'),
-                    'address2' => $existingUser->getFieldValue('businessAddressLine2'),
-                    'city' => $existingUser->getFieldValue('businessCity'),
-                    'country' => $existingUser->getFieldValue('businessCountry'),
-                    'state' => $existingUser->getFieldValue('businessState'),
-                    'zipCode' => $existingUser->getFieldValue('businessZipCode'),
-                ]);
 
                 $existingUser->email = null;
                 $existingUser->username = null;
@@ -74,8 +65,6 @@ class OrgsController extends \yii\console\Controller
                 $existingUser->supportPlanExpiryDate = $existingUser->getFieldValue('supportPlanExpiryDate');
                 $existingUser->enablePartnerFeatures = $existingUser->getFieldValue('enablePartnerFeatures');
                 $existingUser->enableDeveloperFeatures = $developerIds->contains($existingUser->id);
-                $existingUser->billingAddress = count($billingAddress) ? $billingAddress : null;
-                $existingUser->vatId = $existingUser->getFieldValue('businessVatId');
                 $existingUser->org = new Org($existingUser);
 
                 $this->stdout("    > Saving user as org ... ");

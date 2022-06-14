@@ -101,16 +101,6 @@ class UserBehavior extends Behavior
     public bool $enablePartnerFeatures = false;
 
     /**
-     * @var array|null
-     */
-    private ?array $_billingAddress;
-
-    /**
-     * @var string|null
-     */
-    public ?string $vatId;
-
-    /**
      * @var Plugin[]|null
      */
     private ?array $_plugins;
@@ -337,8 +327,6 @@ class UserBehavior extends Behavior
                 'supportPlanExpiryDate' => $this->supportPlanExpiryDate,
                 'enableDeveloperFeatures' => $this->enableDeveloperFeatures,
                 'enablePartnerFeatures' => $this->enablePartnerFeatures,
-                'billingAddress' => $this->_billingAddress,
-                'vatId' => $this->vatId,
             ], [], false)
             ->execute();
     }
@@ -380,21 +368,5 @@ class UserBehavior extends Behavior
     public function setOrg(?Org $org): void
     {
         $this->_org = $org;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getBillingAddress(): ?array
-    {
-        return $this->_billingAddress;
-    }
-
-    /**
-     * @param string|array|null $billingAddress
-     */
-    public function setBillingAddress(string|array|null $billingAddress): void
-    {
-        $this->_billingAddress = Json::decodeIfJson($billingAddress);
     }
 }
