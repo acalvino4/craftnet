@@ -59,6 +59,7 @@ use craftnet\fields\Plugins;
 use craftnet\helpers\Cache;
 use craftnet\invoices\InvoiceManager;
 use craftnet\orders\PdfRenderer;
+use craftnet\orgs\OrgsService;
 use craftnet\payouts\PayoutManager;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginEdition;
@@ -249,6 +250,14 @@ class Module extends \yii\base\Module
         }
 
         parent::init();
+    }
+
+    /**
+     * @return OrgsService
+     */
+    public function getOrgs(): OrgsService
+    {
+        return $this->get('orgs');
     }
 
     /**

@@ -13,6 +13,7 @@ use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
+use craftnet\Module;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
@@ -113,7 +114,7 @@ class UserBehavior extends Behavior
     /**
      * @var Org[]|null
      */
-    private ?array $_orgs;
+    private ?array $_orgs = null;
 
     /**
      * @inheritdoc
@@ -358,7 +359,7 @@ class UserBehavior extends Behavior
             return $this->_orgs;
         }
 
-        return $this->_orgs = Craft::$app->getOrgs()->getOrgsByMemberUserId($this->owner->id);
+        return $this->_orgs = Module::getInstance()->getOrgs()->getOrgsByMemberUserId($this->owner->id);
     }
 
     /**
