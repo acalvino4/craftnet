@@ -220,7 +220,7 @@ class AccountController extends Controller
         $address->addressLine2 = $this->request->getBodyParam('address2');
         $address->locality = $this->request->getBodyParam('city');
         $address->postalCode = $this->request->getBodyParam('zipCode');
-        $address->countryCode = $this->request->getBodyParam('country');
+        $address->countryCode = $this->request->getBodyParam('country') ?? 'US';
         $address->administrativeArea = $this->request->getBodyParam('state');
         $address->ownerId = $customer->id;
 
