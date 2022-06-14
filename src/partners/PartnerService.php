@@ -581,6 +581,7 @@ class PartnerService
             $targetFilename = $screenshotFile->name;
 
             $screenshot = new Asset([
+                'filename' => $targetFilename,
                 'title' => $partner->businessName,
                 'tempFilePath' => $tempPath,
                 'newLocation' => "{folder:{$folderId}}" . $targetFilename,
@@ -696,6 +697,7 @@ class PartnerService
         $targetFilename = $uploadedFile->name;
 
         $image = new Asset([
+            'filename' => $targetFilename,
             'title' => $partner->businessName,
             'tempFilePath' => $tempPath,
             'newLocation' => "{folder:{$folderId}}" . $targetFilename,

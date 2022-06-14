@@ -405,6 +405,7 @@ JS;
                         }
 
                         $icon = new Asset([
+                            'filename' => $targetFilename,
                             'title' => $plugin->name,
                             'tempFilePath' => $tempPath,
                             'newLocation' => "{folder:$folderId}$targetFilename",
@@ -942,11 +943,13 @@ JS;
         $volumesService = Craft::$app->getVolumes();
         $volume = $volumesService->getVolumeByHandle('icons');
         $folderId = $volumesService->ensureTopFolder($volume)->id;
+        $filename = StringHelper::randomString() . ".svg";
 
         $icon = new Asset([
+            'filename' => $filename,
             'title' => $name,
             'tempFilePath' => $tempPath,
-            'newLocation' => "{folder:{$folderId}}{$handle}" . StringHelper::randomString() . ".svg",
+            'newLocation' => "{folder:{$folderId}}{$handle}" . $filename,
         ]);
 
         if (!Craft::$app->getElements()->saveElement($icon, false)) {
