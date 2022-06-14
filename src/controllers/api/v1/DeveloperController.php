@@ -41,6 +41,7 @@ class DeveloperController extends BaseApiController
         ];
 
         // Are they a partner?
+        /** @var Partner|null $partner */
         $partner = Partner::find()
             ->ownerId($user->id)
             ->status(null)

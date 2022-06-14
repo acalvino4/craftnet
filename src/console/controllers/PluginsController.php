@@ -47,6 +47,7 @@ OUTPUT;
 
         if ($totalPending) {
             $output .= "\nPending plugins:\n\n";
+            /** @var Plugin[] $pending */
             $pending = Plugin::find()->status(Plugin::STATUS_PENDING)->all();
             $maxLength = max(array_map('mb_strlen', ArrayHelper::getColumn($pending, 'name'))) + 2;
             foreach ($pending as $plugin) {

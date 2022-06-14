@@ -4,10 +4,12 @@ namespace craftnet\controllers\feeds;
 
 use Craft;
 use craft\db\Query;
+use craft\elements\User;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
 use craft\db\Table as CraftTable;
 use craftnet\Module;
@@ -48,14 +50,16 @@ class FeedsController extends Controller
             ->all();
 
         return $this->_asFeed('New Plugins', array_map(function(Plugin $plugin): array {
+            /** @var User|UserBehavior $developer */
+            $developer = $plugin->getDeveloper();
             return [
                 'id' => $plugin->handle,
                 'title' => $plugin->name,
                 'link' => "https://plugins.craftcms.com/$plugin->handle",
                 'updated' => $plugin->dateApproved,
                 'author' => [
-                    'name' => $plugin->getDeveloper()->getDeveloperName(),
-                    'url' => $plugin->getDeveloper()->developerUrl,
+                    'name' => $developer->getDeveloperName(),
+                    'url' => $developer->developerUrl,
                 ],
                 'summary' => $plugin->shortDescription,
             ];
@@ -97,13 +101,16 @@ class FeedsController extends Controller
             throw new NotFoundHttpException("Invalid plugin handle: $handle");
         }
 
+        /** @var User|UserBehavior $developer */
+        $developer = $plugin->getDeveloper();
+
         return $this->_asReleaseFeed("$plugin->name Releases", function(Query $query) use ($plugin): void {
             $query->andWhere(['p.id' => $plugin->packageId]);
         }, [
             'link' => "https://plugins.craftcms.com/$plugin->handle",
             'author' => [
-                'name' => $plugin->getDeveloper()->getDeveloperName(),
-                'url' => $plugin->getDeveloper()->developerUrl,
+                'name' => $developer->getDeveloperName(),
+                'url' => $developer->developerUrl,
             ],
             'icon' => $plugin->icon->url ?? null,
         ]);

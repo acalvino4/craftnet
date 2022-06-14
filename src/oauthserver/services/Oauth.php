@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\services;
 
 use Craft;
+use craft\elements\User;
 use craftnet\oauthserver\Module;
 use yii\base\Component;
 
@@ -25,7 +26,7 @@ class Oauth extends Component
     }
 
     /**
-     * @return \craft\elements\User|null
+     * @return User|null
      */
     public function getAuthenticatedUser()
     {
@@ -44,6 +45,8 @@ class Oauth extends Component
                 }
             }
         }
+
+        return null;
     }
 
     /**

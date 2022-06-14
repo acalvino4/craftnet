@@ -4,6 +4,7 @@ namespace craftnet\services;
 
 use Craft;
 use craft\db\Query;
+use craft\helpers\Db;
 use craftnet\db\Table;
 use Github\Client as GithubClient;
 use Github\Exception\RuntimeException;
@@ -113,7 +114,7 @@ class Oauth extends Component
     /**
      * @param string $appTypeHandle
      *
-     * @return array|null
+     * @return array
      * @throws Exception if $appTypeHandle is invalid
      */
     public function getAppTypeConfig(string $appTypeHandle): array
@@ -196,8 +197,6 @@ class Oauth extends Component
      */
     public function deleteAccessToken($userId, $provider)
     {
-        Craft::$app->getDb()->createCommand()
-            ->delete(Table::VCSTOKENS, ['userId' => $userId, 'provider' => $provider])
-            ->execute();
+        Db::delete(Table::VCSTOKENS, ['userId' => $userId, 'provider' => $provider]);
     }
 }

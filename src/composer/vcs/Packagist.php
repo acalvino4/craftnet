@@ -20,7 +20,7 @@ class Packagist extends BaseVcs
     const BASE_URL = 'https://packagist.org/';
 
     /**
-     * @var
+     * @var array|null
      */
     private static $_rootComposerInfo;
 

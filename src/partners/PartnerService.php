@@ -3,7 +3,6 @@
 namespace craftnet\partners;
 
 use Craft;
-use craft\base\Volume;
 use craft\db\Query;
 use craft\elements\Asset;
 use craft\errors\AssetDisallowedExtensionException;
@@ -11,6 +10,7 @@ use craft\errors\ImageException;
 use craft\helpers\ConfigHelper;
 use craft\helpers\ElementHelper;
 use craft\helpers\StringHelper;
+use craft\models\Volume;
 use craft\web\Request;
 use craft\web\UploadedFile;
 use craftnet\db\Table;
@@ -563,7 +563,7 @@ class PartnerService
 
             /** @var Volume $volume */
             $volume = $volumesService->getVolumeByHandle('partnerImages');
-            $volumeId = $volumesService->ensureTopFolder($volume);
+            $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
             $subpath = '/' . $handle;
 
@@ -573,7 +573,7 @@ class PartnerService
             ]);
 
             if (!$folder) {
-                $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+                $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
             } else {
                 $folderId = $folder->id;
             }
@@ -581,6 +581,7 @@ class PartnerService
             $targetFilename = $screenshotFile->name;
 
             $screenshot = new Asset([
+                'filename' => $targetFilename,
                 'title' => $partner->businessName,
                 'tempFilePath' => $tempPath,
                 'newLocation' => "{folder:{$folderId}}" . $targetFilename,
@@ -678,7 +679,7 @@ class PartnerService
 
         /** @var Volume $volume */
         $volume = $volumesService->getVolumeByHandle('partnerImages');
-        $volumeId = $volumesService->ensureTopFolder($volume);
+        $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
         $subpath = '/' . $handle;
 
@@ -688,7 +689,7 @@ class PartnerService
         ]);
 
         if (!$folder) {
-            $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+            $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
         } else {
             $folderId = $folder->id;
         }
@@ -696,6 +697,7 @@ class PartnerService
         $targetFilename = $uploadedFile->name;
 
         $image = new Asset([
+            'filename' => $targetFilename,
             'title' => $partner->businessName,
             'tempFilePath' => $tempPath,
             'newLocation' => "{folder:{$folderId}}" . $targetFilename,

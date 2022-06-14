@@ -80,8 +80,8 @@ class CmsLicensesController extends BaseApiController
                     if ($this->cmsVersion) {
                         // Get the latest release that's compatible with their current Craft version
                         $pluginLicenseInfo['plugin']['latestVersion'] = Plugin::find()
-                            ->id($pluginLicense->pluginId)
                             ->withLatestReleaseInfo(true, $this->cmsVersion)
+                            ->id($pluginLicense->pluginId)
                             ->select(['latestVersion'])
                             ->asArray()
                             ->scalar();

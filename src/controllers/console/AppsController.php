@@ -114,6 +114,7 @@ class AppsController extends BaseController
             $tokenRecord->provider = $appTypeConfig['class'];
         } else {
             // A previous one, let's update it.
+            /** @var VcsToken $tokenRecord */
             $tokenRecord = VcsToken::find()
                 ->where(Db::parseParam('accessToken', $existingToken))
                 ->andWhere(Db::parseParam('provider', $appTypeConfig['class']))

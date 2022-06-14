@@ -63,11 +63,14 @@ class DeveloperSupportController extends Controller
     public function actionCancelSubscription(): Response
     {
         $subscriptionUid = $this->request->getRequiredBodyParam('subscription');
+        /** @var Subscription|null $subscription */
         $subscription = Subscription::find()->userId($this->_user->id)->uid($subscriptionUid)->one();
 
         if ($subscription) {
+            /** @var SubscriptionGateway $gateway */
+            $gateway = $subscription->getGateway();
             /** @var CancelSubscription $cancelForm */
-            $cancelForm = $subscription->getGateway()->getCancelSubscriptionFormModel();
+            $cancelForm = $gateway->getCancelSubscriptionFormModel();
             $cancelForm->cancelImmediately = $subscription->getSubscriptionData()['status'] === 'trialing';
 
             Commerce::getInstance()->getSubscriptions()->cancelSubscription($subscription, $cancelForm);
@@ -84,15 +87,18 @@ class DeveloperSupportController extends Controller
     public function actionReactivateSubscription(): Response
     {
         $subscriptionUid = $this->request->getRequiredBodyParam('subscription');
+        /** @var Subscription|null $subscription */
         $subscription = Subscription::find()->userId($this->_user->id)->uid($subscriptionUid)->one();
 
         // If re-activating Premium, cancel any pro subscriptions.
-        if ($subscription->getPlan()->handle === self::PLAN_PREMIUM) {
+        if ($subscription?->getPlan()->handle === self::PLAN_PREMIUM) {
             $proSubscription = Subscription::find()->plan(self::PLAN_PRO)->userId($this->_user->id)->isExpired(false)->one();
 
             if ($proSubscription) {
+                /** @var SubscriptionGateway $gateway */
+                $gateway = $subscription->getGateway();
                 /** @var CancelSubscription $cancelForm */
-                $cancelForm = $subscription->getGateway()->getCancelSubscriptionFormModel();
+                $cancelForm = $gateway->getCancelSubscriptionFormModel();
                 $cancelForm->cancelImmediately = true;
                 Commerce::getInstance()->getSubscriptions()->cancelSubscription($proSubscription, $cancelForm);
             }
@@ -229,6 +235,8 @@ class DeveloperSupportController extends Controller
                 /** @var SwitchPlans $switchPlansForm */
                 $switchPlansForm = $gateway->getSwitchPlansFormModel();
                 $switchPlansForm->prorate = true;
+                // todo: fix this
+                /** @phpstan-ignore-next-line  */
                 $switchPlansForm->billingCycleAnchor = 'now';
                 $switchResult = $subscriptionService->switchSubscriptionPlan($proSubscription, $commerce->getPlans()->getPlanByHandle(self::PLAN_PREMIUM), $switchPlansForm);
 
@@ -240,7 +248,7 @@ class DeveloperSupportController extends Controller
                 break;
         }
 
-        return $this->asJson($this->_getSubscriptionData(true));
+        return $this->asJson($this->_getSubscriptionData());
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\services;
 
 use Craft;
+use craft\helpers\Db;
 use craftnet\oauthserver\models\RefreshToken;
 use craftnet\oauthserver\records\RefreshToken as RefreshTokenRecord;
 use yii\base\Component;
@@ -34,7 +35,7 @@ class RefreshTokens extends Component
     /**
      * @param $id
      *
-     * @return RefreshToken
+     * @return RefreshToken|null
      */
     public function getRefreshTokenById($id)
     {
@@ -45,12 +46,14 @@ class RefreshTokens extends Component
                 return new RefreshToken($record->getAttributes());
             }
         }
+
+        return null;
     }
 
     /**
      * @param $identifier
      *
-     * @return RefreshToken
+     * @return RefreshToken|null
      */
     public function getRefreshTokenByIdentifier($identifier)
     {
@@ -59,12 +62,14 @@ class RefreshTokens extends Component
         if ($record) {
             return new RefreshToken($record->getAttributes());
         }
+
+        return null;
     }
 
     /**
      * @param $id
      *
-     * @return RefreshToken
+     * @return RefreshToken|null
      */
     public function getRefreshTokenByAccessTokenId($id)
     {
@@ -73,6 +78,8 @@ class RefreshTokens extends Component
         if ($record) {
             return new RefreshToken($record->getAttributes());
         }
+
+        return null;
     }
 
     /**
@@ -88,10 +95,7 @@ class RefreshTokens extends Component
             return false;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_refresh_tokens}}', ['id' => $refreshTokenId])
-            ->execute();
-
+        Db::delete('{{%oauthserver_refresh_tokens}}', ['id' => $refreshTokenId]);
         return true;
     }
 
@@ -100,10 +104,7 @@ class RefreshTokens extends Component
      */
     public function clearRefreshTokens()
     {
-        Craft::$app->getDb()->createCommand()
-            ->delete('{{%oauthserver_refresh_tokens}}')
-            ->execute();
-
+        Db::delete('{{%oauthserver_refresh_tokens}}');
         return true;
     }
 

@@ -449,9 +449,7 @@ class PluginLicenseManager extends Component
         ];
 
         if (!$license->id) {
-            $success = (bool)Craft::$app->getDb()->createCommand()
-                ->insert(Table::PLUGINLICENSES, $data)
-                ->execute();
+            $success = (bool)Db::insert(Table::PLUGINLICENSES, $data);
 
             // set the ID on the model
             $license->id = (int)Craft::$app->getDb()->getLastInsertID(Table::PLUGINLICENSES);
@@ -459,9 +457,7 @@ class PluginLicenseManager extends Component
             if ($attributes !== null) {
                 $data = ArrayHelper::filter($data, array_keys($attributes));
             }
-            $success = (bool)Craft::$app->getDb()->createCommand()
-                ->update(Table::PLUGINLICENSES, $data, ['id' => $license->id])
-                ->execute();
+            $success = (bool)Db::update(Table::PLUGINLICENSES, $data, ['id' => $license->id]);
         }
 
         if (!$success) {
@@ -480,13 +476,11 @@ class PluginLicenseManager extends Component
      */
     public function addHistory(int $licenseId, string $note, string $timestamp = null)
     {
-        Craft::$app->getDb()->createCommand()
-            ->insert(Table::PLUGINLICENSEHISTORY, [
-                'licenseId' => $licenseId,
-                'note' => $note,
-                'timestamp' => $timestamp ?? Db::prepareDateForDb(new \DateTime()),
-            ], false)
-            ->execute();
+        Db::insert(Table::PLUGINLICENSEHISTORY, [
+            'licenseId' => $licenseId,
+            'note' => $note,
+            'timestamp' => $timestamp ?? Db::prepareDateForDb(new \DateTime()),
+        ]);
     }
 
     /**
@@ -556,15 +550,13 @@ class PluginLicenseManager extends Component
      */
     public function claimLicenses(User $user, string $email = null): int
     {
-        return Craft::$app->getDb()->createCommand()
-            ->update(Table::PLUGINLICENSES, [
-                'ownerId' => $user->id,
-            ], [
-                'and',
-                ['ownerId' => null],
-                new Expression('lower([[email]]) = :email', [':email' => strtolower($email ?? $user->email)]),
-            ], [], false)
-            ->execute();
+        return Db::update(Table::PLUGINLICENSES, [
+            'ownerId' => $user->id,
+        ], [
+            'and',
+            ['ownerId' => null],
+            new Expression('lower([[email]]) = :email', [':email' => strtolower($email ?? $user->email)]),
+        ], updateTimestamp: false);
     }
 
     /**
@@ -659,6 +651,7 @@ class PluginLicenseManager extends Component
         $plugin = null;
 
         if ($result->pluginId) {
+            /** @var Plugin $pluginResult */
             $pluginResult = Plugin::find()->id($result->pluginId)->status(null)->one();
             $plugin = $pluginResult->getAttributes(['name', 'handle']);
             $plugin['hasMultipleEditions'] = $pluginResult->getHasMultipleEditions();
@@ -694,9 +687,7 @@ class PluginLicenseManager extends Component
      */
     public function deleteLicenseById(int $id)
     {
-        $rows = Craft::$app->getDb()->createCommand()
-            ->delete(Table::PLUGINLICENSES, ['id' => $id])
-            ->execute();
+        $rows = Db::delete(Table::PLUGINLICENSES, ['id' => $id]);
 
         if ($rows === 0) {
             throw new LicenseNotFoundException($id);
@@ -717,9 +708,7 @@ class PluginLicenseManager extends Component
             throw new LicenseNotFoundException($key, $e->getMessage(), 0, $e);
         }
 
-        $rows = Craft::$app->getDb()->createCommand()
-            ->delete(Table::PLUGINLICENSES, ['key' => $key])
-            ->execute();
+        $rows = Db::delete(Table::PLUGINLICENSES, ['key' => $key]);
 
         if ($rows === 0) {
             throw new LicenseNotFoundException($key);

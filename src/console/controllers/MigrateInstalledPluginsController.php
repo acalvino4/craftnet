@@ -5,6 +5,7 @@ namespace craftnet\console\controllers;
 use Craft;
 use craft\db\Query;
 use craft\helpers\Console;
+use craft\helpers\Db;
 use craftnet\db\Table;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\Module;
@@ -54,9 +55,7 @@ class MigrateInstalledPluginsController extends Controller
             foreach ($plugins as $pluginId => $timestamp) {
                 $data[] = [$license->id, $pluginId, $timestamp];
             }
-            $db->createCommand()
-                ->batchInsert(Table::CMSLICENSE_PLUGINS, ['licenseId', 'pluginId', 'timestamp'], $data, false)
-                ->execute();
+            Db::batchInsert(Table::CMSLICENSE_PLUGINS, ['licenseId', 'pluginId', 'timestamp'], $data);
             $this->stdout('done' . PHP_EOL, Console::FG_GREEN);
         }
 

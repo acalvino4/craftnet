@@ -35,7 +35,6 @@ class ClaimLicensesController extends Controller
     /**
      * Requests to claim licenses for a given email.
      *
-     * @param string $email
      * @return Response
      */
     public function actionRequest(): Response
@@ -65,8 +64,9 @@ class ClaimLicensesController extends Controller
      */
     public function actionVerify(string $id, string $email, string $code): Response
     {
-        /** @var User|UserBehavior $user */
-        if (($user = User::find()->uid($id)->one()) === null) {
+        /** @var User|UserBehavior|null $user */
+        $user = User::find()->uid($id)->one();
+        if ($user === null) {
             throw new NotFoundHttpException("Invalid user ID: {$id}");
         }
 

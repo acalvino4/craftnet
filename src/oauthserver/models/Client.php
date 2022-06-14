@@ -3,6 +3,7 @@
 namespace craftnet\oauthserver\models;
 
 use craft\base\Model;
+use DateTime;
 
 /**
  * Class Client
@@ -13,47 +14,47 @@ class Client extends Model
     // =========================================================================
 
     /**
-     * @var
+     * @var int|null
      */
     public $id;
 
     /**
-     * @var
+     * @var string|null
      */
     public $name;
 
     /**
-     * @var
+     * @var string|null
      */
     public $identifier;
 
     /**
-     * @var
+     * @var string|null
      */
     public $secret;
 
     /**
-     * @var
+     * @var string|null
      */
     public $redirectUri;
 
     /**
-     * @var
+     * @var bool|null
      */
     public $redirectUriLocked;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateCreated;
 
     /**
-     * @var
+     * @var DateTime|null
      */
     public $dateUpdated;
 
     /**
-     * @var
+     * @var string|null
      */
     public $uid;
 

@@ -204,6 +204,7 @@ class PluginLicense extends License
             return null;
         }
 
+        /** @var PluginEdition|null */
         return PluginEdition::find()
             ->id($this->editionId)
             ->status(null)
@@ -247,6 +248,7 @@ class PluginLicense extends License
      */
     public function getPlugin(): Plugin
     {
+        /** @var Plugin|null */
         return Plugin::find()
             ->id($this->pluginId)
             ->status(null)

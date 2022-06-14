@@ -18,7 +18,7 @@ class ScopeRepository implements ScopeRepositoryInterface
      *
      * @param string $identifier The scope identifier
      *
-     * @return ScopeEntityInterface
+     * @return ScopeEntityInterface|null
      */
     public function getScopeEntityByIdentifier($identifier)
     {
@@ -32,6 +32,8 @@ class ScopeRepository implements ScopeRepositoryInterface
                 return $scopeEntity;
             }
         }
+
+        return null;
     }
 
     /**

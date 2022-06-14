@@ -3,7 +3,9 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
+use craft\elements\User;
 use craft\helpers\ArrayHelper;
+use craftnet\behaviors\UserBehavior;
 use craftnet\controllers\api\BaseApiController;
 use craftnet\plugins\Plugin;
 use yii\helpers\Inflector;
@@ -75,6 +77,7 @@ class AvailablePluginsController extends BaseApiController
         }
 
         // Find the plugins
+        /** @var Plugin[] $plugins */
         $plugins = Plugin::find()
             ->handle($newHandles)
             ->with(['icon', 'developer', 'editions'])
@@ -84,6 +87,7 @@ class AvailablePluginsController extends BaseApiController
         foreach ($plugins as $plugin) {
             $oldHandle = $oldHandlesByNew[$plugin->handle] ?? $plugin->handle;
             $icon = $plugin->getIcon();
+            /** @var User|UserBehavior $developer */
             $developer = $plugin->getDeveloper();
             $statusColor = $plugin->enabled ? 'green' : 'red';
             $status = $plugin->enabled ? 'Available' : 'Coming soon';

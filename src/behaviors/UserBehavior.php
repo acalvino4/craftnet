@@ -13,6 +13,7 @@ use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
+use craftnet\Module;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
@@ -31,6 +32,7 @@ use yii\base\Exception;
  * @property null|\craftnet\orgs\Org $org
  * @property-read \craftnet\partners\Partner $partner
  * @property Plugin[] $plugins
+ * @mixin CustomFieldBehavior
  */
 class UserBehavior extends Behavior
 {
@@ -100,16 +102,6 @@ class UserBehavior extends Behavior
     public bool $enablePartnerFeatures = false;
 
     /**
-     * @var array|null
-     */
-    private ?array $_billingAddress;
-
-    /**
-     * @var string|null
-     */
-    public ?string $vatId;
-
-    /**
      * @var Plugin[]|null
      */
     private ?array $_plugins;
@@ -122,7 +114,7 @@ class UserBehavior extends Behavior
     /**
      * @var Org[]|null
      */
-    private ?array $_orgs;
+    private ?array $_orgs = null;
 
     /**
      * @inheritdoc
@@ -143,6 +135,7 @@ class UserBehavior extends Behavior
      */
     public function getPartner(): Partner
     {
+        /** @var Partner|null $partner */
         $partner = Partner::find()
             ->ownerId($this->owner->id)
             ->status(null)
@@ -177,10 +170,12 @@ class UserBehavior extends Behavior
             return $this->_plugins;
         }
 
-        return $this->_plugins = Plugin::find()
+        /** @var Plugin[] $plugins */
+        $plugins = Plugin::find()
             ->developerId($this->owner->id)
             ->status(null)
             ->all();
+        return $this->_plugins = $plugins;
     }
 
     /**
@@ -245,6 +240,7 @@ class UserBehavior extends Behavior
      */
     public function beforeSave(ModelEvent $event): void
     {
+        /** @var User|self $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
         $isAdmin = $currentUser && ($currentUser->isInGroup('admins') || $currentUser->admin);
         $request = Craft::$app->getRequest();
@@ -332,8 +328,6 @@ class UserBehavior extends Behavior
                 'supportPlanExpiryDate' => $this->supportPlanExpiryDate,
                 'enableDeveloperFeatures' => $this->enableDeveloperFeatures,
                 'enablePartnerFeatures' => $this->enablePartnerFeatures,
-                'billingAddress' => $this->_billingAddress,
-                'vatId' => $this->vatId,
             ], [], false)
             ->execute();
     }
@@ -365,7 +359,7 @@ class UserBehavior extends Behavior
             return $this->_orgs;
         }
 
-        return $this->_orgs = Craft::$app->getOrgs()->getOrgsByMemberUserId($this->owner->id);
+        return $this->_orgs = Module::getInstance()->getOrgs()->getOrgsByMemberUserId($this->owner->id);
     }
 
     /**
@@ -375,21 +369,5 @@ class UserBehavior extends Behavior
     public function setOrg(?Org $org): void
     {
         $this->_org = $org;
-    }
-
-    /**
-     * @return array|null
-     */
-    public function getBillingAddress(): ?array
-    {
-        return $this->_billingAddress;
-    }
-
-    /**
-     * @param string|array|null $billingAddress
-     */
-    public function setBillingAddress(string|array|null $billingAddress): void
-    {
-        $this->_billingAddress = Json::decodeIfJson($billingAddress);
     }
 }

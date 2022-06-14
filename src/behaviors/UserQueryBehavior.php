@@ -45,8 +45,6 @@ class UserQueryBehavior extends Behavior
             'orgs.supportPlanExpiryDate',
             'orgs.enableDeveloperFeatures',
             'orgs.enablePartnerFeatures',
-            'orgs.billingAddress',
-            'orgs.vatId',
         ]);
 
         $this->owner->query->leftJoin(['orgs' => Table::ORGS], '[[orgs.id]] = [[users.id]]');
