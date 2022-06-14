@@ -50,7 +50,7 @@
 {% endif %}
 
 {% set billingAddress = order.getBillingAddress() %}
-
+{% set note = order.lineItems[0].note ?? null %}
 <table cellspacing="0" cellpadding="0">
 	<tr>
 		<td>
@@ -58,25 +58,18 @@
 			{{ order.datePaid|date('d F, Y') }}<br>
 			{% if paymentMethod %}Paid via {{ paymentMethod }}<br>{% endif %}
 			&nbsp;<br>
-
-			<strong>Sold to</strong><br>
-
-			{{ line(billingAddress.fullName) }}
+			<strong>Sold to</strong>&nbsp;<br>
 			{{ line(order.email) }}
-			&nbsp;<br>
-			{{ line(billingAddress.organization) }}
-			{{ line(billingAddress.addressLine1) }}
-			{{ line(billingAddress.addressLine2) }}
-			{{ line(billingAddress.locality) }}
-			{{ line(billingAddress.getAdministrativeArea()) }}
-			{{ line(billingAddress.postalCode) }}
-
-			{% set country = craft.app.getAddresses().getCountryRepository().get(billingAddress.getCountryCode()) %}
-			{% if country %}
-				{{ line(country.name) }}
+			{% if billingAddress %}
+				&nbsp;<br>
+				{{ craft.app.getAddresses().formatAddress(billingAddress)|striptags('<br>')|raw }}
+				{{ line(billingAddress.organizationTaxId) }}<br>
 			{% endif %}
-			{{ line(billingAddress.organizationTaxId) }}
-			{{ line(order.lineItems[0].note) }}
+
+			{% if note %}
+				&nbsp;<br>
+				{{ note }}
+			{% endif %}
 		</td>
 		<td>
 			<strong>Pixel &amp; Tonic</strong><br>
