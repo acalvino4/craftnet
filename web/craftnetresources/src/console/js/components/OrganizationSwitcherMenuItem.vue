@@ -11,7 +11,6 @@
     <div class="min-w-0">
       <div class="truncate">
         <slot />
-        *
       </div>
     </div>
 
