@@ -103,9 +103,9 @@ class OrgsController extends \yii\console\Controller
                     $this->stdout('done' . PHP_EOL);
 
                     // TODO: Once this exists https://github.com/craftcms/commerce/pull/2801/files
-                    // $this->stdout("    > Migrating commerce data to org admin ... ");
-                    // Commerce::getInstance()->getCustomers()->moveCustomerDataToCustomer($existingUser, $orgAdmin);
-                    // $this->stdout('done' . PHP_EOL);
+                    $this->stdout("    > Migrating commerce data to org admin ... ");
+                    Commerce::getInstance()->getCustomers()->moveCustomerDataToCustomer($existingUser, $orgAdmin);
+                    $this->stdout('done' . PHP_EOL);
 
                     $this->stdout("    > Migrating address data to org admin ... ");
                     Craft::$app->getDb()->createCommand()

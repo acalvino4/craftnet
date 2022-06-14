@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "069b469bf46ad1c9d7465ecfa1b13a76",
+    "content-hash": "423c6c466c3b80936d1644fadeca0bc6",
     "packages": [
         {
             "name": "adam-paterson/oauth2-stripe",
@@ -1189,16 +1189,16 @@
         },
         {
             "name": "craftcms/commerce",
-            "version": "dev-develop",
+            "version": "dev-feature/dsg-127-create-method-to-transfer-all-commerce",
             "source": {
                 "type": "git",
                 "url": "https://github.com/craftcms/commerce.git",
-                "reference": "ebc45436219be3513e2d7af98f3feff90cb9ffb7"
+                "reference": "78c92bbf61c2a23bfdc7bb3bd0e6814a5cf744f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/craftcms/commerce/zipball/ebc45436219be3513e2d7af98f3feff90cb9ffb7",
-                "reference": "ebc45436219be3513e2d7af98f3feff90cb9ffb7",
+                "url": "https://api.github.com/repos/craftcms/commerce/zipball/78c92bbf61c2a23bfdc7bb3bd0e6814a5cf744f2",
+                "reference": "78c92bbf61c2a23bfdc7bb3bd0e6814a5cf744f2",
                 "shasum": ""
             },
             "require": {
@@ -1221,7 +1221,6 @@
                 "craftcms/redactor": "*",
                 "vlucas/phpdotenv": "^3.4"
             },
-            "default-branch": true,
             "type": "craft-plugin",
             "extra": {
                 "handle": "commerce",
@@ -1256,7 +1255,7 @@
                 "rss": "https://github.com/craftcms/commerce/releases.atom",
                 "source": "https://github.com/craftcms/commerce"
             },
-            "time": "2022-06-14T18:51:49+00:00"
+            "time": "2022-06-14T20:40:46+00:00"
         },
         {
             "name": "craftcms/commerce-stripe",
@@ -13242,7 +13241,7 @@
     "aliases": [
         {
             "package": "craftcms/commerce",
-            "version": "dev-develop",
+            "version": "dev-feature/dsg-127-create-method-to-transfer-all-commerce",
             "alias": "4.0.3",
             "alias_normalized": "4.0.3.0"
         }
@@ -13260,5 +13259,5 @@
     "platform-overrides": {
         "php": "8.0.8"
     },
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }
