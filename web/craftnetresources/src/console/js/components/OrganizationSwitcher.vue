@@ -8,28 +8,28 @@
         class="header-brand relative">
         <MenuButton
           class="flex w-full items-center hover:no-underline font-bold text-gray-800 dark:text-gray-200 px-5 py-3">
-                        <span class="rounded overflow-hidden">
-                            <template v-if="currentOrganization">
-                                <template v-if="orgAvatarUrl">
-                                    <img
-                                      class="w-7 h-7 bg-teal-500"
-                                      :src="orgAvatarUrl" />
-                                </template>
-                            </template>
-                            <template v-else>
-                                <div
-                                  class="w-7 h-7 bg-gray-100 flex items-center justify-center">
-                                    <template v-if="user.photoUrl">
-                                        <img :src="user.photoUrl" />
-                                    </template>
-                                    <template v-else>
-                                        <icon
-                                          icon="user"
-                                          class="w-3 h-3 text-gray-500" />
-                                    </template>
-                                </div>
-                            </template>
-                        </span>
+            <span class="rounded overflow-hidden">
+                <template v-if="currentOrganization">
+                    <template v-if="orgAvatarUrl">
+                        <img
+                          class="w-7 h-7 bg-teal-500"
+                          :src="orgAvatarUrl" />
+                    </template>
+                </template>
+                <template v-else>
+                    <div
+                      class="w-7 h-7 bg-gray-100 flex items-center justify-center">
+                        <template v-if="user.photoUrl">
+                            <img :src="user.photoUrl" />
+                        </template>
+                        <template v-else>
+                            <icon
+                              icon="user"
+                              class="w-3 h-3 text-gray-500" />
+                        </template>
+                    </div>
+                </template>
+            </span>
 
           <div
             v-if="orgName"
@@ -122,7 +122,7 @@
 
 <script>
 import {Menu, MenuButton, MenuItems, MenuItem} from '@headlessui/vue'
-import {mapState} from 'vuex';
+import {mapGetters, mapState} from 'vuex';
 import helpers from '@/console/js/mixins/helpers.js';
 import OrganizationSwitcherMenuItem from './OrganizationSwitcherMenuItem';
 
@@ -140,8 +140,11 @@ export default {
   computed: {
     ...mapState({
       organizations: state => state.organizations.organizations,
-      currentOrganization: state => state.organizations.currentOrganization,
       user: state => state.account.user,
+    }),
+
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
     }),
 
     orgAvatarUrl() {
@@ -192,15 +195,17 @@ export default {
      * Select an organization.
      */
     selectOrganization(organization) {
-      this.$store.commit('organizations/updateCurrentOrganization', organization)
+      console.log('select organization', organization);
+      this.$store.dispatch('organizations/saveCurrentOrganization', organization)
+        .then(() => {
+          if (!organization && this.$route.path === '/settings/members') {
+            this.$router.push('/settings/profile')
+          }
 
-      if (!organization && this.$route.path === '/settings/members') {
-        this.$router.push('/settings/profile')
-      }
-
-      if (organization && this.$route.path === '/settings/organizations') {
-        this.$router.push('/settings/profile')
-      }
+          if (organization && this.$route.path === '/settings/organizations') {
+            this.$router.push('/settings/profile')
+          }
+        })
     },
 
     newOrganization() {

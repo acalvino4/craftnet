@@ -5,13 +5,21 @@ import organizationsApi from '@/console/js/api/organizations';
  */
 const state = {
   organizations: [],
-  currentOrganization: null,
+  currentOrganizationId: null,
 }
 
 /**
  * Getters
  */
-const getters = {}
+const getters = {
+  currentOrganization(state) {
+    if (!state.currentOrganizationId) {
+      return null
+    }
+
+    return state.organizations.find(o => o.id === state.currentOrganizationId)
+  }
+}
 
 /**
  * Actions
@@ -28,14 +36,36 @@ const actions = {
         })
     })
   },
+
+  saveCurrentOrganization({commit}, organization) {
+    return new Promise((resolve, reject) => {
+      const organizationId = organization ? organization.id : null
+
+      organizationsApi.saveCurrentOrganizationId(organizationId)
+        .then((response) => {
+          commit('updateCurrentOrganizationId', organizationId)
+          resolve(response)
+        })
+        .catch((response) => {
+          reject(response)
+        })
+    })
+  },
+
+  getCurrentOrganizationId({commit}) {
+    return organizationsApi.getCurrentOrganizationId()
+      .then((response) => {
+        commit('updateCurrentOrganizationId', response.organizationId)
+      })
+  }
 }
 
 /**
  * Mutations
  */
 const mutations = {
-  updateCurrentOrganization(state, organization) {
-    state.currentOrganization = JSON.parse(JSON.stringify(organization))
+  updateCurrentOrganizationId(state, organizationId) {
+    state.currentOrganizationId = organizationId
   },
 
   updateOrganizations(state, organizations) {

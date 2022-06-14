@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapGetters} from 'vuex'
 import PersonalIndex from './_personal'
 import OrganizationIndex from './_organization'
 
@@ -13,8 +13,8 @@ export default {
     OrganizationIndex,
   },
   computed: {
-    ...mapState({
-      currentOrganization: state => state.organizations.currentOrganization,
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
     }),
 
     computedComponent() {

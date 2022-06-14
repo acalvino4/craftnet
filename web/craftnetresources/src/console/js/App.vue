@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 import helpers from './mixins/helpers.js'
 import AuthManager from './components/AuthManager'
 import AppLayout from './components/layouts/AppLayout'
@@ -51,9 +51,12 @@ export default {
     ...mapState({
       notification: state => state.app.notification,
       organizations: state => state.organizations.organizations,
-      currentOrganization: state => state.organizations.currentOrganization,
       loading: state => state.app.loading,
       user: state => state.account.user,
+    }),
+
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
     }),
 
     layoutComponent() {
@@ -93,22 +96,25 @@ export default {
               // Load the cart
               this.$store.dispatch('cart/getCart')
                 .then(() => {
-                  this.$store.commit('app/updateLoading', false)
+                  this.$store.dispatch('organizations/getCurrentOrganizationId')
+                    .then(() => {
+                      this.$store.commit('app/updateLoading', false)
 
-                  if (vueApp.$store.state.account.user) {
-                    if (vueApp.$refs.authManager) {
-                      vueApp.$refs.authManager.renewSession()
-                    }
+                      if (vueApp.$store.state.account.user) {
+                        if (vueApp.$refs.authManager) {
+                          vueApp.$refs.authManager.renewSession()
+                        }
 
-                    next()
-                  } else {
-                    // Check that the user can access the next route
-                    if (!to.meta.allowAnonymous) {
-                      next({path: '/login'})
-                    } else {
-                      next()
-                    }
-                  }
+                        next()
+                      } else {
+                        // Check that the user can access the next route
+                        if (!to.meta.allowAnonymous) {
+                          next({path: '/login'})
+                        } else {
+                          next()
+                        }
+                      }
+                    })
                 })
             })
         } else {

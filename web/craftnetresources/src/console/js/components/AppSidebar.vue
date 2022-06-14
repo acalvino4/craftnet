@@ -206,7 +206,10 @@ export default {
   computed: {
     ...mapState({
       user: state => state.account.user,
-      currentOrganization: state => state.organizations.currentOrganization,
+    }),
+
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
     }),
 
     ...mapGetters({

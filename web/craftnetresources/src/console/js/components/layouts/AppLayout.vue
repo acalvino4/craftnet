@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 import LicenseRenewAlert from '../LicenseRenewAlert'
 import AppSidebar from '../AppSidebar'
 import MainHeader from '@/console/js/components/MainHeader'
@@ -67,9 +67,12 @@ export default {
     ...mapState({
       expiringCmsLicensesTotal: state => state.cmsLicenses.expiringCmsLicensesTotal,
       expiringPluginLicensesTotal: state => state.pluginLicenses.expiringPluginLicensesTotal,
-      currentOrganization: state => state.organizations.currentOrganization,
     }),
   },
+
+  ...mapGetters({
+    currentOrganization: 'organizations/currentOrganization'
+  }),
 
   methods: {
     /**

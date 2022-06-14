@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
+import {mapGetters} from 'vuex';
 import helpers from '@/console/js/mixins/helpers';
 import MemberActions from '@/console/js/components/MemberActions';
 import ChangeMemberRoleModal from '@/console/js/components/members/ChangeMemberRoleModal';
@@ -91,8 +91,8 @@ export default {
   },
 
   computed: {
-    ...mapState({
-      currentOrganization: state => state.organizations.currentOrganization,
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
     }),
   },
 
