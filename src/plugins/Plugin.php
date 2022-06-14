@@ -199,20 +199,11 @@ class Plugin extends Element
         $assetsService = Craft::$app->getAssets();
 
         foreach ($categories as $category) {
-            $source = [
+            $sources[] = [
                 'key' => 'category:' . $category->id,
                 'label' => $category->title,
                 'criteria' => ['categoryId' => $category->id],
             ];
-
-            if (!empty($category->icon)) {
-                try {
-                    $source['icon'] = $assetsService->getThumbPath($category->icon[0], 16);
-                } catch (\Throwable $e) {
-                }
-            }
-
-            $sources[] = $source;
         }
 
         return $sources;
@@ -280,39 +271,39 @@ class Plugin extends Element
     public bool $published = false;
 
     /**
-     * @var int The developer’s user ID
+     * @var int|null The developer’s user ID
      */
-    public int $developerId;
+    public ?int $developerId = null;
 
     /**
-     * @var int The Composer package ID
+     * @var null|int The Composer package ID
      */
-    public int $packageId;
+    public ?int $packageId = null;
 
     /**
      * @var int|null The icon asset’s ID
      */
-    public ?int $iconId;
+    public ?int $iconId = null;
 
     /**
      * @var string|null Composer package name
      */
-    public ?string $packageName;
+    public ?string $packageName = null;
 
     /**
-     * @var string The VCS repository URL
+     * @var null|string The VCS repository URL
      */
-    public string $repository;
+    public ?string $repository = null;
 
     /**
-     * @var string The plugin name
+     * @var null|string The plugin name
      */
-    public string $name;
+    public ?string $name = null;
 
     /**
-     * @var string The plugin handle
+     * @var null|string The plugin handle
      */
-    public string $handle;
+    public ?string $handle = null;
 
     /**
      * @var string The license type ('mit', 'craft')
@@ -322,37 +313,37 @@ class Plugin extends Element
     /**
      * @var string|null The plugin’s short description
      */
-    public ?string $shortDescription;
+    public ?string $shortDescription = null;
 
     /**
      * @var string|null The plugin’s long description
      */
-    public $longDescription;
+    public ?string $longDescription = null;
 
     /**
      * @var string|null The plugin’s documentation URL
      */
-    public $documentationUrl;
+    public ?string $documentationUrl = null;
 
     /**
      * @var string|null The plugin’s changelog path
      */
-    public $changelogPath;
+    public ?string $changelogPath = null;
 
     /**
      * @var int|null The ID of the latest version available for the plugin
      */
-    public $latestVersionId;
+    public ?int $latestVersionId = null;
 
     /**
      * @var string|null The latest version available for the plugin
      */
-    public $latestVersion;
+    public ?string $latestVersion = null;
 
     /**
      * @var DateTime|null The release time of the latest version
      */
-    public $latestVersionTime;
+    public ?DateTime $latestVersionTime = null;
 
     /**
      * @var string|null The Craft CMS version that the latest version must have been compatible with
@@ -362,110 +353,110 @@ class Plugin extends Element
     /**
      * @var int The number of active installs.
      */
-    public $activeInstalls = 0;
+    public int $activeInstalls = 0;
 
     /**
      * @var string|null
      */
-    public $devComments;
+    public ?string $devComments = null;
 
     /**
      * @var bool Whether the plugin is pending approval.
      */
-    public $pendingApproval = false;
+    public bool $pendingApproval = false;
 
     /**
      * @var string|null
      */
-    public $keywords;
+    public ?string $keywords = null;
 
     /**
      * @var DateTime|null The date that the plugin was approved
      */
-    public $dateApproved;
+    public ?DateTime $dateApproved = null;
 
     /**
      * @var int|null The total number of times this plugin has been purchased.
      */
-    public $totalPurchases;
+    public ?int $totalPurchases = null;
 
     /**
      * @var bool Whether the plugin is abandoned
      */
-    public $abandoned = false;
+    public bool $abandoned = false;
 
     /**
      * @var int|null The replacement plugin’s ID
      */
-    public $replacementId;
+    public ?int $replacementId = null;
 
     /**
      * @var PluginEdition[]|null
      */
-    private $_editions;
+    private ?array $_editions = null;
 
     /**
      * @var PluginEdition[]|null All editions regardless of status
      */
-    private $_allEditions;
+    private ?array $_allEditions = null;
 
     /**
      * @var User|null
      */
-    private $_developer;
+    private ?User $_developer = null;
 
     /**
      * @var Package|null
      */
-    private $_package;
+    private ?Package $_package = null;
 
     /**
      * @var Asset|null
      */
-    private $_icon;
+    private ?Asset $_icon = null;
 
     /**
      * @var Category[]|null
      */
-    private $_categories;
+    private ?array $_categories = null;
 
     /**
      * @var Asset[]|null
      */
-    private $_screenshots;
+    private ?array $_screenshots = null;
 
     /**
      * @var Plugin|null
      */
-    private $_replacement;
+    private ?Plugin $_replacement = null;
 
     /**
      * @var bool Whether the plugin was just submitted for approval
      */
-    private $_submittedForApproval = false;
+    private bool $_submittedForApproval = false;
 
     /**
      * @var bool Whether the plugin was just approved
      * @see approve()
      */
-    private $_approved = false;
+    private bool $_approved = false;
 
     /**
      * @var bool Whether changes have been requested
      * @see requestChanges()
      */
-    private $_changesRequested = false;
+    private bool $_changesRequested = false;
 
     /**
      * @var bool Whether the plugin has been fully rejected
      * @see reject()
      */
-    private $_rejected = false;
+    private bool $_rejected = false;
 
     /**
      * @var PluginHistory|null
      */
-    private $_history;
+    private ?PluginHistory $_history = null;
 
     /**
      * @return string
@@ -625,7 +616,7 @@ class Plugin extends Element
     }
 
     /**
-     * @return User|UserBehavior
+     * @return User
      * @throws InvalidConfigException
      */
     public function getDeveloper(): User
@@ -636,7 +627,9 @@ class Plugin extends Element
         if ($this->developerId === null) {
             throw new InvalidConfigException('Plugin is missing its developer ID');
         }
-        if (($user = User::find()->id($this->developerId)->status(null)->one()) === null) {
+        /** @var User|null $user */
+        $user = User::find()->id($this->developerId)->status(null)->one();
+        if ($user === null) {
             throw new InvalidConfigException('Invalid developer ID: ' . $this->developerId);
         }
         return $this->_developer = $user;
@@ -662,7 +655,9 @@ class Plugin extends Element
      */
     public function getDeveloperName(): string
     {
-        return $this->getDeveloper()->getDeveloperName();
+        /** @var User|UserBehavior $developer */
+        $developer = $this->getDeveloper();
+        return $developer->getDeveloperName();
     }
 
     /**
@@ -675,10 +670,9 @@ class Plugin extends Element
             if ($this->iconId === null) {
                 return null;
             }
-            if (($this->_icon = Asset::find()->id($this->iconId)->one()) === null) {
-                // It's probably soft-deleted
-                $this->_icon = false;
-            }
+            /** @var Asset|null $icon */
+            $icon = Asset::find()->id($this->iconId)->one();
+            $this->_icon = $icon ?? false;
         }
 
         return $this->_icon ?: null;
@@ -692,7 +686,8 @@ class Plugin extends Element
         if ($this->_categories !== null) {
             return $this->_categories;
         }
-        return $this->_categories = Category::find()
+        /** @var Category[] $categories */
+        $categories = Category::find()
             ->innerJoin(['pc' => Table::PLUGINCATEGORIES], [
                 'and',
                 '[[pc.categoryId]] = [[categories.id]]',
@@ -700,6 +695,7 @@ class Plugin extends Element
             ])
             ->orderBy(['pc.sortOrder' => SORT_ASC])
             ->all();
+        return $this->_categories = $categories;
     }
 
     /**
@@ -718,7 +714,8 @@ class Plugin extends Element
         if ($this->_screenshots !== null) {
             return $this->_screenshots;
         }
-        return $this->_screenshots = Asset::find()
+        /** @var Asset[] $screenshots */
+        $screenshots = Asset::find()
             ->innerJoin(['ps' => Table::PLUGINSCREENSHOTS], [
                 'and',
                 '[[ps.assetId]] = [[assets.id]]',
@@ -726,6 +723,7 @@ class Plugin extends Element
             ])
             ->orderBy(['ps.sortOrder' => SORT_ASC])
             ->all();
+        return $this->_screenshots = $screenshots;
     }
 
     /**
@@ -1001,31 +999,19 @@ class Plugin extends Element
 
         if ($isNew) {
             // Save a new row in the plugins table
-            $db->createCommand()
-                ->insert(Table::PLUGINS, $pluginData)
-                ->execute();
+            Db::insert(Table::PLUGINS, $pluginData);
         } else {
             // Update the plugins table row
-            $db->createCommand()
-                ->update(Table::PLUGINS, $pluginData, ['id' => $this->id])
-                ->execute();
+            Db::update(Table::PLUGINS, $pluginData, ['id' => $this->id]);
 
             // Also delete any existing category/screenshot relations
-            $db->createCommand()
-                ->delete(Table::PLUGINCATEGORIES, ['pluginId' => $this->id])
-                ->execute();
-            $db->createCommand()
-                ->delete(Table::PLUGINSCREENSHOTS, ['pluginId' => $this->id])
-                ->execute();
+            Db::delete(Table::PLUGINCATEGORIES, ['pluginId' => $this->id]);
+            Db::delete(Table::PLUGINSCREENSHOTS, ['pluginId' => $this->id]);
         }
 
         // Save the new category/screenshot relations
-        $db->createCommand()
-            ->batchInsert(Table::PLUGINCATEGORIES, ['pluginId', 'categoryId', 'sortOrder'], $categoryData)
-            ->execute();
-        $db->createCommand()
-            ->batchInsert(Table::PLUGINSCREENSHOTS, ['pluginId', 'assetId', 'sortOrder'], $screenshotData)
-            ->execute();
+        Db::batchInsert(Table::PLUGINCATEGORIES, ['pluginId', 'categoryId', 'sortOrder'], $categoryData);
+        Db::batchInsert(Table::PLUGINSCREENSHOTS, ['pluginId', 'assetId', 'sortOrder'], $screenshotData);
 
         // Save the editions
         $elementsService = Craft::$app->getElements();
@@ -1143,9 +1129,7 @@ EOD;
             return;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->update(Table::PLUGINS, ['published' => true], ['id' => $this->id])
-            ->execute();
+        Db::update(Table::PLUGINS, ['published' => true], ['id' => $this->id]);
 
         $this->published = true;
 

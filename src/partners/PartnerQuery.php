@@ -15,7 +15,7 @@ use yii\db\Connection;
 class PartnerQuery extends ElementQuery
 {
     /**
-     * @var string|string[]|null Id of the managing user
+     * @var mixed ID of the managing user
      */
     public $ownerId;
 
@@ -47,8 +47,7 @@ class PartnerQuery extends ElementQuery
     /**
      * Sets the [[ownerId]] property.
      *
-     * @param int|int[]|null $value The property value
-     *
+     * @param mixed $value The property value
      * @return static self reference
      */
     public function ownerId($value)

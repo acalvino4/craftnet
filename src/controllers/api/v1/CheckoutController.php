@@ -3,6 +3,7 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
+use craft\behaviors\CustomFieldBehavior;
 use craft\elements\Entry;
 use craft\helpers\Db;
 use craft\helpers\Json;
@@ -34,6 +35,7 @@ class CheckoutController extends BaseApiController
         $replaceCard = $this->request->getParam('replaceCard');
         $cartItems = $this->request->getParam('cartItems');
 
+        /** @var Entry|CustomFieldBehavior $entry */
         $entry = new Entry();
         $entry->sectionId = 4;
         $entry->typeId = 6;

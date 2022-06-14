@@ -7,6 +7,7 @@ use craft\commerce\elements\Order;
 use craft\commerce\models\LineItem;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\db\ElementQueryInterface;
+use craft\helpers\Db;
 use craftnet\base\EditionInterface;
 use craftnet\base\RenewalInterface;
 use craftnet\db\Table;
@@ -148,13 +149,9 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
         ];
 
         if ($isNew) {
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::CMSEDITIONS, $data, false)
-                ->execute();
+            Db::insert(Table::CMSEDITIONS, $data);
         } else {
-            Craft::$app->getDb()->createCommand()
-                ->update(Table::CMSEDITIONS, $data, ['id' => $this->id], [], false)
-                ->execute();
+            Db::update(Table::CMSEDITIONS, $data, ['id' => $this->id], updateTimestamp: false);
         }
 
         parent::afterSave($isNew);
@@ -292,12 +289,10 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
             }
 
             // relate the license to the line item
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::CMSLICENSES_LINEITEMS, [
-                    'licenseId' => $license->id,
-                    'lineItemId' => $lineItem->id,
-                ], false)
-                ->execute();
+            Db::insert(Table::CMSLICENSES_LINEITEMS, [
+                'licenseId' => $license->id,
+                'lineItemId' => $lineItem->id,
+            ]);
 
             // update the license history
             if ($isNew) {

@@ -31,6 +31,7 @@ use yii\base\Exception;
  * @property null|\craftnet\orgs\Org $org
  * @property-read \craftnet\partners\Partner $partner
  * @property Plugin[] $plugins
+ * @mixin CustomFieldBehavior
  */
 class UserBehavior extends Behavior
 {
@@ -143,6 +144,7 @@ class UserBehavior extends Behavior
      */
     public function getPartner(): Partner
     {
+        /** @var Partner|null $partner */
         $partner = Partner::find()
             ->ownerId($this->owner->id)
             ->status(null)
@@ -177,10 +179,12 @@ class UserBehavior extends Behavior
             return $this->_plugins;
         }
 
-        return $this->_plugins = Plugin::find()
+        /** @var Plugin[] $plugins */
+        $plugins = Plugin::find()
             ->developerId($this->owner->id)
             ->status(null)
             ->all();
+        return $this->_plugins = $plugins;
     }
 
     /**
@@ -245,6 +249,7 @@ class UserBehavior extends Behavior
      */
     public function beforeSave(ModelEvent $event): void
     {
+        /** @var User|self $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
         $isAdmin = $currentUser && ($currentUser->isInGroup('admins') || $currentUser->admin);
         $request = Craft::$app->getRequest();

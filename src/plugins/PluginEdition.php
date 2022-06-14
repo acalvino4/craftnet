@@ -9,6 +9,7 @@ use craft\commerce\Plugin as Commerce;
 use craft\db\Query;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Db;
 use craft\helpers\Json;
 use craftnet\base\EditionInterface;
 use craftnet\base\RenewalInterface;
@@ -297,7 +298,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
     /**
      * Normalizes a price.
      *
-     * @var string $attribute
+     * @param string $attribute
      */
     public function normalizePrice(string $attribute)
     {
@@ -347,13 +348,9 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
         ];
 
         if ($isNew) {
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::PLUGINEDITIONS, $data, false)
-                ->execute();
+            Db::insert(Table::PLUGINEDITIONS, $data);
         } else {
-            Craft::$app->getDb()->createCommand()
-                ->update(Table::PLUGINEDITIONS, $data, ['id' => $this->id], [], false)
-                ->execute();
+            Db::update(Table::PLUGINEDITIONS, $data, ['id' => $this->id], updateTimestamp: false);
         }
 
         // Save the renewal
@@ -539,12 +536,10 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
             }
 
             // relate the license to the line item
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::PLUGINLICENSES_LINEITEMS, [
-                    'licenseId' => $license->id,
-                    'lineItemId' => $lineItem->id,
-                ], false)
-                ->execute();
+            Db::insert(Table::PLUGINLICENSES_LINEITEMS, [
+                'licenseId' => $license->id,
+                'lineItemId' => $lineItem->id,
+            ]);
 
             // update the license history
             if ($isNew) {

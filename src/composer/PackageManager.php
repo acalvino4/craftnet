@@ -471,14 +471,10 @@ class PackageManager extends Component
         $db = Craft::$app->getDb();
 
         if ($package->id === null) {
-            $db->createCommand()
-                ->insert(Table::PACKAGES, $data)
-                ->execute();
+            Db::insert(Table::PACKAGES, $data);
             $package->id = (int)$db->getLastInsertID(Table::PACKAGES);
         } else {
-            $db->createCommand()
-                ->update(Table::PACKAGES, $data, ['id' => $package->id])
-                ->execute();
+            Db::update(Table::PACKAGES, $data, ['id' => $package->id]);;
         }
     }
 
@@ -496,9 +492,7 @@ class PackageManager extends Component
         } catch (Exception $e) {
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->delete(Table::PACKAGES, ['name' => $package->name])
-            ->execute();
+        Db::delete(Table::PACKAGES, ['name' => $package->name]);
     }
 
     /**
@@ -588,12 +582,9 @@ class PackageManager extends Component
         $package->webhookSecret = Craft::$app->getSecurity()->generateRandomString();
 
         // Store the secret first so we're ready for the VCS's test hook request
-        Craft::$app->getDb()->createCommand()
-            ->update(
-                Table::PACKAGES,
-                ['webhookSecret' => $package->webhookSecret],
-                ['id' => $package->id])
-            ->execute();
+        Db::update(Table::PACKAGES, [
+            'webhookSecret' => $package->webhookSecret,
+        ], ['id' => $package->id]);
 
         try {
             $package->getVcs()->createWebhook();
@@ -607,23 +598,17 @@ class PackageManager extends Component
 
             // Clear out the secret
             $package->webhookSecret = null;
-            Craft::$app->getDb()->createCommand()
-                ->update(
-                    Table::PACKAGES,
-                    ['webhookSecret' => null],
-                    ['id' => $package->id])
-                ->execute();
+            Db::update(Table::PACKAGES, [
+                'webhookSecret' => null,
+            ], ['id' => $package->id]);
 
             return;
         }
 
         // Store the new ID
-        Craft::$app->getDb()->createCommand()
-            ->update(
-                Table::PACKAGES,
-                ['webhookId' => $package->webhookId],
-                ['id' => $package->id])
-            ->execute();
+        Db::update(Table::PACKAGES, [
+            'webhookId' => $package->webhookId,
+        ], ['id' => $package->id]);
 
         if ($isConsole) {
             Console::output("Webhook created for {$package->name}.");
@@ -663,15 +648,10 @@ class PackageManager extends Component
         }
 
         // Remove our record of it
-        Craft::$app->getDb()->createCommand()
-            ->update(
-                Table::PACKAGES,
-                [
-                    'webhookId' => null,
-                    'webhookSecret' => null,
-                ],
-                ['id' => $package->id])
-            ->execute();
+        Db::update(Table::PACKAGES, [
+            'webhookId' => null,
+            'webhookSecret' => null,
+        ], ['id' => $package->id]);
 
         if ($isConsole) {
             Console::output("Webhook deleted for {$package->name}.");
@@ -892,9 +872,7 @@ class PackageManager extends Component
                     $versionIdsToDelete[] = $storedVersionInfo[$version]['id'];
                 }
 
-                $db->createCommand()
-                    ->delete(Table::PACKAGEVERSIONS, ['id' => $versionIdsToDelete])
-                    ->execute();
+                Db::delete(Table::PACKAGEVERSIONS, ['id' => $versionIdsToDelete]);
 
                 if ($isConsole) {
                     Console::output('done.');
@@ -962,9 +940,8 @@ class PackageManager extends Component
                                 $packageDeps[$depName][$constraints] = true;
                             }
                         }
-                        $db->createCommand()
-                            ->batchInsert(Table::PACKAGEDEPS, ['packageId', 'versionId', 'name', 'constraints'], $depValues)
-                            ->execute();
+
+                        Db::batchInsert(Table::PACKAGEDEPS, ['packageId', 'versionId', 'name', 'constraints'], $depValues);
                     }
 
                     if ($release->valid) {
@@ -1105,10 +1082,7 @@ class PackageManager extends Component
         }
 
         // Delete existing release order data
-        $db = Craft::$app->getDb();
-        $db->createCommand()
-            ->delete(Table::PLUGINVERSIONORDER, ['pluginId' => $plugin->id])
-            ->execute();
+        Db::delete(Table::PLUGINVERSIONORDER, ['pluginId' => $plugin->id]);
 
         // Get the new plugin releases
         $releases = $this->createReleaseQuery($plugin->packageName)
@@ -1158,14 +1132,12 @@ class PackageManager extends Component
             ];
         }
 
-        $db->createCommand()
-            ->batchInsert(Table::PLUGINVERSIONORDER, [
-                'versionId',
-                'pluginId',
-                'order',
-                'stableOrder',
-            ], $orderData, false)
-            ->execute();
+        Db::batchInsert(Table::PLUGINVERSIONORDER, [
+            'versionId',
+            'pluginId',
+            'order',
+            'stableOrder',
+        ], $orderData);
 
         if ($isConsole) {
             Console::output('done');
@@ -1215,12 +1187,10 @@ class PackageManager extends Component
             }
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->batchInsert(Table::PLUGINVERSIONCOMPAT, [
-                'pluginVersionId',
-                'cmsVersionId',
-            ], $compatData, false)
-            ->execute();
+        Db::batchInsert(Table::PLUGINVERSIONCOMPAT, [
+            'pluginVersionId',
+            'cmsVersionId',
+        ], $compatData);
     }
 
     /**
@@ -1251,12 +1221,10 @@ class PackageManager extends Component
             }
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->batchInsert(Table::PLUGINVERSIONCOMPAT, [
-                'pluginVersionId',
-                'cmsVersionId',
-            ], $compatData, false)
-            ->execute();
+        Db::batchInsert(Table::PLUGINVERSIONCOMPAT, [
+            'pluginVersionId',
+            'cmsVersionId',
+        ], $compatData);
     }
 
     /**
@@ -1275,45 +1243,42 @@ class PackageManager extends Component
      */
     public function savePackageRelease(PackageRelease $release): void
     {
-        $db = Craft::$app->getDb();
-        $db->createCommand()
-            ->insert(Table::PACKAGEVERSIONS, [
-                'packageId' => $release->packageId,
-                'sha' => $release->sha,
-                'description' => $release->description,
-                'version' => $release->version,
-                'normalizedVersion' => $release->getNormalizedVersion(),
-                'stability' => $release->getStability(),
-                'type' => $release->type,
-                'keywords' => $release->keywords ? Json::encode($release->keywords) : null,
-                'homepage' => $release->homepage,
-                'time' => $release->time,
-                'license' => $release->license ? Json::encode($release->license) : null,
-                'authors' => $release->authors ? Json::encode($release->authors) : null,
-                'support' => $release->support ? Json::encode($release->support) : null,
-                'conflict' => $release->conflict ? Json::encode($release->conflict) : null,
-                'replace' => $release->replace ? Json::encode($release->replace) : null,
-                'provide' => $release->provide ? Json::encode($release->provide) : null,
-                'suggest' => $release->suggest ? Json::encode($release->suggest) : null,
-                'autoload' => $release->autoload ? Json::encode($release->autoload) : null,
-                'includePaths' => $release->includePaths ? Json::encode($release->includePaths) : null,
-                'targetDir' => $release->targetDir,
-                'extra' => $release->extra ? Json::encode($release->extra) : null,
-                'binaries' => $release->binaries ? Json::encode($release->binaries) : null,
-                'source' => $release->source ? Json::encode($release->source) : null,
-                'dist' => $release->dist ? Json::encode($release->dist) : null,
-                'changelog' => $release->changelog,
-                'valid' => $release->valid,
-            ])
-            ->execute();
-        $release->id = (int)$db->getLastInsertID(Table::PACKAGEVERSIONS);
+        Db::insert(Table::PACKAGEVERSIONS, [
+            'packageId' => $release->packageId,
+            'sha' => $release->sha,
+            'description' => $release->description,
+            'version' => $release->version,
+            'normalizedVersion' => $release->getNormalizedVersion(),
+            'stability' => $release->getStability(),
+            'type' => $release->type,
+            'keywords' => $release->keywords ? Json::encode($release->keywords) : null,
+            'homepage' => $release->homepage,
+            'time' => $release->time,
+            'license' => $release->license ? Json::encode($release->license) : null,
+            'authors' => $release->authors ? Json::encode($release->authors) : null,
+            'support' => $release->support ? Json::encode($release->support) : null,
+            'conflict' => $release->conflict ? Json::encode($release->conflict) : null,
+            'replace' => $release->replace ? Json::encode($release->replace) : null,
+            'provide' => $release->provide ? Json::encode($release->provide) : null,
+            'suggest' => $release->suggest ? Json::encode($release->suggest) : null,
+            'autoload' => $release->autoload ? Json::encode($release->autoload) : null,
+            'includePaths' => $release->includePaths ? Json::encode($release->includePaths) : null,
+            'targetDir' => $release->targetDir,
+            'extra' => $release->extra ? Json::encode($release->extra) : null,
+            'binaries' => $release->binaries ? Json::encode($release->binaries) : null,
+            'source' => $release->source ? Json::encode($release->source) : null,
+            'dist' => $release->dist ? Json::encode($release->dist) : null,
+            'changelog' => $release->changelog,
+            'valid' => $release->valid,
+        ]);
+        $release->id = (int)Craft::$app->getDb()->getLastInsertID(Table::PACKAGEVERSIONS);
     }
 
     /**
      * Updates a package’s releases’ dates, critical flags, and notes based on its changelog.
      *
      * @param string $name The package name
-     * @param string|null The version to fetch the changelog from. If `null` the latest version will be used
+     * @param string|null $version The version to fetch the changelog from. If `null` the latest version will be used
      * @throws InvalidArgumentException if `$version` is unknown
      */
     public function processPackageChangelog(string $name, ?string $version = null): void
@@ -1353,13 +1318,11 @@ class PackageManager extends Component
                 $release->critical !== $info['critical'] ||
                 $release->notes !== $info['notes']
             ) {
-                $db->createCommand()
-                    ->update(Table::PACKAGEVERSIONS, [
-                        'date' => Db::prepareDateForDb($info['date']),
-                        'critical' => $info['critical'],
-                        'notes' => $info['notes'],
-                    ], ['id' => $release->id], [], false)
-                    ->execute();
+                Db::update(Table::PACKAGEVERSIONS, [
+                    'date' => Db::prepareDateForDb($info['date']),
+                    'critical' => $info['critical'],
+                    'notes' => $info['notes'],
+                ], ['id' => $release->id], updateTimestamp: false);
             }
         }
     }

@@ -121,14 +121,15 @@ export default {
   mounted() {
     this.loading = true
 
-    this.getCountries()
-      .then(() => {
-        this.loading = false
-      })
-      .catch(() => {
-        this.loading = false
-        this.$store.dispatch('app/displayNotice', 'Couldn’t get countries.');
-      })
-  }
-}
+            this.getCountries()
+                .then(() => {
+                    this.loading = false
+                    this.billingInfo.country = 'US';
+                })
+                .catch(() => {
+                    this.loading = false
+                    this.$store.dispatch('app/displayNotice', 'Couldn’t get countries.');
+                })
+        }
+    }
 </script>

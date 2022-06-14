@@ -4,6 +4,7 @@ namespace craftnet\oauthserver\controllers;
 
 use Craft;
 use craft\web\Controller;
+use craft\web\UrlManager;
 use craftnet\oauthserver\models\Client;
 use craftnet\oauthserver\Module as OauthServer;
 use yii\web\NotFoundHttpException;
@@ -88,7 +89,9 @@ class ClientsController extends Controller
             Craft::$app->getSession()->setError(Craft::t('app', "Couldn't save client."));
 
             // Send the site back to the template
-            Craft::$app->getUrlManager()->setRouteParams([
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
                 'client' => $client,
             ]);
 

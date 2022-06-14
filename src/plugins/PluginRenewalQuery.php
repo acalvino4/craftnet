@@ -15,15 +15,14 @@ use yii\db\Connection;
 class PluginRenewalQuery extends ElementQuery
 {
     /**
-     * @var int|int[]|null The plugin edition IDs(s) that the resulting renewals must be associated with.
+     * @var mixed The plugin edition IDs(s) that the resulting renewals must be associated with.
      */
     public $editionId;
 
     /**
      * Sets the [[editionId]] property.
      *
-     * @param string|string[]|null $value The property value
-     *
+     * @param mixed $value The property value
      * @return static self reference
      */
     public function editionId($value)

@@ -15,7 +15,7 @@ use yii\db\Connection;
 class PluginEditionQuery extends ElementQuery
 {
     /**
-     * @var int|int[]|null The plugin IDs(s) that the resulting editions must be associated with.
+     * @var mixed The plugin IDs(s) that the resulting editions must be associated with.
      */
     public $pluginId;
 
@@ -42,8 +42,7 @@ class PluginEditionQuery extends ElementQuery
     /**
      * Sets the [[pluginId]] property.
      *
-     * @param string|string[]|null $value The property value
-     *
+     * @param mixed $value The property value
      * @return static self reference
      */
     public function pluginId($value)

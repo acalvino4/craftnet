@@ -222,7 +222,7 @@ class CmsLicensesController extends Controller
                 $keys[$index] = $license['key'];
             }
             $choice = $this->select('Which license key?', $options);
-            $key = $keys[$choice];
+            $key = $keys[(int)$choice];
         }
 
         return $manager->getLicenseByKey($key);

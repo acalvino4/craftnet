@@ -6,6 +6,7 @@ use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\models\LineItem;
 use craft\elements\db\ElementQueryInterface;
+use craft\helpers\Db;
 use craftnet\base\RenewalInterface;
 use craftnet\db\Table;
 use craftnet\errors\LicenseNotFoundException;
@@ -77,13 +78,9 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
         ];
 
         if ($isNew) {
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::CMSRENEWALS, $data, false)
-                ->execute();
+            Db::insert(Table::CMSRENEWALS, $data);
         } else {
-            Craft::$app->getDb()->createCommand()
-                ->update(Table::CMSRENEWALS, $data, ['id' => $this->id], [], false)
-                ->execute();
+            Db::update(Table::CMSRENEWALS, $data, ['id' => $this->id], updateTimestamp: false);
         }
 
         parent::afterSave($isNew);
@@ -100,9 +97,11 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
         if ($this->editionId === null) {
             throw new InvalidConfigException('CMS renewal is missing its edition ID');
         }
-        if (($edition = CmsEdition::findOne($this->editionId)) === null) {
+        /** @var CmsEdition|null $edition */
+        $edition = CmsEdition::findOne($this->editionId);
+        if ($edition === null) {
             throw new InvalidConfigException('Invalid edition ID: ' . $this->editionId);
-        };
+        }
         return $edition;
     }
 
@@ -111,7 +110,7 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
      */
     public function getIsAvailable(): bool
     {
-        return $this->price;
+        return (bool)$this->price;
     }
 
     /**
@@ -127,7 +126,7 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
      */
     public function getPrice(): float
     {
-        return (float)$this->price;
+        return $this->price;
     }
 
     /**
@@ -185,12 +184,10 @@ class CmsRenewal extends CmsPurchasable implements RenewalInterface
             }
 
             // relate the license to the line item
-            Craft::$app->getDb()->createCommand()
-                ->insert(Table::CMSLICENSES_LINEITEMS, [
-                    'licenseId' => $license->id,
-                    'lineItemId' => $lineItem->id,
-                ], false)
-                ->execute();
+            Db::insert(Table::CMSLICENSES_LINEITEMS, [
+                'licenseId' => $license->id,
+                'lineItemId' => $lineItem->id,
+            ]);
 
             // update the license history
             $expiryStr = OrderHelper::expiryObj2Str($license->expiresOn);

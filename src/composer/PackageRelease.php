@@ -60,7 +60,7 @@ class PackageRelease extends Model
     public $version;
 
     /**
-     * @var string
+     * @var string|null
      */
     public $type = 'library';
 

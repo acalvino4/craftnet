@@ -64,12 +64,12 @@ class InvoiceManager extends Component
     /**
      * Get invoice by its number.
      *
-     * @param Customer $customer
+     * @param User $customer
      * @param $number
      * @return mixed
      * @throws \yii\base\InvalidConfigException
      */
-    public function getInvoiceByNumber(Customer $customer, $number)
+    public function getInvoiceByNumber(User $customer, $number)
     {
         $query = $this->_createInvoiceQuery($customer);
         $query->andWhere(Db::parseParam('commerce_orders.number', $number));

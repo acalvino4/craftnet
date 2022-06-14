@@ -4,7 +4,7 @@
     "aws/aws-sdk-php": "^3.71",
     "craftcms/aws-s3": "^2.0.0",
     "craftcms/cms": "^4.0.3",
-    "craftcms/commerce": "^4.0.0",
+    "craftcms/commerce": "dev-develop#ebc45436219be3513e2d7af98f3feff90cb9ffb7 as 4.0.3",
     "craftcms/commerce-stripe": "^3.0.0",
     "craftcms/postmark": "^3.0.0",
     "craftcms/webhooks": "^3.0.0",
@@ -32,6 +32,7 @@
     "codeception/module-phpbrowser": "^1.0.0",
     "codeception/module-rest": "^1.0.0",
     "codeception/module-yii2": "^1.0.0",
+    "craftcms/phpstan": "dev-main",
     "craftcms/rector": "dev-main",
     "yiisoft/yii2-shell": "^2.0"
   },
@@ -52,5 +53,8 @@
       "yiisoft/yii2-composer": true,
       "craftcms/plugin-installer": true
     }
+  },
+  "scripts": {
+    "phpstan": "phpstan --memory-limit=1G"
   }
 }

@@ -180,8 +180,8 @@ class UpdatesController extends BaseApiController
         foreach ($this->plugins as $handle => $plugin) {
             // Get the latest release that's compatible with their current Craft version
             $toVersion = Plugin::find()
-                ->id($plugin->id)
                 ->withLatestReleaseInfo(true, $this->cmsVersion)
+                ->id($plugin->id)
                 ->select(['latestVersion'])
                 ->asArray()
                 ->scalar();

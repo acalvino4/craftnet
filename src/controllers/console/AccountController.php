@@ -37,12 +37,11 @@ class AccountController extends Controller
     {
         /** @var User|UserBehavior $user */
         $user = Craft::$app->getUser()->getIdentity();
-        $photo = $user->getPhoto();
-        $photoUrl = $photo ? Craft::$app->getAssets()->getAssetUrl($photo, [
+        $photoUrl = $user->getPhoto()?->getUrl([
             'mode' => 'crop',
             'width' => 200,
             'height' => 200,
-        ], true) : null;
+        ], true);
 
         return $this->asJson([
             'billingAddress' => $this->getBillingAddress($user),
@@ -122,12 +121,11 @@ class AccountController extends Controller
             move_uploaded_file($file->tempName, $fileLocation);
             Craft::$app->getUsers()->saveUserPhoto($fileLocation, $user, $file->name);
 
-            $photo = $user->getPhoto();
-            $photoUrl = $photo ? Craft::$app->getAssets()->getAssetUrl($photo, [
+            $photoUrl = $user->getPhoto()?->getUrl([
                 'mode' => 'crop',
                 'width' => 200,
                 'height' => 200,
-            ], true) : null;
+            ], true);
 
             return $this->asJson([
                 'photoId' => $user->photoId,
@@ -229,7 +227,7 @@ class AccountController extends Controller
         $address->addressLine2 = $this->request->getBodyParam('address2');
         $address->locality = $this->request->getBodyParam('city');
         $address->postalCode = $this->request->getBodyParam('zipCode');
-        $address->countryCode = $this->request->getBodyParam('country');
+        $address->countryCode = $this->request->getBodyParam('country') ?? 'US';
         $address->administrativeArea = $this->request->getBodyParam('state');
         $address->ownerId = $customer->id;
 

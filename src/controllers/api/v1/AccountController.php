@@ -3,9 +3,11 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
+use craft\behaviors\CustomFieldBehavior;
 use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
+use craftnet\behaviors\UserBehavior;
 use craftnet\controllers\api\BaseApiController;
 use craftnet\controllers\api\RateLimiterTrait;
 use craftnet\helpers\Address as AddressHelper;
@@ -30,8 +32,9 @@ class AccountController extends BaseApiController
      */
     public function actionIndex(): Response
     {
-        /** @var User|CustomerBehavior $user */
-        if (($user = Craft::$app->getUser()->getIdentity(false)) === null) {
+        /** @var User|CustomerBehavior|CustomFieldBehavior|null $user */
+        $user = Craft::$app->getUser()->getIdentity(false);
+        if ($user === null) {
             throw new UnauthorizedHttpException('Not Authorized');
         }
 
@@ -40,10 +43,12 @@ class AccountController extends BaseApiController
 
         // TODO: @tim ask about this
         foreach ($user->purchasedPlugins->all() as $purchasedPlugin) {
+            /** @var User|UserBehavior $author */
+            $author = $purchasedPlugin->getAuthor();
             $purchasedPlugins[] = [
                 'name' => $purchasedPlugin->title,
-                'developerName' => $purchasedPlugin->getAuthor()->developerName,
-                'developerUrl' => $purchasedPlugin->getAuthor()->developerUrl,
+                'developerName' => $author->developerName,
+                'developerUrl' => $author->developerUrl,
             ];
         }
 

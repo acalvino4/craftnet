@@ -4,6 +4,7 @@ namespace craftnet\controllers;
 
 use Craft;
 use craft\base\Element;
+use craft\behaviors\CustomFieldBehavior;
 use craft\elements\Asset;
 use craft\elements\Category;
 use craft\errors\AssetDisallowedExtensionException;
@@ -16,6 +17,7 @@ use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\UploadedFile;
+use craft\web\UrlManager;
 use craftnet\errors\InvalidSvgException;
 use craftnet\helpers\Cache;
 use craftnet\Module;
@@ -179,6 +181,7 @@ class PluginsController extends Controller
     {
         if ($plugin === null) {
             if ($pluginId !== null) {
+                /** @var Plugin|null $plugin */
                 $plugin = Plugin::find()->id($pluginId)->status(null)->one();
                 if ($plugin === null) {
                     throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
@@ -230,7 +233,7 @@ JS;
     }
 
     /**
-     * @return Response
+     * @return Response|null
      * @throws Exception
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
@@ -242,6 +245,7 @@ JS;
         $newPlugin = false;
 
         if ($pluginId = $this->request->getBodyParam('pluginId')) {
+            /** @var Plugin|CustomFieldBehavior|null $plugin */
             $plugin = Plugin::find()->id($pluginId)->status(null)->one();
             if ($plugin === null) {
                 throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
@@ -251,6 +255,7 @@ JS;
                 throw new ForbiddenHttpException('User is not permitted to perform this action');
             }
         } else {
+            /** @var Plugin|CustomFieldBehavior $plugin */
             $plugin = new Plugin();
             $newPlugin = true;
         }
@@ -376,7 +381,7 @@ JS;
 
                     // Save as an asset
                     $volume = $volumesService->getVolumeByHandle('icons');
-                    $folderId = $volumesService->ensureTopFolder($volume);
+                    $folderId = $volumesService->ensureTopFolder($volume)->id;
                     $targetFilename = "$plugin->handle.svg";
 
                     if (!$newPlugin) {
@@ -400,6 +405,7 @@ JS;
                         }
 
                         $icon = new Asset([
+                            'filename' => $targetFilename,
                             'title' => $plugin->name,
                             'tempFilePath' => $tempPath,
                             'newLocation' => "{folder:$folderId}$targetFilename",
@@ -472,7 +478,7 @@ JS;
                     // Save as an asset
                     $volumesService = Craft::$app->getVolumes();
                     $volume = $volumesService->getVolumeByHandle('screenshots');
-                    $volumeId = $volumesService->ensureTopFolder($volume);
+                    $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
                     $subpath = '/' . $plugin->handle;
 
@@ -482,7 +488,7 @@ JS;
                     ]);
 
                     if (!$folder) {
-                        $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+                        $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
                     } else {
                         $folderId = $folder->id;
                     }
@@ -490,6 +496,7 @@ JS;
                     $targetFilename = $screenshotFile->name;
 
                     $screenshot = new Asset([
+                        'filename' => $targetFilename,
                         'title' => $plugin->name,
                         'tempFilePath' => $tempPath,
                         'newLocation' => "{folder:{$folderId}}" . $targetFilename,
@@ -544,7 +551,6 @@ JS;
 
         $editions = [];
 
-        /** @var PluginEdition[] $currentEditions */
         if ($newPlugin) {
             $currentEditions = [
                 'new' => new PluginEdition([
@@ -553,6 +559,7 @@ JS;
                 ]),
             ];
         } else {
+            /** @var PluginEdition[] $currentEditions */
             $currentEditions = ArrayHelper::index(PluginEdition::find()->pluginId($plugin->id)->status(null)->all(), 'id');
 
             // Include any disabled editions if this is a front-end request
@@ -599,7 +606,9 @@ JS;
             }
 
             Craft::$app->getSession()->setError('Couldn’t save plugin.');
-            Craft::$app->getUrlManager()->setRouteParams([
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
                 'plugin' => $plugin,
             ]);
             return null;
@@ -631,7 +640,7 @@ JS;
             // Screenshots
             if ($newHandle) {
                 $volume = $volumesService->getVolumeByHandle('screenshots');
-                $volumeId = $volumesService->ensureTopFolder($volume);
+                $volumeId = $volumesService->ensureTopFolder($volume)->id;
 
                 $subpath = '/' . $plugin->handle;
 
@@ -641,11 +650,11 @@ JS;
                 ]);
 
                 if (!$folder) {
-                    $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume);
+                    $folderId = $assetsService->ensureFolderByFullPathAndVolume($subpath, $volume)->id;
                     $folder = $assetsService->getFolderById($folderId);
                 }
 
-                foreach ($plugin->screenshots as $screenshot) {
+                foreach ($plugin->getScreenshots() as $screenshot) {
                     if (!$assetsService->moveAsset($screenshot, $folder)) {
                         throw new Exception('Could not save screenshot asset: ' . implode(', ', $screenshot->getErrorSummary(true)));
                     }
@@ -710,6 +719,7 @@ JS;
     public function actionDelete()
     {
         $pluginId = $this->request->getBodyParam('pluginId');
+        /** @var Plugin|null $plugin */
         $plugin = Plugin::find()->id($pluginId)->status(null)->one();
 
         if (!$plugin) {
@@ -726,7 +736,7 @@ JS;
 
         // Delete screenshots
 
-        foreach ($plugin->screenshots as $screenshot) {
+        foreach ($plugin->getScreenshots() as $screenshot) {
             Craft::$app->getElements()->deleteElement($screenshot);
         }
 
@@ -756,6 +766,7 @@ JS;
     public function actionSubmit()
     {
         $pluginId = $this->request->getBodyParam('pluginId');
+        /** @var Plugin|null $plugin */
         $plugin = Plugin::find()->id($pluginId)->status(null)->one();
 
         if (!$plugin) {
@@ -787,7 +798,9 @@ JS;
             }
 
             Craft::$app->getSession()->setError('Couldn’t submit plugin for approval.');
-            Craft::$app->getUrlManager()->setRouteParams([
+            /** @var UrlManager $urlManager */
+            $urlManager = Craft::$app->getUrlManager();
+            $urlManager->setRouteParams([
                 'plugin' => $plugin,
             ]);
             return null;
@@ -929,12 +942,14 @@ JS;
         // Save as an asset
         $volumesService = Craft::$app->getVolumes();
         $volume = $volumesService->getVolumeByHandle('icons');
-        $folderId = $volumesService->ensureTopFolder($volume);
+        $folderId = $volumesService->ensureTopFolder($volume)->id;
+        $filename = StringHelper::randomString() . ".svg";
 
         $icon = new Asset([
+            'filename' => $filename,
             'title' => $name,
             'tempFilePath' => $tempPath,
-            'newLocation' => "{folder:{$folderId}}{$handle}" . StringHelper::randomString() . ".svg",
+            'newLocation' => "{folder:{$folderId}}{$handle}" . $filename,
         ]);
 
         if (!Craft::$app->getElements()->saveElement($icon, false)) {

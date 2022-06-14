@@ -40,7 +40,7 @@ class FundsManager extends BaseObject
     private $_lockName;
 
     /**
-     * @var bool
+     * @var int
      * @see _lockFunds()
      * @see _unlockFunds()
      */
@@ -305,15 +305,9 @@ class FundsManager extends BaseObject
         }
 
         if ($adjustment !== false) {
-            $db->createCommand()
-                ->update(Table::DEVELOPERS,
-                    [
-                        'balance' => new Expression("[[balance]] {$operator} :adjustment", [':adjustment' => $adjustment]),
-                    ],
-                    [
-                        'id' => $this->developer->id,
-                    ], [], false)
-                ->execute();
+            Db::update(Table::DEVELOPERS, [
+                'balance' => new Expression("[[balance]] {$operator} :adjustment", [':adjustment' => $adjustment]),
+            ], ['id' => $this->developer->id], updateTimestamp: false);
         }
 
         $ledgerSql = <<<SQL
@@ -358,6 +352,6 @@ SQL;
             'dateCreated' => Db::prepareDateForDb(new \DateTime()),
         ])->execute();
 
-        return $db->getLastInsertID(Table::DEVELOPERLEDGER);
+        return (int)$db->getLastInsertID(Table::DEVELOPERLEDGER);
     }
 }
