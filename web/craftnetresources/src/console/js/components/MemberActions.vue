@@ -9,7 +9,7 @@
     </MenuButton>
 
     <MenuItems
-      class="absolute z-10 right-0 w-56 mt-2 origin-top-right bg-gray-100 dark:bg-gray-800 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+      class="absolute z-10 right-0 w-56 mt-2 origin-top-right bg-white dark:bg-gray-800 divide-y divide-gray-100 rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
       <div class="px-2 py-1">
         <MenuItem v-slot="{active}">
           <button
