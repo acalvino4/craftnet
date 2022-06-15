@@ -378,7 +378,6 @@ class CartsController extends BaseApiController
             }
 
             if ($country) {
-
                 // get the state
                 if (!empty($billingAddress->state)) {
                     // see if it's a valid state abbreviation
@@ -406,17 +405,19 @@ class CartsController extends BaseApiController
 
         // populate the address
         $addressConfig = [
-            'firstName' => $billingAddress->firstName,
-            'lastName' => $billingAddress->lastName,
-            'addressLine1' => $billingAddress->address1 ?? null,
-            'addressLine2' => $billingAddress->address2 ?? null,
+            'title' => $billingAddress->title ?? 'Billing Address',
+            'ownerId' => $cart->id,
+            'fullName' => trim("$billingAddress->firstName $billingAddress->lastName") ?: null,
+            'countryCode' => $country?->getCountryCode(),
+            'administrativeArea' => $state?->getIsoCode(),
             'locality' => $billingAddress->city ?? null,
             'postalCode' => $billingAddress->zipCode ?? null,
+            'addressLine1' => $billingAddress->address1 ?? null,
+            'addressLine2' => $billingAddress->address2 ?? null,
             'organization' => $billingAddress->businessName ?? null,
             'organizationTaxId' => $billingAddress->businessTaxId ?? null,
             'addressPhone' => $billingAddress->phone ?? null,
             'addressAttention' => $billingAddress->attention ?? null,
-            'title' => $billingAddress->title ?? 'Billing Address',
         ];
 
         Craft::configure($address, $addressConfig);
@@ -424,10 +425,12 @@ class CartsController extends BaseApiController
 
         if (!$address->validate(array_keys($addressConfig))) {
             array_push($addressErrors, ...$this->modelErrors($address, 'billingAddress', [
-                'addressLine1' => 'address1',
-                'addressLine2' => 'address2',
+                'countryCode' => 'country',
+                'administrativeArea' => 'state',
                 'locality' => 'city',
                 'postalCode' => 'zipCode',
+                'addressLine1' => 'address1',
+                'addressLine2' => 'address2',
                 'organization' => 'businessName',
                 'organizationTaxId' => 'businessTaxId',
                 'addressPhone' => 'phone',
@@ -439,14 +442,6 @@ class CartsController extends BaseApiController
             array_push($errors, ...$addressErrors);
             return;
         }
-
-        $address->ownerId = $cart->id;
-
-        if ($country) {
-            $address->countryCode = $country->getCountryCode();
-        }
-
-        $address->administrativeArea = $state?->getIsoCode();
 
         // save the address
         if (!Craft::$app->getElements()->saveElement($address)) {
