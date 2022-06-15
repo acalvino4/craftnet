@@ -3,6 +3,7 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
+use craft\commerce\elements\Order;
 use craft\commerce\errors\PaymentException;
 use craft\commerce\errors\PaymentSourceException;
 use craft\commerce\models\PaymentSource;
@@ -126,7 +127,7 @@ class PaymentsController extends CartsController
             $paymentForm = $gateway->getPaymentFormModel();
 
             try {
-                $this->_populatePaymentForm($payload, $gateway, $paymentForm);
+                $this->_populatePaymentForm($cart, $payload, $gateway, $paymentForm);
                 $commerce->getPayments()->processPayment($cart, $paymentForm, $redirect, $transaction);
             } catch (ApiErrorException $e) {
                 throw new BadRequestHttpException($e->getMessage(), 0, $e);
@@ -157,12 +158,13 @@ class PaymentsController extends CartsController
     /**
      * Populates a Stripe payment form from the payload.
      *
+     * @param Order $cart
      * @param \stdClass $payload
      * @param StripeGateway $gateway
      * @param PaymentForm $paymentForm
      * @throws PaymentSourceException
      */
-    private function _populatePaymentForm(\stdClass $payload, StripeGateway $gateway, PaymentForm $paymentForm)
+    private function _populatePaymentForm(Order $cart, \stdClass $payload, StripeGateway $gateway, PaymentForm $paymentForm)
     {
         // use the payload's token by default
         $paymentForm->paymentMethodId = $payload->token;
@@ -184,7 +186,6 @@ class PaymentsController extends CartsController
             $stripeCustomerId = $paymentSource->customer ?? null;
         }
 
-        $cart = $this->getCart($payload->orderNumber);
         $address = $cart->getBillingAddress();
 
         $customerData = [
