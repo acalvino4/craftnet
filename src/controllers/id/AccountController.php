@@ -3,6 +3,7 @@
 namespace craftnet\controllers\id;
 
 use Craft;
+use craft\base\Element;
 use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
@@ -223,6 +224,8 @@ class AccountController extends Controller
         $address->countryCode = $this->request->getBodyParam('country') ?? 'US';
         $address->administrativeArea = $this->request->getBodyParam('state');
         $address->ownerId = $customer->id;
+
+        $address->setScenario(Element::SCENARIO_LIVE);
 
         try {
             if (!Craft::$app->getElements()->saveElement($address)) {

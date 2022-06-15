@@ -4,6 +4,7 @@ namespace craftnet\controllers\api\v1;
 
 use CommerceGuys\Addressing\Exception\UnknownCountryException;
 use Craft;
+use craft\base\Element;
 use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\elements\Order;
 use craft\commerce\models\LineItem;
@@ -419,9 +420,19 @@ class CartsController extends BaseApiController
         ];
 
         Craft::configure($address, $addressConfig);
+        $address->setScenario(Element::SCENARIO_LIVE);
 
         if (!$address->validate(array_keys($addressConfig))) {
-            array_push($addressErrors, ...$this->modelErrors($address, 'billingAddress'));
+            array_push($addressErrors, ...$this->modelErrors($address, 'billingAddress', [
+                'addressLine1' => 'address1',
+                'addressLine2' => 'address2',
+                'locality' => 'city',
+                'postalCode' => 'zipCode',
+                'organization' => 'businessName',
+                'organizationTaxId' => 'businessTaxId',
+                'addressPhone' => 'phone',
+                'addressAttention' => 'attention',
+            ]));
         }
 
         if (!empty($addressErrors)) {
