@@ -5,13 +5,13 @@ php_version: "8.0"
 webserver_type: nginx-fpm
 router_http_port: "80"
 router_https_port: "443"
-xdebug_enabled: false
+xdebug_enabled: true
 additional_hostnames:
-  - id.craftnet
-  - api.craftnet
-  - composer.craftnet
-  - plugins.craftnet
-  - feeds.craftnet
+- id.craftnet
+- api.craftnet
+- composer.craftnet
+- plugins.craftnet
+- feeds.craftnet
 additional_fqdns: []
 database:
   type: postgres
