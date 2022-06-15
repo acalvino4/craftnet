@@ -9,11 +9,11 @@
         @toggleSidebar="toggleSidebar()"></app-sidebar>
       <!--</template>-->
 
-      <div class="flex flex-col flex-1 bg-primary">
+      <div class="flex flex-col flex-1 bg-primary overflow-auto relative">
         <main-header
           context="app"
           :showingSidebar="showingSidebar"
-          class="showingSidebar"
+          class="showingSidebar sticky top-0 bg-white bg-opacity-90 backdrop-blur ml-[0.02rem]"
           @toggleSidebar="toggleSidebar()"></main-header>
 
         <div
@@ -144,7 +144,7 @@ export default {
 /* Main */
 
 .main {
-  @apply flex-1 overflow-auto;
+  @apply flex-1;
 
   &:not(.main-full) {
     @apply py-6;
