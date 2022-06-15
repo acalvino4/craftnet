@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "069b469bf46ad1c9d7465ecfa1b13a76",
+    "content-hash": "83de6fa631796a6cd05305d1b237384c",
     "packages": [
         {
             "name": "adam-paterson/oauth2-stripe",
@@ -1256,20 +1256,20 @@
                 "rss": "https://github.com/craftcms/commerce/releases.atom",
                 "source": "https://github.com/craftcms/commerce"
             },
-            "time": "2022-06-14T18:51:49+00:00"
+            "time": "2022-06-15T13:27:55+00:00"
         },
         {
             "name": "craftcms/commerce-stripe",
-            "version": "3.0.0",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/craftcms/commerce-stripe.git",
-                "reference": "53ab9987811c3da7ff11f2daaebde41310dfc35b"
+                "reference": "4b0e9c3b195d790d8756afade07ee0e0879b3050"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/craftcms/commerce-stripe/zipball/53ab9987811c3da7ff11f2daaebde41310dfc35b",
-                "reference": "53ab9987811c3da7ff11f2daaebde41310dfc35b",
+                "url": "https://api.github.com/repos/craftcms/commerce-stripe/zipball/4b0e9c3b195d790d8756afade07ee0e0879b3050",
+                "reference": "4b0e9c3b195d790d8756afade07ee0e0879b3050",
                 "shasum": ""
             },
             "require": {
@@ -1282,6 +1282,7 @@
                 "craftcms/ecs": "dev-main",
                 "craftcms/phpstan": "dev-main"
             },
+            "default-branch": true,
             "type": "craft-plugin",
             "extra": {
                 "name": "Stripe for Craft Commerce",
@@ -1317,7 +1318,7 @@
                 "rss": "https://github.com/craftcms/commerce-stripe/commits/master.atom",
                 "source": "https://github.com/craftcms/commerce-stripe"
             },
-            "time": "2022-05-04T17:31:27+00:00"
+            "time": "2022-06-15T15:28:43+00:00"
         },
         {
             "name": "craftcms/flysystem",
@@ -13245,11 +13246,18 @@
             "version": "dev-develop",
             "alias": "4.0.3",
             "alias_normalized": "4.0.3.0"
+        },
+        {
+            "package": "craftcms/commerce-stripe",
+            "version": "dev-develop",
+            "alias": "3.0.0",
+            "alias_normalized": "3.0.0.0"
         }
     ],
     "minimum-stability": "dev",
     "stability-flags": {
         "craftcms/commerce": 20,
+        "craftcms/commerce-stripe": 20,
         "craftcms/phpstan": 20,
         "craftcms/rector": 20
     },
