@@ -68,11 +68,11 @@ export default {
       expiringCmsLicensesTotal: state => state.cmsLicenses.expiringCmsLicensesTotal,
       expiringPluginLicensesTotal: state => state.pluginLicenses.expiringPluginLicensesTotal,
     }),
-  },
 
-  ...mapGetters({
-    currentOrganization: 'organizations/currentOrganization'
-  }),
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+  },
 
   methods: {
     /**
