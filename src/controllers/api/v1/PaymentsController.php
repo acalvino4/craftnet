@@ -175,8 +175,6 @@ class PaymentsController extends CartsController
         $customersService = $stripe->getCustomers();
         $user = Craft::$app->getUser()->getIdentity(false);
 
-        $stripeCustomerId = null;
-
         // Fetch a potentially existing customer
         if ($this->_isPaymentMethod($paymentForm)) {
             $paymentMethod = StripePaymentMethod::retrieve($paymentForm->paymentMethodId);
@@ -244,7 +242,7 @@ class PaymentsController extends CartsController
         if ($this->_isPaymentMethod($paymentForm)) {
             $stripeResponse = StripePaymentMethod::retrieve($paymentForm->paymentMethodId);
         } else {
-            $stripeResponse = $paymentSource = StripeSource::retrieve($paymentForm->paymentMethodId);
+            $stripeResponse = StripeSource::retrieve($paymentForm->paymentMethodId);
         }
 
         // Set it as the customer default for subscriptions
