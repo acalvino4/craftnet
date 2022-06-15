@@ -36,7 +36,7 @@
         {{ content is defined ? content }}
     {% endblock %}
 
-    {{ craft.twigpack.includeJsModule("chunk-common.js", true) }}
     {{ craft.twigpack.includeJsModule("chunk-vendors.js", true) }}
     {{ craft.twigpack.includeJsModule("console.js", true) }}
+    {{ craft.twigpack.includeJsModule("chunk-common.js", true) }}
 {% endblock %}
