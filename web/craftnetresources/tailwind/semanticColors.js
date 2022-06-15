@@ -23,6 +23,12 @@ module.exports = {
       dark: colors['gray'][500]
     },
   },
+  ringColor: {
+    outline: {
+      light: colors.blue[600],
+      dark: colors.blue[600],
+    }
+  },
   boxShadowColor: {
     'sm': {light: 'rgba(0, 0, 0, 0.05)', dark: 'rgba(0, 0, 0, 0.05)'},
     'default-1': {light: 'rgba(0, 0, 0, 0.1)', dark: 'rgba(0, 0, 0, 0.1)'},

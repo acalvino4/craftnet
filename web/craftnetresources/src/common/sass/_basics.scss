@@ -17,22 +17,22 @@
   select:focus,
   :focus-visible {
     --tw-ring-opacity: 0.75;
-    --tw-ring-offset-color: rgb(var(--craftui-backgroundcolor-primary));
-    --tw-ring-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
-    border-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
+    --tw-ring-offset-color: rgb(var(--console-color-backgroundcolor-primary));
+    --tw-ring-color: #{'rgb(var(--console-color-ringcolor-outline) / var(--tw-ring-opacity))'};
+    border-color: #{'rgb(var(--console-color-ringcolor-outline) / var(--tw-ring-opacity))'};
   }
 
   [type='checkbox']:focus,
   [type='radio']:focus {
     --tw-ring-opacity: 0.75;
-    --tw-ring-offset-color: rgb(var(--craftui-backgroundcolor-primary));
-    --tw-ring-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
+    --tw-ring-offset-color: rgb(var(--console-color-backgroundcolor-primary));
+    --tw-ring-color: #{'rgb(var(--console-color-ringcolor-outline) / var(--tw-ring-opacity))'};
   }
 }
 
 /* Set the outline color */
 * {
-  outline-color: #{'rgba(var(--craftui-ringcolor-outline), var(--tw-ring-opacity))'};
+  outline-color: #{'rgb(var(--console-color-ringcolor-outline) / var(--tw-ring-opacity))'};
   @apply focus:outline-none focus-visible:ring-2;
 }
 
