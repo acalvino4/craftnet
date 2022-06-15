@@ -100,10 +100,8 @@ return [
                 if ($bugsnagApiKey = App::env('BUGSNAG_API_KEY')) {
                     $bugsnagClient = Bugsnag\Client::make($bugsnagApiKey);
                     $bugsnagClient->setReleaseStage(App::env('CRAFT_ENVIRONMENT'));
-
-                    // Fix for Yii preventing 3rd party shutdown fns…
-                    // https://github.com/yiisoft/yii2/pull/19401
-                    $bugsnagClient->setBatchSending(false);
+                    $shutdownStrategy = new \craftnet\logs\PhpShutdownStrategy();
+                    $shutdownStrategy->registerShutdownStrategy($bugsnagClient);
 
                     $targets[] = [
                         'class' => PsrTarget::class,
