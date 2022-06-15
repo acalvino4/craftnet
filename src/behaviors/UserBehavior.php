@@ -18,6 +18,7 @@ use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use DateTime;
+use Illuminate\Support\Collection;
 use yii\base\Behavior;
 use yii\base\Exception;
 
@@ -112,9 +113,9 @@ class UserBehavior extends Behavior
     private ?Org $_org = null;
 
     /**
-     * @var Org[]|null
+     * @var Collection|null
      */
-    private ?array $_orgs = null;
+    private ?Collection $_orgs = null;
 
     /**
      * @inheritdoc
@@ -353,13 +354,15 @@ class UserBehavior extends Behavior
         return ($this->_org = new Org($this->owner));
     }
 
-    public function getOrgs(): array
+    public function getOrgs(): Collection
     {
         if ($this->_orgs !== null) {
             return $this->_orgs;
         }
 
-        return $this->_orgs = Module::getInstance()->getOrgs()->getOrgsByMemberUserId($this->owner->id);
+        $this->_orgs = Module::getInstance()?->getOrgs()->getOrgsByMemberUserId($this->owner->id);
+
+        return $this->_orgs;
     }
 
     /**
