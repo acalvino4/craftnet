@@ -10,6 +10,8 @@
         <div class="border-t py-2 flex items-start">
           <div class="w-36">
             <radio
+              v-model="role"
+              value="owner"
               class="mr-4"
               label="Owner"></radio>
           </div>
@@ -25,6 +27,8 @@
         <div class="border-t py-2 flex items-start">
           <div class="w-36">
             <radio
+              v-model="role"
+              value="member"
               class="mr-4"
               label="Member"></radio>
           </div>
@@ -50,6 +54,11 @@ import ModalHeadless from '@/console/js/components/ModalHeadless';
 
 export default {
   components: {ModalHeadless},
-  props: ['showChangeMemberRoleModal']
+  props: ['showChangeMemberRoleModal'],
+  data() {
+    return {
+      role: 'owner'
+    }
+  }
 }
 </script>
