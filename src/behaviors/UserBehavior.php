@@ -8,7 +8,6 @@ use craft\db\Query;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
-use craft\helpers\Json;
 use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
@@ -30,9 +29,9 @@ use yii\base\Exception;
  * @property User $owner
  * @property-read string $developerName
  * @property-read \craftnet\orgs\Org[] $orgs
- * @property null|\craftnet\orgs\Org $org
  * @property-read \craftnet\partners\Partner $partner
  * @property Plugin[] $plugins
+ * @property bool $isOrg
  * @mixin CustomFieldBehavior
  */
 class UserBehavior extends Behavior
@@ -108,9 +107,9 @@ class UserBehavior extends Behavior
     private ?array $_plugins = null;
 
     /**
-     * @var Org|null
+     * @var bool
      */
-    private ?Org $_org = null;
+    private bool $_isOrg;
 
     /**
      * @var Collection|null
@@ -218,7 +217,7 @@ class UserBehavior extends Behavior
         // Only set the PayPal email if we're saving the current user and they are an org
         if (
             (Craft::$app->getRequest()->getIsCpRequest() || $this->owner->getIsCurrent()) &&
-            $this->org &&
+            $this->isOrg &&
             ($payPalEmail = Craft::$app->getRequest()->getBodyParam('payPalEmail')) !== null
         ) {
             $this->payPalEmail = $payPalEmail ?: null;
@@ -284,7 +283,7 @@ class UserBehavior extends Behavior
             $request->getIsSiteRequest() &&
             $request->getIsPost() &&
             $request->getBodyParam('fields.enablePluginDeveloperFeatures') &&
-            $this->org &&
+            $this->isOrg &&
             !$this->enableDeveloperFeatures
         ) {
             // Get any existing group IDs.
@@ -302,7 +301,7 @@ class UserBehavior extends Behavior
             Craft::$app->getUsers()->assignUserToGroups($currentUser->id, $groupIds);
         }
 
-        if ($this->org) {
+        if ($this->isOrg) {
             $this->saveOrgInfo();
         }
     }
@@ -334,24 +333,21 @@ class UserBehavior extends Behavior
     }
 
     /**
-     * @return Org|null
+     * @return bool
      */
-    public function getOrg(): ?Org
+    public function getIsOrg(): bool
     {
-        if ($this->_org !== null) {
-            return $this->_org;
-        }
+        $this->_isOrg = $this->_isOrg ?? (new Query())
+                ->from(Table::ORGS)
+                ->where(['id' => $this->owner->id])
+                ->exists();
 
-        $isOrg = (new Query())
-            ->from(Table::ORGS)
-            ->where(['id' => $this->owner->id])
-            ->exists();
+        return $this->_isOrg;
+    }
 
-        if (!$isOrg) {
-            return null;
-        }
-
-        return ($this->_org = new Org($this->owner));
+    public function setIsOrg(bool $isOrg): void
+    {
+        $this->_isOrg = $isOrg;
     }
 
     public function getOrgs(): Collection
@@ -366,11 +362,55 @@ class UserBehavior extends Behavior
     }
 
     /**
-     * @param Org|null $org
-     * @return void
+     * @throws Exception
      */
-    public function setOrg(?Org $org): void
+    public function addOrgAdmin(User $user): bool
     {
-        $this->_org = $org;
+        $this->_requireOrg();
+
+        return (bool)Craft::$app->getDb()->createCommand()
+            ->upsert(Table::ORGS_MEMBERS, [
+                'orgId' => $this->owner->id,
+                'userId' => $user->owner->id,
+                'admin' => true,
+            ])
+            ->execute();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getOrgMemberIds(): array
+    {
+        $this->_requireOrg();
+
+        return $this->_createOrgMemberIdsQuery()->column();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getOrgAdminIds(): array
+    {
+        $this->_requireOrg();
+
+        return $this->_createOrgMemberIdsQuery()
+            ->andWhere(['admin' => true])
+            ->column();
+    }
+
+    private function _createOrgMemberIdsQuery(): Query
+    {
+        return (new Query())
+            ->select(['userId'])
+            ->from(Table::ORGS_MEMBERS)
+            ->where(['orgId' => $this->owner->id]);
+    }
+
+    private function _requireOrg(): void
+    {
+        if (!$this->isOrg) {
+            throw new Exception('User is not an org.');
+        }
     }
 }

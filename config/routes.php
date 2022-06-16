@@ -81,7 +81,7 @@ return [
         'POST    stripe/save-card' => 'craftnet/console/stripe/save-card',
         'POST    stripe/remove-card' => 'craftnet/console/stripe/remove-card',
 
-        'GET     orgs/user-orgs' => 'craftnet/console/orgs/user-orgs',
+        'GET     orgs/all' => 'craftnet/console/orgs/get-all',
 
         'oauth/login' => 'oauth-server/oauth/login',
         'oauth/authorize' => 'oauth-server/oauth/authorize',

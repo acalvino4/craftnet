@@ -65,7 +65,7 @@ class OrgsController extends \yii\console\Controller
                 $existingUser->supportPlanExpiryDate = $existingUser->getFieldValue('supportPlanExpiryDate');
                 $existingUser->enablePartnerFeatures = $existingUser->getFieldValue('enablePartnerFeatures');
                 $existingUser->enableDeveloperFeatures = $developerIds->contains($existingUser->id);
-                $existingUser->org = new Org($existingUser);
+                $existingUser->isOrg = true;
 
                 $this->stdout("    > Saving user as org ... ");
                 if (!Craft::$app->getElements()->saveElement($existingUser)) {
@@ -73,7 +73,7 @@ class OrgsController extends \yii\console\Controller
                 }
                 $this->stdout('done' . PHP_EOL);
 
-                if ($existingUser->getOrg()->getAdminIds()) {
+                if ($existingUser->getOrgAdminIds()) {
                     $this->stdout("    > Org already has admin assigned, skipping.");
                 } else {
                     /** @var User|UserBehavior $orgAdmin */
@@ -81,14 +81,14 @@ class OrgsController extends \yii\console\Controller
                     $orgAdmin = Craft::$app->getElements()->duplicateElement($existingUser, [
                         'email' => $email,
                         'username' => $username,
-                        'org' => null,
+                        'isOrg' => false,
                         'active' => $active,
                         'pending' => $pending,
                     ]);
                     $this->stdout('done' . PHP_EOL);
 
                     $this->stdout("    > Adding admin user to org ... ");
-                    $existingUser->getOrg()->addAdmin($orgAdmin);
+                    $existingUser->addOrgAdmin($orgAdmin);
                     $this->stdout('done' . PHP_EOL);
 
                     // TODO: Once this exists https://github.com/craftcms/commerce/pull/2801/files

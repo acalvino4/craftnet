@@ -20,11 +20,20 @@ class OrgsController extends Controller
     }
 
     /**
-     * Get orgs for current user
+     * @return Response
+     */
+    public function actionGet($id): Response
+    {
+        /** @var User|UserBehavior $currentUser */
+        $currentUser = Craft::$app->getUser()->getIdentity();
+    }
+
+    /**
+     * Get all orgs current user is a member of
      *
      * @return Response
      */
-    public function actionUserOrgs(): Response
+    public function actionGetAll(): Response
     {
         /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
@@ -39,12 +48,12 @@ class OrgsController extends Controller
         return $this->asSuccess(data: $orgs->all());
     }
 
-    public function actionLeaveOrg(): Response
+    public function actionNewOrg(): Response
     {
         return $this->asSuccess();
     }
 
-    public function actionNewOrg(): Response
+    public function actionLeaveOrg(): Response
     {
         return $this->asSuccess();
     }
@@ -54,7 +63,6 @@ class OrgsController extends Controller
     public function actionConvertToOrg(): Response
     {
         return $this->asSuccess();
-
     }
 
     public function actionInviteMemberToOrg(): Response
