@@ -26,6 +26,7 @@ class OrgsController extends Controller
     {
         /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
+        // return $this->asSuccess(data: $orgs->all());
     }
 
     /**
@@ -42,6 +43,7 @@ class OrgsController extends Controller
             ->map(fn($org) => $org->getAttributes([
                 'id',
                 'displayName',
+                // avatar
             ])
         );
 
@@ -50,29 +52,34 @@ class OrgsController extends Controller
 
     public function actionNewOrg(): Response
     {
+        // orgs/create
+        // create an org user
+        // assign current user as admin
         return $this->asSuccess();
     }
 
     public function actionLeaveOrg(): Response
     {
+        // can't leave if you are the sole admind
         return $this->asSuccess();
     }
 
     // Convert your account to an organization
     // You cannot convert this account to an organization until you leave all organizations that you’re a member of.
-    public function actionConvertToOrg(): Response
-    {
-        return $this->asSuccess();
-    }
+    // public function actionConvertToOrg(): Response
+    // {
+    //     return $this->asSuccess();
+    // }
 
     public function actionInviteMemberToOrg(): Response
     {
+        // require admin
         return $this->asSuccess();
-
     }
 
     public function actionRemoveMember(): Response
     {
+        // require admin
         return $this->asSuccess();
     }
 
