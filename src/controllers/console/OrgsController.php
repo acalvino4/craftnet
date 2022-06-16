@@ -6,6 +6,8 @@ use Craft;
 use craft\elements\User;
 use craft\web\Controller;
 use craftnet\behaviors\UserBehavior;
+use craftnet\db\Table;
+use Illuminate\Support\Collection;
 use yii\web\Response;
 
 class OrgsController extends Controller
@@ -27,7 +29,14 @@ class OrgsController extends Controller
         /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
 
-        return $this->asSuccess(data: $currentUser->getOrgs());
+        $orgs = $currentUser->getOrgs()
+            ->map(fn($org) => $org->getAttributes([
+                'id',
+                'displayName',
+            ])
+        );
+
+        return $this->asSuccess(data: $orgs->all());
     }
 
     public function actionLeaveOrg(): Response

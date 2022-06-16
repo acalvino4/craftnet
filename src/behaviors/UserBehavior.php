@@ -18,6 +18,7 @@ use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use DateTime;
+use Illuminate\Support\Collection;
 use yii\base\Behavior;
 use yii\base\Exception;
 
@@ -39,57 +40,57 @@ class UserBehavior extends Behavior
     /**
      * @var string|null
      */
-    public ?string $country;
+    public ?string $country = null;
 
     /**
      * @var string|null
      */
-    public ?string $stripeAccessToken;
+    public ?string $stripeAccessToken = null;
 
     /**
      * @var string|null
      */
-    public ?string $stripeAccount;
+    public ?string $stripeAccount = null;
 
     /**
      * @var string|null
      */
-    public ?string $payPalEmail;
+    public ?string $payPalEmail = null;
 
     /**
      * @var string|null
      */
-    public ?string $apiToken;
+    public ?string $apiToken = null;
 
     /**
      * @var string|null
      */
-    public ?string $websiteSlug;
+    public ?string $websiteSlug = null;
 
     /**
      * @var string|null
      */
-    public ?string $displayName;
+    public ?string $displayName = null;
 
     /**
      * @var string|null
      */
-    public ?string $websiteUrl;
+    public ?string $websiteUrl = null;
 
     /**
      * @var string|null
      */
-    public ?string $location;
+    public ?string $location = null;
 
     /**
      * @var string|null
      */
-    public ?string $supportPlan;
+    public ?string $supportPlan = null;
 
     /**
      * @var DateTime|null
      */
-    public ?DateTime $supportPlanExpiryDate;
+    public ?DateTime $supportPlanExpiryDate = null;
 
     /**
      * @var null|bool
@@ -104,7 +105,7 @@ class UserBehavior extends Behavior
     /**
      * @var Plugin[]|null
      */
-    private ?array $_plugins;
+    private ?array $_plugins = null;
 
     /**
      * @var Org|null
@@ -112,9 +113,9 @@ class UserBehavior extends Behavior
     private ?Org $_org = null;
 
     /**
-     * @var Org[]|null
+     * @var Collection|null
      */
-    private ?array $_orgs = null;
+    private ?Collection $_orgs = null;
 
     /**
      * @inheritdoc
@@ -353,13 +354,15 @@ class UserBehavior extends Behavior
         return ($this->_org = new Org($this->owner));
     }
 
-    public function getOrgs(): array
+    public function getOrgs(): Collection
     {
         if ($this->_orgs !== null) {
             return $this->_orgs;
         }
 
-        return $this->_orgs = Module::getInstance()->getOrgs()->getOrgsByMemberUserId($this->owner->id);
+        $this->_orgs = Module::getInstance()?->getOrgs()->getOrgsByMemberUserId($this->owner->id);
+
+        return $this->_orgs;
     }
 
     /**

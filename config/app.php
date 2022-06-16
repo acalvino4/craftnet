@@ -104,6 +104,9 @@ return [
                 if ($bugsnagApiKey = App::env('BUGSNAG_API_KEY')) {
                     $bugsnagClient = Bugsnag\Client::make($bugsnagApiKey);
                     $bugsnagClient->setReleaseStage(App::env('CRAFT_ENVIRONMENT'));
+                    $shutdownStrategy = new \craftnet\logs\PhpShutdownStrategy();
+                    $shutdownStrategy->registerShutdownStrategy($bugsnagClient);
+
                     $targets[] = [
                         'class' => PsrTarget::class,
                         'logger' => (new Logger('bugsnag'))->pushHandler(new BugsnagHandler($bugsnagClient)),
