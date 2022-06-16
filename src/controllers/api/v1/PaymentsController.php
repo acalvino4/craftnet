@@ -175,17 +175,7 @@ class PaymentsController extends CartsController
         $customersService = $stripe->getCustomers();
         $user = Craft::$app->getUser()->getIdentity(false);
 
-        // Fetch a potentially existing customer
-        if ($this->_isPaymentMethod($paymentForm)) {
-            $paymentMethod = StripePaymentMethod::retrieve($paymentForm->paymentMethodId);
-            $stripeCustomerId = $paymentMethod->customer ?? null;
-        } else {
-            $paymentSource = StripeSource::retrieve($paymentForm->paymentMethodId);
-            $stripeCustomerId = $paymentSource->customer ?? null;
-        }
-
         $address = $cart->getBillingAddress();
-
         $customerData = [
             'address' => [
                 'line1' => $address?->addressLine1,
@@ -198,6 +188,15 @@ class PaymentsController extends CartsController
             'name' => $address?->fullName,
             'email' => $cart->getEmail(),
         ];
+
+        // Fetch a potentially existing customer and set the customer data on the payment method
+        if ($this->_isPaymentMethod($paymentForm)) {
+            $stripeCustomerId = StripePaymentMethod::retrieve($paymentForm->paymentMethodId)?->customer;
+            StripePaymentMethod::update($paymentForm->paymentMethodId, ['billing_details' => $customerData]);
+        } else {
+            $stripeCustomerId = StripeSource::retrieve($paymentForm->paymentMethodId)?->customer;
+            StripeSource::update($paymentForm->paymentMethodId, ['owner' => $customerData]);
+        }
 
         // If there was no customer stored on payment method
         if (!$stripeCustomerId) {
