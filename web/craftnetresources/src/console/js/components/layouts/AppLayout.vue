@@ -13,7 +13,7 @@
         <main-header
           context="app"
           :showingSidebar="showingSidebar"
-          class="showingSidebar sticky z-10 top-0 bg-white bg-opacity-90 backdrop-blur ml-[0.02rem]"
+          class="showingSidebar sticky z-10 top-0 bg-primary bg-opacity-90 backdrop-blur ml-[0.02rem]"
           @toggleSidebar="toggleSidebar()"></main-header>
 
         <div
