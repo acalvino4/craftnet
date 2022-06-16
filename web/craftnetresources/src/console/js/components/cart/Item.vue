@@ -1,12 +1,12 @@
 <template>
-  <div class="border-t py-12 flex">
+  <div class="border-t py-12 md:flex">
     <item-quantity
       :item="item"
       :item-key="itemKey"></item-quantity>
 
     <item-icon :item="item"></item-icon>
 
-    <div class="flex-1">
+    <div class="mt-6 md:mt-0 flex-1">
       <div>
         <div class="flex justify-between">
           <item-description
@@ -15,15 +15,17 @@
 
           <div class="text-right">
             <!-- Subtotal -->
-            <strong
-              class="block text-xl">
+            <div
+              class="font-semibold text-xl">
               {{
                 $filters.currency(item.lineItem.subtotal)
               }}
-            </strong>
+            </div>
 
             <!-- Remove button -->
-            <a @click="removeFromCart(itemKey)">Remove</a>
+            <div class="mt-1">
+              <a @click="removeFromCart(itemKey)">Remove</a>
+            </div>
           </div>
         </div>
 

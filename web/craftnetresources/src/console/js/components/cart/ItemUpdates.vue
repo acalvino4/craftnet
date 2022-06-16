@@ -1,11 +1,11 @@
 <template>
   <div
-    class="flex"
+    class="md:flex"
     :class="{
             'border-t mt-6 pt-6': item.lineItem.purchasable.type != 'plugin-renewal' && item.lineItem.purchasable.type != 'cms-renewal',
             'mt-2': !(item.lineItem.purchasable.type != 'plugin-renewal' && item.lineItem.purchasable.type != 'cms-renewal')
         }">
-    <div class="flex-1">
+    <div class="md:flex-1">
       <div
         v-if="item.lineItem.purchasable.type != 'plugin-renewal' && item.lineItem.purchasable.type != 'cms-renewal'"
         class="font-bold">
@@ -41,12 +41,14 @@
       <template
         v-for="(adjustment, adjustmentKey) in item.lineItem.adjustments.filter(lineItemAdustment => lineItemAdustment.sourceSnapshot.type == 'extendedUpdates')"
         :key="itemKey + 'updates-adjustment-' + adjustmentKey">
-        <div class="text-right">
-          <div class="font-bold">
+        <div class="mt-4 text-right">
+          <div class="font-semibold text-lg">
             {{ $filters.currency(adjustment.amount) }}
           </div>
 
-          <a @click="removeUpdate(itemKey, item.id)">Remove</a>
+          <div class="mt-1">
+            <a @click="removeUpdate(itemKey, item.id)">Remove</a>
+          </div>
         </div>
       </template>
     </template>

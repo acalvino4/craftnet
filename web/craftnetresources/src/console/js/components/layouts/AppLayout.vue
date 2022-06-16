@@ -18,7 +18,7 @@
 
         <div
           id="main"
-          class="main flex-1 p-4 md:p-8"
+          class="main flex-1 p-6 md:p-8"
           :class="{'main-full': $route.meta.mainFull}">
           <div class="page-alerts">
             <template v-if="$route.meta.cmsLicensesRenewAlert">
