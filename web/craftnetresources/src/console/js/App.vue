@@ -96,17 +96,22 @@ export default {
               // Load the cart
               this.$store.dispatch('cart/getCart')
                 .then(() => {
+                  // Load the current organization
                   this.$store.dispatch('organizations/getCurrentOrganizationId')
                     .then(() => {
                       this.$store.commit('app/updateLoading', false)
 
                       if (vueApp.$store.state.account.user) {
+                        // Logged in user
+
+                        // Renew the auth manager’s session if needed
                         if (vueApp.$refs.authManager) {
                           vueApp.$refs.authManager.renewSession()
                         }
 
                         next()
                       } else {
+                        // Guest user
                         // Check that the user can access the next route
                         if (!to.meta.allowAnonymous) {
                           next({path: '/login'})
