@@ -3,6 +3,7 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
+use craft\commerce\elements\Order;
 use craft\commerce\errors\PaymentException;
 use craft\commerce\errors\PaymentSourceException;
 use craft\commerce\models\PaymentSource;
@@ -126,7 +127,7 @@ class PaymentsController extends CartsController
             $paymentForm = $gateway->getPaymentFormModel();
 
             try {
-                $this->_populatePaymentForm($payload, $gateway, $paymentForm);
+                $this->_populatePaymentForm($cart, $payload, $gateway, $paymentForm);
                 $commerce->getPayments()->processPayment($cart, $paymentForm, $redirect, $transaction);
             } catch (ApiErrorException $e) {
                 throw new BadRequestHttpException($e->getMessage(), 0, $e);
@@ -157,12 +158,13 @@ class PaymentsController extends CartsController
     /**
      * Populates a Stripe payment form from the payload.
      *
+     * @param Order $cart
      * @param \stdClass $payload
      * @param StripeGateway $gateway
      * @param PaymentForm $paymentForm
      * @throws PaymentSourceException
      */
-    private function _populatePaymentForm(\stdClass $payload, StripeGateway $gateway, PaymentForm $paymentForm)
+    private function _populatePaymentForm(Order $cart, \stdClass $payload, StripeGateway $gateway, PaymentForm $paymentForm)
     {
         // use the payload's token by default
         $paymentForm->paymentMethodId = $payload->token;
@@ -173,20 +175,7 @@ class PaymentsController extends CartsController
         $customersService = $stripe->getCustomers();
         $user = Craft::$app->getUser()->getIdentity(false);
 
-        $stripeCustomerId = null;
-
-        // Fetch a potentially existing customer
-        if ($this->_isPaymentMethod($paymentForm)) {
-            $paymentMethod = StripePaymentMethod::retrieve($paymentForm->paymentMethodId);
-            $stripeCustomerId = $paymentMethod->customer ?? null;
-        } else {
-            $paymentSource = StripeSource::retrieve($paymentForm->paymentMethodId);
-            $stripeCustomerId = $paymentSource->customer ?? null;
-        }
-
-        $cart = $this->getCart($payload->orderNumber);
         $address = $cart->getBillingAddress();
-
         $customerData = [
             'address' => [
                 'line1' => $address?->addressLine1,
@@ -199,6 +188,15 @@ class PaymentsController extends CartsController
             'name' => $address?->fullName,
             'email' => $cart->getEmail(),
         ];
+
+        // Fetch a potentially existing customer and set the customer data on the payment method
+        if ($this->_isPaymentMethod($paymentForm)) {
+            $stripeCustomerId = StripePaymentMethod::retrieve($paymentForm->paymentMethodId)?->customer;
+            StripePaymentMethod::update($paymentForm->paymentMethodId, ['billing_details' => $customerData]);
+        } else {
+            $stripeCustomerId = StripeSource::retrieve($paymentForm->paymentMethodId)?->customer;
+            StripeSource::update($paymentForm->paymentMethodId, ['owner' => $customerData]);
+        }
 
         // If there was no customer stored on payment method
         if (!$stripeCustomerId) {
@@ -243,7 +241,7 @@ class PaymentsController extends CartsController
         if ($this->_isPaymentMethod($paymentForm)) {
             $stripeResponse = StripePaymentMethod::retrieve($paymentForm->paymentMethodId);
         } else {
-            $stripeResponse = $paymentSource = StripeSource::retrieve($paymentForm->paymentMethodId);
+            $stripeResponse = StripeSource::retrieve($paymentForm->paymentMethodId);
         }
 
         // Set it as the customer default for subscriptions
