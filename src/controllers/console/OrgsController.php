@@ -28,6 +28,7 @@ class OrgsController extends Controller
     {
         /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
+
         $orgs = $currentUser->getOrgs()
             ->map(fn($org) => $org->getAttributes([
                 'id',
@@ -35,7 +36,7 @@ class OrgsController extends Controller
             ])
         );
 
-        return $this->asJson(data: $orgs);
+        return $this->asSuccess(data: $orgs->all());
     }
 
     public function actionLeaveOrg(): Response
