@@ -14,6 +14,7 @@ use craft\commerce\stripe\models\forms\payment\PaymentIntent as PaymentForm;
 use craft\commerce\stripe\Plugin as Stripe;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
+use craftnet\base\RenewalInterface;
 use craftnet\controllers\api\RateLimiterTrait;
 use craftnet\errors\ValidationException;
 use Stripe\Customer as StripeCustomer;
@@ -189,13 +190,17 @@ class PaymentsController extends CartsController
             'email' => $cart->getEmail(),
         ];
 
-        // Fetch a potentially existing customer and set the customer data on the payment method
+        // Fetch a potentially existing customer and maybe set the billing details on the payment method
         if ($this->_isPaymentMethod($paymentForm)) {
             $stripeCustomerId = StripePaymentMethod::retrieve($paymentForm->paymentMethodId)?->customer;
-            StripePaymentMethod::update($paymentForm->paymentMethodId, ['billing_details' => $customerData]);
+            if ($this->_includeBillingDetails($cart)) {
+                StripePaymentMethod::update($paymentForm->paymentMethodId, ['billing_details' => $customerData]);
+            }
         } else {
             $stripeCustomerId = StripeSource::retrieve($paymentForm->paymentMethodId)?->customer;
-            StripeSource::update($paymentForm->paymentMethodId, ['owner' => $customerData]);
+            if ($this->_includeBillingDetails($cart)) {
+                StripeSource::update($paymentForm->paymentMethodId, ['owner' => $customerData]);
+            }
         }
 
         // If there was no customer stored on payment method
@@ -263,6 +268,19 @@ class PaymentsController extends CartsController
         if (!$paymentSourcesService->savePaymentSource($paymentSource)) {
             throw new PaymentSourceException('Could not create the payment method: ' . implode(', ', $paymentSource->getErrorSummary(true)));
         }
+    }
+
+    private function _includeBillingDetails(Order $cart): bool
+    {
+        if ($cart->getTotalPrice() > App::env('SPS_MAX') ?? 0) {
+            return false;
+        }
+
+        if ($cart->getCustomer()?->active ?? false) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
