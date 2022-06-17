@@ -105,7 +105,7 @@ const actions = {
     })
   },
 
-  getAccount({commit}) {
+  getAccount({commit, dispatch}) {
     return new Promise((resolve, reject) => {
       accountApi.getAccount()
         .then((response) => {
@@ -115,13 +115,21 @@ const actions = {
           commit('stripe/updateCard', {card: response.data.card}, {root: true})
           commit('stripe/updateCardToken', {cardToken: response.data.cardToken}, {root: true})
           commit('updateCurrentUserLoaded', true)
-          commit('organizations/updateOrganizations', response.data.organizations, {root: true})
 
-          resolve(response)
+          dispatch('organizations/getOrganizations', null, {root: true})
+            .then((orgResponse) => {
+              resolve({
+                response,
+                orgResponse,
+              })
+            })
+            .catch((error) => {
+              reject(error)
+            })
         })
-        .catch((response) => {
+        .catch((error) => {
           commit('updateCurrentUserLoaded', true)
-          reject(response)
+          reject(error)
         })
     })
   },

@@ -1,3 +1,6 @@
+/* global VUE_APP_URL_CONSOLE */
+import axios from 'axios';
+
 export default {
   leave() {
     console.log('TODO: Implement leaving an organization.')
@@ -32,5 +35,9 @@ export default {
         organizationId,
       })
     })
+  },
+
+  getOrganizations() {
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/all')
   }
 }

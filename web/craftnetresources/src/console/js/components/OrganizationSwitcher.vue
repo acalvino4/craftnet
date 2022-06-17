@@ -8,32 +8,15 @@
         class="header-brand relative">
         <MenuButton
           class="flex w-full items-center hover:no-underline font-bold text-gray-800 dark:text-gray-200 px-5 py-3">
-            <span class="rounded overflow-hidden">
-                <template v-if="currentOrganization">
-                    <template v-if="orgAvatarUrl">
-                        <img
-                          class="w-7 h-7 bg-teal-500"
-                          :src="orgAvatarUrl" />
-                    </template>
-                </template>
-                <template v-else>
-                    <div
-                      class="w-7 h-7 bg-gray-100 flex items-center justify-center">
-                        <template v-if="user.photoUrl">
-                            <img :src="user.photoUrl" />
-                        </template>
-                        <template v-else>
-                            <icon
-                              icon="user"
-                              class="w-3 h-3 text-gray-500" />
-                        </template>
-                    </div>
-                </template>
-            </span>
+          <organization-switcher-photo
+            class="mr-2"
+            :organization="(currentOrganization ? currentOrganization : null)"
+            :user="(!currentOrganization ? user : null)"
+          />
 
           <div
             v-if="orgName"
-            class="ml-2 inline-block">
+            class="inline-block">
             {{ orgName }}
           </div>
 
@@ -54,17 +37,10 @@
                 @click="selectOrganization(null)"
               >
                 <div class="flex items-center">
-                  <div
-                    class="w-7 h-7 bg-gray-100 rounded overflow-hidden mr-2 flex items-center justify-center">
-                    <template v-if="user.photoUrl">
-                      <img :src="user.photoUrl" />
-                    </template>
-                    <template v-else>
-                      <icon
-                        icon="user"
-                        class="w-3 h-3 text-gray-500" />
-                    </template>
-                  </div>
+                  <organization-switcher-photo
+                    class="mr-2"
+                    :user="user"
+                  />
 
                   <template
                     v-if="user.firstName || user.lastName">
@@ -87,11 +63,12 @@
                   @click="selectOrganization(organization)"
                 >
                   <div class="flex items-center min-w-0">
-                    <img
-                      class="w-7 h-7 rounded mr-2"
-                      :src="staticImageUrl('avatars/' + organization.avatar)" />
+                    <organization-switcher-photo
+                      class="mr-2"
+                      :organization="organization"
+                    />
                     <div class="truncate">
-                      {{ organization.name }}
+                      {{ organization.displayName }}
                     </div>
                   </div>
                 </organization-switcher-menu-item>
@@ -125,11 +102,13 @@ import {Menu, MenuButton, MenuItems, MenuItem} from '@headlessui/vue'
 import {mapGetters, mapState} from 'vuex';
 import helpers from '@/console/js/mixins/helpers.js';
 import OrganizationSwitcherMenuItem from './OrganizationSwitcherMenuItem';
+import OrganizationSwitcherPhoto from './OrganizationSwitcherPhoto';
 
 export default {
   mixins: [helpers],
 
   components: {
+    OrganizationSwitcherPhoto,
     OrganizationSwitcherMenuItem,
     Menu,
     MenuButton,
@@ -147,21 +126,9 @@ export default {
       currentOrganization: 'organizations/currentOrganization'
     }),
 
-    orgAvatarUrl() {
-      if (this.currentOrganization) {
-        return this.staticImageUrl('avatars/' + this.currentOrganization.avatar)
-      }
-
-      if (this.user && this.user.photoUrl) {
-        return this.user.photoUrl
-      }
-
-      return null
-    },
-
     orgName() {
       if (this.currentOrganization) {
-        return this.currentOrganization.name
+        return this.currentOrganization.displayName
       }
 
       if (this.user && (this.user.firstName || this.user.lastName)) {
@@ -195,7 +162,6 @@ export default {
      * Select an organization.
      */
     selectOrganization(organization) {
-      console.log('select organization', organization);
       this.$store.dispatch('organizations/saveCurrentOrganization', organization)
         .then(() => {
           if (!organization && this.$route.path === '/settings/members') {

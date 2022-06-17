@@ -12,35 +12,61 @@
     </page-header>
 
     <div class="space-y-6">
-      <pane :padded="false">
-        <div>
-          <div
-            v-for="(organization, organizationKey) in organizations"
-            :key="organizationKey">
+      <template v-if="organizations.length > 0">
+        <pane :padded="false">
+          <div>
             <div
-              class="flex items-center justify-between px-6 py-4"
-              :class="[{
-                            'border-t': organizationKey !== 0
-                        }]">
-              <div class="flex items-center">
-                <div class="mr-4">
-                  <div
-                    class="w-12 h-12 bg-gray-200 rounded-md overflow-hidden">
-                    <img
-                      :src="staticImageUrl('avatars/' + organization.avatar)" />
+              v-for="(organization, organizationKey) in organizations"
+              :key="organizationKey">
+              <div
+                class="flex items-center justify-between px-6 py-4"
+                :class="[{
+                  'border-t': organizationKey !== 0
+                }]">
+                <div class="flex items-center">
+                  <div class="mr-4">
+                    <div
+                      :class="{
+                        'w-12 h-12 rounded-md overflow-hidden': true,
+                        'bg-gray-100 dark:bg-gray-400': !organization.avatar,
+                      }"
+                    >
+                      <template v-if="organization.avatar">
+                        <img
+                          :src="staticImageUrl('avatars/' + organization.avatar)" />
+                      </template>
+                    </div>
+                  </div>
+                  <div class="font-medium">
+                    {{ organization.displayName }}
                   </div>
                 </div>
-                <div class="font-medium">
-                  {{ organization.name }}
+                <div>
+                  <btn @click="leaveOrganization">Leave</btn>
                 </div>
-              </div>
-              <div>
-                <btn @click="leaveOrganization">Leave</btn>
               </div>
             </div>
           </div>
-        </div>
-      </pane>
+        </pane>
+      </template>
+      <template v-else>
+        <pane>
+          <div class="flex gap-6 max-w-lg mx-auto px-12 py-24">
+            <div>
+              <icon
+                class="text-blue-500 w-16 h-16"
+                icon="collection"
+              />
+            </div>
+
+            <div>
+              <h2>No organizations</h2>
+              <p class="text-gray-600">You are not part of any organizations, create or join an organization.</p>
+            </div>
+          </div>
+        </pane>
+      </template>
+
 
 
       <pane class="border border-red-500 mb-3">

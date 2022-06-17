@@ -57,6 +57,19 @@ const actions = {
       .then((response) => {
         commit('updateCurrentOrganizationId', response.organizationId)
       })
+  },
+
+  getOrganizations({commit}) {
+    return new Promise((resolve, reject) => {
+      organizationsApi.getOrganizations()
+        .then((response) => {
+          commit('updateOrganizations', response.data)
+          resolve(response)
+        })
+        .catch((response) => {
+          reject(response)
+        })
+    })
   }
 }
 
