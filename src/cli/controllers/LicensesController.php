@@ -1,6 +1,6 @@
 <?php
 
-namespace craftnet\console\controllers;
+namespace craftnet\cli\controllers;
 
 use Craft;
 use craft\commerce\behaviors\CustomerBehavior;
