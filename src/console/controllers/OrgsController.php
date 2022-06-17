@@ -22,6 +22,7 @@ class OrgsController extends \yii\console\Controller
      * @return void
      * @throws ElementNotFoundException
      * @throws Exception
+     * @throws \yii\base\Exception
      */
     public function actionConvert(): void
     {

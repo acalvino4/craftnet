@@ -43,8 +43,9 @@ class OrgsController extends Controller
             ->map(fn($org) => $org->getAttributes([
                 'id',
                 'displayName',
-                // avatar
-            ])
+            ]) + [
+                'photo' => $org->photo->getAttributes(['id', 'url']),
+            ]
         );
 
         return $this->asSuccess(data: $orgs->all());
