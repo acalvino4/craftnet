@@ -51,7 +51,7 @@
       </template>
       <template v-else>
         <pane>
-          <div class="flex gap-6 max-w-lg mx-auto px-12 py-24">
+          <div class="flex gap-6 max-w-lg mx-auto p-12 min-h-[30vh] md:min-h-[40vh]  lg:min-h-[50vh] justify-center items-center">
             <div>
               <icon
                 class="text-blue-500 w-16 h-16"
