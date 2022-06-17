@@ -67,8 +67,6 @@
         </pane>
       </template>
 
-
-
       <pane class="border border-red-500 mb-3">
         <template v-slot:header>
           <h2 class="mb-0 text-red-600">
