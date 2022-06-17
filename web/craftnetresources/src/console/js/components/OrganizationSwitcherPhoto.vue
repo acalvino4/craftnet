@@ -5,20 +5,14 @@
       'bg-gray-300 dark:bg-gray-400': !photoUrl,
     }"
   >
-    <template v-if="user">
-      <template v-if="user.photoUrl">
-        <img :src="user.photoUrl" />
-      </template>
-      <template v-else>
+    <template v-if="photoUrl">
+      <img :src="photoUrl" />
+    </template>
+
+    <template v-else-if="user && !user.photoUrl">
         <icon
           icon="user"
           class="w-3 h-3 text-gray-500" />
-      </template>
-    </template>
-
-    <template v-else-if="organization && organization.avatar">
-        <img
-          :src="staticImageUrl('avatars/' + organization.avatar)" />
     </template>
   </div>
 </template>
@@ -37,8 +31,8 @@ export default {
   },
   computed: {
     photoUrl() {
-      if(this.organization && this.organization.avatar) {
-        return this.staticImageUrl('avatars/' + this.organization.avatar);
+      if(this.organization && this.organization.photo) {
+        return this.organization.photo.url;
       }
 
       if (this.user && this.user.photoUrl) {
