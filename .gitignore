@@ -9,6 +9,8 @@
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
+/packages/*
+
 /web/packages.json
 /web/p
 /templates/test.twig
