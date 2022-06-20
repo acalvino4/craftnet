@@ -237,7 +237,7 @@ class Module extends \yii\base\Module
         // request type-specific stuff
         $request = Craft::$app->getRequest();
         if ($request->getIsConsoleRequest()) {
-            $this->controllerNamespace = 'craftnet\\console\\controllers';
+            $this->controllerNamespace = 'craftnet\\cli\\controllers';
             $this->_initConsoleRequset();
         } else {
             $this->controllerNamespace = 'craftnet\\controllers';
