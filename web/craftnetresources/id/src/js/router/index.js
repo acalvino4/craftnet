@@ -185,13 +185,13 @@ const router = new VueRouter({
             path: '/payment',
             name: 'Payment',
             component: Payment,
-            meta: { sidebar: false, allowAnonymous: true }
+            meta: { sidebar: false, allowAnonymous: false }
         },
         {
             path: '/thank-you',
             name: 'ThankYou',
             component: ThankYou,
-            meta: { sidebar: false, allowAnonymous: true }
+            meta: { sidebar: false, allowAnonymous: false }
         },
 
 

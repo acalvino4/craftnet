@@ -78,7 +78,6 @@
                 error: null,
                 errors: {},
                 cardToken: null,
-                guestCardToken: null,
             }
         },
 
@@ -158,39 +157,25 @@
             savePaymentMethod() {
                 return new Promise((resolve, reject) => {
                     if (this.cart && this.cart.totalPrice > 0) {
-                        if (this.user) {
-                            // Save card for existing user
-                            if (this.paymentMode === 'newCard') {
-                                // Save new card
-                                if (!this.cardToken) {
-                                    this.$refs.paymentMethod.$refs.newCard.save(
-                                        // success
-                                        (source) => {
-                                            this.cardToken = source
-                                            resolve()
-                                        },
-                                        // error
-                                        () => {
-                                            reject()
-                                        })
-                                } else {
-                                    resolve()
-                                }
+                        // Save card for existing user
+                        if (this.paymentMode === 'newCard') {
+                            // Save new card
+                            if (!this.cardToken) {
+                                this.$refs.paymentMethod.$refs.newCard.save(
+                                    // success
+                                    (source) => {
+                                        this.cardToken = source
+                                        resolve()
+                                    },
+                                    // error
+                                    () => {
+                                        reject()
+                                    })
                             } else {
                                 resolve()
                             }
                         } else {
-                            // Save card for guest user
-                            this.$refs.paymentMethod.$refs.guestCard.save(
-                                // success
-                                (response) => {
-                                    this.guestCardToken = response
-                                    resolve()
-                                },
-                                // error
-                                () => {
-                                    reject()
-                                })
+                            resolve()
                         }
                     } else {
                         resolve()
@@ -211,11 +196,8 @@
                         state: this.billingInfo.state,
                         city: this.billingInfo.city,
                         zipCode: this.billingInfo.zipCode,
+                        email: this.user.email,
                     },
-                }
-
-                if (this.user) {
-                    cartData.email = this.user.email
                 }
 
                 return this.$store.dispatch('cart/saveCart', cartData)
@@ -225,16 +207,12 @@
                 let cardToken = null
 
                 if (this.cart.totalPrice > 0) {
-                    if (this.user) {
-                        switch (this.paymentMode) {
-                            case 'newCard':
-                                cardToken = this.cardToken.id
-                                break
-                            default:
-                                cardToken = this.existingCardToken
-                        }
-                    } else {
-                        cardToken = this.guestCardToken.id
+                    switch (this.paymentMode) {
+                        case 'newCard':
+                            cardToken = this.cardToken.id
+                            break
+                        default:
+                            cardToken = this.existingCardToken
                     }
                 }
 
@@ -262,17 +240,13 @@
 
             this.getCart()
                 .then(() => {
-                    if (this.user) {
-                        this.getStripeAccount()
-                            .then(() => {
-                                this.loading = false
-                            })
-                            .catch(() => {
-                                this.loading = false
-                            })
-                    } else {
-                        this.loading = false
-                    }
+                    this.getStripeAccount()
+                        .then(() => {
+                            this.loading = false
+                        })
+                        .catch(() => {
+                            this.loading = false
+                        })
                 })
                 .catch(() => {
                     this.loading = false
