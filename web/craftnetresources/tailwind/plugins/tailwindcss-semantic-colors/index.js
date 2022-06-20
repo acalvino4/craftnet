@@ -20,45 +20,55 @@ function parseColor(inputColor) {
   return `${parsedColor.rgba.r} ${parsedColor.rgba.g} ${parsedColor.rgba.b}`;
 }
 
+function getParsedColors(pluginOptions, theme) {
+  const colors = {};
+
+  for (let colorSetKey in pluginOptions.semanticColors) {
+    for (let colorKey in pluginOptions.semanticColors[colorSetKey]) {
+      const inputColor = pluginOptions.semanticColors[colorSetKey][colorKey][theme]
+      if (inputColor) {
+        colors[`--console-color-${colorSetKey.toLowerCase()}-${colorKey}`] = parseColor(inputColor)
+      }
+    }
+  }
+
+  return colors
+}
+
 module.exports = tailwindPlugin.withOptions(
   // Plugin function
   function(pluginOptions) {
     return function(options) {
       const {addBase} = options
 
-      const lightColors = {};
-
-      for (let colorSetKey in pluginOptions.semanticColors) {
-        for (let colorKey in pluginOptions.semanticColors[colorSetKey]) {
-          const inputColor = pluginOptions.semanticColors[colorSetKey][colorKey].light
-          lightColors[`--console-color-${colorSetKey.toLowerCase()}-${colorKey}`] = parseColor(inputColor)
-        }
-      }
-
-      const darkColors = {};
-
-      for (let colorSetKey in pluginOptions.semanticColors) {
-        for (let colorKey in pluginOptions.semanticColors[colorSetKey]) {
-          const inputColor = pluginOptions.semanticColors[colorSetKey][colorKey].dark
-          darkColors[`--console-color-${colorSetKey.toLowerCase()}-${colorKey}`] = parseColor(inputColor);
-        }
-      }
-
-      // console.log('lightColors', lightColors);
+      const lightColors = getParsedColors(pluginOptions, 'light')
+      const lightContrastColors = getParsedColors(pluginOptions, 'lightContrast')
+      const darkColors = getParsedColors(pluginOptions, 'dark')
+      const darkContrastColors = getParsedColors(pluginOptions, 'darkContrast')
 
       addBase({
-        // `light` color scheme
+        // light
         'body': {
           ...lightColors,
           '--console-color-text-lightold': '255 196 2',
         },
 
-        // `dark` color scheme
+        // dark
         '@media (prefers-color-scheme: dark)': {
           'body': {
             ...darkColors,
             '--console-color-text-lightold': '220 208 192',
           },
+        },
+
+        // light + contrast
+        '@media (prefers-color-scheme: light) and (prefers-contrast: more)': {
+          'body': lightContrastColors,
+        },
+
+        // dark + contrast
+        '@media (prefers-color-scheme: dark) and (prefers-contrast: more)': {
+          'body': darkContrastColors,
         },
       })
     }

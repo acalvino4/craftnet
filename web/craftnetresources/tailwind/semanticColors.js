@@ -15,6 +15,8 @@ module.exports = {
     DEFAULT: {
       light: colors.gray[200],
       dark: colors.gray[700],
+      lightContrast: colors.gray[400],
+      darkContrast: colors.gray[600],
     }
   },
   textColor: {
