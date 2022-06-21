@@ -33,6 +33,8 @@ class PaymentsController extends CartsController
 {
     use RateLimiterTrait;
 
+    protected int|bool|array $allowAnonymous = false;
+
     // Properties
     // =========================================================================
 
