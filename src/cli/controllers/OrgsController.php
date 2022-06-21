@@ -3,6 +3,7 @@
 namespace craftnet\cli\controllers;
 
 use Craft;
+use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\db\Table;
 use craft\elements\User;
@@ -36,8 +37,7 @@ class OrgsController extends \yii\console\Controller
             ->all();
 
         User::find()
-            // TODO: replace with 'credentialed'
-            ->status(['active', 'pending'])
+            ->status('credentialed')
             ->id($existingUserIds)
             ->collect()
             ->each(function(User $existingUser) use($developerIds) {
@@ -97,13 +97,14 @@ class OrgsController extends \yii\console\Controller
                     Commerce::getInstance()->getCustomers()->moveCustomerDataToCustomer($existingUser, $orgAdmin);
                     $this->stdout('done' . PHP_EOL);
 
-                    $this->stdout("    > Migrating address data to org admin ... ");
+                    $this->stdout("    > Relating orders to org ... ");
+                    $rows = Order::find()->customer($orgAdmin)->collect()
+                        ->map(fn($order) => [
+                            $order->id,
+                            $existingUser->id,
+                        ]);
                     Craft::$app->getDb()->createCommand()
-                        ->update(Table::ADDRESSES, [
-                            'ownerId' => $orgAdmin->id,
-                        ], [
-                            'ownerId' => $existingUser->id,
-                        ])
+                        ->batchInsert(\craftnet\db\Table::ORGS_ORDERS, ['id', 'orgId'], $rows->all())
                         ->execute();
                     $this->stdout('done' . PHP_EOL);
 
