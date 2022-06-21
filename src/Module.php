@@ -3,6 +3,7 @@
 namespace craftnet;
 
 use Craft;
+use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\events\MatchLineItemEvent;
 use craft\commerce\events\PdfEvent;
@@ -48,6 +49,7 @@ use craft\web\View;
 use craftnet\behaviors\AssetBehavior;
 use craftnet\behaviors\DiscountBehavior;
 use craftnet\behaviors\OrderBehavior;
+use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\cms\CmsEdition;
@@ -107,6 +109,9 @@ class Module extends \yii\base\Module
         });
         Event::on(UserQuery::class, UserQuery::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
             $e->behaviors['cn.userQuery'] = UserQueryBehavior::class;
+        });
+        Event::on(OrderQuery::class, OrderQuery::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
+            $e->behaviors['cn.orderQuery'] = OrderQueryBehavior::class;
         });
         Event::on(User::class, User::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
             $e->behaviors['cn.user'] = UserBehavior::class;

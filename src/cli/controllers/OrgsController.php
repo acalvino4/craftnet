@@ -5,12 +5,9 @@ namespace craftnet\cli\controllers;
 use Craft;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
-use craft\db\Table;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
-use craft\helpers\Console;
 use craftnet\behaviors\UserBehavior;
-use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use yii\db\Exception;
@@ -74,7 +71,7 @@ class OrgsController extends \yii\console\Controller
                 }
                 $this->stdout('done' . PHP_EOL);
 
-                if ($existingUser->getOrgAdminIds()) {
+                if ($existingUser->findOrgAdmins()->exists()) {
                     $this->stdout("    > Org already has admin assigned, skipping.");
                 } else {
                     /** @var User|UserBehavior $orgAdmin */

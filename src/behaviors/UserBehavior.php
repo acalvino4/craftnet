@@ -5,6 +5,7 @@ namespace craftnet\behaviors;
 use Craft;
 use craft\base\Element;
 use craft\db\Query;
+use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
@@ -31,8 +32,7 @@ use yii\base\Exception;
  * @property-read \craftnet\orgs\Org[] $orgs
  * @property-read \craftnet\partners\Partner $partner
  * @property Plugin[] $plugins
- * @property bool $isOrg
- * @mixin CustomFieldBehavior
+= * @mixin CustomFieldBehavior
  */
 class UserBehavior extends Behavior
 {
@@ -109,7 +109,7 @@ class UserBehavior extends Behavior
     /**
      * @var bool
      */
-    private bool $_isOrg;
+    public bool $isOrg = false;
 
     /**
      * @var Collection|null
@@ -333,35 +333,6 @@ class UserBehavior extends Behavior
     }
 
     /**
-     * @return bool
-     */
-    public function getIsOrg(): bool
-    {
-        $this->_isOrg = $this->_isOrg ?? (new Query())
-                ->from(Table::ORGS)
-                ->where(['id' => $this->owner->id])
-                ->exists();
-
-        return $this->_isOrg;
-    }
-
-    public function setIsOrg(bool $isOrg): void
-    {
-        $this->_isOrg = $isOrg;
-    }
-
-    public function getOrgs(): Collection
-    {
-        if ($this->_orgs !== null) {
-            return $this->_orgs;
-        }
-
-        $this->_orgs = Module::getInstance()?->getOrgs()->getOrgsByMemberUserId($this->owner->id);
-
-        return $this->_orgs;
-    }
-
-    /**
      * @throws Exception
      */
     public function addOrgAdmin(User $user): bool
@@ -377,40 +348,39 @@ class UserBehavior extends Behavior
             ->execute();
     }
 
-    /**
-     * @throws Exception
-     */
-    public function getOrgMemberIds(): array
+    public function findOrgs(): UserQuery
     {
-        $this->_requireOrg();
-
-        return $this->_createOrgMemberIdsQuery()->column();
+        return User::find()
+            ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.orgId]] = [[users.id]]')
+            ->andWhere(['orgs_members.userId' => $this->owner->id]);
     }
 
     /**
      * @throws Exception
      */
-    public function getOrgAdminIds(): array
+    public function findOrgMembers(): UserQuery
     {
         $this->_requireOrg();
 
-        return $this->_createOrgMemberIdsQuery()
-            ->andWhere(['admin' => true])
-            ->column();
+        return User::find()
+            ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.userId]] = [[users.id]]')
+            ->andWhere(['orgs_members.orgId' => $this->owner->id]);
     }
 
-    private function _createOrgMemberIdsQuery(): Query
+    /**
+     * @throws Exception
+     */
+    public function findOrgAdmins(): UserQuery
     {
-        return (new Query())
-            ->select(['userId'])
-            ->from(Table::ORGS_MEMBERS)
-            ->where(['orgId' => $this->owner->id]);
+        $this->_requireOrg();
+
+        return $this->findOrgMembers()->andWhere(['orgs_members.admin' => true]);
     }
 
     private function _requireOrg(): void
     {
         if (!$this->isOrg) {
-            throw new Exception('User is not an org.');
+            throw new Exception('User is not an organization.');
         }
     }
 }

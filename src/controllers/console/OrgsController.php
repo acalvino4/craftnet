@@ -3,11 +3,14 @@
 namespace craftnet\controllers\console;
 
 use Craft;
+use craft\commerce\elements\db\OrderQuery;
+use craft\commerce\elements\Order;
+use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craft\web\Controller;
+use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\behaviors\UserBehavior;
-use craftnet\db\Table;
-use Illuminate\Support\Collection;
+use craftnet\behaviors\UserQueryBehavior;
 use yii\web\Response;
 
 class OrgsController extends Controller
@@ -19,14 +22,26 @@ class OrgsController extends Controller
         return parent::beforeAction($action);
     }
 
-    /**
-     * @return Response
-     */
     public function actionGet($id): Response
     {
-        /** @var User|UserBehavior $currentUser */
-        $currentUser = Craft::$app->getUser()->getIdentity();
-        // return $this->asSuccess(data: $orgs->all());
+        /** @var UserQuery|UserQueryBehavior $query */
+        $query = User::find()->id($id);
+        $org = $query->isOrg(true)->one();
+
+        if (!$org) {
+            return $this->asFailure('Organization not found.');
+        }
+
+        return $this->asSuccess(data: $org->getAttributes());
+    }
+
+    public function actionGetOrders($id): Response
+    {
+        /** @var OrderQuery|OrderQueryBehavior $query */
+        $query = Order::find();
+        $orders = $query->orgId($id)->all();
+
+        return $this->asSuccess(data: $orders);
     }
 
     /**
@@ -39,7 +54,7 @@ class OrgsController extends Controller
         /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
 
-        $orgs = $currentUser->getOrgs()
+        $orgs = $currentUser->findOrgs()->collect()
             ->map(fn($org) => $org->getAttributes([
                 'id',
                 'displayName',

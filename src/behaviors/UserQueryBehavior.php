@@ -2,6 +2,7 @@
 
 namespace craftnet\behaviors;
 
+use craft\commerce\elements\db\OrderQuery;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\UserQuery;
 use craftnet\db\Table;
@@ -12,6 +13,8 @@ use yii\base\Behavior;
  */
 class UserQueryBehavior extends Behavior
 {
+    public ?bool $isOrg = null;
+
     /**
      * @inheritdoc
      */
@@ -20,6 +23,13 @@ class UserQueryBehavior extends Behavior
         return [
             ElementQuery::EVENT_BEFORE_PREPARE => 'beforePrepare',
         ];
+    }
+
+    public function isOrg(bool $isOrg): UserQuery
+    {
+        $this->isOrg = $isOrg;
+
+        return $this->owner;
     }
 
     /**
@@ -32,6 +42,7 @@ class UserQueryBehavior extends Behavior
         }
 
         $this->owner->query->addSelect([
+            '(orgs.id is not null) AS isOrg',
             'orgs.country',
             'orgs.stripeAccessToken',
             'orgs.stripeAccount',
@@ -49,5 +60,9 @@ class UserQueryBehavior extends Behavior
 
         $this->owner->query->leftJoin(['orgs' => Table::ORGS], '[[orgs.id]] = [[users.id]]');
         $this->owner->subQuery->leftJoin(['orgs' => Table::ORGS], '[[orgs.id]] = [[users.id]]');
+
+        if ($this->isOrg !== null) {
+            $this->owner->subQuery->andWhere($this->isOrg ? '[[orgs.id]] is not null' : '[[orgs.id]] is null');
+        }
     }
 }
