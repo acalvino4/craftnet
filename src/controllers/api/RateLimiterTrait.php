@@ -35,7 +35,7 @@ trait RateLimiterTrait
                             'limit' => App::env('API_RATE_LIMIT') ?: 1000,
                             'window' => App::env('API_RATE_LIMIT_WINDOW') ?: 3600,
 
-                            // Rate limit is per IP address per controller action
+                            // Rate limit is per user account per controller action
                             'identifier' => function(Context $context, $rateLimitId) {
                                 if (($userId = $context->getUser()->getId()) === null) {
                                     throw new UnauthorizedHttpException();
