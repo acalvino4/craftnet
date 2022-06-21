@@ -37,9 +37,7 @@ trait RateLimiterTrait
 
                             // Rate limit is per IP address per controller action
                             'identifier' => function(Context $context, $rateLimitId) {
-                                $userId = $context->getUser()->getId();
-
-                                if (!$userId) {
+                                if (($userId = $context->getUser()->getId()) === null) {
                                     throw new UnauthorizedHttpException();
                                 }
                                 return $rateLimitId.':'.$context->request->getPathInfo().':'.$userId;
