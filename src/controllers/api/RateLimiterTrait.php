@@ -12,7 +12,6 @@ use thamtech\ratelimiter\limit\RateLimitResult;
 use thamtech\ratelimiter\RateLimiter;
 use thamtech\ratelimiter\RateLimitsCheckedEvent;
 use yii\base\Component;
-use yii\web\UnauthorizedHttpException;
 
 /**
  * @mixin Component
@@ -35,12 +34,9 @@ trait RateLimiterTrait
                             'limit' => App::env('API_RATE_LIMIT') ?: 1000,
                             'window' => App::env('API_RATE_LIMIT_WINDOW') ?: 3600,
 
-                            // Rate limit is per user account per controller action
+                            // Rate limit is per IP address per controller action
                             'identifier' => function(Context $context, $rateLimitId) {
-                                if (($key = Craft::$app->getUser()->getId()) === null) {
-                                    $key = $context->request->getUserIP();
-                                }
-                                return $rateLimitId.':'.$context->request->getPathInfo().':'.$key;
+                                return $rateLimitId.':'.$context->request->getPathInfo().':'.$context->request->getUserIP();
                             },
                         ],
                     ],
