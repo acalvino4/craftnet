@@ -37,7 +37,7 @@ trait RateLimiterTrait
 
                             // Rate limit is per user account per controller action
                             'identifier' => function(Context $context, $rateLimitId) {
-                                if (($userId = $context->getUser()->getId()) === null) {
+                                if (($userId = Craft::$app->getUser()->getId()) === null) {
                                     throw new UnauthorizedHttpException();
                                 }
                                 return $rateLimitId.':'.$context->request->getPathInfo().':'.$userId;
