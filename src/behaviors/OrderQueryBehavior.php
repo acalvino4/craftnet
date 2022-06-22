@@ -3,6 +3,7 @@
 namespace craftnet\behaviors;
 
 use craft\commerce\elements\db\OrderQuery;
+use craft\commerce\elements\Order;
 use craft\elements\db\ElementQuery;
 use craftnet\db\Table;
 use yii\base\Behavior;
@@ -40,5 +41,10 @@ class OrderQueryBehavior extends Behavior
 
         $this->owner->subQuery->innerJoin(['orgs_orders' => Table::ORGS_ORDERS], '[[orgs_orders.id]] = [[commerce_orders.id]]');
         $this->owner->subQuery->andWhere(['orgs_orders.orgId' => $this->owner->orgId]);
+    }
+
+    public static function find(): OrderQuery|OrderQueryBehavior
+    {
+        return Order::find();
     }
 }

@@ -4,6 +4,7 @@ namespace craftnet\behaviors;
 
 use craft\elements\db\ElementQuery;
 use craft\elements\db\UserQuery;
+use craft\elements\User;
 use craftnet\db\Table;
 use yii\base\Behavior;
 
@@ -105,5 +106,10 @@ class UserQueryBehavior extends Behavior
                 ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.orgId]] = [[users.id]]')
                 ->andWhere(['orgs_members.userId' => $this->hasOrgMember]);
         }
+    }
+
+    public static function find(): UserQuery|UserQueryBehavior
+    {
+        return User::find();
     }
 }
