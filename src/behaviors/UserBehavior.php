@@ -4,23 +4,22 @@ namespace craftnet\behaviors;
 
 use Craft;
 use craft\base\Element;
-use craft\db\Query;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
+use craft\errors\InvalidFieldException;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
 use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
-use craftnet\Module;
-use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use DateTime;
-use Illuminate\Support\Collection;
+use Throwable;
 use yii\base\Behavior;
 use yii\base\Exception;
+use yii\base\Model;
 
 /**
  * The Org behavior extends users with plugin org-related features.
@@ -29,14 +28,13 @@ use yii\base\Exception;
  * @property FundsManager $fundsManager
  * @property User $owner
  * @property-read string $developerName
- * @property-read \craftnet\orgs\Org[] $orgs
- * @property-read \craftnet\partners\Partner $partner
+ * @property-read Partner $partner
  * @property Plugin[] $plugins
-= * @mixin CustomFieldBehavior
  */
 class UserBehavior extends Behavior
 {
     /**
+     * TODO: we can likely remove this, now that we have addresses
      * @var string|null
      */
     public ?string $country = null;
@@ -112,18 +110,13 @@ class UserBehavior extends Behavior
     public bool $isOrg = false;
 
     /**
-     * @var Collection|null
-     */
-    private ?Collection $_orgs = null;
-
-    /**
      * @inheritdoc
      */
     public function events(): array
     {
         return [
-            Element::EVENT_BEFORE_VALIDATE => [$this, 'beforeValidate'],
-            Element::EVENT_DEFINE_RULES => [$this, 'defineRules'],
+            Model::EVENT_BEFORE_VALIDATE => [$this, 'beforeValidate'],
+            \craft\base\Model::EVENT_DEFINE_RULES => [$this, 'defineRules'],
             Element::EVENT_BEFORE_SAVE => [$this, 'beforeSave'],
             Element::EVENT_AFTER_SAVE => [$this, 'afterSave'],
         ];
@@ -131,7 +124,7 @@ class UserBehavior extends Behavior
 
     /**
      * @return Partner
-     * @throws Exception if the partner element couldn't be created
+     * @throws Exception|Throwable
      */
     public function getPartner(): Partner
     {
@@ -145,7 +138,7 @@ class UserBehavior extends Behavior
             $partner = new Partner();
             $partner->ownerId = $this->owner->id;
             if (!Craft::$app->getElements()->saveElement($partner)) {
-                throw new Exception('Couldn\'t save partner: ' . implode(', ', $partner->getErrorSummary(true)));
+                throw new Exception("Couldn't save partner: " . implode(', ', $partner->getErrorSummary(true)));
             }
         }
 
@@ -155,6 +148,7 @@ class UserBehavior extends Behavior
     /**
      * @return string
      * TODO: remove
+     * @throws InvalidFieldException
      */
     public function getDeveloperName(): string
     {
@@ -175,6 +169,7 @@ class UserBehavior extends Behavior
             ->developerId($this->owner->id)
             ->status(null)
             ->all();
+
         return $this->_plugins = $plugins;
     }
 
@@ -198,6 +193,7 @@ class UserBehavior extends Behavior
      * Generates a new API token for the org.
      *
      * @return string the new API token
+     * @throws Exception
      */
     public function generateApiToken(): string
     {
@@ -214,7 +210,7 @@ class UserBehavior extends Behavior
      */
     public function beforeValidate(): void
     {
-        // Only set the PayPal email if we're saving the current user and they are an org
+        // Only set the PayPal email if we're saving the current user, and they are an org
         if (
             (Craft::$app->getRequest()->getIsCpRequest() || $this->owner->getIsCurrent()) &&
             $this->isOrg &&
@@ -270,13 +266,15 @@ class UserBehavior extends Behavior
      * Handles post-user-save stuff
      * Note: `enablePluginDeveloperFeatures` is not actually a field.
      * TODO: do we even need to worry about the developer group any longer?
+     * @throws \yii\db\Exception
+     * @throws Throwable
      */
     public function afterSave(): void
     {
         $request = Craft::$app->getRequest();
         $currentUser = Craft::$app->getUser()->getIdentity();
 
-        // If it's a front-end site POST request and they're not currently a developer, check to see if they've opted into developer features.
+        // If it's a front-end site POST request, and they're not currently a developer, check to see if they've opted into developer features.
         if (
             $currentUser &&
             $currentUser->id == $this->owner->id &&
@@ -308,6 +306,7 @@ class UserBehavior extends Behavior
 
     /**
      * Updates the org data.
+     * @throws \yii\db\Exception
      */
     public function saveOrgInfo(): void
     {
@@ -342,7 +341,7 @@ class UserBehavior extends Behavior
         return (bool)Craft::$app->getDb()->createCommand()
             ->upsert(Table::ORGS_MEMBERS, [
                 'orgId' => $this->owner->id,
-                'userId' => $user->owner->id,
+                'userId' => $user->id,
                 'admin' => true,
             ])
             ->execute();
@@ -377,6 +376,9 @@ class UserBehavior extends Behavior
         return $this->findOrgMembers()->andWhere(['orgs_members.admin' => true]);
     }
 
+    /**
+     * @throws Exception
+     */
     private function _requireOrg(): void
     {
         if (!$this->isOrg) {

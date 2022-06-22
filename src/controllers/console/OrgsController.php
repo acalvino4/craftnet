@@ -11,6 +11,7 @@ use craft\web\Controller;
 use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 class OrgsController extends Controller
@@ -22,26 +23,37 @@ class OrgsController extends Controller
         return parent::beforeAction($action);
     }
 
+    /**
+     * @throws ForbiddenHttpException
+     */
     public function actionGet($id): Response
     {
-        /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find()->id($id);
-        $org = $query->isOrg(true)->one();
-
-        if (!$org) {
-            return $this->asFailure('Organization not found.');
-        }
-
-        return $this->asSuccess(data: $org->getAttributes());
+        $org = $this->_getAllowedOrgById($id);
+        return $this->asSuccess(data: $org->getAttributes([
+            'id',
+            'displayName',
+        ]) + [
+            'photo' => $org->photo->getAttributes(['id', 'url']),
+        ]);
     }
 
+    /**
+     * @throws ForbiddenHttpException
+     */
     public function actionGetOrders($id): Response
     {
+        $org = $this->_getAllowedOrgById($id);
+
         /** @var OrderQuery|OrderQueryBehavior $query */
         $query = Order::find();
-        $orders = $query->orgId($id)->all();
+        $orders = $query->orgId($org->id)->collect()
+            ->map(fn(Order $order) => $order->getAttributes([
+                'id',
+                'number',
+                'dateOrdered',
+            ]));
 
-        return $this->asSuccess(data: $orders);
+        return $this->asSuccess(data: $orders->all());
     }
 
     /**
@@ -76,7 +88,7 @@ class OrgsController extends Controller
 
     public function actionLeaveOrg(): Response
     {
-        // can't leave if you are the sole admind
+        // can't leave if you are the sole admin
         return $this->asSuccess();
     }
 
@@ -112,4 +124,24 @@ class OrgsController extends Controller
     // opt-in plugin dev features?
     // developer support?
     // partner profile
+
+    /**
+     * Gets an org by id, ensuring the logged-in user has permission to do so.
+     * @throws ForbiddenHttpException
+     */
+    private function _getAllowedOrgById(int $id): User
+    {
+        /** @var User|UserBehavior $currentUser */
+        $currentUser = Craft::$app->getUser()->getIdentity();
+
+        /** @var UserQuery|UserQueryBehavior $query */
+        $query = $currentUser->findOrgs()->id($id);
+        $org = $query->one();
+
+        if (!$org) {
+            throw new ForbiddenHttpException();
+        }
+
+        return $org;
+    }
 }

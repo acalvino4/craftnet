@@ -18,7 +18,7 @@ class OrderQueryBehavior extends Behavior
     /**
      * @inheritdoc
      */
-    public function events()
+    public function events(): array
     {
         return [
             ElementQuery::EVENT_BEFORE_PREPARE => 'beforePrepare',
@@ -32,7 +32,7 @@ class OrderQueryBehavior extends Behavior
         return $this->owner;
     }
 
-    public function beforePrepare()
+    public function beforePrepare(): void
     {
         if (!$this->owner->orgId) {
             return;

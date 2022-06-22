@@ -2,7 +2,6 @@
 
 namespace craftnet\behaviors;
 
-use craft\commerce\elements\db\OrderQuery;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\UserQuery;
 use craftnet\db\Table;
@@ -18,7 +17,7 @@ class UserQueryBehavior extends Behavior
     /**
      * @inheritdoc
      */
-    public function events()
+    public function events(): array
     {
         return [
             ElementQuery::EVENT_BEFORE_PREPARE => 'beforePrepare',
@@ -35,7 +34,7 @@ class UserQueryBehavior extends Behavior
     /**
      * Prepares the user query.
      */
-    public function beforePrepare()
+    public function beforePrepare(): void
     {
         if ($this->owner->select === ['COUNT(*)']) {
             return;
