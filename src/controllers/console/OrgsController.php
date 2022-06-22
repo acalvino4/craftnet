@@ -11,6 +11,7 @@ use craft\web\Controller;
 use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
+use Throwable;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -29,12 +30,7 @@ class OrgsController extends Controller
     public function actionGet($id): Response
     {
         $org = $this->_getAllowedOrgById($id);
-        return $this->asSuccess(data: $org->getAttributes([
-            'id',
-            'displayName',
-        ]) + [
-            'photo' => $org->photo->getAttributes(['id', 'url']),
-        ]);
+        return $this->asSuccess(data: static::_transformOrg($org));
     }
 
     /**
@@ -67,29 +63,66 @@ class OrgsController extends Controller
         $currentUser = Craft::$app->getUser()->getIdentity();
 
         $orgs = $currentUser->findOrgs()->collect()
-            ->map(fn($org) => $org->getAttributes([
-                'id',
-                'displayName',
-            ]) + [
-                'photo' => $org->photo->getAttributes(['id', 'url']),
-            ]
-        );
+            ->map(fn($org) => static::_transformOrg($org));
 
         return $this->asSuccess(data: $orgs->all());
     }
 
-    public function actionNewOrg(): Response
+    /**
+     * @throws Throwable
+     * @throws ForbiddenHttpException
+     */
+    public function actionSaveOrg(): Response
     {
-        // orgs/create
-        // create an org user
-        // assign current user as admin
+        /** @var User|UserBehavior $currentUser */
+        $currentUser = Craft::$app->getUser()->getIdentity();
+        $orgValues = Craft::$app->getRequest()->getBodyParam('org', []);
+        $orgId = $orgValues['id'] ?? null;
+        $isNewOrg = !$orgId;
+
+        /** @var User|UserBehavior $org */
+        $org = $orgId ? $this->_getAllowedOrgById($orgId) : new User([
+            'isOrg' => true,
+        ]);
+
+        $org->setAttributes($orgValues);
+
+        if (!Craft::$app->getElements()->saveElement($org)) {
+            return $this->asModelFailure($org);
+        }
+
+        if ($isNewOrg) {
+            $org->addOrgAdmin($currentUser->id);
+        }
+
+        return $this->asModelSuccess($org);
+    }
+
+    /**
+     * @throws \yii\base\Exception
+     * @throws ForbiddenHttpException
+     */
+    public function actionRemoveMember($orgId, $memberId): Response
+    {
+        /** @var User|UserBehavior $org */
+        $org = $this->_getAllowedOrgById($orgId);
+        $org->removeOrgMember($memberId);
+
         return $this->asSuccess();
     }
 
-    public function actionLeaveOrg(): Response
+    /**
+     * @throws ForbiddenHttpException
+     * @throws \yii\base\Exception
+     */
+    public function actionGetMembers($orgId): Response
     {
-        // can't leave if you are the sole admin
-        return $this->asSuccess();
+        /** @var User|UserBehavior $org */
+        $org = $this->_getAllowedOrgById($orgId);
+        $members = $org->findOrgMembers()->collect()
+            ->map(fn($member) => $this->_transformUser($member));
+
+        return $this->asSuccess(data: $members->all());
     }
 
     // Convert your account to an organization
@@ -100,12 +133,6 @@ class OrgsController extends Controller
     // }
 
     public function actionInviteMemberToOrg(): Response
-    {
-        // require admin
-        return $this->asSuccess();
-    }
-
-    public function actionRemoveMember(): Response
     {
         // require admin
         return $this->asSuccess();
@@ -143,5 +170,22 @@ class OrgsController extends Controller
         }
 
         return $org;
+    }
+
+    private static function _transformUser(User $user): array
+    {
+        return $user->getAttributes([
+                'id',
+            ]) + [
+                'photo' => $user->photo?->getAttributes(['id', 'url']),
+            ];
+
+    }
+
+    private static function _transformOrg(User $user): array
+    {
+        return static::_transformUser($user) + $user->getAttributes([
+            'displayName',
+        ]);
     }
 }

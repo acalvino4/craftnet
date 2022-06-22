@@ -258,14 +258,6 @@ class Module extends \yii\base\Module
     }
 
     /**
-     * @return OrgsService
-     */
-    public function getOrgs(): OrgsService
-    {
-        return $this->get('orgs');
-    }
-
-    /**
      * @return CmsLicenseManager
      */
     public function getCmsLicenseManager(): CmsLicenseManager

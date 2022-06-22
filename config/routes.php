@@ -84,6 +84,10 @@ return [
         'GET     orgs/all' => 'craftnet/console/orgs/get-all',
         'GET     orgs/<id:\d+>' => 'craftnet/console/orgs/get',
         'GET     orgs/<id:\d+>/orders' => 'craftnet/console/orgs/get-orders',
+        'GET     orgs/<orgId:\d+>/members' => 'craftnet/console/orgs/get-members',
+        'POST    orgs/<orgId:\d+>/members' => 'craftnet/console/orgs/add-member',
+        'DELETE  orgs/<orgId:\d+>/members/<memberId:\d+>' => 'craftnet/console/orgs/remove-member',
+        'POST    orgs/save-org' => 'craftnet/console/orgs/save-org',
 
         'oauth/login' => 'oauth-server/oauth/login',
         'oauth/authorize' => 'oauth-server/oauth/authorize',

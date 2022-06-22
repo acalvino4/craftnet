@@ -229,6 +229,9 @@ class UserBehavior extends Behavior
     public function defineRules(DefineRulesEvent $event): void
     {
         $event->rules[] = ['payPalEmail', 'email'];
+        $event->rules[] = ['websiteUrl', 'url'];
+        $event->rules[] = [['displayName'], 'required'];
+        $event->rules[] = [['isOrg'], 'boolean'];
     }
 
     /**
@@ -313,67 +316,85 @@ class UserBehavior extends Behavior
         Craft::$app->getDb()->createCommand()
             ->upsert(Table::ORGS, [
                 'id' => $this->owner->id,
-            ], [
+                'displayName' => $this->displayName,
                 'country' => $this->country,
                 'stripeAccessToken' => $this->stripeAccessToken,
                 'stripeAccount' => $this->stripeAccount,
                 'payPalEmail' => $this->payPalEmail,
                 'apiToken' => $this->apiToken,
                 'websiteSlug' => $this->websiteSlug,
-                'displayName' => $this->displayName,
                 'websiteUrl' => $this->websiteUrl,
                 'location' => $this->location,
                 'supportPlan' => $this->supportPlan,
                 'supportPlanExpiryDate' => $this->supportPlanExpiryDate,
                 'enableDeveloperFeatures' => $this->enableDeveloperFeatures,
                 'enablePartnerFeatures' => $this->enablePartnerFeatures,
-            ], [], false)
+            ])
             ->execute();
     }
 
     /**
      * @throws Exception
      */
-    public function addOrgAdmin(User $user): bool
+    public function addOrgAdmin(int $userId): void
     {
         $this->_requireOrg();
 
-        return (bool)Craft::$app->getDb()->createCommand()
+        Craft::$app->getDb()->createCommand()
             ->upsert(Table::ORGS_MEMBERS, [
                 'orgId' => $this->owner->id,
-                'userId' => $user->id,
+                'userId' => $userId,
                 'admin' => true,
             ])
             ->execute();
     }
 
-    public function findOrgs(): UserQuery
+    /**
+     * @throws Exception
+     */
+    public function removeOrgMember(int $userId): void
     {
-        return User::find()
-            ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.orgId]] = [[users.id]]')
-            ->andWhere(['orgs_members.userId' => $this->owner->id]);
+        $this->_requireOrg();
+
+        if ($this->hasSoleAdmin($userId)) {
+            throw new Exception('Cannot remove the sole admin of an organization. Delete the organization instead.');
+        }
+
+        Craft::$app->getDb()->createCommand()
+            ->delete(Table::ORGS_MEMBERS, [
+                'orgId' => $this->owner->id,
+                'userId' => $userId,
+            ])
+            ->execute();
+    }
+
+    public function findOrgs(): UserQuery|UserQueryBehavior
+    {
+        /** @var UserQuery|UserQueryBehavior $query */
+        $query = User::find();
+        return $query->hasOrgMember($this->owner->id);
     }
 
     /**
      * @throws Exception
      */
-    public function findOrgMembers(): UserQuery
+    public function findOrgMembers(): UserQuery|UserQueryBehavior
     {
         $this->_requireOrg();
 
-        return User::find()
-            ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.userId]] = [[users.id]]')
-            ->andWhere(['orgs_members.orgId' => $this->owner->id]);
+        /** @var UserQuery|UserQueryBehavior $query */
+        $query = User::find();
+        return $query->memberOfOrg($this->owner->id);
     }
 
     /**
      * @throws Exception
      */
-    public function findOrgAdmins(): UserQuery
+    public function hasSoleAdmin(int $userId): bool
     {
-        $this->_requireOrg();
+        $adminIds = $this->findOrgMembers()->orgAdmin(true)->ids();
 
-        return $this->findOrgMembers()->andWhere(['orgs_members.admin' => true]);
+        return count($adminIds) <= 1 && in_array($userId, $adminIds, true);
     }
 
     /**

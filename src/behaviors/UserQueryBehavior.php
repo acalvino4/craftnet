@@ -13,6 +13,9 @@ use yii\base\Behavior;
 class UserQueryBehavior extends Behavior
 {
     public ?bool $isOrg = null;
+    public ?int $memberOfOrg = null;
+    public ?int $hasOrgMember = null;
+    public ?bool $orgAdmin = null;
 
     /**
      * @inheritdoc
@@ -24,9 +27,30 @@ class UserQueryBehavior extends Behavior
         ];
     }
 
-    public function isOrg(bool $isOrg): UserQuery
+    public function isOrg(bool $value): UserQuery
     {
-        $this->isOrg = $isOrg;
+        $this->isOrg = $value;
+
+        return $this->owner;
+    }
+
+    public function hasOrgMember(int $value): UserQuery
+    {
+        $this->hasOrgMember = $value;
+
+        return $this->owner;
+    }
+
+    public function memberOfOrg(int $value): UserQuery
+    {
+        $this->memberOfOrg = $value;
+
+        return $this->owner;
+    }
+
+    public function orgAdmin(bool $value): UserQuery
+    {
+        $this->orgAdmin = $value;
 
         return $this->owner;
     }
@@ -62,6 +86,24 @@ class UserQueryBehavior extends Behavior
 
         if ($this->isOrg !== null) {
             $this->owner->subQuery->andWhere($this->isOrg ? '[[orgs.id]] is not null' : '[[orgs.id]] is null');
+        }
+
+        if ($this->memberOfOrg !== null || $this->orgAdmin !== null) {
+            $this->owner->subQuery->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.userId]] = [[users.id]]');
+        }
+
+        if ($this->memberOfOrg !== null) {
+            $this->owner->subQuery->andWhere(['orgs_members.orgId' => $this->memberOfOrg]);
+        }
+
+        if ($this->orgAdmin !== null) {
+            $this->owner->subQuery->andWhere(['orgs_members.admin' => $this->orgAdmin]);
+        }
+
+        if ($this->hasOrgMember !== null) {
+            $this->owner->subQuery
+                ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.orgId]] = [[users.id]]')
+                ->andWhere(['orgs_members.userId' => $this->hasOrgMember]);
         }
     }
 }
