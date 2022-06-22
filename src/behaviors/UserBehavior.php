@@ -356,8 +356,8 @@ class UserBehavior extends Behavior
     {
         $this->_requireOrg();
 
-        if ($this->hasSoleAdmin($userId)) {
-            throw new Exception('Cannot remove the sole admin of an organization. Delete the organization instead.');
+        if ($this->hasSoleOrgAdmin($userId)) {
+            throw new Exception('Cannot remove the sole admin of an organization.');
         }
 
         Craft::$app->getDb()->createCommand()
@@ -368,31 +368,9 @@ class UserBehavior extends Behavior
             ->execute();
     }
 
-    public function findOrgs(): UserQuery|UserQueryBehavior
+    public function hasSoleOrgAdmin(int $userId): bool
     {
-        /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find();
-        return $query->hasOrgMember($this->owner->id);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function findOrgMembers(): UserQuery|UserQueryBehavior
-    {
-        $this->_requireOrg();
-
-        /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find();
-        return $query->memberOfOrg($this->owner->id);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function hasSoleAdmin(int $userId): bool
-    {
-        $adminIds = $this->findOrgMembers()->orgAdmin(true)->ids();
+        $adminIds = UserQueryBehavior::find()->memberOfOrg($this->owner->id)->orgAdmin(true)->ids();
 
         return count($adminIds) <= 1 && in_array($userId, $adminIds, true);
     }
