@@ -16,6 +16,7 @@ class UserQueryBehavior extends Behavior
     public ?bool $isOrg = null;
     public ?int $memberOfOrg = null;
     public ?int $hasOrgMember = null;
+    public ?int $hasOrgAdmin = null;
     public ?bool $orgAdmin = null;
 
     /**
@@ -38,6 +39,13 @@ class UserQueryBehavior extends Behavior
     public function hasOrgMember(?int $value): UserQuery|UserQueryBehavior
     {
         $this->hasOrgMember = $value;
+
+        return $this->owner;
+    }
+
+    public function hasOrgAdmin(?int $value): UserQuery|UserQueryBehavior
+    {
+        $this->hasOrgAdmin = $value;
 
         return $this->owner;
     }
@@ -101,10 +109,14 @@ class UserQueryBehavior extends Behavior
             $this->owner->subQuery->andWhere(['orgs_members.admin' => $this->orgAdmin]);
         }
 
-        if ($this->hasOrgMember !== null) {
+        if ($this->hasOrgMember !== null || $this->hasOrgAdmin !== null) {
             $this->owner->subQuery
                 ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.orgId]] = [[users.id]]')
                 ->andWhere(['orgs_members.userId' => $this->hasOrgMember]);
+        }
+
+        if ($this->hasOrgAdmin !== null) {
+            $this->owner->subQuery->andWhere(['orgs_members.userId' => $this->hasOrgMember]);
         }
     }
 

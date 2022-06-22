@@ -89,7 +89,7 @@ class OrgsController extends Controller
                     $this->stdout('done' . PHP_EOL);
 
                     $this->stdout("    > Adding admin user to org ... ");
-                    $existingUser->addOrgAdmin($orgAdmin->id);
+                    $existingUser->addOrgMember($orgAdmin->id, true);
                     $this->stdout('done' . PHP_EOL);
 
                     // TODO: Once this exists https://github.com/craftcms/commerce/pull/2801/files

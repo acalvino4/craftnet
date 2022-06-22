@@ -13,6 +13,7 @@ use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
 use Throwable;
 use yii\base\Exception;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -74,7 +75,7 @@ class OrgsController extends Controller
         $orgValues = Craft::$app->getRequest()->getBodyParam('org', []);
         $orgId = $orgValues['id'] ?? null;
         $isNewOrg = !$orgId;
-        $org = $orgId ? $this->_getAllowedOrgById($orgId) : new User([
+        $org = $orgId ? $this->_getAllowedOrgById($orgId, true) : new User([
             'isOrg' => true,
         ]);
 
@@ -85,7 +86,7 @@ class OrgsController extends Controller
         }
 
         if ($isNewOrg) {
-            $org->addOrgAdmin($currentUser->id);
+            $org->addOrgMember($currentUser->id, true);
         }
 
         return $this->asModelSuccess($org);
@@ -97,7 +98,7 @@ class OrgsController extends Controller
      */
     public function actionRemoveMember($orgId, $memberId): Response
     {
-        $org = $this->_getAllowedOrgById($orgId);
+        $org = $this->_getAllowedOrgById($orgId, true);
         $org->removeOrgMember($memberId);
 
         return $this->asSuccess();
@@ -110,15 +111,30 @@ class OrgsController extends Controller
     public function actionGetMembers($orgId): Response
     {
         /** @var User|UserBehavior $org */
-        $org = $this->_getAllowedOrgById($orgId);
-        $members = $org->findOrgMembers()->collect()
+        $org = $this->_getAllowedOrgById($orgId, true);
+        $members = UserQueryBehavior::find()->memberOfOrg($org->id)->collect()
             ->map(fn($member) => $this->_transformUser($member));
 
         return $this->asSuccess(data: $members->all());
     }
 
-    public function actionInviteMemberToOrg(): Response
+    /**
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     * @throws Exception
+     */
+    public function actionAddMember($orgId): Response
     {
+        $userId = Craft::$app->getRequest()->getRequiredBodyParam('userId');
+        $asAdmin = Craft::$app->getRequest()->getBodyParam('admin', false);
+        $org = $this->_getAllowedOrgById($orgId, true);
+
+        // $org = UserQueryBehavior::find()->hasOrgMember($currentUser->id)->id($id)->one();
+
+
+
+        $org->addOrgMember($userId, $asAdmin);
+
         // require admin
         return $this->asSuccess();
     }
@@ -141,11 +157,17 @@ class OrgsController extends Controller
      * Gets an org by id, ensuring the logged-in user has permission to do so.
      * @throws ForbiddenHttpException
      */
-    private function _getAllowedOrgById(int $id): User|UserBehavior
+    private function _getAllowedOrgById(int $id, bool $requireAdmin = false): User|UserBehavior
     {
+        /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
-        $org = UserQueryBehavior::find()->hasOrgMember($currentUser->id)->id($id)->one();
+        $query = UserQueryBehavior::find()->id($id)->hasOrgMember($currentUser->id);
 
+        if ($requireAdmin) {
+            $query->hasOrgAdmin($currentUser->id);
+        }
+
+        $org = $query->one();
         if (!$org) {
             throw new ForbiddenHttpException();
         }
