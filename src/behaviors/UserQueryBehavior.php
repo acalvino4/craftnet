@@ -27,28 +27,28 @@ class UserQueryBehavior extends Behavior
         ];
     }
 
-    public function isOrg(bool $value): UserQuery
+    public function isOrg(?bool $value): UserQuery
     {
         $this->isOrg = $value;
 
         return $this->owner;
     }
 
-    public function hasOrgMember(int $value): UserQuery
+    public function hasOrgMember(?int $value): UserQuery
     {
         $this->hasOrgMember = $value;
 
         return $this->owner;
     }
 
-    public function memberOfOrg(int $value): UserQuery
+    public function memberOfOrg(?int $value): UserQuery
     {
         $this->memberOfOrg = $value;
 
         return $this->owner;
     }
 
-    public function orgAdmin(bool $value): UserQuery
+    public function orgAdmin(?bool $value): UserQuery
     {
         $this->orgAdmin = $value;
 
