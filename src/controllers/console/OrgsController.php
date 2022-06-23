@@ -11,6 +11,7 @@ use craft\web\Controller;
 use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
+use craftnet\Module;
 use Throwable;
 use yii\base\Exception;
 use yii\web\BadRequestHttpException;
@@ -132,12 +133,21 @@ class OrgsController extends Controller
     public function actionAddMember($orgId): Response
     {
         $this->_requireOrgAdmin = true;
-        $userId = Craft::$app->getRequest()->getRequiredBodyParam('userId');
+        $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
         $asAdmin = Craft::$app->getRequest()->getBodyParam('admin', false);
         $org = $this->_getAllowedOrgById($orgId);
-        $org->addOrgMember($userId, $asAdmin);
+        $user = Craft::$app->getUsers()->ensureUserByEmail($email);
+        $org->addOrgMember($user->id, $asAdmin);
 
-        // require admin
+        Craft::$app->getMailer()
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_INVITE, [
+                'user' => $user,
+                'inviter' => Craft::$app->getUser()->getIdentity(),
+                'org' => $org,
+            ])
+            ->setTo($email)
+            ->send();
+
         return $this->asSuccess();
     }
 
@@ -161,7 +171,6 @@ class OrgsController extends Controller
      */
     private function _getAllowedOrgById(int $id): User|UserBehavior
     {
-        /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
         $query = UserQueryBehavior::find()->id($id);
 

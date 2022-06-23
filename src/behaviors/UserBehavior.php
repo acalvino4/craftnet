@@ -337,7 +337,7 @@ class UserBehavior extends Behavior
     /**
      * @throws Exception
      */
-    public function addOrgMember(int $userId, $admin = false): void
+    public function addOrgMember(int $userId, $asAdmin = false): void
     {
         $this->_requireOrg();
 
@@ -345,7 +345,7 @@ class UserBehavior extends Behavior
             ->upsert(Table::ORGS_MEMBERS, [
                 'orgId' => $this->owner->id,
                 'userId' => $userId,
-                'admin' => $admin,
+                'admin' => $asAdmin,
             ])
             ->execute();
     }

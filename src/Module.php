@@ -95,6 +95,7 @@ class Module extends \yii\base\Module
     const MESSAGE_KEY_LICENSE_NOTIFICATION = 'license_notification';
     const MESSAGE_KEY_LICENSE_TRANSFER = 'license_transfer';
     const MESSAGE_KEY_SECURITY_ALERT = 'security_alert';
+    const MESSAGE_KEY_ORG_INVITE = 'org_invite';
 
     /**
      * @inheritdoc
@@ -183,6 +184,12 @@ class Module extends \yii\base\Module
                 'heading' => 'When a critical update is available:',
                 'subject' => 'Urgent: You must update {{ name }} now',
                 'body' => file_get_contents(__DIR__ . '/emails/security_alert.md'),
+            ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_INVITE,
+                'heading' => 'When a member is invited to join an org.',
+                'subject' => '{{ inviter.friendlyName }} has invited you to join the {{ org.displayName }} organization',
+                'body' => file_get_contents(__DIR__ . '/emails/org_invite.md'),
             ]);
         });
 
