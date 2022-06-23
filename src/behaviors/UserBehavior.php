@@ -20,6 +20,7 @@ use Throwable;
 use yii\base\Behavior;
 use yii\base\Exception;
 use yii\base\Model;
+use yii\base\UserException;
 
 /**
  * The Org behavior extends users with plugin org-related features.
@@ -356,8 +357,8 @@ class UserBehavior extends Behavior
     {
         $this->_requireOrg();
 
-        if ($this->hasSoleOrgAdmin($userId)) {
-            throw new Exception('Cannot remove the sole admin of an organization.');
+        if ($this->_hasSoleAdmin($userId)) {
+            throw new UserException('Organizations must have at least one admin.');
         }
 
         Craft::$app->getDb()->createCommand()
@@ -368,13 +369,6 @@ class UserBehavior extends Behavior
             ->execute();
     }
 
-    public function hasSoleOrgAdmin(int $userId): bool
-    {
-        $adminIds = UserQueryBehavior::find()->orgMemberOf($this->owner->id)->orgAdmin(true)->ids();
-
-        return count($adminIds) <= 1 && in_array($userId, $adminIds, true);
-    }
-
     /**
      * @throws Exception
      */
@@ -383,5 +377,12 @@ class UserBehavior extends Behavior
         if (!$this->isOrg) {
             throw new Exception('User is not an organization.');
         }
+    }
+
+    private function _hasSoleAdmin(int $userId)
+    {
+        $orgAdmins = UserQueryBehavior::find()->orgMemberOf($this->owner->id)->orgAdmin(true);
+
+        return $orgAdmins->count() < 2 && in_array($userId, $orgAdmins->ids(), true);
     }
 }

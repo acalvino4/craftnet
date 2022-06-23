@@ -14,10 +14,13 @@ use yii\base\Behavior;
 class UserQueryBehavior extends Behavior
 {
     public ?bool $isOrg = null;
+    public ?bool $orgAdmin = null;
     public ?int $orgMemberOf = null;
     public ?int $hasOrgMember = null;
     public ?int $hasOrgAdmin = null;
-    public ?bool $orgAdmin = null;
+
+    private bool $_joinMembers = false;
+    private bool $_joinMembersByOrg = false;
 
     /**
      * @inheritdoc
@@ -69,10 +72,6 @@ class UserQueryBehavior extends Behavior
      */
     public function beforePrepare(): void
     {
-        if ($this->owner->select === ['COUNT(*)']) {
-            return;
-        }
-
         $this->owner->query->addSelect([
             '(orgs.id is not null) AS isOrg',
             'orgs.country',
@@ -97,26 +96,35 @@ class UserQueryBehavior extends Behavior
             $this->owner->subQuery->andWhere($this->isOrg ? '[[orgs.id]] is not null' : '[[orgs.id]] is null');
         }
 
-        if ($this->orgMemberOf !== null || $this->orgAdmin !== null) {
-            $this->owner->subQuery->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.userId]] = [[users.id]]');
-        }
-
         if ($this->orgMemberOf !== null) {
-            $this->owner->subQuery->andWhere(['orgs_members.orgId' => $this->orgMemberOf]);
+            $this->_joinMembers = true;
+            $this->owner->subQuery->andWhere(['orgsMembers.orgId' => $this->orgMemberOf]);
         }
 
         if ($this->orgAdmin !== null) {
-            $this->owner->subQuery->andWhere(['orgs_members.admin' => $this->orgAdmin]);
+            $this->_joinMembers = true;
+            $this->owner->subQuery->andWhere(['orgsMembers.admin' => $this->orgAdmin]);
         }
 
-        if ($this->hasOrgMember !== null || $this->hasOrgAdmin !== null) {
-            $this->owner->subQuery
-                ->innerJoin(['orgs_members' => Table::ORGS_MEMBERS], '[[orgs_members.orgId]] = [[users.id]]')
-                ->andWhere(['orgs_members.userId' => $this->hasOrgMember]);
+        if ($this->hasOrgMember !== null) {
+            $this->_joinMembersByOrg = true;
+            $this->owner->subQuery->andWhere(['orgsMembersByOrg.userId' => $this->hasOrgMember]);
         }
 
         if ($this->hasOrgAdmin !== null) {
-            $this->owner->subQuery->andWhere(['orgs_members.userId' => $this->hasOrgMember]);
+            $this->_joinMembersByOrg = true;
+            $this->owner->subQuery->andWhere([
+                'orgsMembersByOrg.userId' => $this->hasOrgAdmin,
+                'orgsMembersByOrg.admin' => true,
+            ]);
+        }
+
+        if ($this->_joinMembers) {
+            $this->owner->subQuery->innerJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.userId]] = [[users.id]]');
+        }
+
+        if ($this->_joinMembersByOrg) {
+            $this->owner->subQuery->innerJoin(['orgsMembersByOrg' => Table::ORGS_MEMBERS], '[[orgsMembersByOrg.orgId]] = [[users.id]]');
         }
     }
 

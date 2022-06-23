@@ -19,6 +19,8 @@ use yii\web\Response;
 
 class OrgsController extends Controller
 {
+    private bool $_requireOrgAdmin = false;
+
     public function beforeAction($action): bool
     {
         $this->requireAcceptsJson();
@@ -71,11 +73,12 @@ class OrgsController extends Controller
      */
     public function actionSaveOrg(): Response
     {
+        $this->_requireOrgAdmin = true;
         $currentUser = Craft::$app->getUser()->getIdentity();
         $orgValues = Craft::$app->getRequest()->getBodyParam('org', []);
         $orgId = $orgValues['id'] ?? null;
         $isNewOrg = !$orgId;
-        $org = $orgId ? $this->_getAllowedOrgById($orgId, true) : new User([
+        $org = $orgId ? $this->_getAllowedOrgById($orgId) : new User([
             'isOrg' => true,
         ]);
 
@@ -98,10 +101,11 @@ class OrgsController extends Controller
      */
     public function actionRemoveMember($orgId, $memberId): Response
     {
-        $org = $this->_getAllowedOrgById($orgId, true);
+        $this->_requireOrgAdmin = true;
+        $org = $this->_getAllowedOrgById($orgId);
         $org->removeOrgMember($memberId);
 
-        return $this->asSuccess();
+        return $this->asSuccess('Member removed.');
     }
 
     /**
@@ -111,9 +115,11 @@ class OrgsController extends Controller
     public function actionGetMembers($orgId): Response
     {
         /** @var User|UserBehavior $org */
-        $org = $this->_getAllowedOrgById($orgId, true);
+        $org = $this->_getAllowedOrgById($orgId);
         $members = UserQueryBehavior::find()->orgMemberOf($org->id)->collect()
-            ->map(fn($member) => $this->_transformUser($member));
+            ->map(fn($member) => $this->_transformMember($member) + [
+                'orgAdmin' => UserQueryBehavior::find()->id($org->id)->hasOrgAdmin($member->id)->exists(),
+            ]);
 
         return $this->asSuccess(data: $members->all());
     }
@@ -125,14 +131,10 @@ class OrgsController extends Controller
      */
     public function actionAddMember($orgId): Response
     {
+        $this->_requireOrgAdmin = true;
         $userId = Craft::$app->getRequest()->getRequiredBodyParam('userId');
         $asAdmin = Craft::$app->getRequest()->getBodyParam('admin', false);
-        $org = $this->_getAllowedOrgById($orgId, true);
-
-        // $org = UserQueryBehavior::find()->hasOrgMember($currentUser->id)->id($id)->one();
-
-
-
+        $org = $this->_getAllowedOrgById($orgId);
         $org->addOrgMember($userId, $asAdmin);
 
         // require admin
@@ -157,14 +159,16 @@ class OrgsController extends Controller
      * Gets an org by id, ensuring the logged-in user has permission to do so.
      * @throws ForbiddenHttpException
      */
-    private function _getAllowedOrgById(int $id, bool $requireAdmin = false): User|UserBehavior
+    private function _getAllowedOrgById(int $id): User|UserBehavior
     {
         /** @var User|UserBehavior $currentUser */
         $currentUser = Craft::$app->getUser()->getIdentity();
-        $query = UserQueryBehavior::find()->id($id)->hasOrgMember($currentUser->id);
+        $query = UserQueryBehavior::find()->id($id);
 
-        if ($requireAdmin) {
+        if ($this->_requireOrgAdmin) {
             $query->hasOrgAdmin($currentUser->id);
+        } else {
+            $query->hasOrgMember($currentUser->id);
         }
 
         $org = $query->one();
@@ -175,7 +179,7 @@ class OrgsController extends Controller
         return $org;
     }
 
-    private static function _transformUser(User $user): array
+    private static function _transformMember(User $user): array
     {
         return $user->getAttributes([
                 'id',
@@ -187,7 +191,7 @@ class OrgsController extends Controller
 
     private static function _transformOrg(User $user): array
     {
-        return static::_transformUser($user) + $user->getAttributes([
+        return static::_transformMember($user) + $user->getAttributes([
             'displayName',
         ]);
     }
