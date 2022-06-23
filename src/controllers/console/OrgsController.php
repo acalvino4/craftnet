@@ -112,7 +112,7 @@ class OrgsController extends Controller
     {
         /** @var User|UserBehavior $org */
         $org = $this->_getAllowedOrgById($orgId, true);
-        $members = UserQueryBehavior::find()->memberOfOrg($org->id)->collect()
+        $members = UserQueryBehavior::find()->orgMemberOf($org->id)->collect()
             ->map(fn($member) => $this->_transformUser($member));
 
         return $this->asSuccess(data: $members->all());

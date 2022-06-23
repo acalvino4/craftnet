@@ -370,7 +370,7 @@ class UserBehavior extends Behavior
 
     public function hasSoleOrgAdmin(int $userId): bool
     {
-        $adminIds = UserQueryBehavior::find()->memberOfOrg($this->owner->id)->orgAdmin(true)->ids();
+        $adminIds = UserQueryBehavior::find()->orgMemberOf($this->owner->id)->orgAdmin(true)->ids();
 
         return count($adminIds) <= 1 && in_array($userId, $adminIds, true);
     }
