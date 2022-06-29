@@ -4,14 +4,16 @@ namespace craftnet\console\controllers;
 
 use Craft;
 use craft\commerce\elements\Order;
+use craft\commerce\Plugin as Commerce;
+use craft\db\Query;
 use craft\elements\User;
+use craft\helpers\Console;
 use craft\i18n\Formatter;
 use craftnet\behaviors\UserBehavior;
 use craftnet\Module;
 use craftnet\plugins\Plugin;
 use yii\console\Controller;
 use yii\console\ExitCode;
-use yii\helpers\Console;
 
 /**
  * Show information about accounts
@@ -64,6 +66,35 @@ class AccountsController extends Controller
         $this->cmsLicenses($user);
         $this->pluginLicenses($user);
         $this->plugins($user);
+
+        return ExitCode::OK;
+    }
+
+    public function actionReconcileOrphanedOrders(): int
+    {
+        (new Query())
+            ->select('*')
+            ->from(['{{%craftnet_user_order_email_mismatch}}'])
+            ->collect()
+            ->each(function(array $row) : void {
+                if (!$userByOrderEmail = Craft::$app->getUsers()->getUserByUsernameOrEmail($row['order_email'])) {
+                    $this->stderr("User not found: $userByOrderEmail->email. Blame Nate." . PHP_EOL, Console::FG_RED);
+                    return;
+                }
+                if (!$userByUserEmail = Craft::$app->getUsers()->getUserByUsernameOrEmail($row['user_email'])) {
+                    $this->stderr("User not found: $userByUserEmail->email. Blame Nate." . PHP_EOL, Console::FG_RED);
+                    return;
+                }
+
+                if (!$userByOrderEmail->isCredentialed && $userByUserEmail->isCredentialed) {
+                    $this->stdout("Transferring Commerce data from #$userByOrderEmail->id to #$userByUserEmail->id ... ", Console::FG_CYAN);
+                    if (Commerce::getInstance()->getCustomers()->transferCustomerData($userByOrderEmail, $userByUserEmail)) {
+                        $this->stdout('done' . PHP_EOL, Console::FG_GREEN);
+                        return;
+                    }
+                    $this->stderr('failed' . PHP_EOL, Console::FG_RED);
+                }
+            });
 
         return ExitCode::OK;
     }
