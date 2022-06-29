@@ -72,30 +72,34 @@ class AccountsController extends Controller
 
     public function actionReconcileOrphanedOrders(): int
     {
-        (new Query())
+        $converted = (new Query())
             ->select('*')
             ->from(['{{%craftnet_user_order_email_mismatch}}'])
             ->collect()
-            ->each(function(array $row) : void {
+            ->map(function(array $row) : ?array {
                 if (!$userByOrderEmail = Craft::$app->getUsers()->getUserByUsernameOrEmail($row['order_email'])) {
-                    $this->stderr("User not found: $userByOrderEmail->email. Blame Nate." . PHP_EOL, Console::FG_RED);
-                    return;
+                    $this->stderr("User not found: {$row['order_email']}." . PHP_EOL, Console::FG_RED);
+                    return null;
                 }
                 if (!$userByUserEmail = Craft::$app->getUsers()->getUserByUsernameOrEmail($row['user_email'])) {
-                    $this->stderr("User not found: $userByUserEmail->email. Blame Nate." . PHP_EOL, Console::FG_RED);
-                    return;
+                    $this->stderr("User not found: {$row['user_email']}." . PHP_EOL, Console::FG_RED);
+                    return null;
                 }
 
                 if (!$userByOrderEmail->isCredentialed && $userByUserEmail->isCredentialed) {
                     $this->stdout("Transferring Commerce data from #$userByOrderEmail->id to #$userByUserEmail->id ... ", Console::FG_CYAN);
                     if (Commerce::getInstance()->getCustomers()->transferCustomerData($userByOrderEmail, $userByUserEmail)) {
                         $this->stdout('done' . PHP_EOL, Console::FG_GREEN);
-                        return;
+                        return $row;
                     }
                     $this->stderr('failed' . PHP_EOL, Console::FG_RED);
                 }
-            });
 
+                return null;
+            })
+            ->filter();
+
+        $this->stdout(PHP_EOL . "Transferred Commerce data for {$converted->count()} users." . PHP_EOL, Console::FG_GREEN);
         return ExitCode::OK;
     }
 
