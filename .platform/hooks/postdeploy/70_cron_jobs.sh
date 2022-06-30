@@ -6,4 +6,4 @@ mkdir -p /home/webapp ; chown -R webapp:webapp /home/webapp
 # Create CRON files
 
 # After the deployment finishes, set up a Crontab for craftnet
-echo "* * * * * webapp source /opt/elasticbeanstalk/deployment/envvars && php /var/app/current/craft 1>> /dev/null 2>&1"\"" " | sudo tee /etc/cron.d/craftnet
+echo "* * * * * webapp source /opt/elasticbeanstalk/deployment/envvars && php /var/app/current/craft 1>> /dev/null 2>&1" | sudo tee /etc/cron.d/craftnet
