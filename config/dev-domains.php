@@ -31,6 +31,7 @@ return [
     'ddev.site',
     'deltablue.io',
     'designandbuildsandbox.com',
+    'destinationcore.io',
     'development-client-server.com',
     'devhandle.com',
     'devprevu.com',
