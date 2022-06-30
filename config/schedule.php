@@ -39,9 +39,9 @@ $deliveryEmail = 'devops@pixelandtonic.com';
     //->sendOutputTo('/var/www/html/cron/plugins-update-issue-stats.log');
 //->emailOutputTo([$deliveryEmail]);
 
-$schedule->command('date | tee -a /var/app/current/time.log')
+$schedule->command('help')
     ->everyMinute()
-    ->withoutOverlapping();
-    //->sendOutputTo('/var/app/current/cron/plugins-update-issue-stats.log')
+    ->withoutOverlapping()
+    ->sendOutputTo('/var/app/current/cron/plugins-update-issue-stats.log');
     //->sendOutputTo('/var/www/html/cron/plugins-update-issue-stats.log');
     //->emailOutputTo([$deliveryEmail]);
