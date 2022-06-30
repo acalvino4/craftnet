@@ -27,11 +27,11 @@ $deliveryEmail = 'devops@pixelandtonic.com';
 //    ->sendOutputTo('/var/app/current/cron/packages-update-deps.log')
 //    ->emailOutputTo([$deliveryEmail]);
 //
-//$schedule->command('craftnet/plugins/update-install-counts')
-//    ->daily()
-//    ->withoutOverlapping()
-//    ->sendOutputTo('/var/app/current/cron/plugins-update-install-counts.log')
-//    ->emailOutputTo([$deliveryEmail]);
+$schedule->command('craftnet/plugins/update-install-counts')
+    ->everyMinute()
+    ->withoutOverlapping()
+    ->sendOutputTo('/var/app/current/cron/plugins-update-install-counts.log')
+    ->emailOutputTo([$deliveryEmail]);
 
 //$schedule->command('craftnet/plugins/update-issue-stats')
     //->withoutOverlapping()
@@ -39,9 +39,9 @@ $deliveryEmail = 'devops@pixelandtonic.com';
     //->sendOutputTo('/var/www/html/cron/plugins-update-issue-stats.log');
 //->emailOutputTo([$deliveryEmail]);
 
-$schedule->command('help')
-    ->everyMinute()
-    ->withoutOverlapping()
-    ->sendOutputTo('/var/app/current/cron/plugins-update-issue-stats.log');
+//$schedule->command('help')
+//    ->everyMinute()
+//    ->withoutOverlapping()
+//    ->sendOutputTo('/var/app/current/cron/plugins-update-issue-stats.log');
     //->sendOutputTo('/var/www/html/cron/plugins-update-issue-stats.log');
     //->emailOutputTo([$deliveryEmail]);
