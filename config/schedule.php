@@ -1,7 +1,9 @@
 <?php
 
 // Only run scheduled jobs on production
-if (!defined('CRAFT_ENVIRONMENT') || CRAFT_ENVIRONMENT !== 'prod') {
+use craft\helpers\App;
+
+if (App::env('CRAFT_ENVIRONMENT') !== 'prod') {
     return;
 }
 
