@@ -4,22 +4,23 @@ namespace craftnet\behaviors;
 
 use Craft;
 use craft\base\Element;
-use craft\db\Query;
+use craft\elements\db\UserQuery;
 use craft\elements\User;
+use craft\errors\InvalidFieldException;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
 use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
-use craftnet\Module;
-use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use DateTime;
-use Illuminate\Support\Collection;
+use Throwable;
 use yii\base\Behavior;
 use yii\base\Exception;
+use yii\base\Model;
+use yii\base\UserException;
 
 /**
  * The Org behavior extends users with plugin org-related features.
@@ -28,15 +29,13 @@ use yii\base\Exception;
  * @property FundsManager $fundsManager
  * @property User $owner
  * @property-read string $developerName
- * @property-read \craftnet\orgs\Org[] $orgs
- * @property-read \craftnet\partners\Partner $partner
+ * @property-read Partner $partner
  * @property Plugin[] $plugins
- * @property bool $isOrg
- * @mixin CustomFieldBehavior
  */
 class UserBehavior extends Behavior
 {
     /**
+     * TODO: we can likely remove this, now that we have addresses
      * @var string|null
      */
     public ?string $country = null;
@@ -109,12 +108,7 @@ class UserBehavior extends Behavior
     /**
      * @var bool
      */
-    private bool $_isOrg;
-
-    /**
-     * @var Collection|null
-     */
-    private ?Collection $_orgs = null;
+    public bool $isOrg = false;
 
     /**
      * @inheritdoc
@@ -122,8 +116,8 @@ class UserBehavior extends Behavior
     public function events(): array
     {
         return [
-            Element::EVENT_BEFORE_VALIDATE => [$this, 'beforeValidate'],
-            Element::EVENT_DEFINE_RULES => [$this, 'defineRules'],
+            Model::EVENT_BEFORE_VALIDATE => [$this, 'beforeValidate'],
+            \craft\base\Model::EVENT_DEFINE_RULES => [$this, 'defineRules'],
             Element::EVENT_BEFORE_SAVE => [$this, 'beforeSave'],
             Element::EVENT_AFTER_SAVE => [$this, 'afterSave'],
         ];
@@ -131,7 +125,7 @@ class UserBehavior extends Behavior
 
     /**
      * @return Partner
-     * @throws Exception if the partner element couldn't be created
+     * @throws Exception|Throwable
      */
     public function getPartner(): Partner
     {
@@ -145,7 +139,7 @@ class UserBehavior extends Behavior
             $partner = new Partner();
             $partner->ownerId = $this->owner->id;
             if (!Craft::$app->getElements()->saveElement($partner)) {
-                throw new Exception('Couldn\'t save partner: ' . implode(', ', $partner->getErrorSummary(true)));
+                throw new Exception("Couldn't save partner: " . implode(', ', $partner->getErrorSummary(true)));
             }
         }
 
@@ -155,6 +149,7 @@ class UserBehavior extends Behavior
     /**
      * @return string
      * TODO: remove
+     * @throws InvalidFieldException
      */
     public function getDeveloperName(): string
     {
@@ -175,6 +170,7 @@ class UserBehavior extends Behavior
             ->developerId($this->owner->id)
             ->status(null)
             ->all();
+
         return $this->_plugins = $plugins;
     }
 
@@ -198,6 +194,7 @@ class UserBehavior extends Behavior
      * Generates a new API token for the org.
      *
      * @return string the new API token
+     * @throws Exception
      */
     public function generateApiToken(): string
     {
@@ -214,7 +211,7 @@ class UserBehavior extends Behavior
      */
     public function beforeValidate(): void
     {
-        // Only set the PayPal email if we're saving the current user and they are an org
+        // Only set the PayPal email if we're saving the current user, and they are an org
         if (
             (Craft::$app->getRequest()->getIsCpRequest() || $this->owner->getIsCurrent()) &&
             $this->isOrg &&
@@ -233,6 +230,9 @@ class UserBehavior extends Behavior
     public function defineRules(DefineRulesEvent $event): void
     {
         $event->rules[] = ['payPalEmail', 'email'];
+        $event->rules[] = ['websiteUrl', 'url'];
+        $event->rules[] = [['displayName'], 'required'];
+        $event->rules[] = [['isOrg'], 'boolean'];
     }
 
     /**
@@ -270,13 +270,15 @@ class UserBehavior extends Behavior
      * Handles post-user-save stuff
      * Note: `enablePluginDeveloperFeatures` is not actually a field.
      * TODO: do we even need to worry about the developer group any longer?
+     * @throws \yii\db\Exception
+     * @throws Throwable
      */
     public function afterSave(): void
     {
         $request = Craft::$app->getRequest();
         $currentUser = Craft::$app->getUser()->getIdentity();
 
-        // If it's a front-end site POST request and they're not currently a developer, check to see if they've opted into developer features.
+        // If it's a front-end site POST request, and they're not currently a developer, check to see if they've opted into developer features.
         if (
             $currentUser &&
             $currentUser->id == $this->owner->id &&
@@ -308,71 +310,26 @@ class UserBehavior extends Behavior
 
     /**
      * Updates the org data.
+     * @throws \yii\db\Exception
      */
     public function saveOrgInfo(): void
     {
         Craft::$app->getDb()->createCommand()
             ->upsert(Table::ORGS, [
                 'id' => $this->owner->id,
-            ], [
+                'displayName' => $this->displayName,
                 'country' => $this->country,
                 'stripeAccessToken' => $this->stripeAccessToken,
                 'stripeAccount' => $this->stripeAccount,
                 'payPalEmail' => $this->payPalEmail,
                 'apiToken' => $this->apiToken,
                 'websiteSlug' => $this->websiteSlug,
-                'displayName' => $this->displayName,
                 'websiteUrl' => $this->websiteUrl,
                 'location' => $this->location,
                 'supportPlan' => $this->supportPlan,
                 'supportPlanExpiryDate' => $this->supportPlanExpiryDate,
                 'enableDeveloperFeatures' => $this->enableDeveloperFeatures,
                 'enablePartnerFeatures' => $this->enablePartnerFeatures,
-            ], [], false)
-            ->execute();
-    }
-
-    /**
-     * @return bool
-     */
-    public function getIsOrg(): bool
-    {
-        $this->_isOrg = $this->_isOrg ?? (new Query())
-                ->from(Table::ORGS)
-                ->where(['id' => $this->owner->id])
-                ->exists();
-
-        return $this->_isOrg;
-    }
-
-    public function setIsOrg(bool $isOrg): void
-    {
-        $this->_isOrg = $isOrg;
-    }
-
-    public function getOrgs(): Collection
-    {
-        if ($this->_orgs !== null) {
-            return $this->_orgs;
-        }
-
-        $this->_orgs = Module::getInstance()?->getOrgs()->getOrgsByMemberUserId($this->owner->id);
-
-        return $this->_orgs;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function addOrgAdmin(User $user): bool
-    {
-        $this->_requireOrg();
-
-        return (bool)Craft::$app->getDb()->createCommand()
-            ->upsert(Table::ORGS_MEMBERS, [
-                'orgId' => $this->owner->id,
-                'userId' => $user->owner->id,
-                'admin' => true,
             ])
             ->execute();
     }
@@ -380,37 +337,52 @@ class UserBehavior extends Behavior
     /**
      * @throws Exception
      */
-    public function getOrgMemberIds(): array
+    public function addOrgMember(int $userId, $asAdmin = false): void
     {
         $this->_requireOrg();
 
-        return $this->_createOrgMemberIdsQuery()->column();
+        Craft::$app->getDb()->createCommand()
+            ->upsert(Table::ORGS_MEMBERS, [
+                'orgId' => $this->owner->id,
+                'userId' => $userId,
+                'admin' => $asAdmin,
+            ])
+            ->execute();
     }
 
     /**
      * @throws Exception
      */
-    public function getOrgAdminIds(): array
+    public function removeOrgMember(int $userId): void
     {
         $this->_requireOrg();
 
-        return $this->_createOrgMemberIdsQuery()
-            ->andWhere(['admin' => true])
-            ->column();
+        if ($this->_hasSoleAdmin($userId)) {
+            throw new UserException('Organizations must have at least one admin.');
+        }
+
+        Craft::$app->getDb()->createCommand()
+            ->delete(Table::ORGS_MEMBERS, [
+                'orgId' => $this->owner->id,
+                'userId' => $userId,
+            ])
+            ->execute();
     }
 
-    private function _createOrgMemberIdsQuery(): Query
-    {
-        return (new Query())
-            ->select(['userId'])
-            ->from(Table::ORGS_MEMBERS)
-            ->where(['orgId' => $this->owner->id]);
-    }
-
+    /**
+     * @throws Exception
+     */
     private function _requireOrg(): void
     {
         if (!$this->isOrg) {
-            throw new Exception('User is not an org.');
+            throw new Exception('User is not an organization.');
         }
+    }
+
+    private function _hasSoleAdmin(int $userId)
+    {
+        $orgAdmins = UserQueryBehavior::find()->orgMemberOf($this->owner->id)->orgAdmin(true);
+
+        return $orgAdmins->count() < 2 && in_array($userId, $orgAdmins->ids(), true);
     }
 }

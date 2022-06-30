@@ -3,6 +3,7 @@
 namespace craftnet;
 
 use Craft;
+use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\events\MatchLineItemEvent;
 use craft\commerce\events\PdfEvent;
@@ -48,6 +49,7 @@ use craft\web\View;
 use craftnet\behaviors\AssetBehavior;
 use craftnet\behaviors\DiscountBehavior;
 use craftnet\behaviors\OrderBehavior;
+use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\cms\CmsEdition;
@@ -93,6 +95,7 @@ class Module extends \yii\base\Module
     const MESSAGE_KEY_LICENSE_NOTIFICATION = 'license_notification';
     const MESSAGE_KEY_LICENSE_TRANSFER = 'license_transfer';
     const MESSAGE_KEY_SECURITY_ALERT = 'security_alert';
+    const MESSAGE_KEY_ORG_INVITE = 'org_invite';
 
     /**
      * @inheritdoc
@@ -107,6 +110,9 @@ class Module extends \yii\base\Module
         });
         Event::on(UserQuery::class, UserQuery::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
             $e->behaviors['cn.userQuery'] = UserQueryBehavior::class;
+        });
+        Event::on(OrderQuery::class, OrderQuery::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
+            $e->behaviors['cn.orderQuery'] = OrderQueryBehavior::class;
         });
         Event::on(User::class, User::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
             $e->behaviors['cn.user'] = UserBehavior::class;
@@ -179,6 +185,12 @@ class Module extends \yii\base\Module
                 'subject' => 'Urgent: You must update {{ name }} now',
                 'body' => file_get_contents(__DIR__ . '/emails/security_alert.md'),
             ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_INVITE,
+                'heading' => 'When a member is invited to join an org.',
+                'subject' => '{{ inviter.friendlyName }} has invited you to join the {{ org.displayName }} organization',
+                'body' => file_get_contents(__DIR__ . '/emails/org_invite.md'),
+            ]);
         });
 
         // claim Craft/plugin licenses after user activation
@@ -250,14 +262,6 @@ class Module extends \yii\base\Module
         }
 
         parent::init();
-    }
-
-    /**
-     * @return OrgsService
-     */
-    public function getOrgs(): OrgsService
-    {
-        return $this->get('orgs');
     }
 
     /**

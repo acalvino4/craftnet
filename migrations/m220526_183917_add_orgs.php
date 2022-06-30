@@ -35,15 +35,26 @@ class m220526_183917_add_orgs extends Migration
             'id' => $this->primaryKey(),
             'userId' => $this->integer()->notNull(),
             'orgId' => $this->integer()->notNull(),
+            'admin' => $this->boolean()->defaultValue(false),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
-            'admin' => $this->boolean()->defaultValue(false),
         ]);
 
-        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['orgId'], \craft\db\Table::USERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_MEMBERS, ['userId'], \craft\db\Table::USERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
         $this->createIndex(null, Table::ORGS_MEMBERS, ['userId', 'orgId'], true);
+
+        $this->createTable(Table::ORGS_ORDERS, [
+            'id' => $this->integer()->notNull(),
+            'orgId' => $this->integer()->notNull(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
+
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], \craft\commerce\db\Table::ORDERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
 
         return true;
     }

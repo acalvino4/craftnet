@@ -3,26 +3,27 @@
 namespace craftnet\cli\controllers;
 
 use Craft;
+use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
-use craft\db\Table;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
-use craft\helpers\Console;
 use craftnet\behaviors\UserBehavior;
-use craftnet\orgs\Org;
+use craftnet\db\Table;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
+use Throwable;
+use yii\console\Controller;
 use yii\db\Exception;
 
-class OrgsController extends \yii\console\Controller
+class OrgsController extends Controller
 {
     /**
-     * Converts existing developers and parters to orgs and creates an org admin with matching credentials
+     * Converts existing developers and partners to orgs and creates an org admin with matching credentials
      *
      * @return void
      * @throws ElementNotFoundException
      * @throws Exception
-     * @throws \yii\base\Exception
+     * @throws \yii\base\Exception|Throwable
      */
     public function actionConvert(): void
     {
@@ -36,8 +37,7 @@ class OrgsController extends \yii\console\Controller
             ->all();
 
         User::find()
-            // TODO: replace with 'credentialed'
-            ->status(['active', 'pending'])
+            ->status('credentialed')
             ->id($existingUserIds)
             ->collect()
             ->each(function(User $existingUser) use($developerIds) {
@@ -47,7 +47,7 @@ class OrgsController extends \yii\console\Controller
                 $active = $existingUser->active;
                 $pending = $existingUser->pending;
 
-                $this->stdout("Converting user #{$existingUser->id} ({$existingUser->email}) to org ..." . PHP_EOL);
+                $this->stdout("Converting user #$existingUser->id ($existingUser->email) to org ..." . PHP_EOL);
 
                 if (!Craft::$app->getUsers()->removeCredentials($existingUser)) {
                     throw new Exception("Couldn't remove credentials: " . implode(', ', $existingUser->getFirstErrors()));
@@ -70,11 +70,11 @@ class OrgsController extends \yii\console\Controller
 
                 $this->stdout("    > Saving user as org ... ");
                 if (!Craft::$app->getElements()->saveElement($existingUser)) {
-                    throw new Exception("Couldn't save user with id \"{$existingUser->id}\": " . implode(', ', $existingUser->getFirstErrors()));
+                    throw new Exception("Couldn't save user with id \"$existingUser->id\": " . implode(', ', $existingUser->getFirstErrors()));
                 }
                 $this->stdout('done' . PHP_EOL);
 
-                if ($existingUser->getOrgAdminIds()) {
+                if ($existingUser->findOrgAdmins()->exists()) {
                     $this->stdout("    > Org already has admin assigned, skipping.");
                 } else {
                     /** @var User|UserBehavior $orgAdmin */
@@ -89,25 +89,26 @@ class OrgsController extends \yii\console\Controller
                     $this->stdout('done' . PHP_EOL);
 
                     $this->stdout("    > Adding admin user to org ... ");
-                    $existingUser->addOrgAdmin($orgAdmin);
+                    $existingUser->addOrgMember($orgAdmin->id, true);
                     $this->stdout('done' . PHP_EOL);
 
                     // TODO: Once this exists https://github.com/craftcms/commerce/pull/2801/files
                     $this->stdout("    > Migrating commerce data to org admin ... ");
-                    Commerce::getInstance()->getCustomers()->moveCustomerDataToCustomer($existingUser, $orgAdmin);
+                    Commerce::getInstance()?->getCustomers()->moveCustomerDataToCustomer($existingUser, $orgAdmin);
                     $this->stdout('done' . PHP_EOL);
 
-                    $this->stdout("    > Migrating address data to org admin ... ");
+                    $this->stdout("    > Relating orders to org ... ");
+                    $rows = Order::find()->customer($orgAdmin)->collect()
+                        ->map(fn($order) => [
+                            $order->id,
+                            $existingUser->id,
+                        ]);
                     Craft::$app->getDb()->createCommand()
-                        ->update(Table::ADDRESSES, [
-                            'ownerId' => $orgAdmin->id,
-                        ], [
-                            'ownerId' => $existingUser->id,
-                        ])
+                        ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId'], $rows->all())
                         ->execute();
                     $this->stdout('done' . PHP_EOL);
 
-                    $this->stdout("Done converting user #{$existingUser->id} with org admin #{$orgAdmin->id}" . PHP_EOL . PHP_EOL);
+                    $this->stdout("Done converting user #$existingUser->id with org admin #$orgAdmin->id" . PHP_EOL . PHP_EOL);
                 }
 
             });
