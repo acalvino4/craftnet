@@ -3,9 +3,9 @@
 // Only run scheduled jobs on production
 use craft\helpers\App;
 
-if (App::env('CRAFT_ENVIRONMENT') !== 'prod') {
-    return;
-}
+//if (App::env('CRAFT_ENVIRONMENT') !== 'prod') {
+//    return;
+//}
 
 $deliveryEmail = 'devops@pixelandtonic.com';
 
@@ -29,11 +29,17 @@ $deliveryEmail = 'devops@pixelandtonic.com';
 //    ->sendOutputTo('/var/app/current/cron/packages-update-deps.log')
 //    ->emailOutputTo([$deliveryEmail]);
 //
-$schedule->command('craftnet/plugins/update-install-counts')
+//$schedule->command('craftnet/plugins/update-install-counts')
+//    ->everyMinute()
+//    ->withoutOverlapping()
+//    ->sendOutputTo('/var/app/current/cron/plugins-update-install-counts.log')
+//    ->emailOutputTo([$deliveryEmail]);
+
+$schedule->command('craftnet/test')
     ->everyMinute()
     ->withoutOverlapping()
-    ->sendOutputTo('/var/app/current/cron/plugins-update-install-counts.log')
-    ->emailOutputTo([$deliveryEmail]);
+    ->sendOutputTo('/var/app/current/cron/test.log');
+
 
 //$schedule->command('craftnet/plugins/update-issue-stats')
     //->withoutOverlapping()
