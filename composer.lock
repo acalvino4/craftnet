@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "faad25e938f4cff344f77e46873f545a",
+    "content-hash": "b349ac6bf51cecc3b19dfe0dc3f9c3a7",
     "packages": [
         {
             "name": "adam-paterson/oauth2-stripe",
@@ -117,16 +117,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.227.1",
+            "version": "3.229.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "dd3271b171cd83dfcfa3cfc390057114d8f010b1"
+                "reference": "5e01f0809682060dc5018bf5f267f40c32f4944d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/dd3271b171cd83dfcfa3cfc390057114d8f010b1",
-                "reference": "dd3271b171cd83dfcfa3cfc390057114d8f010b1",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/5e01f0809682060dc5018bf5f267f40c32f4944d",
+                "reference": "5e01f0809682060dc5018bf5f267f40c32f4944d",
                 "shasum": ""
             },
             "require": {
@@ -134,7 +134,7 @@
                 "ext-json": "*",
                 "ext-pcre": "*",
                 "ext-simplexml": "*",
-                "guzzlehttp/guzzle": "^6.5.7 || ^7.4.4",
+                "guzzlehttp/guzzle": "^6.5.8 || ^7.4.5",
                 "guzzlehttp/promises": "^1.4.0",
                 "guzzlehttp/psr7": "^1.8.5 || ^2.3",
                 "mtdowling/jmespath.php": "^2.6",
@@ -202,9 +202,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.227.1"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.229.0"
             },
-            "time": "2022-06-20T18:14:17+00:00"
+            "time": "2022-06-29T18:15:30+00:00"
         },
         {
             "name": "bugsnag/bugsnag",
@@ -1071,16 +1071,16 @@
         },
         {
             "name": "craftcms/cms",
-            "version": "4.0.4",
+            "version": "4.1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/craftcms/cms.git",
-                "reference": "623f8899b25aa957be7ec1f59cad7a11e0599499"
+                "reference": "d2de6f40c4641c1fad126e03af229ac59ab5ef7c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/craftcms/cms/zipball/623f8899b25aa957be7ec1f59cad7a11e0599499",
-                "reference": "623f8899b25aa957be7ec1f59cad7a11e0599499",
+                "url": "https://api.github.com/repos/craftcms/cms/zipball/d2de6f40c4641c1fad126e03af229ac59ab5ef7c",
+                "reference": "d2de6f40c4641c1fad126e03af229ac59ab5ef7c",
                 "shasum": ""
             },
             "require": {
@@ -1185,20 +1185,20 @@
                 "rss": "https://github.com/craftcms/cms/releases.atom",
                 "source": "https://github.com/craftcms/cms"
             },
-            "time": "2022-06-03T19:10:26+00:00"
+            "time": "2022-06-28T20:18:17+00:00"
         },
         {
             "name": "craftcms/commerce",
-            "version": "dev-develop",
+            "version": "4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/craftcms/commerce.git",
-                "reference": "777de0fdee4a5b315f279fa310f533ae03f236c0"
+                "reference": "76631f59c1eed5b233be7fd9d0f8c709a9606986"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/craftcms/commerce/zipball/777de0fdee4a5b315f279fa310f533ae03f236c0",
-                "reference": "777de0fdee4a5b315f279fa310f533ae03f236c0",
+                "url": "https://api.github.com/repos/craftcms/commerce/zipball/76631f59c1eed5b233be7fd9d0f8c709a9606986",
+                "reference": "76631f59c1eed5b233be7fd9d0f8c709a9606986",
                 "shasum": ""
             },
             "require": {
@@ -1221,7 +1221,6 @@
                 "craftcms/redactor": "*",
                 "vlucas/phpdotenv": "^3.4"
             },
-            "default-branch": true,
             "type": "craft-plugin",
             "extra": {
                 "handle": "commerce",
@@ -1256,20 +1255,20 @@
                 "rss": "https://github.com/craftcms/commerce/releases.atom",
                 "source": "https://github.com/craftcms/commerce"
             },
-            "time": "2022-06-21T08:11:34+00:00"
+            "time": "2022-06-22T18:39:00+00:00"
         },
         {
             "name": "craftcms/commerce-stripe",
-            "version": "dev-develop",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/craftcms/commerce-stripe.git",
-                "reference": "4b0e9c3b195d790d8756afade07ee0e0879b3050"
+                "reference": "28340e5b8e1bfb2fac0d69083f0365735b3eebc2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/craftcms/commerce-stripe/zipball/4b0e9c3b195d790d8756afade07ee0e0879b3050",
-                "reference": "4b0e9c3b195d790d8756afade07ee0e0879b3050",
+                "url": "https://api.github.com/repos/craftcms/commerce-stripe/zipball/28340e5b8e1bfb2fac0d69083f0365735b3eebc2",
+                "reference": "28340e5b8e1bfb2fac0d69083f0365735b3eebc2",
                 "shasum": ""
             },
             "require": {
@@ -1282,7 +1281,6 @@
                 "craftcms/ecs": "dev-main",
                 "craftcms/phpstan": "dev-main"
             },
-            "default-branch": true,
             "type": "craft-plugin",
             "extra": {
                 "name": "Stripe for Craft Commerce",
@@ -1318,7 +1316,7 @@
                 "rss": "https://github.com/craftcms/commerce-stripe/commits/master.atom",
                 "source": "https://github.com/craftcms/commerce-stripe"
             },
-            "time": "2022-06-16T13:35:04+00:00"
+            "time": "2022-06-16T13:35:03+00:00"
         },
         {
             "name": "craftcms/flysystem",
@@ -2785,16 +2783,16 @@
         },
         {
             "name": "illuminate/collections",
-            "version": "v9.17.0",
+            "version": "v9.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/collections.git",
-                "reference": "5aac36506247e4f0e50afe815ba711c16e65bcef"
+                "reference": "253cfce2bf469c340d2268bfbc31d4ad446a1fa7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/collections/zipball/5aac36506247e4f0e50afe815ba711c16e65bcef",
-                "reference": "5aac36506247e4f0e50afe815ba711c16e65bcef",
+                "url": "https://api.github.com/repos/illuminate/collections/zipball/253cfce2bf469c340d2268bfbc31d4ad446a1fa7",
+                "reference": "253cfce2bf469c340d2268bfbc31d4ad446a1fa7",
                 "shasum": ""
             },
             "require": {
@@ -2836,11 +2834,11 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-05-30T13:16:45+00:00"
+            "time": "2022-06-28T14:33:19+00:00"
         },
         {
             "name": "illuminate/conditionable",
-            "version": "v9.17.0",
+            "version": "v9.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/conditionable.git",
@@ -2886,16 +2884,16 @@
         },
         {
             "name": "illuminate/contracts",
-            "version": "v9.17.0",
+            "version": "v9.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/contracts.git",
-                "reference": "e354ef98f3c59e5c8b5ba87299999220270f3da5"
+                "reference": "e014cf88ef46065b8b1f078893c01189b95ffb11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/illuminate/contracts/zipball/e354ef98f3c59e5c8b5ba87299999220270f3da5",
-                "reference": "e354ef98f3c59e5c8b5ba87299999220270f3da5",
+                "url": "https://api.github.com/repos/illuminate/contracts/zipball/e014cf88ef46065b8b1f078893c01189b95ffb11",
+                "reference": "e014cf88ef46065b8b1f078893c01189b95ffb11",
                 "shasum": ""
             },
             "require": {
@@ -2930,11 +2928,11 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2022-04-28T13:05:07+00:00"
+            "time": "2022-06-07T19:28:00+00:00"
         },
         {
             "name": "illuminate/macroable",
-            "version": "v9.17.0",
+            "version": "v9.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/illuminate/macroable.git",
@@ -3349,16 +3347,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.0.21",
+            "version": "3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "8f1fcf9d2304ff77a006aa36dd2cb5f236999b12"
+                "reference": "34a68067b7ae3b836ea5e57e1fc432478372a4f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/8f1fcf9d2304ff77a006aa36dd2cb5f236999b12",
-                "reference": "8f1fcf9d2304ff77a006aa36dd2cb5f236999b12",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/34a68067b7ae3b836ea5e57e1fc432478372a4f5",
+                "reference": "34a68067b7ae3b836ea5e57e1fc432478372a4f5",
                 "shasum": ""
             },
             "require": {
@@ -3419,7 +3417,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.0.21"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.1.0"
             },
             "funding": [
                 {
@@ -3435,20 +3433,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-06-12T17:54:28+00:00"
+            "time": "2022-06-29T17:29:54+00:00"
         },
         {
             "name": "league/flysystem-aws-s3-v3",
-            "version": "3.0.21",
+            "version": "3.0.22",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem-aws-s3-v3.git",
-                "reference": "f4ee238279f1eb39a32539a18ef845db7251fd05"
+                "reference": "e5fc508faf83df2fbd2a215d2b4bea9584906221"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem-aws-s3-v3/zipball/f4ee238279f1eb39a32539a18ef845db7251fd05",
-                "reference": "f4ee238279f1eb39a32539a18ef845db7251fd05",
+                "url": "https://api.github.com/repos/thephpleague/flysystem-aws-s3-v3/zipball/e5fc508faf83df2fbd2a215d2b4bea9584906221",
+                "reference": "e5fc508faf83df2fbd2a215d2b4bea9584906221",
                 "shasum": ""
             },
             "require": {
@@ -3489,9 +3487,9 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem-aws-s3-v3/issues",
-                "source": "https://github.com/thephpleague/flysystem-aws-s3-v3/tree/3.0.21"
+                "source": "https://github.com/thephpleague/flysystem-aws-s3-v3/tree/3.0.22"
             },
-            "time": "2022-06-12T17:34:31+00:00"
+            "time": "2022-06-29T07:09:46+00:00"
         },
         {
             "name": "league/mime-type-detection",
@@ -6270,16 +6268,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v5.4.9",
+            "version": "v5.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "829d5d1bf60b2efeb0887b7436873becc71a45eb"
+                "reference": "4d671ab4ddac94ee439ea73649c69d9d200b5000"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/829d5d1bf60b2efeb0887b7436873becc71a45eb",
-                "reference": "829d5d1bf60b2efeb0887b7436873becc71a45eb",
+                "url": "https://api.github.com/repos/symfony/console/zipball/4d671ab4ddac94ee439ea73649c69d9d200b5000",
+                "reference": "4d671ab4ddac94ee439ea73649c69d9d200b5000",
                 "shasum": ""
             },
             "require": {
@@ -6349,7 +6347,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v5.4.9"
+                "source": "https://github.com/symfony/console/tree/v5.4.10"
             },
             "funding": [
                 {
@@ -6365,11 +6363,11 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-18T06:17:34+00:00"
+            "time": "2022-06-26T13:00:04+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "v3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
@@ -6416,7 +6414,7 @@
             "description": "A generic function and convention to trigger deprecation notices",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.0.1"
+                "source": "https://github.com/symfony/deprecation-contracts/tree/v3.0.2"
             },
             "funding": [
                 {
@@ -6521,7 +6519,7 @@
         },
         {
             "name": "symfony/event-dispatcher-contracts",
-            "version": "v3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher-contracts.git",
@@ -6580,7 +6578,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.0.1"
+                "source": "https://github.com/symfony/event-dispatcher-contracts/tree/v3.0.2"
             },
             "funding": [
                 {
@@ -6810,16 +6808,16 @@
         },
         {
             "name": "symfony/http-client-contracts",
-            "version": "v3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-client-contracts.git",
-                "reference": "f7525778c712be78ad5b6ca31f47fdcfd404c280"
+                "reference": "4184b9b63af1edaf35b6a7974c6f1f9f33294129"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-client-contracts/zipball/f7525778c712be78ad5b6ca31f47fdcfd404c280",
-                "reference": "f7525778c712be78ad5b6ca31f47fdcfd404c280",
+                "url": "https://api.github.com/repos/symfony/http-client-contracts/zipball/4184b9b63af1edaf35b6a7974c6f1f9f33294129",
+                "reference": "4184b9b63af1edaf35b6a7974c6f1f9f33294129",
                 "shasum": ""
             },
             "require": {
@@ -6868,7 +6866,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/http-client-contracts/tree/v3.0.1"
+                "source": "https://github.com/symfony/http-client-contracts/tree/v3.0.2"
             },
             "funding": [
                 {
@@ -6884,20 +6882,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-13T20:10:05+00:00"
+            "time": "2022-04-12T16:11:42+00:00"
         },
         {
             "name": "symfony/mailer",
-            "version": "v6.0.8",
+            "version": "v6.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mailer.git",
-                "reference": "706af6b3e99ebcbc639c9c664f5579aaa869409b"
+                "reference": "9b60de35f0b4eed09ee2b25195a478b86acd128d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mailer/zipball/706af6b3e99ebcbc639c9c664f5579aaa869409b",
-                "reference": "706af6b3e99ebcbc639c9c664f5579aaa869409b",
+                "url": "https://api.github.com/repos/symfony/mailer/zipball/9b60de35f0b4eed09ee2b25195a478b86acd128d",
+                "reference": "9b60de35f0b4eed09ee2b25195a478b86acd128d",
                 "shasum": ""
             },
             "require": {
@@ -6942,7 +6940,7 @@
             "description": "Helps sending emails",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/mailer/tree/v6.0.8"
+                "source": "https://github.com/symfony/mailer/tree/v6.0.10"
             },
             "funding": [
                 {
@@ -6958,20 +6956,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-04-27T17:10:30+00:00"
+            "time": "2022-06-19T12:07:20+00:00"
         },
         {
             "name": "symfony/mime",
-            "version": "v6.0.9",
+            "version": "v6.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mime.git",
-                "reference": "e17bae63d437b3e21942dcc47ccca802d3573dd8"
+                "reference": "4de7886c66e0953f5d6edab3e49ceb751d01621c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mime/zipball/e17bae63d437b3e21942dcc47ccca802d3573dd8",
-                "reference": "e17bae63d437b3e21942dcc47ccca802d3573dd8",
+                "url": "https://api.github.com/repos/symfony/mime/zipball/4de7886c66e0953f5d6edab3e49ceb751d01621c",
+                "reference": "4de7886c66e0953f5d6edab3e49ceb751d01621c",
                 "shasum": ""
             },
             "require": {
@@ -7023,7 +7021,7 @@
                 "mime-type"
             ],
             "support": {
-                "source": "https://github.com/symfony/mime/tree/v6.0.9"
+                "source": "https://github.com/symfony/mime/tree/v6.0.10"
             },
             "funding": [
                 {
@@ -7039,7 +7037,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-05-21T13:33:31+00:00"
+            "time": "2022-06-09T12:50:38+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -7975,16 +7973,16 @@
         },
         {
             "name": "symfony/service-contracts",
-            "version": "v3.0.1",
+            "version": "v3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/service-contracts.git",
-                "reference": "e517458f278c2131ca9f262f8fbaf01410f2c65c"
+                "reference": "d78d39c1599bd1188b8e26bb341da52c3c6d8a66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/e517458f278c2131ca9f262f8fbaf01410f2c65c",
-                "reference": "e517458f278c2131ca9f262f8fbaf01410f2c65c",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/d78d39c1599bd1188b8e26bb341da52c3c6d8a66",
+                "reference": "d78d39c1599bd1188b8e26bb341da52c3c6d8a66",
                 "shasum": ""
             },
             "require": {
@@ -8037,7 +8035,7 @@
                 "standards"
             ],
             "support": {
-                "source": "https://github.com/symfony/service-contracts/tree/v3.0.1"
+                "source": "https://github.com/symfony/service-contracts/tree/v3.0.2"
             },
             "funding": [
                 {
@@ -8053,20 +8051,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-13T20:10:05+00:00"
+            "time": "2022-05-30T19:17:58+00:00"
         },
         {
             "name": "symfony/string",
-            "version": "v6.0.9",
+            "version": "v6.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "df9f03d595aa2d446498ba92fe803a519b2c43cc"
+                "reference": "1b3adf02a0fc814bd9118d7fd68a097a599ebc27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/df9f03d595aa2d446498ba92fe803a519b2c43cc",
-                "reference": "df9f03d595aa2d446498ba92fe803a519b2c43cc",
+                "url": "https://api.github.com/repos/symfony/string/zipball/1b3adf02a0fc814bd9118d7fd68a097a599ebc27",
+                "reference": "1b3adf02a0fc814bd9118d7fd68a097a599ebc27",
                 "shasum": ""
             },
             "require": {
@@ -8122,7 +8120,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v6.0.9"
+                "source": "https://github.com/symfony/string/tree/v6.0.10"
             },
             "funding": [
                 {
@@ -8138,7 +8136,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-04-22T08:18:02+00:00"
+            "time": "2022-06-26T16:34:50+00:00"
         },
         {
             "name": "symfony/var-dumper",
@@ -8231,16 +8229,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v5.4.3",
+            "version": "v5.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "e80f87d2c9495966768310fc531b487ce64237a2"
+                "reference": "04e42926429d9e8b39c174387ab990bf7817f7a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/e80f87d2c9495966768310fc531b487ce64237a2",
-                "reference": "e80f87d2c9495966768310fc531b487ce64237a2",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/04e42926429d9e8b39c174387ab990bf7817f7a2",
+                "reference": "04e42926429d9e8b39c174387ab990bf7817f7a2",
                 "shasum": ""
             },
             "require": {
@@ -8286,7 +8284,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v5.4.3"
+                "source": "https://github.com/symfony/yaml/tree/v5.4.10"
             },
             "funding": [
                 {
@@ -8302,7 +8300,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-01-26T16:32:32+00:00"
+            "time": "2022-06-20T11:50:59+00:00"
         },
         {
             "name": "tecnickcom/tcpdf",
@@ -10053,16 +10051,16 @@
         },
         {
             "name": "codeception/codeception",
-            "version": "4.2.0",
+            "version": "4.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codeception/Codeception.git",
-                "reference": "e646d160bf1223d3595b227b69d903777fbcfb5f"
+                "reference": "77b3e2003fd4446b35826cb9dc397129c521c888"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codeception/Codeception/zipball/e646d160bf1223d3595b227b69d903777fbcfb5f",
-                "reference": "e646d160bf1223d3595b227b69d903777fbcfb5f",
+                "url": "https://api.github.com/repos/Codeception/Codeception/zipball/77b3e2003fd4446b35826cb9dc397129c521c888",
+                "reference": "77b3e2003fd4446b35826cb9dc397129c521c888",
                 "shasum": ""
             },
             "require": {
@@ -10139,7 +10137,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Codeception/Codeception/issues",
-                "source": "https://github.com/Codeception/Codeception/tree/4.2.0"
+                "source": "https://github.com/Codeception/Codeception/tree/4.2.1"
             },
             "funding": [
                 {
@@ -10147,7 +10145,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2022-06-16T05:33:39+00:00"
+            "time": "2022-06-22T06:18:59+00:00"
         },
         {
             "name": "codeception/lib-asserts",
@@ -11269,16 +11267,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.7.15",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "cd0202ea1b1fc6d1bbe156c6e2e18a03e0ff160a"
+                "reference": "b7648d4ee9321665acaf112e49da9fd93df8fbd5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/cd0202ea1b1fc6d1bbe156c6e2e18a03e0ff160a",
-                "reference": "cd0202ea1b1fc6d1bbe156c6e2e18a03e0ff160a",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b7648d4ee9321665acaf112e49da9fd93df8fbd5",
+                "reference": "b7648d4ee9321665acaf112e49da9fd93df8fbd5",
                 "shasum": ""
             },
             "require": {
@@ -11304,7 +11302,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.7.15"
+                "source": "https://github.com/phpstan/phpstan/tree/1.8.0"
             },
             "funding": [
                 {
@@ -11324,7 +11322,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-06-20T08:29:01+00:00"
+            "time": "2022-06-29T08:53:31+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -13239,24 +13237,9 @@
             "time": "2020-05-02T11:43:24+00:00"
         }
     ],
-    "aliases": [
-        {
-            "package": "craftcms/commerce",
-            "version": "dev-develop",
-            "alias": "4.0.3",
-            "alias_normalized": "4.0.3.0"
-        },
-        {
-            "package": "craftcms/commerce-stripe",
-            "version": "dev-develop",
-            "alias": "3.0.0",
-            "alias_normalized": "3.0.0.0"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "craftcms/commerce": 20,
-        "craftcms/commerce-stripe": 20,
         "craftcms/phpstan": 20,
         "craftcms/rector": 20
     },
