@@ -32,8 +32,8 @@ $deliveryEmail = 'devops@pixelandtonic.com';
 $schedule->command('craftnet/plugins/update-install-counts')
     ->everyMinute()
     ->withoutOverlapping()
-    ->sendOutputTo('/var/app/current/cron/plugins-update-install-counts.log');
-    //->emailOutputTo([$deliveryEmail]);
+    ->sendOutputTo('/var/app/current/cron/plugins-update-install-counts.log')
+    ->emailOutputTo([$deliveryEmail]);
 
 //$schedule->command('craftnet/plugins/update-issue-stats')
     //->withoutOverlapping()
