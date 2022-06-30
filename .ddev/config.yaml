@@ -1,4 +1,4 @@
-name: craftnet
+name: craftnet.next
 type: php
 docroot: web
 php_version: "8.0"
@@ -7,12 +7,12 @@ router_http_port: "80"
 router_https_port: "443"
 xdebug_enabled: false
 additional_hostnames:
-  - console.craftnet
-  - id.craftnet
-  - api.craftnet
-  - composer.craftnet
-  - plugins.craftnet
-  - feeds.craftnet
+  - console.craftnet.next
+  - id.craftnet.next
+  - api.craftnet.next
+  - composer.craftnet.next
+  - plugins.craftnet.next
+  - feeds.craftnet.next
 additional_fqdns: []
 database:
   type: postgres
