@@ -4,7 +4,7 @@
     "aws/aws-sdk-php": "^3.71",
     "craftcms/aws-s3": "^2.0.0",
     "craftcms/cms": "^4.0.3",
-    "craftcms/commerce": "^4.0.4",
+    "craftcms/commerce": "4.1.x-dev as 4.1.0",
     "craftcms/commerce-stripe": "^3.0.1",
     "craftcms/postmark": "^3.0.0",
     "craftcms/webhooks": "^3.0.0",
