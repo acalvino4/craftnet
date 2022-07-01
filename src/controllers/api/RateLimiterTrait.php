@@ -34,9 +34,10 @@ trait RateLimiterTrait
                             'limit' => App::env('API_RATE_LIMIT') ?: 1000,
                             'window' => App::env('API_RATE_LIMIT_WINDOW') ?: 3600,
 
-                            // Rate limit is per IP address per controller action
+                            // Rate limit is per user account per controller action
                             'identifier' => function(Context $context, $rateLimitId) {
-                                return $rateLimitId.':'.$context->request->getPathInfo().':'.$context->request->getUserIP();
+                                $userId = Craft::$app->getUser()->getId();
+                                return sprintf('%s:%s', $rateLimitId, $userId ?? $context->request->getUserIP());
                             },
                         ],
                     ],
@@ -58,23 +59,33 @@ trait RateLimiterTrait
             // custom action on check
             'on rateLimitsChecked' => function(RateLimitsCheckedEvent $event) {
                 $ip = $event->context->request->getUserIP();
+                $userMessage = '';
+
+                if (($userId = Craft::$app->getUser()->getId()) !== null) {
+                    $userMessage = 'UserID: '.$userId;
+                }
 
                 /** @var RateLimitResult $rateLimitResult */
                 $rateLimitResult = $event->rateLimitResults['craftnetapi'];
                 $rateLimit = $rateLimitResult->rateLimit;
 
-                Craft::info('Rate limit checked: ' . $ip . ' checked at '.$rateLimitResult->timestamp.'. '.$rateLimitResult->allowance.' out of '.$rateLimit->limit.' left. Exceeded? '.($rateLimitResult->isExceeded ? 'True' : 'False'));
+                Craft::info('Rate limit checked: ' . $ip . ' checked at '.$rateLimitResult->timestamp.'. '.$rateLimitResult->allowance.' out of '.$rateLimit->limit.' left. Exceeded? '.($rateLimitResult->isExceeded ? 'True' : 'False').'. '.$userMessage);
             },
 
             // custom action on limits exceeded
             'on rateLimitsExceeded' => function(RateLimitsCheckedEvent $event) {
                 $ip = $event->context->request->getUserIP();
+                $userMessage = '';
+
+                if (($userId = Craft::$app->getUser()->getId()) !== null) {
+                    $userMessage = 'UserID: '.$userId;
+                }
 
                 /** @var RateLimitResult $rateLimitResult */
                 $rateLimitResult = $event->rateLimitResults['craftnetapi'];
                 $rateLimit = $rateLimitResult->rateLimit;
 
-                Craft::error('Rate limit exceeded: ' . $ip . ' checked at '.$rateLimitResult->timestamp.'. '.$rateLimitResult->allowance.' out of '.$rateLimit->limit.' left. Exceeded? '.($rateLimitResult->isExceeded ? 'True' : 'False'));
+                Craft::error('Rate limit exceeded: ' . $ip . ' checked at '.$rateLimitResult->timestamp.'. '.$rateLimitResult->allowance.' out of '.$rateLimit->limit.' left. Exceeded? '.($rateLimitResult->isExceeded ? 'True' : 'False').'. '.$userMessage);
             },
         ];
 

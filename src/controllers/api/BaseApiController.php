@@ -789,16 +789,17 @@ EOL;
      *
      * @param Model $model
      * @param string|null $paramPrefix
+     * @param array|null $attributeMap
      * @return array
      */
-    protected function modelErrors(Model $model, string $paramPrefix = null): array
+    protected function modelErrors(Model $model, ?string $paramPrefix = null, ?array $attributeMap): array
     {
         $errors = [];
 
         foreach ($model->getErrors() as $attr => $attrErrors) {
             foreach ($attrErrors as $error) {
                 $errors[] = [
-                    'param' => ($paramPrefix !== null ? $paramPrefix . '.' : '') . $attr,
+                    'param' => ($paramPrefix !== null ? $paramPrefix . '.' : '') . ($attributeMap[$attr] ?? $attr),
                     'message' => $error,
                     'code' => self::ERROR_CODE_INVALID,
                 ];
