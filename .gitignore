@@ -20,3 +20,4 @@
 /storage/composer-backups
 /storage/config-deltas
 /web-composer
+/vendor-local
