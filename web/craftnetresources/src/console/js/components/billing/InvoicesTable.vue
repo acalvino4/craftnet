@@ -6,7 +6,7 @@
       :options="vtOptions">
       <template v-slot:number="props">
         <router-link
-          :to="'/settings/billing/invoices/' + props.row.number">
+          :to="'/settings/orders/' + props.row.number">
           {{ props.row.shortNumber }}
         </router-link>
       </template>

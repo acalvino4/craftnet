@@ -84,7 +84,7 @@ const router = createRouter({
     {
       path: '/settings/orders',
       name: 'Orders',
-      component: () => import('../pages/settings/orders'),
+      component: () => import('../pages/settings/orders/index.vue'),
     },
     {
       path: '/settings/billing',
@@ -92,9 +92,9 @@ const router = createRouter({
       component: () => import('../pages/settings/billing'),
     },
     {
-      path: '/settings/billing/invoices/:number',
+      path: '/settings/orders/:number',
       name: 'AccountBillingInvoiceNumber',
-      component: () => import('../pages/settings/billing/invoices/_number.vue'),
+      component: () => import('../pages/settings/orders/_number.vue'),
     },
     {
       path: '/settings/plugin-store',
