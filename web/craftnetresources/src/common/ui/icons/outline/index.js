@@ -1,4 +1,5 @@
 import ArrowTurnDownLeft from './ArrowTurnDownLeft.vue'
+import Box from './Box.vue'
 import ChartSquareBar from './ChartSquareBar.vue'
 import CheckCircle from './CheckCircle.vue'
 import Check from './Check.vue'
@@ -27,6 +28,7 @@ import X from './X.vue'
 
 export default {
   'arrow-turn-down-left': ArrowTurnDownLeft,
+  'box': Box,
   'chart-square-bar': ChartSquareBar,
   'check-circle': CheckCircle,
   'check': Check,
