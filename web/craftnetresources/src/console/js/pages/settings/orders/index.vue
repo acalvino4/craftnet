@@ -33,6 +33,11 @@
             List order history for orders created on behalf of the org, by its members (past and present), including who placed the order.
           </div>
         </pane>
+
+        <pane>
+          <h2>Organization Orders</h2>
+          <organization-orders class="mt-2" />
+        </pane>
       </template>
 
       <pane>
@@ -53,9 +58,16 @@
 import {mapGetters} from 'vuex';
 import SubscriptionInvoicesTable from '../../../components/billing/SubscriptionInvoicesTable';
 import InvoicesTable from '../../../components/billing/InvoicesTable';
+import OrganizationOrders from '../../../components/orders/OrganizationOrders';
+import Pane from '../../../../../common/ui/components/Pane';
 
 export default {
-  components: {InvoicesTable, SubscriptionInvoicesTable},
+  components: {
+    Pane,
+    OrganizationOrders,
+    InvoicesTable,
+    SubscriptionInvoicesTable
+  },
   computed: {
 
     ...mapGetters({

@@ -7,6 +7,7 @@ const state = {
   organizations: [],
   currentOrganizationId: null,
   members: [],
+  orders: [],
 }
 
 /**
@@ -67,6 +68,13 @@ const actions = {
       })
   },
 
+  getOrders({commit}, {organizationId}) {
+    return organizationsApi.getOrders(organizationId)
+      .then((response) => {
+        commit('updateOrders', response.data)
+      })
+  },
+
   getOrganizationMembers({commit}, {organizationId}) {
     return organizationsApi.getOrganizationMembers({organizationId})
             .then((response) => {
@@ -109,6 +117,11 @@ const mutations = {
 
   updateMembers(state, members) {
     state.members = members
+  },
+
+  updateOrders(state, orders) {
+    console.log('-------------- orders', orders)
+    state.orders = orders
   }
 }
 

@@ -50,6 +50,14 @@ export default {
     })
   },
 
+  getOrders(organizationId) {
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders', {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
+
   getOrganizationMembers({organizationId}) {
     return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members', {
       headers: {
@@ -68,5 +76,5 @@ export default {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
     })
-  }
+  },
 }
