@@ -110,6 +110,16 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
+          to="/settings/orders">
+          <icon
+            class="mr-2 text-blue-500 w-5 h-5"
+            icon="credit-card" />
+          Orders
+        </router-link>
+      </li>
+      <li>
+        <router-link
+          @click="$emit('closeSidebar')"
           to="/settings/billing">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"

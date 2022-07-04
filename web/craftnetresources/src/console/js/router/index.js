@@ -82,6 +82,11 @@ const router = createRouter({
       component: () => import('../pages/settings/organizations/_edit.vue'),
     },
     {
+      path: '/settings/orders',
+      name: 'Orders',
+      component: () => import('../pages/settings/orders'),
+    },
+    {
       path: '/settings/billing',
       name: 'Billing',
       component: () => import('../pages/settings/billing'),
