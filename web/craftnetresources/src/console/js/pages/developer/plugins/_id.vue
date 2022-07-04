@@ -58,7 +58,7 @@
         </template>
 
         <div class="mt-6">
-          <btn to="/settings/developer">Manage connected apps
+          <btn to="/settings/plugin-store">Manage connected apps
           </btn>
         </div>
       </pane>

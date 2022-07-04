@@ -1,7 +1,7 @@
 <template>
   <div>
     <page-header>
-      <h1>Developer Settings</h1>
+      <h1>Plugin Store</h1>
     </page-header>
 
     <div class="space-y-6">

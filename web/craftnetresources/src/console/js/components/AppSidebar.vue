@@ -157,11 +157,11 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/settings/developer">
+          to="/settings/plugin-store">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="cog" />
-          Developer Settings
+          Plugin Store
         </router-link>
       </li>
     </ul>

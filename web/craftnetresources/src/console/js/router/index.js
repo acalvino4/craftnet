@@ -92,9 +92,9 @@ const router = createRouter({
       component: () => import('../pages/settings/billing/invoices/_number.vue'),
     },
     {
-      path: '/settings/developer',
-      name: 'SettingsDeveloper',
-      component: () => import('../pages/settings/developer.vue'),
+      path: '/settings/plugin-store',
+      name: 'SettingsPluginStore',
+      component: () => import('../pages/settings/plugin-store.vue'),
     },
     {
       path: '/settings/developer-support',
