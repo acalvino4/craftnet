@@ -145,11 +145,11 @@
         <li>
           <router-link
             @click="$emit('closeSidebar')"
-            to="/settings/partner/profile">
+            to="/settings/partner/network">
             <icon
               class="mr-2 text-blue-500 w-5 h-5"
               icon="check-circle" />
-            Partner Listing
+            Partner Network
           </router-link>
         </li>
       </template>

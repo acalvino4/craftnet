@@ -116,9 +116,9 @@ const router = createRouter({
       component: () => import('../pages/settings/partner/overview.vue'),
     },
     {
-      path: '/settings/partner/profile',
-      name: 'PartnerProfile',
-      component: () => import('../pages/settings/partner/profile.vue'),
+      path: '/settings/partner/network',
+      name: 'PartnerNetwork',
+      component: () => import('../pages/settings/partner/network.vue'),
     },
     {
       path: '/buy-plugin/:handle/:edition',
