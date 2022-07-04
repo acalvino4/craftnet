@@ -100,7 +100,11 @@ const actions = {
       .then(() => {
         dispatch('getOrganizationMembers', {organizationId})
       })
-  }
+  },
+
+  saveOrganization(context, organization) {
+    return organizationsApi.saveOrganization(organization)
+  },
 }
 
 /**

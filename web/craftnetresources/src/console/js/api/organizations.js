@@ -23,8 +23,15 @@ export default {
     })
   },
 
-  save() {
-    console.log('TODO: Implement saving a new organization or updating an exising one.')
+  saveOrganization(organization) {
+    const data = {
+      ...organization
+    }
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/save-org', qs.stringify(data), {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
   },
 
   convertAccountToOrganization() {
