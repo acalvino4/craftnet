@@ -113,7 +113,7 @@
           to="/settings/orders">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
-            icon="credit-card" />
+            icon="box" />
           Orders
         </router-link>
       </li>
