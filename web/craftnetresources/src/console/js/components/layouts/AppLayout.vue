@@ -9,7 +9,7 @@
         @toggleSidebar="toggleSidebar()"></app-sidebar>
       <!--</template>-->
 
-      <div class="flex flex-col flex-1 bg-primary overflow-auto relative">
+      <div class="flex-1 bg-primary overflow-auto relative">
         <main-header
           context="app"
           :showingSidebar="showingSidebar"
@@ -18,7 +18,7 @@
 
         <div
           id="main"
-          class="main flex-1 p-6 md:p-8"
+          class="main p-6 md:p-8"
           :class="{'main-full': $route.meta.mainFull}">
           <div class="page-alerts">
             <template v-if="$route.meta.cmsLicensesRenewAlert">
