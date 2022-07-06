@@ -14,6 +14,14 @@
           icon="user"
           class="w-3 h-3 text-gray-500" />
     </template>
+
+    <template v-else-if="organization && !organization.photoUrl">
+        <icon
+          icon="building"
+          set="solid"
+          class="w-3 h-3 text-gray-500" />
+    </template>
+
   </div>
 </template>
 
