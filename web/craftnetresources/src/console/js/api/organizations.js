@@ -25,7 +25,7 @@ export default {
 
   saveOrganization(organization) {
     const data = {
-      ...organization
+      org: organization,
     }
     return axios.post(VUE_APP_URL_CONSOLE + '/orgs/save-org', qs.stringify(data), {
       headers: {

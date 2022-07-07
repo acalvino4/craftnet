@@ -102,8 +102,19 @@ const actions = {
       })
   },
 
-  saveOrganization(context, organization) {
-    return organizationsApi.saveOrganization(organization)
+  saveOrganization({dispatch}, organization) {
+    return new Promise((resolve, reject) => {
+      organizationsApi.saveOrganization(organization)
+        .then((response) => {
+          dispatch('getOrganizations')
+            .then(() => {
+              resolve(response)
+            })
+        })
+        .catch((response) => {
+          reject(response)
+        })
+    })
   },
 }
 
