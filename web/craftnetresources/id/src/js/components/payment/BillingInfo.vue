@@ -26,7 +26,14 @@
             </div>
             <div class="md:w-1/2 px-2">
                 <template v-if="!loading">
-                    <dropdown :fullwidth="true" :options="stateOptions(billingInfo.country)" v-model="billingInfo.state" id="state" :errors="errors['billingAddress.state']" @input="onStateChange" />
+                  <template v-if="billingInfo.country">
+                    <template v-if="stateOptions(billingInfo.country).length">
+                      <dropdown :fullwidth="true" :options="stateOptions(billingInfo.country)" v-model="billingInfo.state" id="state" :errors="errors['billingAddress.state']" @input="onStateChange" />
+                    </template>
+                    <template v-else>
+                      <textbox id="state" :placeholder="administrativeAreaLabel(billingInfo.country)" v-model="billingInfo.state" :errors="errors['billingAddress.state']" />
+                    </template>
+                  </template>
                 </template>
             </div>
         </div>
@@ -49,6 +56,7 @@
             ...mapGetters({
                 countryOptions: 'craftId/countryOptions',
                 stateOptions: 'craftId/stateOptions',
+                administrativeAreaLabel: 'craftId/administrativeAreaLabel',
             }),
         },
 
