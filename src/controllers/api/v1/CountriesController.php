@@ -3,6 +3,7 @@
 namespace craftnet\controllers\api\v1;
 
 use Craft;
+use craft\elements\Address;
 use craftnet\controllers\api\BaseApiController;
 use Moccalotto\Eu\CountryInfo;
 use yii\web\Response;
@@ -55,6 +56,7 @@ class CountriesController extends BaseApiController
                 'name' => $country->getName(),
                 'euMember' => $countryInfo->isEuMember($country->getCountryCode()),
                 'stateRequired' => $isStateRequired,
+                'administrativeAreaLabel' => Address::addressAttributeLabel('administrativeArea', $country->getCountryCode())
             ];
 
             if (!empty($administrativeAreas)) {
