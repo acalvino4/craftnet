@@ -8,11 +8,18 @@
         class="header-brand relative">
         <MenuButton
           class="flex w-full items-center hover:no-underline font-bold text-gray-800 dark:text-gray-200 px-5 py-3">
-          <organization-switcher-photo
-            class="mr-2"
-            :organization="(currentOrganization ? currentOrganization : null)"
-            :user="(!currentOrganization ? user : null)"
-          />
+          <div class="mr-2">
+            <template v-if="currentOrganization">
+              <profile-photo
+                :photo-url="currentOrganization.photoUrl"
+                />
+            </template>
+            <template v-else>
+              <profile-photo
+                :photo-url="user.photoUrl"
+              />
+            </template>
+          </div>
 
           <div
             v-if="orgName"
@@ -37,10 +44,10 @@
                 @click="selectOrganization(null)"
               >
                 <div class="flex items-center">
-                  <organization-switcher-photo
+                  <profile-photo
                     class="mr-2"
-                    :user="user"
-                  />
+                    :photo-url="user.photoUrl"
+                    />
 
                   <template
                     v-if="user.firstName || user.lastName">
@@ -63,9 +70,10 @@
                   @click="selectOrganization(organization)"
                 >
                   <div class="flex items-center min-w-0">
-                    <organization-switcher-photo
+                    <profile-photo
                       class="mr-2"
-                      :organization="organization"
+                      :photo-url="organization.photoUrl"
+                      fallback="org"
                     />
                     <div class="truncate">
                       {{ organization.displayName }}
@@ -102,13 +110,13 @@ import {Menu, MenuButton, MenuItems, MenuItem} from '@headlessui/vue'
 import {mapGetters, mapState} from 'vuex';
 import helpers from '@/console/js/mixins/helpers.js';
 import OrganizationSwitcherMenuItem from './OrganizationSwitcherMenuItem';
-import OrganizationSwitcherPhoto from './OrganizationSwitcherPhoto';
+import ProfilePhoto from './ProfilePhoto';
 
 export default {
   mixins: [helpers],
 
   components: {
-    OrganizationSwitcherPhoto,
+    ProfilePhoto,
     OrganizationSwitcherMenuItem,
     Menu,
     MenuButton,
