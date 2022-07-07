@@ -9,36 +9,22 @@
       'rounded-lg': size === 'lg' && shape === 'rounded',
       'rounded-full': shape === 'circle',
       'overflow-hidden flex items-center justify-center': true,
-      'bg-gray-500/10 dark:bg-gray-400': !photoUrl,
+      'bg-gray-500/10 dark:bg-white/20': !photoUrl,
     }]"
   >
     <template v-if="photoUrl">
       <img :src="photoUrl" />
     </template>
     <template v-else>
-      <template v-if="fallback === 'org'">
-        <icon
-          icon="building"
-          set="solid"
-          :class="{
+      <icon
+        :icon="fallback === 'org' ? 'building' : 'user'"
+        set="solid"
+        :class="{
             'w-3 h-3': size === 'sm',
             'w-4 h-4': size === 'md',
             'w-5 h-5': size === 'lg',
           }"
-          class="text-gray-500" />
-      </template>
-      <template v-else>
-        <icon
-          icon="user"
-          set="solid"
-          :class="{
-            'w-3 h-3': size === 'sm',
-            'w-4 h-4': size === 'md',
-            'w-5 h-5': size === 'lg',
-          }"
-          class="text-gray-500" />
-      </template>
-
+        class="text-gray-500 dark:text-white/50" />
     </template>
   </div>
 </template>
