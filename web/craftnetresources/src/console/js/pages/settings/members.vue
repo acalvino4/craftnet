@@ -31,19 +31,12 @@
           :key="'member-' + memberKey">
           <td class="border-b px-4 py-3">
             <div class="flex items-center">
-              <div
-                class="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                <template v-if="member.avatar">
-                  <img
-                    class="w-10 h-10"
-                    :src="staticImageUrl('avatars/' + member.avatar)" />
-                </template>
-                <template v-if="member.photo">
-                  <img
-                    class="w-10 h-10"
-                    :src="member.photo.url" />
-                </template>
-              </div>
+              <profile-photo
+                :photo-url="member.photoUrl"
+                size="md"
+                shape="circle"
+              />
+
               <div class="ml-4 text-sm">
                 <div class="font-bold">
                   [member.name] {{ member.id }}
@@ -84,9 +77,10 @@ import helpers from '@/console/js/mixins/helpers';
 import MemberActions from '@/console/js/components/MemberActions';
 import ChangeMemberRoleModal from '@/console/js/components/members/ChangeMemberRoleModal';
 import InviteMembersModal from '@/console/js/components/members/InviteMembersModal';
+import ProfilePhoto from '../../components/ProfilePhoto';
 
 export default {
-  components: {InviteMembersModal, ChangeMemberRoleModal, MemberActions},
+  components: {ProfilePhoto, InviteMembersModal, ChangeMemberRoleModal, MemberActions},
   mixins: [helpers],
 
   data() {
