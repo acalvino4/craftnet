@@ -68,6 +68,7 @@ return [
     'hpsmartdev.com',
     'hyperlane.co',
     'imarc.io',
+    'immerwieder.dev',
     'infomedia-dev.com',
     'inspireserverc.com',
     'isted.dev',
