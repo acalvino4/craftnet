@@ -42,7 +42,15 @@
                 <textbox id="address2" label="Address Line 2" v-model="invoiceDetailsDraft.address2" :errors="errors.address2" />
                 <textbox id="city" label="City" v-model="invoiceDetailsDraft.city" :errors="errors.city" />
                 <dropdown id="country" label="Country" v-model="invoiceDetailsDraft.country" :options="countryOptions" @input="onCountryChange" />
-                <dropdown id="state" label="State" v-model="invoiceDetailsDraft.state" :options="stateOptions(invoiceDetailsDraft.country)" />
+                <template v-if="invoiceDetailsDraft.country">
+                  <template v-if="stateOptions(invoiceDetailsDraft.country).length">
+                    <dropdown id="state" :label="administrativeAreaLabel(invoiceDetailsDraft.country)" v-model="invoiceDetailsDraft.state" :options="stateOptions(invoiceDetailsDraft.country)" />
+                  </template>
+                  <template v-else>
+                    <textbox id="state" :label="administrativeAreaLabel(invoiceDetailsDraft.country)" v-model="invoiceDetailsDraft.state" :errors="errors.state" />
+                  </template>
+                </template>
+
                 <textbox id="zipCode" label="Zip Code" v-model="invoiceDetailsDraft.zipCode" :errors="errors.zipCode" />
 
                 <btn kind="primary" type="submit" :loading="saveLoading" :disabled="saveLoading">Save</btn>
@@ -75,6 +83,7 @@
 
             ...mapGetters({
                 countryOptions: 'craftId/countryOptions',
+                administrativeAreaLabel: 'craftId/administrativeAreaLabel',
                 stateOptions: 'craftId/stateOptions',
             }),
         },

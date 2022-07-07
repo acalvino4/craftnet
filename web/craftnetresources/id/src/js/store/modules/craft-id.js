@@ -34,6 +34,12 @@ const getters = {
         return options
     },
 
+    administrativeAreaLabel(state) {
+        return country => {
+            return state.countries[country].administrativeAreaLabel || 'State';
+        }
+    },
+
     stateOptions(state) {
         return iso => {
             if (!state.countries) {
