@@ -69,7 +69,7 @@ class StripeController extends BaseController
         $account = Account::retrieve();
         $user->country = $account->country;
 
-        $user->saveOrgInfo();
+        $user->saveDeveloperInfo();
 
         $referrer = Craft::$app->getSession()->get('stripe.referrer');
 
@@ -101,7 +101,7 @@ class StripeController extends BaseController
 
         $user->stripeAccessToken = null;
         $user->stripeAccount = null;
-        $user->saveOrgInfo();
+        $user->saveDeveloperInfo();
 
         return $this->asJson(['success' => true]);
     }
