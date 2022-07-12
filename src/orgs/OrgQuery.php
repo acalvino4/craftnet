@@ -20,7 +20,7 @@ class OrgQuery extends ElementQuery
 
     protected function beforePrepare(): bool
     {
-        $this->joinElementTable(Table::ORGS);
+        $this->joinElementTable('craftnet_orgs');
         $columns = Collection::make([
             'stripeAccessToken',
             'stripeAccount',
@@ -28,7 +28,10 @@ class OrgQuery extends ElementQuery
             'balance',
             'creatorId',
         ]);
-        $this->query->select($columns->map(fn($column) => sprintf('%s.%s', Table::ORGS, $column)));
+
+        $this->query->select(
+            $columns->map(fn($column) => sprintf('%s.%s', Table::ORGS, $column))->all()
+        );
 
         $columns->each(function($column) {
             if (isset($this->$column)) {

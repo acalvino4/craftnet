@@ -328,6 +328,11 @@ class Module extends \yii\base\Module
         return $this->get('payoutManager');
     }
 
+    public function getOrgs(): OrgsService
+    {
+        return $this->get('orgs');
+    }
+
     private function _initConsoleRequset()
     {
         Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, function(DefineConsoleActionsEvent $e) {
