@@ -64,8 +64,8 @@ class OrgsController extends Controller
                 // TODO: other developer data (balance)
 
                 $this->stdout("    > Saving org ... ");
-                if (!Craft::$app->getElements()->saveElement($org)) {
-                    throw new Exception("Couldn't save org with id \"$org->id\": " . implode(', ', $org->getFirstErrors()));
+                if (!Craft::$app->getElements()->saveElement($org, false)) {
+                    throw new Exception("Couldn't save org: " . implode(', ', $org->getFirstErrors()));
                 }
                 $this->stdout('done' . PHP_EOL);
 
