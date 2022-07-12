@@ -25,6 +25,8 @@ class m220526_183917_add_orgs extends Migration
             'stripeAccount' => $this->string()->null(),
             'apiToken' => $this->char(60)->null(),
             'requireOrderApproval' => $this->boolean()->defaultValue(true),
+            'primaryBillingAddressId' => $this->integer(),
+            'primaryPaymentSourceId' => $this->integer(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),

@@ -30,6 +30,8 @@ class Org extends Element
     public ?string $apiToken = null;
     public int $balance = 0;
     public ?int $creatorId = null;
+    public ?int $primaryPaymentSourceId = null;
+    public ?int $primaryBillingAddressId = null;
 
     public static function displayName(): string
     {
@@ -106,7 +108,6 @@ class Org extends Element
                         new CustomField(
                             Craft::$app->getFields()->getFieldByHandle('enablePartnerFeatures')
                         ),
-                        new AddressField(),
                     ]
                 ],
             ]
