@@ -18,6 +18,12 @@ class OrgQuery extends ElementQuery
     public ?int $balance = null;
     public ?int $creatorId = null;
 
+    public function creatorId(?int $creatorId): OrgQuery
+    {
+        $this->creatorId = $creatorId;
+        return $this;
+    }
+
     protected function beforePrepare(): bool
     {
         $this->joinElementTable('craftnet_orgs');

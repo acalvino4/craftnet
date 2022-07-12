@@ -44,6 +44,11 @@ class OrgsController extends Controller
             ->each(function(User $user) {
                 $this->stdout("Creating an org for user #$user->id ($user->email) ..." . PHP_EOL);
 
+                if (Org::find()->creatorId($user->id)->exists()) {
+                    $this->stdout("Org already converted, skipping." . PHP_EOL);
+                    return;
+                }
+
                 $partner = Partner::find()->ownerId($user->id)->one();
 
                 $org = new Org();
@@ -64,7 +69,7 @@ class OrgsController extends Controller
                 // TODO: other developer data (balance)
 
                 $this->stdout("    > Saving org ... ");
-                if (!Craft::$app->getElements()->saveElement($org, false)) {
+                if (!Craft::$app->getElements()->saveElement($org)) {
                     throw new Exception("Couldn't save org: " . implode(', ', $org->getFirstErrors()));
                 }
                 $this->stdout('done' . PHP_EOL);
