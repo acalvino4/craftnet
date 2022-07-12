@@ -1,12 +1,12 @@
-columnSuffix: null
+columnSuffix: byzvacpy
 contentColumnType: boolean
 fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
-handle: enablePartnerFeatures
-instructions: 'Enables partner fields in a user’s Craft ID account.'
-name: 'Enable Partner Features'
-searchable: true
+handle: requireOrderApproval
+instructions: null
+name: 'Require Order Approval'
+searchable: false
 settings:
-  default: false
+  default: true
   offLabel: null
   onLabel: null
 translationKeyFormat: null

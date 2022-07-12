@@ -1,6 +1,6 @@
 columnSuffix: null
 contentColumnType: text
-fieldGroup: add7f1c8-5c4a-4d23-9398-8a9472f169e8 # User
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
 handle: location
 instructions: null
 name: Location
@@ -9,7 +9,7 @@ settings:
   byteLimit: null
   charLimit: null
   code: false
-  columnType: text
+  columnType: null
   initialRows: 4
   multiline: false
   placeholder: null

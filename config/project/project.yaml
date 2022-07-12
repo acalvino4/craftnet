@@ -1,4 +1,4 @@
-dateModified: 1655089084
+dateModified: 1657641901
 elementSources:
   craft\elements\Asset:
     -
@@ -154,6 +154,7 @@ meta:
     01fcd9d2-40bb-4f54-a225-7c9b674c3db9: Plugin # Plugin
     2a835d29-b3e4-4ef5-bf62-ad7285b4a4dd: API # API
     2b0be654-6b0a-454b-939c-86f528888ade: Title # Title
+    2e52616c-f9d9-4228-ba13-614a72c447f5: 'PayPal Email' # PayPal Email
     2f57d7c9-711e-4173-a5b4-df89fb34e085: 'Craft Plugin Store' # Craft Plugin Store
     3be6f954-f541-4687-a94a-b2e02ba2e436: Index # Index
     3d8608c4-0726-4a47-8051-5319922c2a72: 'GitHub Repo URL' # GitHub Repo URL
@@ -188,7 +189,9 @@ meta:
     68465f6c-a70b-4b6b-a3ab-feaece178361: 'Customer Name' # Customer Name
     112552be-dfb0-4cca-a725-b0c4ac73705a: 'Plugin Categories' # Plugin Categories
     149763f1-bd8b-4d8e-a8f0-8ce1b0c6d593: 'Featured Plugins' # Featured Plugins
+    833000d4-aee8-4e2e-b86b-ea7642aeb240: 'External URL' # External URL
     3729338a-bc60-4be2-9fc4-0e63b4a62d4a: Plugins # Plugins
+    15404041-1763-447f-a5f3-77ab36679bb1: 'Require Order Approval'
     63801519-f6aa-468d-9ce9-1a0c289e5ddb: 'Craft Edition' # Craft Edition
     a1deff4e-43ef-4a67-870e-813cfa36700c: 'Enable showcase features' # Enable showcase features
     a2f14c14-960e-4f3a-a673-b505db22569b: 'Craft License' # Craft License
@@ -199,6 +202,7 @@ meta:
     add7f1c8-5c4a-4d23-9398-8a9472f169e8: User # User
     b1a59dd4-5d0c-4d32-925c-8a2349747691: Order # Order
     b9fcbb50-cec0-46a4-a28f-4c93be8e0c95: Feeds # Feeds
+    b20bbbda-6008-40ad-bd08-fff827696050: Org # Org
     b64bf83a-40fd-48a4-ba39-455b7900f976: Staff # Staff
     b384f570-e131-42f9-8c20-8d0faacb734f: 'Business Address Line 2' # Business Address Line 2
     b597a3a5-88d2-4446-9f93-a28351a1b666: Index # Index

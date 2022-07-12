@@ -9,6 +9,7 @@ use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
+use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use Throwable;
@@ -18,7 +19,7 @@ use yii\db\Exception;
 class OrgsController extends Controller
 {
     /**
-     * Converts existing developers and partners to orgs and creates an org admin with matching credentials
+     * Converts existing developers and partners to orgs and creates an org owner with matching credentials
      *
      * @return void
      * @throws ElementNotFoundException
@@ -40,81 +41,50 @@ class OrgsController extends Controller
             ->status('credentialed')
             ->id($existingUserIds)
             ->collect()
-            ->each(function(User $existingUser) use($developerIds) {
-                /** @var User|UserBehavior $existingUser */
-                $email = $existingUser->email;
-                $username = $existingUser->username;
-                $active = $existingUser->active;
-                $pending = $existingUser->pending;
+            ->each(function(User $user) {
+                $this->stdout("Creating an org for user #$user->id ($user->email) ..." . PHP_EOL);
 
-                $this->stdout("Converting user #$existingUser->id ($existingUser->email) to org ..." . PHP_EOL);
+                $partner = Partner::find()->ownerId($user->id)->one();
 
-                if (!Craft::$app->getUsers()->removeCredentials($existingUser)) {
-                    throw new Exception("Couldn't remove credentials: " . implode(', ', $existingUser->getFirstErrors()));
-                }
+                $org = new Org();
+                $org->title = $partner->title ?? $user->developerName ?? $user->username;
+                $org->slug = $partner->websiteSlug ?? $user->username;
+                $org->stripeAccessToken = $user->stripeAccessToken;
+                $org->stripeAccount = $user->stripeAccount;
+                $org->apiToken = $user->apiToken;
+                $org->creatorId = $user->id;
 
-                // Save w/o user/email so new admin user can validate.
-                $partner = Partner::find()->ownerId($existingUser->id)->one();
+                $org->setFieldValues([
+                    'externalUrl' => $partner->website ?? $user->developerUrl,
+                    'location' => $user->location,
+                    'payPalEmail' => $user->payPalEmail,
+                    'enablePartnerFeatures' => $user->enablePartnerFeatures,
+                ]);
+                // TODO: other partner data (partners table)
+                // TODO: other developer data (balance)
 
-                $existingUser->email = null;
-                $existingUser->username = null;
-                $existingUser->websiteSlug = $partner->websiteSlug ?? $username;
-                $existingUser->displayName = $partner->title ?? $existingUser->developerName ?? $existingUser->getName();
-                $existingUser->websiteUrl = $partner->website ?? $existingUser->getFieldValue('developerUrl');
-                $existingUser->location = $existingUser->getFieldValue('location');
-                $existingUser->supportPlan = $existingUser->getFieldValue('supportPlan')->value;
-                $existingUser->supportPlanExpiryDate = $existingUser->getFieldValue('supportPlanExpiryDate');
-                $existingUser->enablePartnerFeatures = $existingUser->getFieldValue('enablePartnerFeatures');
-                $existingUser->enableDeveloperFeatures = $developerIds->contains($existingUser->id);
-                $existingUser->isOrg = true;
-
-                $this->stdout("    > Saving user as org ... ");
-                if (!Craft::$app->getElements()->saveElement($existingUser)) {
-                    throw new Exception("Couldn't save user with id \"$existingUser->id\": " . implode(', ', $existingUser->getFirstErrors()));
+                $this->stdout("    > Saving org ... ");
+                if (!Craft::$app->getElements()->saveElement($org)) {
+                    throw new Exception("Couldn't save org with id \"$org->id\": " . implode(', ', $org->getFirstErrors()));
                 }
                 $this->stdout('done' . PHP_EOL);
 
-                if ($existingUser->findOrgAdmins()->exists()) {
-                    $this->stdout("    > Org already has admin assigned, skipping.");
-                } else {
-                    /** @var User|UserBehavior $orgAdmin */
-                    $this->stdout("    > Creating admin account ... ");
-                    $orgAdmin = Craft::$app->getElements()->duplicateElement($existingUser, [
-                        'email' => $email,
-                        'username' => $username,
-                        'isOrg' => false,
-                        'active' => $active,
-                        'pending' => $pending,
+                $this->stdout("    > Adding user as owner of org ... ");
+                $org->addOwner($user);
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Relating orders to org ... ");
+                $rows = Order::find()->customer($user)->collect()
+                    ->map(fn($order) => [
+                        $order->id,
+                        $org->id,
                     ]);
-                    $this->stdout('done' . PHP_EOL);
+                Craft::$app->getDb()->createCommand()
+                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId'], $rows->all())
+                    ->execute();
+                $this->stdout('done' . PHP_EOL);
 
-                    $this->stdout("    > Adding admin user to org ... ");
-                    $existingUser->addOrgMember($orgAdmin->id, true);
-                    $this->stdout('done' . PHP_EOL);
-
-                    // TODO: Once this exists https://github.com/craftcms/commerce/pull/2801/files
-                    $this->stdout("    > Migrating commerce data to org admin ... ");
-                    Commerce::getInstance()?->getCustomers()->moveCustomerDataToCustomer($existingUser, $orgAdmin);
-                    $this->stdout('done' . PHP_EOL);
-
-                    $this->stdout("    > Relating orders to org ... ");
-                    $rows = Order::find()->customer($orgAdmin)->collect()
-                        ->map(fn($order) => [
-                            $order->id,
-                            $existingUser->id,
-                        ]);
-                    Craft::$app->getDb()->createCommand()
-                        ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId'], $rows->all())
-                        ->execute();
-                    $this->stdout('done' . PHP_EOL);
-
-                    $this->stdout("Done converting user #$existingUser->id with org admin #$orgAdmin->id" . PHP_EOL . PHP_EOL);
-                }
-
+                $this->stdout("Done creating org #$org->id" . PHP_EOL . PHP_EOL);
             });
-
-        // TODO: cleanup custom fields
-
-        // TODO: permissions service, canFoo methods
     }
 }

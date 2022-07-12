@@ -364,6 +364,12 @@ class Module extends \yii\base\Module
                 'label' => 'Partners',
                 'icon' => __DIR__ . '/icons/partner.svg',
             ];
+
+            $e->navItems[] = [
+                'url' => 'orgs',
+                'label' => 'Organizations',
+                'fontIcon' => 'building',
+            ];
         });
 
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $e) {
@@ -379,6 +385,9 @@ class Module extends \yii\base\Module
                 'GET partners/history/<partnerId:\d+>' => 'craftnet/partners/fetch-history',
                 'POST partners/history' => 'craftnet/partners/save-history',
                 'DELETE partners/history/<id:\d+>' => 'craftnet/partners/delete-history',
+                'orgs' => ['template' => 'craftnet/orgs/index'],
+                'orgs/new' => 'craftnet/orgs/create',
+                'orgs/<elementId:\d+><slug:(?:-[^\/]*)?>' => 'elements/edit',
             ]);
         });
 
