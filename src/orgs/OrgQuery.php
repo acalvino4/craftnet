@@ -3,6 +3,7 @@
 namespace craftnet\orgs;
 
 use craft\elements\db\ElementQuery;
+use craft\elements\User;
 use craft\helpers\Db;
 use craftnet\db\Table;
 use Illuminate\Support\Collection;
@@ -10,17 +11,34 @@ use yii\db\Connection;
 
 class OrgQuery extends ElementQuery
 {
-    // public ?int $hasMember = null;
-    // public ?int $hasOwner = null;
     public ?string $stripeAccessToken = null;
     public ?string $stripeAccount = null;
     public ?string $apiToken = null;
     public ?int $balance = null;
     public ?int $creatorId = null;
+    private ?int $hasMemberId = null;
+    private ?int $hasOwnerId = null;
+    private bool $joinMembers = false;
 
     public function creatorId(?int $creatorId): OrgQuery
     {
         $this->creatorId = $creatorId;
+        return $this;
+    }
+
+    public function hasMember(null|int|User $value): static
+    {
+        $this->joinMembers = true;
+        $this->hasMemberId = $value instanceof User ? $value->id : $value;
+
+        return $this;
+    }
+
+    public function hasOwner(null|int|User $value): static
+    {
+        $this->joinMembers = true;
+        $this->hasOwnerId = $value instanceof User ? $value->id : $value;
+
         return $this;
     }
 
@@ -46,6 +64,19 @@ class OrgQuery extends ElementQuery
                 );
             }
         });
+
+        if ($this->joinMembers) {
+            $this->subQuery->innerJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.orgId]] = [[elements.id]]');
+        }
+        if ($this->hasMemberId !== null) {
+            $this->subQuery->andWhere(['orgsMembers.userId' => $this->hasMemberId]);
+        }
+        if ($this->hasOwnerId !== null) {
+            $this->subQuery->andWhere([
+                'orgsMembers.userId' => $this->hasOwnerId,
+                'orgsMembers.admin' => true,
+            ]);
+        }
 
         return parent::beforePrepare();
     }

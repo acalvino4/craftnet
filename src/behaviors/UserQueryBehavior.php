@@ -20,22 +20,22 @@ class UserQueryBehavior extends Behavior
     public ?bool $orgMember = null;
     public null|int|array $ofOrg = null;
 
-    public function ofOrg(mixed $value): static
+    public function ofOrg(mixed $value): UserQuery|static
     {
         $this->ofOrg = static::normalizeOrgOfArgument($value);
-        return $this;
+        return $this->owner;
     }
 
-    public function orgOwner(?bool $value): static
+    public function orgOwner(?bool $value): UserQuery|static
     {
         $this->orgOwner = $value;
-        return $this;
+        return $this->owner;
     }
 
-    public function orgMember(?bool $value): static
+    public function orgMember(?bool $value): UserQuery|static
     {
         $this->orgMember = $value;
-        return $this;
+        return $this->owner;
     }
 
     /**

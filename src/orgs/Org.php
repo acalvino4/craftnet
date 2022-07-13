@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Element;
 use craft\elements\Address;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craft\fieldlayoutelements\addresses\AddressField;
 use craft\fieldlayoutelements\CustomField;
@@ -19,8 +20,10 @@ use craft\models\FieldLayout;
 use craft\models\FieldLayoutTab;
 use craft\models\Section;
 use craft\services\ElementSources;
+use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
 use DateTime;
+use yii\base\UserException;
 use yii\db\Exception;
 
 class Org extends Element
@@ -63,7 +66,7 @@ class Org extends Element
         return true;
     }
 
-    public static function find(): ElementQueryInterface
+    public static function find(): OrgQuery
     {
         return new OrgQuery(static::class);
     }
@@ -156,15 +159,27 @@ class Org extends Element
 
     /**
      * @throws Exception
+     * @throws UserException
      */
     public function removeMember(int|User $user): void
     {
+        if ($this->findOwners()->count() === 1) {
+            throw new UserException('Organizations must have at least one owner.');
+        }
+
         Craft::$app->getDb()->createCommand()
             ->delete(Table::ORGS_MEMBERS, [
                 'orgId' => $this->id,
                 'userId' => $user instanceof User ? $user->id : $user,
             ])
             ->execute();
+    }
+
+    public function findOwners(): UserQuery
+    {
+        /** @var UserQuery|UserQueryBehavior $query */
+        $query = User::find();
+        return $query->ofOrg($this)->orgOwner(true);
     }
 
     /**
@@ -196,26 +211,50 @@ class Org extends Element
 
     public function canView(User $user): bool
     {
-        return true;
+        if ($user->admin) {
+            return true;
+        }
+
+        /** @var UserQuery|UserQueryBehavior $query */
+        $query = User::find()->id($user->id);
+        return $query->orgMember(true)->ofOrg($this)->exists();
     }
 
     public function canSave(User $user): bool
     {
-        return true;
+        if ($user->admin) {
+            return true;
+        }
+
+        /** @var UserQuery|UserQueryBehavior $query */
+        $query = User::find()->id($user->id);
+        return $query->orgOwner(true)->ofOrg($this)->exists();
     }
 
     public function canCreateDrafts(User $user): bool
     {
-        return true;
+        if ($user->admin) {
+            return true;
+        }
+
+        return false;
     }
 
     public function canDelete(User $user): bool
     {
-        return true;
+        if ($user->admin) {
+            return true;
+        }
+
+        return false;
     }
 
     public function canDuplicate(User $user): bool
     {
-        return true;
+        if ($user->admin) {
+            return true;
+        }
+
+        return false;
     }
 }

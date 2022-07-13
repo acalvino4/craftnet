@@ -391,7 +391,7 @@ class Module extends \yii\base\Module
                 'POST partners/history' => 'craftnet/partners/save-history',
                 'DELETE partners/history/<id:\d+>' => 'craftnet/partners/delete-history',
                 'orgs' => ['template' => 'craftnet/orgs/index'],
-                'orgs/new' => 'craftnet/orgs/create',
+                'orgs/new' => 'craftnet/orgs/cp/create',
                 'orgs/<elementId:\d+><slug:(?:-[^\/]*)?>' => 'elements/edit',
             ]);
         });
