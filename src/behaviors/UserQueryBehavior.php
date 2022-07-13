@@ -18,7 +18,7 @@ class UserQueryBehavior extends Behavior
 {
     public ?bool $orgOwner = null;
     public ?bool $orgMember = null;
-    public null|int|array $ofOrg = null;
+    private null|int|array $ofOrg = null;
 
     public function ofOrg(mixed $value): UserQuery|static
     {
