@@ -2,6 +2,8 @@
 
 namespace craftnet\controllers\api\v1;
 
+use CommerceGuys\Addressing\AddressFormat\AddressFormat;
+use CommerceGuys\Addressing\Subdivision\Subdivision;
 use Craft;
 use craft\elements\Address;
 use craftnet\controllers\api\BaseApiController;
@@ -14,7 +16,9 @@ use yii\web\Response;
 class CountriesController extends BaseApiController
 {
     protected const COUNTRY_CACHE_KEY = 'countryListData';
+    protected const FORMAT_CACHE_KEY_PREFIX = 'formatData';
     protected const COUNTRY_CACHE_DURATION = 60 * 60 * 24 * 7;
+    protected const FORMAT_CACHE_DURATION = 60 * 60 * 24 * 7;
 
     protected $checkCraftHeaders = false;
 
@@ -69,5 +73,84 @@ class CountriesController extends BaseApiController
         $cache->set(self::COUNTRY_CACHE_KEY, $countryList, self::COUNTRY_CACHE_DURATION);
 
         return $countryList;
+    }
+
+    /**
+     * @return Response
+     */
+    public function actionFormat(): Response
+    {
+        $subdivisionRepo = Craft::$app->getAddresses()->getSubdivisionRepository();
+        $addressFormatRepo = Craft::$app->getAddresses()->getAddressFormatRepository();
+        $cache = Craft::$app->getCache();
+
+        $data = [];
+
+        $parents = Craft::$app->getRequest()->getParam('parents');
+        if (!$parents) {
+            return $this->asJson($data);
+        }
+
+        $cacheKey = self::FORMAT_CACHE_KEY_PREFIX . '|' . implode('|', $parents);
+
+        if ($cache->exists($cacheKey)) {
+            return $this->asJson($cache->get($cacheKey));
+        }
+
+        // First item must always be a country
+        $data['format'] = $this->_formatAsArray($addressFormatRepo->get(collect($parents)->first()));
+        $data['subdivisions'] = collect($subdivisionRepo->getAll($parents))->map(function ($subdivision) {
+            return $this->_subdivisionsAsArray($subdivision);
+        });
+
+        $cache->set($cacheKey, $data, self::FORMAT_CACHE_DURATION);
+
+        return $this->asJson($data);
+    }
+
+    /**
+     * @param Subdivision $subdivision
+     * @return array
+     */
+    private function _subdivisionsAsArray(Subdivision $subdivision): array
+    {
+        return [
+            'name' => $subdivision->getName(),
+            'code' => $subdivision->getCode(),
+            'locale' => $subdivision->getLocale(),
+            'countryCode' => $subdivision->getCountryCode(),
+            'hasChildren' => (bool)$subdivision->hasChildren(),
+            'children' => collect($subdivision->getChildren())->map(function ($subdivision) {
+                return $this->_subdivisionsAsArray($subdivision);
+            })
+        ];
+    }
+
+    /**
+     * @param AddressFormat $format
+     * @return array
+     */
+    private function _formatAsArray(AddressFormat $format): array
+    {
+        return [
+            'countryCode' => $format->getCountryCode(),
+            'locale' => $format->getLocale(),
+            'administrativeArea' => $format->getAdministrativeAreaType(),
+            'subdivisionDepth' => $format->getSubdivisionDepth(),
+            'administrativeAreaType' => $format->getAdministrativeAreaType(),
+            'administrativeAreaTypeLabel' => Craft::$app->getAddresses()->getAdministrativeAreaTypeLabel($format->getAdministrativeAreaType()),
+            'localityType' => $format->getLocalityType(),
+            'localityTypeLabel' => Craft::$app->getAddresses()->getAdministrativeAreaTypeLabel($format->getLocalityType()),
+            'dependentLocalityType' => $format->getDependentLocalityType(),
+            'dependentLocalityTypeLabel' => Craft::$app->getAddresses()->getAdministrativeAreaTypeLabel($format->getDependentLocalityType()),
+            'format' => $format->getFormat(),
+            'localFormat' => $format->getLocalFormat(),
+            'postalCodePattern' => $format->getPostalCodePattern(),
+            'postalCodePrefix' => $format->getPostalCodePrefix(),
+            'requiredFields' => $format->getRequiredFields(),
+            'uppercaseFields' => $format->getUppercaseFields(),
+            'usedFields' => $format->getUsedFields(),
+            'usedSubdivisionFields' => $format->getUsedSubdivisionFields(),
+        ];
     }
 }
