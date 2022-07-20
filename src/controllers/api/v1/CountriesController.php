@@ -91,7 +91,7 @@ class CountriesController extends BaseApiController
             return $this->asJson($data);
         }
 
-        $cacheKey = self::FORMAT_CACHE_KEY_PREFIX . '|' . join('|', $parents);
+        $cacheKey = self::FORMAT_CACHE_KEY_PREFIX . '|' . implode('|', $parents);
 
         if ($cache->exists($cacheKey)) {
             return $this->asJson($cache->get($cacheKey));
