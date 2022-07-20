@@ -3,7 +3,6 @@
 namespace craftnet\controllers\api\v1;
 
 use CommerceGuys\Addressing\AddressFormat\AddressFormat;
-use CommerceGuys\Addressing\Country\Country;
 use CommerceGuys\Addressing\Subdivision\Subdivision;
 use Craft;
 use craft\elements\Address;
