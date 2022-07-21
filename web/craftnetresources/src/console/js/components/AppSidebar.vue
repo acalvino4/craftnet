@@ -38,8 +38,7 @@
       </li>
     </ul>
 
-    <template v-if="currentOrganization && user">
-      <template v-if="userIsInGroup('developers')">
+    <template v-if="user && currentOrganization">
         <h5>Developer</h5>
         <ul>
           <li>
@@ -63,7 +62,6 @@
             </router-link>
           </li>
         </ul>
-      </template>
     </template>
 
     <h5>
