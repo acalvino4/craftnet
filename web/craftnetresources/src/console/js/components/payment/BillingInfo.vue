@@ -1,6 +1,7 @@
 <template>
   <div>
     <field
+      :vertical="vertical"
       label-for="first-name"
       label="First Name">
       <textbox
@@ -10,6 +11,7 @@
         :errors="errors['billingAddress.firstName']" />
     </field>
     <field
+      :vertical="vertical"
       label-for="last-name"
       label="Last Name">
       <textbox
@@ -19,6 +21,7 @@
         :errors="errors['billingAddress.lastName']" />
     </field>
     <field
+      :vertical="vertical"
       label-for="business-name"
       label="Business Name">
       <textbox
@@ -28,6 +31,7 @@
         :errors="errors['billingAddress.businessName']" />
     </field>
     <field
+      :vertical="vertical"
       label-for="business-tax-id"
       label="Business Tax ID">
       <textbox
@@ -37,6 +41,7 @@
         :errors="errors['billingAddress.businessTaxId']" />
     </field>
     <field
+      :vertical="vertical"
       label-for="address-1"
       label="Address 1">
       <textbox
@@ -46,6 +51,7 @@
         :errors="errors['billingAddress.address1']" />
     </field>
     <field
+      :vertical="vertical"
       label-for="address-2"
       label="Address 2">
       <textbox
@@ -56,6 +62,7 @@
     </field>
 
     <field
+      :vertical="vertical"
       label-for="city"
       label="City">
       <textbox
@@ -65,6 +72,7 @@
         :errors="errors['billingAddress.city']" />
     </field>
     <field
+      :vertical="vertical"
       label-for="zip-code"
       label="Zip Code">
       <textbox
@@ -75,6 +83,7 @@
     </field>
 
     <field
+      :vertical="vertical"
       label-for="country"
       label="Country">
       <template v-if="loading">
@@ -91,6 +100,7 @@
       </template>
     </field>
     <field
+      :vertical="vertical"
       label-for="state"
       label="State">
       <template v-if="!loading">
@@ -110,7 +120,7 @@
 import {mapGetters, mapActions} from 'vuex'
 
 export default {
-  props: ['billingInfo', 'errors'],
+  props: ['billingInfo', 'errors', 'vertical'],
 
   data() {
     return {
