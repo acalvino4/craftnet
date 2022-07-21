@@ -1,15 +1,21 @@
 <template>
   <div v-if="!cartIsEmpty">
     <page-header>
-      <div>
-        <template v-if="user">
-          <router-link to="/cart">← Cart</router-link>
-        </template>
-        <template v-else>
-          <router-link to="/identity">← Identity</router-link>
-        </template>
+      <div class="flex-1 flex">
+        <div class="flex-1">
+          <template v-if="user">
+            <router-link to="/cart">← Cart</router-link>
+          </template>
+          <template v-else>
+            <router-link to="/identity">← Identity</router-link>
+          </template>
 
-        <h1 class="mt-4">Payment</h1>
+          <h1 class="mt-4">How would you like to pay?</h1>
+        </div>
+
+        <div class="space-x-4">
+          <router-link to="/payment">New</router-link>
+        </div>
       </div>
     </page-header>
 
@@ -20,6 +26,7 @@
       <form
         @submit.prevent="pay()"
         class="space-y-8">
+
         <pane>
           <h2 class="mb-2">Payment Method</h2>
 
@@ -64,9 +71,9 @@
 
 <script>
 import {mapState, mapGetters, mapActions} from 'vuex'
-import PaymentMethod from '../components/payment/PaymentMethod'
-import CouponCode from '../components/payment/CouponCode'
-import BillingInfo from '../components/payment/BillingInfo'
+import PaymentMethod from '../../components/payment/PaymentMethod'
+import CouponCode from '../../components/payment/CouponCode'
+import BillingInfo from '../../components/payment/BillingInfo'
 import PageHeader from '@/console/js/components/PageHeader';
 
 export default {

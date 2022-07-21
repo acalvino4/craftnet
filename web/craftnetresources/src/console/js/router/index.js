@@ -201,7 +201,13 @@ const router = createRouter({
     {
       path: '/payment',
       name: 'Payment',
-      component: () => import('../pages/payment.vue'),
+      component: () => import('../pages/payment/index.vue'),
+      meta: {sidebar: false, allowAnonymous: true}
+    },
+    {
+      path: '/payment/old',
+      name: 'PaymentOld',
+      component: () => import('../pages/payment/old.vue'),
       meta: {sidebar: false, allowAnonymous: true}
     },
     {
