@@ -12,6 +12,7 @@
             <template v-if="currentOrganization">
               <profile-photo
                 :photo-url="currentOrganization.photoUrl"
+                fallback="org"
                 />
             </template>
             <template v-else>
