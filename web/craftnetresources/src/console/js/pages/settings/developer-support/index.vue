@@ -18,9 +18,10 @@ export default {
     }),
 
     computedComponent() {
-      if (this.currentOrganization) {
-        return OrganizationIndex
-      }
+      // TODO: Enable developer support for organizations
+      // if (this.currentOrganization) {
+      //   return OrganizationIndex
+      // }
 
       return PersonalIndex
     }

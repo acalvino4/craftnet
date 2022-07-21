@@ -103,6 +103,7 @@ export default {
       currentPlanHandle: 'developerSupport/currentPlanHandle',
       subscriptionInfoSubscriptionData: 'developerSupport/subscriptionInfoSubscriptionData',
       proPlan: 'developerSupport/proPlan',
+      currentOrganization: 'organizations/currentOrganization'
     }),
 
     selectedPlan() {
@@ -152,6 +153,10 @@ export default {
   },
 
   mounted() {
+    if (this.currentOrganization) {
+      this.$router.push({path: '/settings'})
+    }
+
     this.loading = true
 
     this.$store.dispatch('developerSupport/getSubscriptionInfo')

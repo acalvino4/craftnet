@@ -136,7 +136,7 @@
         </router-link>
       </li>
 
-      <li>
+      <li v-if="!currentOrganization">
         <router-link
           @click="$emit('closeSidebar')"
           to="/settings/developer-support">
