@@ -5,11 +5,11 @@ import qs from 'qs'
 
 export default {
   getAccount() {
-    return axios.get(window.craftIdUrl + '/stripe/account')
+    return axios.get(Craft.actionUrl + '/craftnet/console/stripe/account')
   },
 
   disconnect() {
-    return axios.post(window.craftIdUrl + '/stripe/disconnect', {}, {
+    return axios.post(Craft.actionUrl + '/craftnet/console/stripe/disconnect', {}, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -21,7 +21,7 @@ export default {
       paymentMethodId: source.id
     }
 
-    return axios.post(window.craftIdUrl + '/stripe/save-card', qs.stringify(data), {
+    return axios.post(Craft.actionUrl + '/craftnet/console/stripe/save-card', qs.stringify(data), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -29,7 +29,7 @@ export default {
   },
 
   removeCard() {
-    return axios.post(window.craftIdUrl + '/stripe/remove-card', {}, {
+    return axios.post(Craft.actionUrl + '/craftnet/console/stripe/remove-card', {}, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
