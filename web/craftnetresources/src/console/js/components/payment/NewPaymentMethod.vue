@@ -60,6 +60,17 @@
         @input="$emit('update:replaceCard', !replaceCard)" />
     </template>
 
+    <field
+      :vertical="true"
+      label-for="note"
+      label="Note"
+    >
+      <textbox
+        type="textarea"
+        id="note"
+      />
+    </field>
+
     <div class="mt-6 space-x-2">
       <template v-if="!selectedCreditCard || (selectedCreditCard && !selectedCreditCard.org)">
         <btn kind="primary" large>Pay $XX</btn>
