@@ -126,7 +126,18 @@ export default {
           next()
         }
       })
-    }
+    },
+
+    /**
+     * Connect app callback.
+     *
+     * @param apps
+     */
+    connectAppCallback(apps) {
+        this.$store.dispatch('apps/connectAppCallback', apps)
+
+        this.$store.dispatch('app/displayNotice', 'App connected.')
+    },
   },
 
   mounted() {
@@ -139,7 +150,9 @@ export default {
     if (window.sessionError) {
       this.$store.dispatch('app/displayError', window.sessionError)
     }
-  }
+  },
+
+  expose: ['connectAppCallback']
 }
 </script>
 
