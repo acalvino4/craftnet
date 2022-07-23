@@ -85,6 +85,7 @@
                 :first="true"
                 :vertical="true"
                 label="Where is your business located?"
+                instructions="Automatic Stripe payouts only occur for U.S., European, Australian, and New Zealand based accounts."
               >
                 <dropdown
                   v-model="selectedPayoutRegionHandle"
@@ -94,7 +95,7 @@
 
             <template v-if="selectedPayoutRegion">
               <hr>
-              
+
               <template v-if="selectedPayoutRegion.method === 'stripe'">
 
                 <div class="flex">
@@ -108,7 +109,7 @@
                   <div class="flex-1">
                     <h3>Stripe</h3>
                     <div class="text-gray-500">
-                      Automatic Stripe payouts only occur for U.S., European, Australian, and New Zealand based accounts.
+                      Connect to Stripe for automatic payouts.
                     </div>
 
                     <div class="mt-4">
