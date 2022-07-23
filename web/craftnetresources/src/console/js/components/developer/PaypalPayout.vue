@@ -1,28 +1,28 @@
 <template>
   <form
     v-if="userDraft"
-    @submit.prevent="save()">
-    <pane>
-      <div class="card-body">
-        <h2>PayPal Payouts</h2>
-        <p class="text-secondary">Provide your PayPal email, which will
-          be used for Plugin Store payouts in the event that there was
-          a problem transferring via Stripe.</p>
+    @submit.prevent="save()"
+  >
+    <div class="card-body">
+      <field
+        :first="true"
+        :vertical="true"
+        label="PayPal Email Address"
+      >
         <textbox
-          class="mt-4"
           id="paypalEmail"
-          label="PayPal Email Address"
           v-model="userDraft.payPalEmail"
-          :errors="errors.payPalEmail" />
-        <btn
-          class="mt-4"
-          kind="primary"
-          type="submit"
-          :disabled="loading"
-          :loading="loading">Save
-        </btn>
-      </div>
-    </pane>
+          :errors="errors.payPalEmail"
+        />
+      </field>
+      <btn
+        class="mt-4"
+        kind="primary"
+        type="submit"
+        :disabled="loading"
+        :loading="loading">Save
+      </btn>
+    </div>
   </form>
 </template>
 

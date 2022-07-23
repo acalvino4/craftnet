@@ -5,72 +5,186 @@
     </page-header>
 
     <div class="space-y-6">
-      <developer-preferences></developer-preferences>
+      <template v-if="!showOld">
+        <template v-if="!githubConnected">
+          <div class="max-w-screen-sm mt-24 mx-auto">
+            <div class="">
+              <div class="flex">
+                <div class="mt-2 mr-6 px-4">
+                  <icon
+                    class="text-blue-500 w-16 h-16"
+                    icon="plug" />
+                </div>
 
-      <pane>
-        <template v-slot:header>
-          <h2>Connected Apps</h2>
+                <div class="flex-1">
+                  <h3>Submit your plugins</h3>
+                  <p>You can start submitting plugins to the Plugin Store once you’ve connected your GitHub account.</p>
+
+                  <div class="mt-4">
+                    <btn kind="primary" @click="githubConnected = true">Connect to GitHub</btn>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </template>
-        <connected-apps
-          title="Connected Apps"
-          :show-stripe="true"></connected-apps>
-      </pane>
 
-      <pane>
-        <div class="card-body">
-          <form @submit.prevent="generateToken()">
-            <h2>API Token</h2>
+        <template v-else>
+          <pane>
+            <template v-slot:header>
+              <h2>Payouts</h2>
+            </template>
 
-            <p v-if="notice">This is your new API token, <strong>keep
-              it someplace safe</strong>.</p>
+            <div class="flex">
+              <div class="mr-6 px-4">
+                <img
+                  class="mt-2 w-16"
+                  :src="staticImageUrl('stripe.svg')"
+                />
+              </div>
 
-            <div class="mt-2 max-w-sm">
-              <textbox
-                id="apiToken"
-                ref="apiTokenField"
-                class="mono"
-                :spellcheck="false"
-                v-model="apiToken"
-                :readonly="true" />
+              <div class="flex-1">
+                <h3>Stripe</h3>
+                <div class="text-gray-500">
+                  Automatic Stripe payouts only occur for U.S., European, Australian, and New Zealand based accounts.
+                </div>
+
+                <div class="mt-4">
+                  <btn kind="primary">Connect</btn>
+                </div>
+              </div>
             </div>
 
-            <btn
-              class="mt-4"
-              kind="primary"
-              type="submit"
-              :disabled="loading"
-              :loading="loading">
-              <template v-if="apiToken">Generate new API Token
-              </template>
-              <template v-else>Generate API Token</template>
-            </btn>
-          </form>
-        </div>
-      </pane>
+            <hr>
 
-      <payout-settings></payout-settings>
+            <div class="flex">
+              <div class="mr-6 px-4">
+                <img
+                  class="mt-2 w-16"
+                  :src="staticImageUrl('paypal.svg')"
+                />
+              </div>
+
+              <div class="flex-1">
+                <h3>PayPal Fallback</h3>
+                <div class="text-gray-500">
+                  Provide your PayPal email, which will be used for Plugin Store payouts in the event that there was a problem transferring via Stripe.
+                </div>
+
+                <paypal-payout class="mt-4" />
+              </div>
+            </div>
+          </pane>
+          <pane>
+            <template v-slot:header>
+              <h2>GitHub Account</h2>
+            </template>
+
+            <div class="flex items-center">
+              <div class="mr-6 px-4">
+                <img
+                  class="w-16"
+                  :src="staticImageUrl('github.svg')"
+                />
+              </div>
+
+              <div class="flex-1">
+                <h3>Account Name</h3>
+                <p>Connected to GitHub.</p>
+
+                <div class="mt-4">
+                  <btn kind="danger" @click="githubConnected = false">Disconnect</btn>
+                </div>
+              </div>
+            </div>
+          </pane>
+        </template>
+      </template>
+
+      <template v-else>
+        <div class="space-y-6">
+          <developer-preferences></developer-preferences>
+
+          <pane>
+            <template v-slot:header>
+              <h2>Connected Apps</h2>
+            </template>
+            <connected-apps
+              title="Connected Apps"
+              :show-stripe="true"></connected-apps>
+          </pane>
+        </div>
+
+        <pane>
+          <div class="card-body">
+            <form @submit.prevent="generateToken()">
+              <h2>API Token</h2>
+
+              <p v-if="notice">This is your new API token, <strong>keep
+                it someplace safe</strong>.</p>
+
+              <div class="mt-2 max-w-sm">
+                <textbox
+                  id="apiToken"
+                  ref="apiTokenField"
+                  class="mono"
+                  :spellcheck="false"
+                  v-model="apiToken"
+                  :readonly="true" />
+              </div>
+
+              <btn
+                class="mt-4"
+                kind="primary"
+                type="submit"
+                :disabled="loading"
+                :loading="loading">
+                <template v-if="apiToken">Generate new API Token
+                </template>
+                <template v-else>Generate API Token</template>
+              </btn>
+            </form>
+          </div>
+        </pane>
+
+        <pane>
+          <template v-slot:header>
+            <h2>Paypal Payouts</h2>
+            <div class="text-gray-500">
+              Provide your PayPal email, which will be used for Plugin Store payouts in the event that there was a problem transferring via Stripe.
+            </div>
+          </template>
+
+          <paypal-payout />
+        </pane>
+      </template>
     </div>
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
-import PayoutSettings from '../../components/developer/PayoutSettings'
+import PaypalPayout from '../../components/developer/PaypalPayout'
 import DeveloperPreferences from '../../components/developer/Preferences'
 import ConnectedApps from '../../components/developer/connected-apps/ConnectedApps'
 import PageHeader from '@/console/js/components/PageHeader'
+import helpers from '../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
+
   data() {
     return {
       apiToken: '',
       loading: false,
       notice: false,
+      showOld: true,
+      githubConnected: false,
     }
   },
 
   components: {
-    PayoutSettings,
+    PaypalPayout,
     DeveloperPreferences,
     ConnectedApps,
     PageHeader,

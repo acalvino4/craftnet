@@ -168,7 +168,7 @@
           to="/settings/plugin-store">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
-            icon="cog" />
+            icon="plug" />
           Plugin Store
         </router-link>
       </li>
