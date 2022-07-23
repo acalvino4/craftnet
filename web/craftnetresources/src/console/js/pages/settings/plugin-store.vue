@@ -66,7 +66,7 @@
               </div>
 
               <div class="flex-1">
-                <h3>PayPal Fallback</h3>
+                <h3>Payouts Fallback</h3>
                 <div class="text-gray-500">
                   Provide your PayPal email, which will be used for Plugin Store payouts in the event that there was a problem transferring via Stripe.
                 </div>
@@ -75,6 +75,70 @@
               </div>
             </div>
           </pane>
+          <pane>
+            <template v-slot:header>
+              <h2>Payouts</h2>
+            </template>
+
+            <div>
+              <field
+                :first="true"
+                :vertical="true"
+                label="Where is your business located?"
+              >
+                <dropdown
+                  v-model="selectedPayoutRegionHandle"
+                  :options="payoutRegionOptions" />
+              </field>
+            </div>
+
+            <template v-if="selectedPayoutRegion">
+              <hr>
+              
+              <template v-if="selectedPayoutRegion.method === 'stripe'">
+
+                <div class="flex">
+                  <div class="mr-6 px-4">
+                    <img
+                      class="mt-2 w-16"
+                      :src="staticImageUrl('stripe.svg')"
+                    />
+                  </div>
+
+                  <div class="flex-1">
+                    <h3>Stripe</h3>
+                    <div class="text-gray-500">
+                      Automatic Stripe payouts only occur for U.S., European, Australian, and New Zealand based accounts.
+                    </div>
+
+                    <div class="mt-4">
+                      <btn kind="primary">Connect</btn>
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <div class="flex">
+                  <div class="mr-6 px-4">
+                    <img
+                      class="mt-2 w-16"
+                      :src="staticImageUrl('paypal.svg')"
+                    />
+                  </div>
+
+                  <div class="flex-1">
+                    <h3>PayPal</h3>
+                    <div class="text-gray-500">
+                      Provide your PayPal email, which will be used for Plugin Store payouts in the event that there was a problem transferring via Stripe.
+                    </div>
+
+                    <paypal-payout class="mt-4" />
+                  </div>
+                </div>
+              </template>
+            </template>
+          </pane>
+
           <pane class="border border-red-500 mb-3">
             <template v-slot:header>
               <h2 class="mb-0 text-red-600">
@@ -182,6 +246,14 @@ export default {
       notice: false,
       showOld: true,
       githubConnected: false,
+      selectedPayoutRegionHandle: '',
+      payoutRegions: [
+        {name: 'United States', handle: 'us', method: 'stripe'},
+        {name: 'Europe', handle: 'eu', method: 'stripe'},
+        {name: 'Australia', handle: 'au', method: 'stripe'},
+        {name: 'New Zealand', handle: 'nz', method: 'stripe'},
+        {name: 'Other', handle: 'other', method: 'paypal'},
+      ],
     }
   },
 
@@ -197,6 +269,20 @@ export default {
       hasApiToken: state => state.account.hasApiToken,
       user: state => state.account.user,
     }),
+    selectedPayoutRegion() {
+      return this.payoutRegions.find(region => region.handle === this.selectedPayoutRegionHandle)
+    },
+    payoutRegionOptions() {
+      return [
+        {label: 'Select a region', value: ''},
+        ...this.payoutRegions.map(region => {
+          return {
+            label: region.name,
+            value: region.handle,
+          }
+        })
+      ]
+    },
   },
 
   methods: {
