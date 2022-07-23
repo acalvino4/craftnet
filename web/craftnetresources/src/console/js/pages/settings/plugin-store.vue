@@ -75,9 +75,11 @@
               </div>
             </div>
           </pane>
-          <pane>
+          <pane class="border border-red-500 mb-3">
             <template v-slot:header>
-              <h2>GitHub Account</h2>
+              <h2 class="mb-0 text-red-600">
+                Danger Zone
+              </h2>
             </template>
 
             <div class="flex items-center">
@@ -89,8 +91,8 @@
               </div>
 
               <div class="flex-1">
-                <h3>Account Name</h3>
-                <p>Connected to GitHub.</p>
+                <h3>GitHub Account</h3>
+                <p>You are connected to GitHub with the [Account Name] account.</p>
 
                 <div class="mt-4">
                   <btn kind="danger" @click="githubConnected = false">Disconnect</btn>
