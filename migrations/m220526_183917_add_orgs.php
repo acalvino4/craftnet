@@ -75,6 +75,9 @@ class m220526_183917_add_orgs extends Migration
         $this->dropForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER);
         $this->addForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER, ['developerId'], CraftTable::ELEMENTS, ['id']);
 
+        $this->dropForeignKey('craftnet_cmslicenses_ownerId_fk', Table::CMSLICENSES);
+        $this->addForeignKey('craftnet_cmslicenses_ownerId_fk', Table::CMSLICENSES, ['ownerId'], CraftTable::ELEMENTS, ['id']);
+
         return true;
     }
 
