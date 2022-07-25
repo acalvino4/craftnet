@@ -1,7 +1,20 @@
-/* global VUE_APP_URL_CONSOLE */
+/* global VUE_APP_URL_CONSOLE, Craft */
 import axios from 'axios';
+import qs from 'qs';
 
 export default {
+  addMember({organizationId, email}) {
+
+    const data = {
+      email,
+    }
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members', qs.stringify(data), {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
+
   leave() {
     console.log('TODO: Implement leaving an organization.')
 
@@ -10,8 +23,15 @@ export default {
     })
   },
 
-  save() {
-    console.log('TODO: Implement saving a new organization or updating an exising one.')
+  saveOrganization(organization) {
+    const data = {
+      org: organization,
+    }
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/save-org', qs.stringify(data), {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
   },
 
   convertAccountToOrganization() {
@@ -37,7 +57,31 @@ export default {
     })
   },
 
+  getOrders(organizationId) {
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders', {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
+
+  getOrganizationMembers({organizationId}) {
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members', {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
+
   getOrganizations() {
     return axios.get(VUE_APP_URL_CONSOLE + '/orgs/all')
-  }
+  },
+
+  removeMember({organizationId, memberId}) {
+    return axios.delete(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members/' + memberId, {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
 }

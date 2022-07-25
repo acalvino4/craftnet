@@ -224,7 +224,7 @@ class StripeController extends BaseController
         $provider = new StripeOauthProvider([
             'clientId' => $craftIdConfig['stripeClientId'],
             'clientSecret' => $craftIdConfig['stripeApiKey'],
-            'redirectUri' => UrlHelper::actionUrl('craftnet/id/stripe/callback'),
+            'redirectUri' => UrlHelper::actionUrl('craftnet/console/stripe/callback'),
         ]);
 
         return $provider;

@@ -16,17 +16,6 @@
       <pane>
         <billing-invoice-details></billing-invoice-details>
       </pane>
-
-      <pane>
-        <h2>Invoices</h2>
-
-        <invoices-table class="mt-4"></invoices-table>
-      </pane>
-
-      <pane>
-        <h2>Subscription Invoices</h2>
-        <subscription-invoices-table class="mt-4"></subscription-invoices-table>
-      </pane>
     </div>
   </div>
 </template>
@@ -35,8 +24,6 @@
 import BillingPayment from '../../../components/billing/BillingPayment'
 import BillingInvoiceDetails from '../../../components/billing/BillingInvoiceDetails'
 import BillingAddressForm from '../../../components/billing/BillingAddressForm'
-import InvoicesTable from '../../../components/billing/InvoicesTable'
-import SubscriptionInvoicesTable from '../../../components/billing/SubscriptionInvoicesTable'
 import PageHeader from '@/console/js/components/PageHeader'
 
 export default {
@@ -44,8 +31,6 @@ export default {
     BillingPayment,
     BillingInvoiceDetails,
     BillingAddressForm,
-    InvoicesTable,
-    SubscriptionInvoicesTable,
     PageHeader,
   },
 }

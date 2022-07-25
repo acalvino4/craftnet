@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import {Menu, MenuButton, MenuItems, MenuItem} from "@headlessui/vue";
+import {Menu, MenuButton, MenuItem} from "@headlessui/vue";
 import HudMenuItems from './HudMenuItems';
 import HudMenuItem from './HudMenuItem';
 
@@ -45,7 +45,6 @@ export default {
     HudMenuItems,
     Menu,
     MenuButton,
-    MenuItems,
     MenuItem,
   },
 
@@ -57,10 +56,11 @@ export default {
 
   methods: {
     removeMember() {
-      if (confirm("Are you sure you want to remove this member?")) {
-        // TODO: Implement removing a member
-        console.log('Remove member')
+      if (!confirm("Are you sure you want to remove this member?")) {
+        return null;
       }
+
+      this.$emit('removeMember')
     }
   },
 }

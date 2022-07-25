@@ -5,9 +5,9 @@
         <p>
           <router-link
             class="nav-link"
-            to="/settings/billing"
+            to="/settings/orders"
             exact>←
-            Billing
+            Orders
           </router-link>
         </p>
         <h1>Invoice {{ invoice.shortNumber }}</h1>
@@ -137,10 +137,10 @@
 </template>
 
 <script>
-import invoicesApi from '../../../../api/invoices'
-import BillingAddress from '../../../../components/billing/BillingAddress'
-import CmsLicensesTable from '../../../../components/licenses/CmsLicensesTable'
-import PluginLicensesTable from '../../../../components/licenses/PluginLicensesTable'
+import invoicesApi from '../../../api/invoices'
+import BillingAddress from '../../../components/billing/BillingAddress'
+import CmsLicensesTable from '../../../components/licenses/CmsLicensesTable'
+import PluginLicensesTable from '../../../components/licenses/PluginLicensesTable'
 
 export default {
   components: {

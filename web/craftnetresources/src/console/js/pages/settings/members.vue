@@ -27,35 +27,34 @@
         </thead>
         <tbody>
         <tr
-          v-for="(member, memberKey) in currentOrganization.members"
+          v-for="(member, memberKey) in members"
           :key="'member-' + memberKey">
           <td class="border-b px-4 py-3">
             <div class="flex items-center">
-              <div
-                class="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                <template v-if="member.avatar">
-                  <img
-                    class="w-10 h-10"
-                    :src="staticImageUrl('avatars/' + member.avatar)" />
-                </template>
-              </div>
+              <profile-photo
+                :photo-url="member.photoUrl"
+                size="md"
+                shape="circle"
+              />
+
               <div class="ml-4 text-sm">
                 <div class="font-bold">
-                  {{ member.name }}
+                  [member.name] {{ member.id }}
                 </div>
                 <div>
-                  {{ member.email }}
+                  [member.email]
                 </div>
               </div>
             </div>
           </td>
-          <td class="border-b px-4 py-3 text-sm">{{
-              member.role
-            }}
+          <td class="border-b px-4 py-3 text-sm">
+            {{ member.orgAdmin ? 'Admin' : 'Member' }}
           </td>
           <td class="border-b px-4 py-3 text-sm">
             <member-actions
-              @changeRole="changeMemberRole(memberKey)"></member-actions>
+              @changeRole="changeMemberRole(member.id)"
+              @removeMember="removeMember(member.id)"
+            />
           </td>
         </tr>
         </tbody>
@@ -73,14 +72,15 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
+import {mapActions, mapGetters, mapState} from 'vuex';
 import helpers from '@/console/js/mixins/helpers';
 import MemberActions from '@/console/js/components/MemberActions';
 import ChangeMemberRoleModal from '@/console/js/components/members/ChangeMemberRoleModal';
 import InviteMembersModal from '@/console/js/components/members/InviteMembersModal';
+import ProfilePhoto from '../../components/ProfilePhoto';
 
 export default {
-  components: {InviteMembersModal, ChangeMemberRoleModal, MemberActions},
+  components: {ProfilePhoto, InviteMembersModal, ChangeMemberRoleModal, MemberActions},
   mixins: [helpers],
 
   data() {
@@ -91,17 +91,29 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      members: state => state.organizations.members,
+    }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization'
     }),
   },
 
   methods: {
+    ...mapActions({
+      getOrganizationMembers: 'organizations/getOrganizationMembers',
+    }),
     changeMemberRole(memberKey) {
       // TODO: Implement change member role
       console.log('change member role', memberKey)
 
       this.showChangeMemberRoleModal = true
+    },
+
+    removeMember(memberId) {
+      const organizationId = this.$store.getters['organizations/currentOrganization'].id
+
+      this.$store.dispatch('organizations/removeMember', {organizationId, memberId})
     }
   },
 
@@ -109,6 +121,10 @@ export default {
     if (!this.currentOrganization) {
       this.$router.push({path: '/settings/profile'})
     }
+
+    this.getOrganizationMembers({
+      organizationId: this.currentOrganization.id
+    })
   },
 }
 </script>

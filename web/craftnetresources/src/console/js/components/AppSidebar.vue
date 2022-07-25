@@ -38,8 +38,7 @@
       </li>
     </ul>
 
-    <template v-if="currentOrganization && user">
-      <template v-if="userIsInGroup('developers')">
+    <template v-if="user && currentOrganization">
         <h5>Developer</h5>
         <ul>
           <li>
@@ -63,7 +62,6 @@
             </router-link>
           </li>
         </ul>
-      </template>
     </template>
 
     <h5>
@@ -110,6 +108,16 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
+          to="/settings/orders">
+          <icon
+            class="mr-2 text-blue-500 w-5 h-5"
+            icon="box" />
+          Orders
+        </router-link>
+      </li>
+      <li>
+        <router-link
+          @click="$emit('closeSidebar')"
           to="/settings/billing">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
@@ -123,12 +131,12 @@
           to="/settings/organizations">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
-            icon="collection" />
+            icon="buildings" />
           Organizations
         </router-link>
       </li>
 
-      <li>
+      <li v-if="!currentOrganization">
         <router-link
           @click="$emit('closeSidebar')"
           to="/settings/developer-support">
@@ -145,11 +153,11 @@
         <li>
           <router-link
             @click="$emit('closeSidebar')"
-            to="/settings/partner/profile">
+            to="/settings/partner/network">
             <icon
               class="mr-2 text-blue-500 w-5 h-5"
               icon="check-circle" />
-            Partner Listing
+            Partner Network
           </router-link>
         </li>
       </template>
@@ -157,33 +165,14 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/settings/developer">
+          to="/settings/plugin-store">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
-            icon="cog" />
-          Developer Settings
+            icon="plug" />
+          Plugin Store
         </router-link>
       </li>
     </ul>
-
-    <!--
-    <h5>Accessibility</h5>
-    <ul>
-        <li>
-            <a @click.prevent="toggleDarkMode()">
-                <template v-if="!darkMode">Dark Mode</template>
-                <template v-else>Light Mode</template>
-            </a>
-        </li>
-        <li>
-            <a @click.prevent="toggleHighContrast()">
-
-                <template v-if="!highContrast">High Contrast</template>
-                <template v-else>Low Contrast</template>
-            </a>
-        </li>
-    </ul>
-    -->
   </div>
 </template>
 
@@ -197,8 +186,6 @@ export default {
 
   data() {
     return {
-      darkMode: false,
-      highContrast: false,
       showingOrganizationHud: false,
     }
   },
@@ -218,26 +205,6 @@ export default {
   },
 
   methods: {
-    toggleDarkMode() {
-      if (!this.darkMode) {
-        window.document.body.classList.add('theme-dark')
-        this.darkMode = true
-      } else {
-        window.document.body.classList.remove('theme-dark')
-        this.darkMode = false
-      }
-    },
-
-    toggleHighContrast() {
-      if (!this.highContrast) {
-        window.document.body.classList.add('high-contrast')
-        this.highContrast = true
-      } else {
-        window.document.body.classList.remove('high-contrast')
-        this.highContrast = false
-      }
-    },
-
     /**
      * Click away from the organization hud.
      */

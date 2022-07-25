@@ -68,8 +68,7 @@
 
       <div class="mt-3 text-sm">
         <p>Don’t have an account yet?
-          <router-link to="/register">Create yours now</router-link>
-          .
+          <span><router-link to="/register">Create yours now</router-link>.</span>
         </p>
       </div>
     </form>

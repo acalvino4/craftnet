@@ -50,7 +50,7 @@
         <li>
           <router-link
             @click="$emit('closeSidebar')"
-            to="/settings/partner/profile">Partner Listing
+            to="/settings/partner/network">Partner Network
           </router-link>
         </li>
       </template>

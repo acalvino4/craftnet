@@ -5,6 +5,6 @@
 
 {% js %}
 let apps = {{ apps|json_encode|raw }};
-window.opener.craftIdApp.connectAppCallback(apps);
+window.opener.craftIdApp._instance.exposed.connectAppCallback(apps);
 window.close();
 {% endjs %}

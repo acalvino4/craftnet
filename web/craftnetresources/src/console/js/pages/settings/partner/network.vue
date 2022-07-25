@@ -3,7 +3,7 @@
     <page-header>
       <div>
         <h1>
-          Partner Listing
+          Partner Network
 
           <template v-if="partner">
             <badge
@@ -232,7 +232,7 @@ export default {
       })
       .catch((response) => {
         this.loadState = this.LOAD_ERROR
-        this.loadError = response.data.error || 'Couldn’t load partner listing'
+        this.loadError = response.data.error || 'Couldn’t load partner network'
       })
   }
 }

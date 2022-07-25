@@ -4,7 +4,7 @@
 
     <pane>
       <p>Welcome to Craft Partners. Here is where you will manage your
-        <router-link to="profile">Partner listing</router-link>
+        <router-link to="profile">Partner Network</router-link>
         .
       </p>
 

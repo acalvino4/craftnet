@@ -9,7 +9,9 @@
 
     <div class="flex md:flex-1 items-center">
       <div class="flex-1 flex">
-        <search-toggle></search-toggle>
+        <div class="hidden">
+          <search-toggle></search-toggle>
+        </div>
       </div>
 
       <ul class="py-2.5 flex items-center space-x-2">

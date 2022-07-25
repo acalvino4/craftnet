@@ -107,7 +107,7 @@ class Oauth extends Component
         return new $config['oauthClass']([
             'clientId' => $config['clientIdKey'],
             'clientSecret' => $config['clientSecretKey'],
-            'redirectUri' => $craftIdConfig['craftIdUrl'] . '/apps/callback',
+            'redirectUri' => $craftIdConfig['consoleUrl'] . 'apps/callback',
         ]);
     }
 

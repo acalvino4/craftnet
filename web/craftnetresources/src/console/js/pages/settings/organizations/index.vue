@@ -25,17 +25,11 @@
                 }]">
                 <div class="flex items-center">
                   <div class="mr-4">
-                    <div
-                      :class="{
-                        'w-12 h-12 rounded-md overflow-hidden': true,
-                        'bg-gray-100 dark:bg-gray-400': !organization.avatar,
-                      }"
-                    >
-                      <template v-if="organization.avatar">
-                        <img
-                          :src="staticImageUrl('avatars/' + organization.avatar)" />
-                      </template>
-                    </div>
+                    <profile-photo
+                      size="lg"
+                      :photo-url="organization.photoUrl"
+                      fallback="org"
+                    />
                   </div>
                   <div class="font-medium">
                     {{ organization.displayName }}
@@ -84,11 +78,13 @@ import {mapActions, mapState} from 'vuex';
 import helpers from '@/console/js/mixins/helpers.js';
 import PageHeader from '@/console/js/components/PageHeader'
 import ConvertAccountToOrganization from '@/console/js/components/ConvertAccountToOrganization';
+import ProfilePhoto from '../../../components/ProfilePhoto';
 
 export default {
   mixins: [helpers],
 
   components: {
+    ProfilePhoto,
     ConvertAccountToOrganization,
     PageHeader,
   },

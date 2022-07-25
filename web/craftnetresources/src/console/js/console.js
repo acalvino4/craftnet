@@ -24,21 +24,4 @@ app.config.globalProperties.$filters = filters
 
 app.mount('#app')
 
-// window.craftIdApp = new Vue({
-//     store,
-//
-//     render: h => h(App),
-//
-//     methods: {
-//         /**
-//          * Connect app callback.
-//          *
-//          * @param apps
-//          */
-//         connectAppCallback(apps) {
-//             this.$store.dispatch('apps/connectAppCallback', apps)
-//
-//             this.$store.dispatch('app/displayNotice', 'App connected.')
-//         },
-//     },
-// })
+window.craftIdApp = app

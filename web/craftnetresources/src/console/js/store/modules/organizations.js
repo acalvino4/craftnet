@@ -6,6 +6,8 @@ import organizationsApi from '@/console/js/api/organizations';
 const state = {
   organizations: [],
   currentOrganizationId: null,
+  members: [],
+  orders: [],
 }
 
 /**
@@ -25,6 +27,13 @@ const getters = {
  * Actions
  */
 const actions = {
+  addMember({dispatch}, {organizationId, email, role}) {
+    return organizationsApi.addMember({organizationId, email, role})
+      .then(() => {
+        dispatch('getOrganizationMembers', {organizationId})
+      })
+  },
+
   leaveOrganization() {
     return new Promise((resolve, reject) => {
       organizationsApi.leave()
@@ -59,6 +68,20 @@ const actions = {
       })
   },
 
+  getOrders({commit}, {organizationId}) {
+    return organizationsApi.getOrders(organizationId)
+      .then((response) => {
+        commit('updateOrders', response.data)
+      })
+  },
+
+  getOrganizationMembers({commit}, {organizationId}) {
+    return organizationsApi.getOrganizationMembers({organizationId})
+            .then((response) => {
+              commit('updateMembers', response.data)
+            })
+  },
+
   getOrganizations({commit}) {
     return new Promise((resolve, reject) => {
       organizationsApi.getOrganizations()
@@ -70,7 +93,29 @@ const actions = {
           reject(response)
         })
     })
-  }
+  },
+
+  removeMember({dispatch}, {organizationId, memberId}) {
+    return organizationsApi.removeMember({organizationId, memberId})
+      .then(() => {
+        dispatch('getOrganizationMembers', {organizationId})
+      })
+  },
+
+  saveOrganization({dispatch}, organization) {
+    return new Promise((resolve, reject) => {
+      organizationsApi.saveOrganization(organization)
+        .then((response) => {
+          dispatch('getOrganizations')
+            .then(() => {
+              resolve(response)
+            })
+        })
+        .catch((response) => {
+          reject(response)
+        })
+    })
+  },
 }
 
 /**
@@ -83,6 +128,15 @@ const mutations = {
 
   updateOrganizations(state, organizations) {
     state.organizations = organizations
+  },
+
+  updateMembers(state, members) {
+    state.members = members
+  },
+
+  updateOrders(state, orders) {
+    console.log('-------------- orders', orders)
+    state.orders = orders
   }
 }
 
