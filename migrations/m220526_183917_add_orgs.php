@@ -60,6 +60,21 @@ class m220526_183917_add_orgs extends Migration
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], \craft\commerce\db\Table::ORDERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
 
+        $this->dropForeignKey('craftcom_plugins_developerId_fk', Table::PLUGINS);
+        $this->addForeignKey('craftcom_plugins_developerId_fk', Table::PLUGINS, ['developerId'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
+
+        $this->dropForeignKey('craftnet_pluginlicenses_ownerId_fk', Table::PLUGINLICENSES);
+        $this->addForeignKey('craftnet_pluginlicenses_ownerId_fk', Table::PLUGINLICENSES, ['ownerId'], CraftTable::ELEMENTS, ['id']);
+
+        $this->dropForeignKey('fk_nadpvidlmfiafsxiwgkwdoerxoglbldsiuoz', Table::PAYOUT_ITEMS);
+        $this->addForeignKey('craftnet_payout_items_developerId_fk', Table::PAYOUT_ITEMS, ['developerId'], CraftTable::ELEMENTS, ['id']);
+
+        $this->dropForeignKey('craftnet_packages_developerId_fk', Table::PACKAGES);
+        $this->addForeignKey('craftnet_packages_developerId_fk', Table::PACKAGES, ['developerId'], CraftTable::ELEMENTS, ['id']);
+
+        $this->dropForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER);
+        $this->addForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER, ['developerId'], CraftTable::ELEMENTS, ['id']);
+
         return true;
     }
 
