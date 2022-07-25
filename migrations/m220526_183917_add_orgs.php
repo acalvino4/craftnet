@@ -33,7 +33,7 @@ class m220526_183917_add_orgs extends Migration
         ]);
 
         $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id']);
 
         $this->createTable(Table::ORGS_MEMBERS, [
             'id' => $this->primaryKey(),
