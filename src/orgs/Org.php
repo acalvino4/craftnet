@@ -33,8 +33,8 @@ class Org extends Element
     public ?string $apiToken = null;
     public int $balance = 0;
     public ?int $creatorId = null;
-    public ?int $primaryPaymentSourceId = null;
-    public ?int $primaryBillingAddressId = null;
+    public ?int $paymentSourceId = null;
+    public ?int $billingAddressId = null;
 
     public static function displayName(): string
     {
