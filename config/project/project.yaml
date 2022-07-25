@@ -1,4 +1,4 @@
-dateModified: 1657641901
+dateModified: 1658780312
 elementSources:
   craft\elements\Asset:
     -
@@ -168,6 +168,7 @@ meta:
     7e55127b-d67b-4d6e-8737-e6370c3063fc: Attention # Attention
     8b796e49-612b-4477-9567-64c11f929737: 'Customer Email' # Customer Email
     8c77d2c1-8b2d-4175-894d-3360298ed704: Screenshots # Screenshots
+    9ccab6a8-d358-4d2c-af6b-c6edeb1dcb94: Avatar
     42b088ed-cffc-4382-aeb1-56e192d4138b: 'Support Plan' # Support Plan
     64f9978b-3086-49db-b59e-eced2a2dc63e: 'Manual Selection' # Manual Selection
     69a360da-0024-4460-a54a-b898d616b013: Orders # Orders
@@ -191,7 +192,7 @@ meta:
     149763f1-bd8b-4d8e-a8f0-8ce1b0c6d593: 'Featured Plugins' # Featured Plugins
     833000d4-aee8-4e2e-b86b-ea7642aeb240: 'External URL' # External URL
     3729338a-bc60-4be2-9fc4-0e63b4a62d4a: Plugins # Plugins
-    15404041-1763-447f-a5f3-77ab36679bb1: 'Require Order Approval'
+    15404041-1763-447f-a5f3-77ab36679bb1: 'Require Order Approval' # Require Order Approval
     63801519-f6aa-468d-9ce9-1a0c289e5ddb: 'Craft Edition' # Craft Edition
     a1deff4e-43ef-4a67-870e-813cfa36700c: 'Enable showcase features' # Enable showcase features
     a2f14c14-960e-4f3a-a673-b505db22569b: 'Craft License' # Craft License
