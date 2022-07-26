@@ -57,6 +57,7 @@ class OrgsController extends Controller
                 $org->stripeAccessToken = $user->stripeAccessToken;
                 $org->stripeAccount = $user->stripeAccount;
                 $org->apiToken = $user->apiToken;
+                $org->balance = $user->balance;
                 $org->creatorId = $user->id;
 
                 $org->setFieldValues([
@@ -68,7 +69,6 @@ class OrgsController extends Controller
                 ]);
 
                 // TODO: other partner data (partners table)
-                // TODO: other developer data (balance)
 
                 $this->stdout("    > Saving org ... ");
                 if (!Craft::$app->getElements()->saveElement($org)) {

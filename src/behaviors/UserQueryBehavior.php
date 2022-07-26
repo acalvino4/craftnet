@@ -83,6 +83,7 @@ class UserQueryBehavior extends Behavior
             'developers.stripeAccount',
             'developers.payPalEmail',
             'developers.apiToken',
+            'developers.balance',
         ]);
 
         $this->owner->query->leftJoin(['developers' => Table::DEVELOPERS], '[[developers.id]] = [[users.id]]');
