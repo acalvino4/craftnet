@@ -7,6 +7,8 @@ use craft\elements\User;
 use craft\helpers\Db;
 use craftnet\db\Table;
 use Illuminate\Support\Collection;
+use ReflectionObject;
+use ReflectionProperty;
 use yii\db\Connection;
 
 class OrgQuery extends ElementQuery
@@ -16,6 +18,8 @@ class OrgQuery extends ElementQuery
     public ?string $apiToken = null;
     public ?int $balance = null;
     public ?int $creatorId = null;
+    public ?int $paymentSourceId = null;
+    public ?int $billingAddressId = null;
     private ?int $hasMemberId = null;
     private ?int $hasOwnerId = null;
     private bool $joinMembers = false;
@@ -23,6 +27,18 @@ class OrgQuery extends ElementQuery
     public function creatorId(?int $creatorId): OrgQuery
     {
         $this->creatorId = $creatorId;
+        return $this;
+    }
+
+    public function paymentSourceId(?int $paymentSourceId): OrgQuery
+    {
+        $this->paymentSourceId = $creatorId;
+        return $this;
+    }
+
+    public function billingAddressId(?int $billingAddressId): OrgQuery
+    {
+        $this->billingAddressId = $creatorId;
         return $this;
     }
 
@@ -51,6 +67,8 @@ class OrgQuery extends ElementQuery
             'apiToken',
             'balance',
             'creatorId',
+            'paymentSourceId',
+            'billingAddressId',
         ]);
 
         $this->query->select(
@@ -74,7 +92,7 @@ class OrgQuery extends ElementQuery
         if ($this->hasOwnerId !== null) {
             $this->subQuery->andWhere([
                 'orgsMembers.userId' => $this->hasOwnerId,
-                'orgsMembers.admin' => true,
+                'orgsMembers.owner' => true,
             ]);
         }
 

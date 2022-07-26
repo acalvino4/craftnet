@@ -100,6 +100,9 @@ class Org extends Element
                             Craft::$app->getFields()->getFieldByHandle('externalUrl')
                         ),
                         new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('avatar')
+                        ),
+                        new CustomField(
                             Craft::$app->getFields()->getFieldByHandle('location')
                         ),
                         new CustomField(

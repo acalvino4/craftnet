@@ -9,6 +9,7 @@ use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
+use craftnet\Module;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
@@ -31,17 +32,16 @@ class OrgsController extends Controller
         $partnerOwnerIds = Partner::find()->collect()->pluck('ownerId');
         $developerIds = Plugin::find()->collect()->pluck('developerId');
 
-        // All plugin developers and partner owners
-        $existingUserIds = $developerIds
+        $userIds = $developerIds
             ->push(...$partnerOwnerIds)
             ->unique()
             ->all();
 
         User::find()
             ->status('credentialed')
-            ->id($existingUserIds)
+            ->id($userIds)
             ->collect()
-            ->each(function(User $user) {
+            ->each(function (User $user) {
                 $this->stdout("Creating an org for user #$user->id ($user->email) ..." . PHP_EOL);
 
                 if (Org::find()->creatorId($user->id)->exists()) {
@@ -64,7 +64,9 @@ class OrgsController extends Controller
                     'location' => $user->location,
                     'payPalEmail' => $user->payPalEmail,
                     'enablePartnerFeatures' => $user->enablePartnerFeatures,
+                    'avatar' => $user->photoId ? [$user->photoId] : null,
                 ]);
+
                 // TODO: other partner data (partners table)
                 // TODO: other developer data (balance)
 
@@ -72,6 +74,11 @@ class OrgsController extends Controller
                 if (!Craft::$app->getElements()->saveElement($org)) {
                     throw new Exception("Couldn't save org: " . implode(', ', $org->getFirstErrors()));
                 }
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Removing avatar from user ... ");
+                $user->setPhoto(null);
+                Craft::$app->getElements()->saveElement($user);
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("    > Adding user as owner of org ... ");
@@ -89,7 +96,48 @@ class OrgsController extends Controller
                     ->execute();
                 $this->stdout('done' . PHP_EOL);
 
+                $this->stdout("    > Relating plugins to org ... ");
+                Craft::$app->getDb()->createCommand()
+                    ->update(Table::PLUGINS, ['developerId' => $org->id], ['developerId' => $user->id])
+                    ->execute();
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Relating CMS licenses to org ... ");
+                Craft::$app->getDb()->createCommand()
+                    ->update(Table::CMSLICENSES, ['ownerId' => $org->id], ['ownerId' => $user->id])
+                    ->execute();
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Relating plugins licenses to org ... ");
+                Craft::$app->getDb()->createCommand()
+                    ->update(Table::PLUGINLICENSES, ['ownerId' => $org->id], ['ownerId' => $user->id])
+                    ->execute();
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Relating payout items to org ... ");
+                Craft::$app->getDb()->createCommand()
+                    ->update(Table::PAYOUT_ITEMS, ['developerId' => $org->id], ['developerId' => $user->id])
+                    ->execute();
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Relating packages to org ... ");
+                Craft::$app->getDb()->createCommand()
+                    ->update(Table::PACKAGES, ['developerId' => $org->id], ['developerId' => $user->id])
+                    ->execute();
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Relating developer ledger to org ... ");
+                Craft::$app->getDb()->createCommand()
+                    ->update(Table::DEVELOPERLEDGER, ['developerId' => $org->id], ['developerId' => $user->id])
+                    ->execute();
+                $this->stdout('done' . PHP_EOL);
+
                 $this->stdout("Done creating org #$org->id" . PHP_EOL . PHP_EOL);
             });
+    }
+
+    public function actionCleanup(): void
+    {
+
     }
 }
