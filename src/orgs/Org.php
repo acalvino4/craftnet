@@ -97,10 +97,10 @@ class Org extends Element
                     'elements' => [
                         new TitleField(),
                         new CustomField(
-                            Craft::$app->getFields()->getFieldByHandle('externalUrl')
+                            Craft::$app->getFields()->getFieldByHandle('requireOrderApproval')
                         ),
                         new CustomField(
-                            Craft::$app->getFields()->getFieldByHandle('avatar')
+                            Craft::$app->getFields()->getFieldByHandle('externalUrl')
                         ),
                         new CustomField(
                             Craft::$app->getFields()->getFieldByHandle('location')
@@ -109,13 +109,66 @@ class Org extends Element
                             Craft::$app->getFields()->getFieldByHandle('payPalEmail')
                         ),
                         new CustomField(
-                            Craft::$app->getFields()->getFieldByHandle('requireOrderApproval')
-                        ),
-                        new CustomField(
-                            Craft::$app->getFields()->getFieldByHandle('enablePartnerFeatures')
+                            Craft::$app->getFields()->getFieldByHandle('orgLogo')
                         ),
                     ]
                 ],
+                [
+                    'name' => 'Partner Network',
+                    'elements' => [
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('enablePartnerFeatures')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('primaryContactName')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('primaryContactEmail')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('primaryContactPhone')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerFullBio')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerShortBio')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerHasFullTimeDev')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerIsCraftVerified')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerIsCommerceVerified')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerIsEnterpriseVerified')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerIsRegisteredBusiness')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerAgencySize')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerCapabilities')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerExpertise')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerVerificationStartDate')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerRegion')
+                        ),
+                        new CustomField(
+                            Craft::$app->getFields()->getFieldByHandle('partnerProjects')
+                        ),
+                    ]
+                ]
             ]
         ]);
     }

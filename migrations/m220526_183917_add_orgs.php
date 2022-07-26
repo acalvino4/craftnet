@@ -77,6 +77,7 @@ class m220526_183917_add_orgs extends Migration
         $this->dropForeignKey('craftnet_cmslicenses_ownerId_fk', Table::CMSLICENSES);
         $this->addForeignKey('craftnet_cmslicenses_ownerId_fk', Table::CMSLICENSES, ['ownerId'], CraftTable::ELEMENTS, ['id'], 'SET NULL');
 
+        // TODO: userId should be replaced with orgId or ownerId
         $this->dropForeignKey('craftcom_vcstokens_userId_fk', Table::VCSTOKENS);
         $this->addForeignKey('craftcom_vcstokens_userId_fk', Table::VCSTOKENS, ['userId'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
 

@@ -21,6 +21,24 @@ use yii\db\Exception;
 
 class OrgsController extends Controller
 {
+    public string|int|null $userId = null;
+
+    /**
+     * @inheritdoc
+     */
+    public function options($actionID): array
+    {
+        $options = parent::options($actionID);
+
+        switch ($actionID) {
+            case 'convert':
+                $options[] = 'userId';
+                break;
+        }
+
+        return $options;
+    }
+
     /**
      * Converts existing developers and partners to orgs and creates an org owner with matching credentials
      *
@@ -34,7 +52,7 @@ class OrgsController extends Controller
         $partnerOwnerIds = Partner::find()->collect()->pluck('ownerId');
         $developerIds = Plugin::find()->collect()->pluck('developerId');
 
-        $userIds = $developerIds
+        $userIds = $this->userId ?? $developerIds
             ->push(...$partnerOwnerIds)
             ->unique()
             ->all();
@@ -62,12 +80,32 @@ class OrgsController extends Controller
                 $org->balance = $user->balance;
                 $org->creatorId = $user->id;
 
+                $projectsAsMatrix = Collection::make($partner?->getProjects())
+                    ->flatMap(function($project, $index) {
+                        $key = 'new' . ($index + 1);
+
+                        return [
+                            $key => [
+                                'type' => 'project',
+                                'fields' => [
+                                    'projectName' => $project->name,
+                                    'projectUrl' => $project->url,
+                                    'linkType' => $project->linkType,
+                                    'role' => $project->role,
+                                    'withCraftCommerce' => $project->withCraftCommerce,
+                                    'screenshots' => $project->getScreenshotIds(),
+                                ]
+                            ]
+                        ];
+                    })
+                    ->all();
+
                 $org->setFieldValues([
                     'externalUrl' => $partner?->website ?? $user->developerUrl,
                     'location' => $user->location,
                     'payPalEmail' => $user->payPalEmail,
                     'enablePartnerFeatures' => $user->enablePartnerFeatures,
-                    'orgLogo' => array_filter($partner?->logoAssetId ?? $user->photoId),
+                    'orgLogo' => array_filter([$partner?->logoAssetId ?? $user->photoId]),
                     'primaryContactName' => $partner?->primaryContactName,
                     'primaryContactEmail' => $partner?->primaryContactEmail,
                     'primaryContactPhone' => $partner?->primaryContactPhone,
@@ -84,6 +122,7 @@ class OrgsController extends Controller
                     'partnerExpertise' => $partner?->expertise,
                     'partnerVerificationStartDate' => $partner?->getVerificationStartDate(),
                     'partnerRegion' => $partner?->region,
+                    'partnerProjects' => $projectsAsMatrix,
                 ]);
 
                 $this->stdout("    > Saving org ... ");
