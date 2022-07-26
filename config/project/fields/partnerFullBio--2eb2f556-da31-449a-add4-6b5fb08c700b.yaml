@@ -1,0 +1,19 @@
+columnSuffix: ztfxdfup
+contentColumnType: text
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: partnerFullBio
+instructions: null
+name: 'Full Bio'
+searchable: true
+settings:
+  byteLimit: null
+  charLimit: null
+  code: false
+  columnType: null
+  initialRows: 10
+  multiline: true
+  placeholder: null
+  uiMode: normal
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\PlainText

@@ -7,12 +7,14 @@ use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
+use craft\helpers\StringHelper;
 use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
 use craftnet\Module;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
+use Illuminate\Support\Collection;
 use Throwable;
 use yii\console\Controller;
 use yii\db\Exception;
@@ -49,11 +51,11 @@ class OrgsController extends Controller
                     return;
                 }
 
-                $partner = Partner::find()->ownerId($user->id)->one();
+                $partner = Partner::find()->ownerId($user->id)->status(null)->one();
 
                 $org = new Org();
-                $org->title = $partner->title ?? $user->developerName ?? $user->username;
-                $org->slug = $partner->websiteSlug ?? $user->username;
+                $org->title = $partner->businessName ?? $user->developerName ?? $user->username;
+                $org->slug = $partner?->websiteSlug ?? $user->username;
                 $org->stripeAccessToken = $user->stripeAccessToken;
                 $org->stripeAccount = $user->stripeAccount;
                 $org->apiToken = $user->apiToken;
@@ -61,14 +63,28 @@ class OrgsController extends Controller
                 $org->creatorId = $user->id;
 
                 $org->setFieldValues([
-                    'externalUrl' => $partner->website ?? $user->developerUrl,
+                    'externalUrl' => $partner?->website ?? $user->developerUrl,
                     'location' => $user->location,
                     'payPalEmail' => $user->payPalEmail,
                     'enablePartnerFeatures' => $user->enablePartnerFeatures,
-                    'avatar' => $user->photoId ? [$user->photoId] : null,
+                    'orgLogo' => array_filter($partner?->logoAssetId ?? $user->photoId),
+                    'primaryContactName' => $partner?->primaryContactName,
+                    'primaryContactEmail' => $partner?->primaryContactEmail,
+                    'primaryContactPhone' => $partner?->primaryContactPhone,
+                    'partnerFullBio' => $partner?->fullBio,
+                    'partnerShortBio' => $partner?->shortBio,
+                    'partnerHasFullTimeDev' => $partner?->hasFullTimeDev,
+                    'partnerIsCraftVerified' => $partner?->isCraftVerified,
+                    'partnerIsCommerceVerified' => $partner?->isCommerceVerified,
+                    'partnerIsEnterpriseVerified' => $partner?->isEnterpriseVerified,
+                    'partnerIsRegisteredBusiness' => $partner?->isRegisteredBusiness,
+                    'partnerAgencySize' => $partner?->agencySize,
+                    'partnerCapabilities' => Collection::make($partner?->getCapabilities())
+                        ->map(fn($label) => StringHelper::toCamelCase($label))->all(),
+                    'partnerExpertise' => $partner?->expertise,
+                    'partnerVerificationStartDate' => $partner?->getVerificationStartDate(),
+                    'partnerRegion' => $partner?->region,
                 ]);
-
-                // TODO: other partner data (partners table)
 
                 $this->stdout("    > Saving org ... ");
                 if (!Craft::$app->getElements()->saveElement($org)) {

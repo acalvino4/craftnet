@@ -1,0 +1,19 @@
+columnSuffix: fncinwek
+contentColumnType: text
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: primaryContactPhone
+instructions: null
+name: 'Primary Contact Phone'
+searchable: false
+settings:
+  byteLimit: null
+  charLimit: null
+  code: false
+  columnType: null
+  initialRows: 4
+  multiline: false
+  placeholder: null
+  uiMode: normal
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\PlainText

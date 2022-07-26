@@ -1,0 +1,16 @@
+columnSuffix: null
+contentColumnType: string
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: partnerProjects
+instructions: null
+name: Projects
+searchable: false
+settings:
+  contentTable: '{{%matrixcontent_partnerprojects}}'
+  maxBlocks: null
+  minBlocks: null
+  propagationKeyFormat: null
+  propagationMethod: all
+translationKeyFormat: null
+translationMethod: site
+type: craft\fields\Matrix

@@ -1,0 +1,67 @@
+columnSuffix: kylubfne
+contentColumnType: string
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: partnerAgencySize
+instructions: null
+name: 'Agency Size'
+searchable: false
+settings:
+  options:
+    -
+      __assoc__:
+        -
+          - label
+          - 'Select one…'
+        -
+          - value
+          - ''
+        -
+          - default
+          - '1'
+    -
+      __assoc__:
+        -
+          - label
+          - 1-2
+        -
+          - value
+          - XS
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 3-9
+        -
+          - value
+          - S
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 10-29
+        -
+          - value
+          - M
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 30+
+        -
+          - value
+          - L
+        -
+          - default
+          - ''
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Dropdown

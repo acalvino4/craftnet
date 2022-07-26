@@ -31,7 +31,7 @@ class Org extends Element
     public ?string $stripeAccessToken = null;
     public ?string $stripeAccount = null;
     public ?string $apiToken = null;
-    public int $balance = 0;
+    public float $balance = 0;
     public ?int $creatorId = null;
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;

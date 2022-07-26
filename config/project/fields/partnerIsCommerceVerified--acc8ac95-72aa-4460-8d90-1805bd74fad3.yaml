@@ -1,0 +1,14 @@
+columnSuffix: dfhddobk
+contentColumnType: boolean
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: partnerIsCommerceVerified
+instructions: null
+name: 'Is Commerce Verified?'
+searchable: false
+settings:
+  default: false
+  offLabel: null
+  onLabel: null
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Lightswitch

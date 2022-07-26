@@ -54,6 +54,8 @@ class UserBehavior extends Behavior
      */
     public $apiToken;
 
+    public ?float $balance = null;
+
     /**
      * @var Plugin[]|null
      */

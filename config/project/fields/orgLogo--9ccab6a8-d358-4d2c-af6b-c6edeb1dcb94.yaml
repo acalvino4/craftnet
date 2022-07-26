@@ -1,16 +1,16 @@
 columnSuffix: null
 contentColumnType: string
 fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
-handle: avatar
+handle: orgLogo
 instructions: null
-name: Avatar
+name: Logo
 searchable: false
 settings:
   allowSelfRelations: false
   allowSubfolders: false
   allowUploads: true
   allowedKinds: null
-  defaultUploadLocationSource: 'volume:238dc7f2-e863-4b8f-96fa-805a3324dc5d' # Avatars
+  defaultUploadLocationSource: 'volume:e08a6ce3-ecbb-469e-b0e5-a03d2d9c6052' # Partner Images
   defaultUploadLocationSubpath: null
   localizeRelations: false
   maxRelations: 1
@@ -39,6 +39,7 @@ settings:
   source: null
   sources:
     - 'volume:238dc7f2-e863-4b8f-96fa-805a3324dc5d' # Avatars
+    - 'volume:e08a6ce3-ecbb-469e-b0e5-a03d2d9c6052' # Partner Images
   targetSiteId: null
   validateRelatedElements: false
   viewMode: large
