@@ -121,9 +121,11 @@ class OrgsController extends Controller
                         ->map(fn($label) => StringHelper::toCamelCase($label))->all(),
                     'partnerExpertise' => $partner?->expertise,
                     'partnerVerificationStartDate' => $partner?->getVerificationStartDate(),
-                    'partnerRegion' => $partner?->region,
+                    'partnerRegion' => StringHelper::toCamelCase($partner?->region),
                     'partnerProjects' => $projectsAsMatrix,
                 ]);
+
+                // TODO: migrate $partner->locations to an address field (orgs.locationAddressId)
 
                 $this->stdout("    > Saving org ... ");
                 if (!Craft::$app->getElements()->saveElement($org)) {

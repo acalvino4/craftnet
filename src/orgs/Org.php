@@ -4,25 +4,15 @@ namespace craftnet\orgs;
 
 use Craft;
 use craft\base\Element;
-use craft\elements\Address;
-use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
-use craft\fieldlayoutelements\addresses\AddressField;
 use craft\fieldlayoutelements\CustomField;
 use craft\fieldlayoutelements\TitleField;
-use craft\fields\RadioButtons;
-use craft\fields\Url;
-use craft\helpers\Cp;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
-use craft\models\FieldLayoutTab;
-use craft\models\Section;
-use craft\services\ElementSources;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
-use DateTime;
 use yii\base\UserException;
 use yii\db\Exception;
 
@@ -111,6 +101,8 @@ class Org extends Element
                         new CustomField(
                             Craft::$app->getFields()->getFieldByHandle('orgLogo')
                         ),
+                        // TODO: Include Address field (orgs.locationAddressId)
+                        // TODO: Include Address field (orgs.billingAddressId)
                     ]
                 ],
                 [
