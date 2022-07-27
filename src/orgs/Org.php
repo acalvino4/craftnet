@@ -11,8 +11,11 @@ use craft\fieldlayoutelements\TitleField;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
+use craft\models\Site;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
+use Illuminate\Support\Collection;
+use yii\base\InvalidConfigException;
 use yii\base\UserException;
 use yii\db\Exception;
 
@@ -26,6 +29,12 @@ class Org extends Element
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;
 
+    public function init(): void
+    {
+        $this->siteId = Craft::$app->getSites()->getSiteByHandle('plugins')->id;
+        parent::init();
+    }
+
     public static function displayName(): string
     {
         return Craft::t('app', 'Organization');
@@ -34,6 +43,14 @@ class Org extends Element
     public static function pluralDisplayName(): string
     {
         return Craft::t('app', 'Organizations');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUriFormat(): ?string
+    {
+        return 'developer/{slug}';
     }
 
     public static function hasTitles(): bool
@@ -49,6 +66,16 @@ class Org extends Element
     public static function hasUris(): bool
     {
         return true;
+    }
+
+    public static function isLocalized(): bool
+    {
+        return true;
+    }
+
+    public function getSupportedSites(): array
+    {
+        return [$this->siteId];
     }
 
     public static function hasStatuses(): bool
@@ -75,6 +102,41 @@ class Org extends Element
                 ]),
             ],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineTableAttributes(): array
+    {
+        return Collection::make()
+            ->merge(static::getTableAttributeByFieldHandle('orgLogo'))
+            ->merge(static::getTableAttributeByFieldHandle('enablePartnerFeatures'))
+            ->merge([
+                'slug' => ['label' => Craft::t('app', 'Slug')],
+                'uri' => ['label' => Craft::t('app', 'URI')],
+                'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
+                'id' => ['label' => Craft::t('app', 'ID')],
+                'uid' => ['label' => Craft::t('app', 'UID')],
+                'dateCreated' => ['label' => Craft::t('app', 'Date Created')],
+                'dateUpdated' => ['label' => Craft::t('app', 'Date Updated')],
+            ])
+            ->all();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        return Collection::make()
+            ->merge(static::getTableAttributeByFieldHandle('orgLogo'))
+            ->merge(static::getTableAttributeByFieldHandle('enablePartnerFeatures'))
+            ->keys()
+            ->merge([
+                'link',
+            ])
+            ->all();
     }
 
     public function getFieldLayout(): ?FieldLayout
@@ -304,5 +366,14 @@ class Org extends Element
         }
 
         return false;
+    }
+
+    private static function getTableAttributeByFieldHandle(string $handle): array
+    {
+        $field = Craft::$app->getFields()->getFieldByHandle('orgLogo');
+
+        return [
+            "field:$field->uid" => ['label' => $field->name]
+        ];
     }
 }
