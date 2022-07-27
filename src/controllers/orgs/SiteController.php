@@ -128,7 +128,6 @@ class SiteController extends Controller
             throw new ForbiddenHttpException('User not authorized to save this organization.');
         }
 
-        // siteId?
         $element->slug = $this->request->getBodyParam('slug', $element->slug);
         $element->title = $this->request->getBodyParam('title', $element->title);
         $element->setFieldValuesFromRequest('fields');
@@ -153,14 +152,14 @@ class SiteController extends Controller
         if (!$success) {
             return $this->asModelFailure(
                 $element,
-                Craft::t('app', 'Couldn’t save {type}.', ['type' => Org::displayName()]),
+                Craft::t('app', 'Couldn’t save organization.'),
                 'org'
             );
         }
 
         return $this->asModelSuccess(
             $element,
-            Craft::t('app', '{type} saved.', ['type' => Org::displayName()]),
+            Craft::t('app', 'Organization saved.'),
         );
     }
 
