@@ -96,11 +96,16 @@ class Org extends Element
         return [
             [
                 'key' => '*',
-                'criteria' => ['status' => null],
+                'criteria' => [],
                 'label' => Craft::t('app', 'All {pluralLowerDisplayName}', [
                     'pluralLowerDisplayName' => static::pluralLowerDisplayName()
                 ]),
             ],
+            [
+                'key' => 'partners',
+                'criteria' => ['enablePartnerFeatures' => true],
+                'label' => Craft::t('app', 'Partners'),
+            ]
         ];
     }
 
@@ -109,19 +114,15 @@ class Org extends Element
      */
     protected static function defineTableAttributes(): array
     {
-        return Collection::make()
-            ->merge(static::getTableAttributeByFieldHandle('orgLogo'))
-            ->merge(static::getTableAttributeByFieldHandle('enablePartnerFeatures'))
-            ->merge([
-                'slug' => ['label' => Craft::t('app', 'Slug')],
-                'uri' => ['label' => Craft::t('app', 'URI')],
-                'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
-                'id' => ['label' => Craft::t('app', 'ID')],
-                'uid' => ['label' => Craft::t('app', 'UID')],
-                'dateCreated' => ['label' => Craft::t('app', 'Date Created')],
-                'dateUpdated' => ['label' => Craft::t('app', 'Date Updated')],
-            ])
-            ->all();
+        return [
+            'slug' => ['label' => Craft::t('app', 'Slug')],
+            'uri' => ['label' => Craft::t('app', 'URI')],
+            'link' => ['label' => Craft::t('app', 'Link'), 'icon' => 'world'],
+            'id' => ['label' => Craft::t('app', 'ID')],
+            'uid' => ['label' => Craft::t('app', 'UID')],
+            'dateCreated' => ['label' => Craft::t('app', 'Date Created')],
+            'dateUpdated' => ['label' => Craft::t('app', 'Date Updated')],
+        ];
     }
 
     /**
@@ -129,14 +130,9 @@ class Org extends Element
      */
     protected static function defineDefaultTableAttributes(string $source): array
     {
-        return Collection::make()
-            ->merge(static::getTableAttributeByFieldHandle('orgLogo'))
-            ->merge(static::getTableAttributeByFieldHandle('enablePartnerFeatures'))
-            ->keys()
-            ->merge([
-                'link',
-            ])
-            ->all();
+        return [
+            'link'
+        ];
     }
 
     public function getFieldLayout(): ?FieldLayout
@@ -366,14 +362,5 @@ class Org extends Element
         }
 
         return false;
-    }
-
-    private static function getTableAttributeByFieldHandle(string $handle): array
-    {
-        $field = Craft::$app->getFields()->getFieldByHandle('orgLogo');
-
-        return [
-            "field:$field->uid" => ['label' => $field->name]
-        ];
     }
 }
