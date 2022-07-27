@@ -3,8 +3,12 @@
 namespace craftnet\controllers\orgs;
 
 use Craft;
+use craft\base\Element;
 use craft\commerce\elements\Order;
+use craft\elements\Entry;
 use craft\elements\User;
+use craft\errors\UnsupportedSiteException;
+use craft\services\Elements;
 use craft\web\Controller;
 use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\behaviors\UserBehavior;
@@ -21,7 +25,6 @@ use yii\web\Response;
 
 class SiteController extends Controller
 {
-    private bool $_requireOrgAdmin = false;
     private ?User $_currentUser = null;
 
     public function beforeAction($action): bool
@@ -52,8 +55,8 @@ class SiteController extends Controller
     }
 
     /**
-     * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionGetOrders($id): Response
     {
@@ -62,6 +65,10 @@ class SiteController extends Controller
 
         if (!$org) {
             throw new NotFoundHttpException();
+        }
+
+        if (!$org->canView($this->_currentUser)) {
+            throw new ForbiddenHttpException();
         }
 
         /** @var Order|OrderQueryBehavior $orders */
@@ -88,34 +95,75 @@ class SiteController extends Controller
 
         return $this->asSuccess(data: $orgs->all());
     }
-    //
-    // /**
-    //  * @throws Throwable
-    //  * @throws ForbiddenHttpException
-    //  */
-    // public function actionSaveOrg(): Response
-    // {
-    //     $this->_requireOrgAdmin = true;
-    //     $currentUser = Craft::$app->getUser()->getIdentity();
-    //     $orgValues = Craft::$app->getRequest()->getBodyParam('org', []);
-    //     $orgId = $orgValues['id'] ?? null;
-    //     $isNewOrg = !$orgId;
-    //     $org = $orgId ? $this->_getAllowedOrgById($orgId) : new User([
-    //         'isOrg' => true,
-    //     ]);
-    //
-    //     $org->setAttributes($orgValues);
-    //
-    //     if (!Craft::$app->getElements()->saveElement($org)) {
-    //         return $this->asModelFailure($org);
-    //     }
-    //
-    //     if ($isNewOrg) {
-    //         $org->addOrgMember($currentUser->id, true);
-    //     }
-    //
-    //     return $this->asModelSuccess($org);
-    // }
+
+    /**
+     * @throws Throwable
+     * @throws ForbiddenHttpException
+     */
+    public function actionSaveOrg(): Response
+    {
+        $this->requirePostRequest();
+        $elementId = $this->request->getBodyParam('orgId');
+        $siteId = $this->request->getBodyParam('siteId');
+        $isNew = !$elementId;
+
+        if ($isNew) {
+            $element = new Org();
+            if ($siteId) {
+                $element->siteId = $siteId;
+            }
+        } else {
+            $element = Org::find()
+                ->status(null)
+                ->siteId($siteId)
+                ->id($elementId)
+                ->one();
+
+            if (!$element) {
+                throw new NotFoundHttpException('Organization not found');
+            }
+        }
+
+        if (!$element->canSave($this->_currentUser)) {
+            throw new ForbiddenHttpException('User not authorized to save this organization.');
+        }
+
+        // siteId?
+        $element->slug = $this->request->getBodyParam('slug', $element->slug);
+        $element->title = $this->request->getBodyParam('title', $element->title);
+        $element->setFieldValuesFromRequest('fields');
+
+        if ($isNew) {
+            $element->creatorId = $this->_currentUser->id;
+        }
+
+        if ($element->enabled && $element->getEnabledForSite()) {
+            $element->setScenario(Element::SCENARIO_LIVE);
+        }
+
+        // TODO: do we need mutex?
+
+        try {
+            $success = Craft::$app->getElements()->saveElement($element);
+        } catch (UnsupportedSiteException $e) {
+            $element->addError('siteId', $e->getMessage());
+            $success = false;
+        }
+
+        if (!$success) {
+            return $this->asModelFailure(
+                $element,
+                Craft::t('app', 'Couldn’t save {type}.', ['type' => Org::displayName()]),
+                'org'
+            );
+        }
+
+        return $this->asModelSuccess(
+            $element,
+            Craft::t('app', '{type} saved.', ['type' => Org::displayName()]),
+        );
+    }
+
     //
     // /**
     //  * @throws ForbiddenHttpException

@@ -39,17 +39,7 @@ class Org extends Element
         return Craft::t('app', 'Organizations');
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getUriFormat(): ?string
-    {
-        if ($this->site->handle === 'plugins') {
-            return 'developer/{slug}';
-        }
 
-        return null;
-    }
 
     public static function hasTitles(): bool
     {
@@ -71,6 +61,17 @@ class Org extends Element
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getUriFormat(): ?string
+    {
+        if ($this->site->handle === 'plugins') {
+            return 'developer/{slug}';
+        }
+
+        return null;
+    }
     public static function hasStatuses(): bool
     {
         return true;
