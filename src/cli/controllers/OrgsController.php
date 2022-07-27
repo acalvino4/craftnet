@@ -195,7 +195,7 @@ class OrgsController extends Controller
 
     public function actionCleanup(): void
     {
-        // drop developers
-        // drop partners
+        // drop craftnet_developers
+        // drop craftnet_partners
     }
 }
