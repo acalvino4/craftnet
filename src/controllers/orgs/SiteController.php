@@ -5,6 +5,7 @@ namespace craftnet\controllers\orgs;
 use Craft;
 use craft\base\Element;
 use craft\commerce\elements\Order;
+use craft\elements\db\UserQuery;
 use craft\elements\Entry;
 use craft\elements\User;
 use craft\errors\UnsupportedSiteException;
@@ -167,99 +168,82 @@ class SiteController extends Controller
         );
     }
 
-    //
-    // /**
-    //  * @throws ForbiddenHttpException
-    //  * @throws Exception
-    //  */
-    // public function actionRemoveMember($orgId, $memberId): Response
-    // {
-    //     $this->_requireOrgAdmin = true;
-    //     $org = $this->_getAllowedOrgById($orgId);
-    //     $org->removeOrgMember($memberId);
-    //
-    //     return $this->asSuccess('Member removed.');
-    // }
-    //
-    // /**
-    //  * @throws ForbiddenHttpException
-    //  * @throws Exception
-    //  */
-    // public function actionGetMembers($orgId): Response
-    // {
-    //     /** @var User|UserBehavior $org */
-    //     $org = $this->_getAllowedOrgById($orgId);
-    //     $members = UserQueryBehavior::find()->orgMemberOf($org->id)->collect()
-    //         ->map(fn($member) => $this->_transformMember($member) + [
-    //             'orgAdmin' => UserQueryBehavior::find()->id($org->id)->hasOrgAdmin($member->id)->exists(),
-    //         ]);
-    //
-    //     return $this->asSuccess(data: $members->all());
-    // }
-    //
-    // /**
-    //  * @throws ForbiddenHttpException
-    //  * @throws BadRequestHttpException
-    //  * @throws Exception
-    //  */
-    // public function actionAddMember($orgId): Response
-    // {
-    //     $this->_requireOrgAdmin = true;
-    //     $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
-    //     $asAdmin = Craft::$app->getRequest()->getBodyParam('admin', false);
-    //     $org = $this->_getAllowedOrgById($orgId);
-    //     $user = Craft::$app->getUsers()->ensureUserByEmail($email);
-    //     $org->addOrgMember($user->id, $asAdmin);
-    //
-    //     Craft::$app->getMailer()
-    //         ->composeFromKey(Module::MESSAGE_KEY_ORG_INVITE, [
-    //             'user' => $user,
-    //             'inviter' => Craft::$app->getUser()->getIdentity(),
-    //             'org' => $org,
-    //         ])
-    //         ->setTo($email)
-    //         ->send();
-    //
-    //     return $this->asSuccess();
-    // }
-    //
-    // // owner or member
-    // // must have one owner
-    // public function actionChangeRole(): Response
-    // {
-    //     return $this->asSuccess();
-    // }
-    //
-    // // make sure these can take a user(org)
-    // // - profile, billing
-    //
-    // // opt-in plugin dev features?
-    // // developer support?
-    // // partner profile
-    //
-    // /**
-    //  * Gets an org by id, ensuring the logged-in user has permission to do so.
-    //  * @throws ForbiddenHttpException
-    //  */
-    // private function _getAllowedOrgById(int $id): User|UserBehavior
-    // {
-    //     $currentUser = Craft::$app->getUser()->getIdentity();
-    //     $query = UserQueryBehavior::find()->id($id);
-    //
-    //     if ($this->_requireOrgAdmin) {
-    //         $query->hasOrgAdmin($currentUser->id);
-    //     } else {
-    //         $query->hasOrgMember($currentUser->id);
-    //     }
-    //
-    //     $org = $query->one();
-    //     if (!$org) {
-    //         throw new ForbiddenHttpException();
-    //     }
-    //
-    //     return $org;
-    // }
-    //
+
+    /**
+     * @throws ForbiddenHttpException
+     * @throws Exception
+     */
+    public function actionRemoveMember($orgId, $memberId): Response
+    {
+        $org = $this->_getOrgById($orgId);
+        $success = $org->removeMember($memberId);
+
+        return $success ? $this->asSuccess('Member removed.') : $this->asFailure('Unable to remove member.');
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     * @throws Exception
+     */
+    public function actionGetMembers($orgId): Response
+    {
+        $org = $this->_getOrgById($orgId);
+
+        /** @var UserQuery|UserQueryBehavior $userQuery */
+        $userQuery = User::find();
+        $members = $userQuery->ofOrg($org->id)->collect()
+            ->map(fn($member) => $this->_transformMember($member) + [
+                'owner' => (clone $userQuery)->id($member->id)->orgOwner(true)->exists(),
+            ]);
+
+        return $this->asSuccess(data: $members->all());
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     * @throws Exception
+     */
+    public function actionAddMember($orgId): Response
+    {
+        $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
+        $asOwner = Craft::$app->getRequest()->getBodyParam('owner', false);
+        $org = $this->_getOrgById($orgId);
+        $user = Craft::$app->getUsers()->ensureUserByEmail($email);
+
+        if ($asOwner) {
+            $org->addOwner($user->id);
+        } else {
+            $org->addMember($user->id);
+        }
+
+        // TODO: split to different controller
+        $success = Craft::$app->getMailer()
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_INVITE, [
+                'user' => $user,
+                'inviter' => Craft::$app->getUser()->getIdentity(),
+                'org' => $org,
+            ])
+            ->setTo($email)
+            ->send();
+
+        return $success ? $this->asSuccess() : $this->asFailure();
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     */
+    private function _getOrgById(int $id): Org
+    {
+        $org = Org::find()->id($id)->one();
+
+        if (!$org || !$org->canView($this->_currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+        return $org;
+    }
+
     private static function _transformMember(User $user): array
     {
         return $user->getAttributes([

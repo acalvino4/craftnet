@@ -243,12 +243,12 @@ class Org extends Element
     /**
      * @throws Exception
      */
-    public function addMember(int|User $user, array $insertColumns = []): void
+    public function addMember(int|User $user, array $insertColumns = []): bool
     {
-        Craft::$app->getDb()->createCommand()
+        return (bool) Craft::$app->getDb()->createCommand()
             ->upsert(Table::ORGS_MEMBERS, [
                 'orgId' => $this->id,
-                'userId' => $user->id,
+                'userId' => $user instanceof User ? $user->id : $user,
             ] + $insertColumns)
             ->execute();
     }
@@ -256,9 +256,9 @@ class Org extends Element
     /**
      * @throws Exception
      */
-    public function addOwner($user): void
+    public function addOwner(int|User $user): bool
     {
-        $this->addMember($user, [
+        return $this->addMember($user, [
             'owner' => true
         ]);
     }
@@ -267,13 +267,13 @@ class Org extends Element
      * @throws Exception
      * @throws UserException
      */
-    public function removeMember(int|User $user): void
+    public function removeMember(int|User $user): bool
     {
-        if ($this->owners()->count() === 1) {
+        if ($this->hasOwner($user) && (int) $this->owners()->count() === 1) {
             throw new UserException('Organizations must have at least one owner.');
         }
 
-        Craft::$app->getDb()->createCommand()
+        return (bool) Craft::$app->getDb()->createCommand()
             ->delete(Table::ORGS_MEMBERS, [
                 'orgId' => $this->id,
                 'userId' => $user instanceof User ? $user->id : $user,
@@ -315,17 +315,21 @@ class Org extends Element
         Db::delete(Table::ORGS, ['id' => $this->id]);
     }
 
-    public function hasMember(User $user): bool
+    public function hasMember(int|User $user): bool
     {
+        $userId = $user instanceof User ? $user->id : $user;
+
         /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find()->id($user->id);
+        $query = User::find()->id($userId);
         return $query->orgMember(true)->ofOrg($this)->exists();
     }
 
-    public function hasOwner(User $user): bool
+    public function hasOwner(int|User $user): bool
     {
+        $userId = $user instanceof User ? $user->id : $user;
+
         /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find()->id($user->id);
+        $query = User::find()->id($userId);
         return $query->orgOwner(true)->ofOrg($this)->exists();
     }
 
