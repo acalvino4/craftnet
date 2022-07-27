@@ -157,7 +157,9 @@ class SiteController extends Controller
             );
         }
 
-        $element->addOwner($this->_currentUser);
+        if ($isNew) {
+            $element->addOwner($this->_currentUser);
+        }
 
         return $this->asModelSuccess(
             $element,
