@@ -269,7 +269,7 @@ class Org extends Element
      */
     public function removeMember(int|User $user): void
     {
-        if ($this->findOwners()->count() === 1) {
+        if ($this->owners()->count() === 1) {
             throw new UserException('Organizations must have at least one owner.');
         }
 
@@ -281,7 +281,7 @@ class Org extends Element
             ->execute();
     }
 
-    public function findOwners(): UserQuery
+    public function owners(): UserQuery
     {
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find();
@@ -315,52 +315,42 @@ class Org extends Element
         Db::delete(Table::ORGS, ['id' => $this->id]);
     }
 
-    public function canView(User $user): bool
+    public function hasMember(User $user): bool
     {
-        if ($user->admin) {
-            return true;
-        }
-
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find()->id($user->id);
         return $query->orgMember(true)->ofOrg($this)->exists();
     }
 
-    public function canSave(User $user): bool
+    public function hasOwner(User $user): bool
     {
-        if ($user->admin) {
-            return true;
-        }
-
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find()->id($user->id);
         return $query->orgOwner(true)->ofOrg($this)->exists();
     }
 
+    public function canView(User $user): bool
+    {
+        return $this->admin || $this->hasMember($user);
+    }
+
+    public function canSave(User $user): bool
+    {
+        return $this->admin || $this->hasOwner($user);
+    }
+
     public function canCreateDrafts(User $user): bool
     {
-        if ($user->admin) {
-            return true;
-        }
-
-        return false;
+        return $user->admin;
     }
 
     public function canDelete(User $user): bool
     {
-        if ($user->admin) {
-            return true;
-        }
-
-        return false;
+        return $user->admin;
     }
 
     public function canDuplicate(User $user): bool
     {
-        if ($user->admin) {
-            return true;
-        }
-
-        return false;
+        return $user->admin;
     }
 }
