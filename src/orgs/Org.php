@@ -29,12 +29,6 @@ class Org extends Element
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;
 
-    public function init(): void
-    {
-        $this->siteId = Craft::$app->getSites()->getSiteByHandle('plugins')->id;
-        parent::init();
-    }
-
     public static function displayName(): string
     {
         return Craft::t('app', 'Organization');
@@ -50,7 +44,11 @@ class Org extends Element
      */
     public function getUriFormat(): ?string
     {
-        return 'developer/{slug}';
+        if ($this->site->handle === 'plugins') {
+            return 'developer/{slug}';
+        }
+
+        return null;
     }
 
     public static function hasTitles(): bool
@@ -71,11 +69,6 @@ class Org extends Element
     public static function isLocalized(): bool
     {
         return true;
-    }
-
-    public function getSupportedSites(): array
-    {
-        return [$this->siteId];
     }
 
     public static function hasStatuses(): bool
@@ -135,15 +128,21 @@ class Org extends Element
         ];
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function getFieldLayout(): ?FieldLayout
     {
+        $titleElement = new TitleField();
+        $titleElement->translatable = false;
+
         return new FieldLayout([
             'type' => static::class,
             'tabs' => [
                 [
                     'name' => 'Organization',
                     'elements' => [
-                        new TitleField(),
+                        $titleElement,
                         new CustomField(
                             Craft::$app->getFields()->getFieldByHandle('requireOrderApproval')
                         ),
