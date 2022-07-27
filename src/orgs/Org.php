@@ -336,7 +336,7 @@ class Org extends Element
 
     public function canSave(User $user): bool
     {
-        return $user->admin || $this->hasOwner($user);
+        return $user->admin || !$this->id || $this->hasOwner($user);
     }
 
     public function canCreateDrafts(User $user): bool

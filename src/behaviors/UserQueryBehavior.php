@@ -96,7 +96,7 @@ class UserQueryBehavior extends Behavior
             return $value;
         }
 
-        if ($value instanceof Org) {
+        if ($value instanceof Org && $value->id) {
             return $value->id;
         }
 

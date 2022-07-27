@@ -157,6 +157,8 @@ class SiteController extends Controller
             );
         }
 
+        $element->addOwner($this->_currentUser);
+
         return $this->asModelSuccess(
             $element,
             Craft::t('app', 'Organization saved.'),
