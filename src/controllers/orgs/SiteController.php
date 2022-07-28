@@ -47,7 +47,6 @@ class SiteController extends Controller
             ]) + [
                 'photo' => $user->photo?->getAttributes(['id', 'url']),
             ];
-
     }
 
     protected static function _transformOrg(Org $org): array
@@ -55,6 +54,9 @@ class SiteController extends Controller
         return $org->getAttributes([
             'id',
             'title',
-        ]);
+            'requireOrderApproval',
+        ]) + [
+            'orgLogo' => $org->orgLogo->one()?->getAttributes(['id', 'url']),
+        ];
     }
 }
