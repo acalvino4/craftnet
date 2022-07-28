@@ -21,7 +21,7 @@ use yii\db\Exception;
 
 class OrgsController extends Controller
 {
-    public string|int|null $userId = null;
+    public ?int $userId = null;
 
     /**
      * @inheritdoc
@@ -121,7 +121,7 @@ class OrgsController extends Controller
                         ->map(fn($label) => StringHelper::toCamelCase($label))->all(),
                     'partnerExpertise' => $partner?->expertise,
                     'partnerVerificationStartDate' => $partner?->getVerificationStartDate(),
-                    'partnerRegion' => StringHelper::toCamelCase($partner?->region),
+                    'partnerRegion' => $partner?->region ? StringHelper::toCamelCase($partner?->region) : null,
                     'partnerProjects' => $projectsAsMatrix,
                 ]);
 
