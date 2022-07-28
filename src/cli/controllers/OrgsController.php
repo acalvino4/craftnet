@@ -77,7 +77,7 @@ class OrgsController extends Controller
                 $org->stripeAccessToken = $user->stripeAccessToken;
                 $org->stripeAccount = $user->stripeAccount;
                 $org->apiToken = $user->apiToken;
-                $org->balance = $user->balance;
+                $org->balance = $user->balance ?? 0;
                 $org->creatorId = $user->id;
 
                 $projectsAsMatrix = Collection::make($partner?->getProjects())
