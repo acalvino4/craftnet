@@ -223,14 +223,10 @@ class SiteController extends Controller
         $role = OrgMemberRole::tryFrom(Craft::$app->getRequest()->getBodyParam('role')) ?? OrgMemberRole::Member;
         $user = Craft::$app->getUsers()->ensureUserByEmail($email);
 
-        try {
-            if ($role === OrgMemberRole::Owner) {
-                $org->addOwner($user);
-            } else {
-                $org->addMember($user);
-            }
-        } catch (UserException $e) {
-            return $this->asFailure($e->getMessage());
+        if ($role === OrgMemberRole::Owner) {
+            $org->addOwner($user);
+        } else {
+            $org->addMember($user);
         }
 
         // TODO: split to different controller
