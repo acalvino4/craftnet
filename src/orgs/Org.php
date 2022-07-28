@@ -245,7 +245,7 @@ class Org extends Element
      */
     public function addMember(User $user, array $attributes = []): bool
     {
-        if (Org::find()->hasMember($user)) {
+        if ($this->hasMember($user)) {
             throw new UserException('User is already a member of this organization.');
         }
 
@@ -340,21 +340,17 @@ class Org extends Element
         Db::delete(Table::ORGS, ['id' => $this->id]);
     }
 
-    public function hasMember(int|User $user): bool
+    public function hasMember(User $user): bool
     {
-        $userId = $user instanceof User ? $user->id : $user;
-
         /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find()->id($userId);
+        $query = User::find()->id($user->id);
         return $query->orgMember(true)->ofOrg($this)->exists();
     }
 
-    public function hasOwner(int|User $user): bool
+    public function hasOwner(User $user): bool
     {
-        $userId = $user instanceof User ? $user->id : $user;
-
         /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find()->id($userId);
+        $query = User::find()->id($user->id);
         return $query->orgOwner(true)->ofOrg($this)->exists();
     }
 
