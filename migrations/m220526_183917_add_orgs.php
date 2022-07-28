@@ -52,6 +52,8 @@ class m220526_183917_add_orgs extends Migration
         $this->createTable(Table::ORGS_ORDERS, [
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
+            'isPending' => $this->boolean()->defaultValue(false),
+            'isRejected' => $this->boolean()->defaultValue(false),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
@@ -59,6 +61,21 @@ class m220526_183917_add_orgs extends Migration
 
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], \craft\commerce\db\Table::ORDERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+
+        $this->createTable(Table::ORGS_INVITATIONS, [
+            'id' => $this->primaryKey(),
+            'orgId' => $this->integer()->notNull(),
+            'memberId' => $this->integer()->notNull(),
+            'token' => $this->char(32)->notNull(),
+            'expiryDate' => $this->dateTime(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
+
+        $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['memberId'], Table::ORGS_MEMBERS, ['id'], 'CASCADE');
+        $this->createIndex(null, Table::ORGS_INVITATIONS, ['orgId', 'memberId'], true);
 
         $this->dropForeignKey('craftcom_plugins_developerId_fk', Table::PLUGINS);
         $this->addForeignKey('craftcom_plugins_developerId_fk', Table::PLUGINS, ['developerId'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
@@ -77,10 +94,6 @@ class m220526_183917_add_orgs extends Migration
 
         $this->dropForeignKey('craftnet_cmslicenses_ownerId_fk', Table::CMSLICENSES);
         $this->addForeignKey('craftnet_cmslicenses_ownerId_fk', Table::CMSLICENSES, ['ownerId'], CraftTable::ELEMENTS, ['id'], 'SET NULL');
-
-        // TODO: userId should be replaced with orgId or ownerId
-        $this->dropForeignKey('craftcom_vcstokens_userId_fk', Table::VCSTOKENS);
-        $this->addForeignKey('craftcom_vcstokens_userId_fk', Table::VCSTOKENS, ['userId'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
 
         return true;
     }

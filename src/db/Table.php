@@ -21,6 +21,7 @@ abstract class Table
     public const ORGS = '{{%craftnet_orgs}}';
     public const ORGS_MEMBERS = '{{%craftnet_orgs_members}}';
     public const ORGS_ORDERS = '{{%craftnet_orgs_orders}}';
+    public const ORGS_INVITATIONS = '{{%craftnet_orgs_invitations}}';
     public const EMAILCODES = '{{%craftnet_emailcodes}}';
     public const INACTIVECMSLICENSES = '{{%craftnet_inactivecmslicenses}}';
     public const INSTALLEDPLUGINS = '{{%craftnet_installedplugins}}';
