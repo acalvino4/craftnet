@@ -38,7 +38,6 @@ class Org extends Element
         return Craft::t('app', 'Organizations');
     }
 
-
     public static function hasTitles(): bool
     {
         return true;
@@ -60,15 +59,26 @@ class Org extends Element
     }
 
     /**
+     * @throws \yii\base\Exception
+     */
+    public function getInvitationUrl(): ?string
+    {
+        return match($this->site->handle) {
+            'console' => UrlHelper::siteUrl("$this->uri/invitation"),
+            default => null,
+        };
+    }
+
+    /**
      * @inheritdoc
      */
     public function getUriFormat(): ?string
     {
-        if ($this->site->handle === 'plugins') {
-            return 'developer/{slug}';
-        }
-
-        return null;
+        return match($this->site->handle) {
+            'plugins' => 'developer/{slug}',
+            'console' => 'orgs/{slug}',
+            default => null,
+        };
     }
 
     public static function hasStatuses(): bool
@@ -279,13 +289,26 @@ class Org extends Element
 
     /**
      * @throws Exception
+     */
+    public function enableMember(User $user): bool
+    {
+        return (bool) Craft::$app->getDb()->createCommand()
+            ->update(Table::ORGS_MEMBERS, ['enabled' => true], [
+                'orgId' => $this->id,
+                'userId' => $user->id,
+            ])
+            ->execute();
+    }
+
+    /**
+     * @throws Exception
      * @throws UserException
      */
-    public function addOwner(User $user): bool
+    public function addOwner(User $user, array $attributes = []): bool
     {
         return $this->addMember($user, [
             'owner' => true
-        ]);
+        ] + $attributes);
     }
 
     /**

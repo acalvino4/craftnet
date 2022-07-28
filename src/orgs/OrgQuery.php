@@ -85,9 +85,14 @@ class OrgQuery extends ElementQuery
 
         if ($this->joinMembers) {
             $this->subQuery->innerJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.orgId]] = [[elements.id]]');
+            $this->subQuery->andWhere([
+                'orgsMembers.enabled' => true,
+            ]);
         }
         if ($this->hasMemberId !== null) {
-            $this->subQuery->andWhere(['orgsMembers.userId' => $this->hasMemberId]);
+            $this->subQuery->andWhere([
+                'orgsMembers.userId' => $this->hasMemberId,
+            ]);
         }
         if ($this->hasOwnerId !== null) {
             $this->subQuery->andWhere([

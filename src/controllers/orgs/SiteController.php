@@ -33,10 +33,6 @@ class SiteController extends Controller
             throw new NotFoundHttpException();
         }
 
-        if (!$org->canView($this->_currentUser)) {
-            throw new ForbiddenHttpException();
-        }
-
         return $org;
     }
 

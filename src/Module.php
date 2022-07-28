@@ -95,7 +95,7 @@ class Module extends \yii\base\Module
     const MESSAGE_KEY_LICENSE_NOTIFICATION = 'license_notification';
     const MESSAGE_KEY_LICENSE_TRANSFER = 'license_transfer';
     const MESSAGE_KEY_SECURITY_ALERT = 'security_alert';
-    const MESSAGE_KEY_ORG_INVITE = 'org_invite';
+    const MESSAGE_KEY_ORG_INVITATION = 'org_invitation';
 
     /**
      * @inheritdoc
@@ -186,10 +186,10 @@ class Module extends \yii\base\Module
                 'body' => file_get_contents(__DIR__ . '/emails/security_alert.md'),
             ]);
             $e->messages[] = new SystemMessage([
-                'key' => self::MESSAGE_KEY_ORG_INVITE,
+                'key' => self::MESSAGE_KEY_ORG_INVITATION,
                 'heading' => 'When a member is invited to join an org.',
                 'subject' => '{{ inviter.friendlyName }} has invited you to join the {{ org.displayName }} organization',
-                'body' => file_get_contents(__DIR__ . '/emails/org_invite.md'),
+                'body' => file_get_contents(__DIR__ . '/emails/org_invitation.md'),
             ]);
         });
 

@@ -22,12 +22,14 @@ class UserQueryBehavior extends Behavior
 
     public function ofOrg(mixed $value): UserQuery|static
     {
+        $this->orgMember = true;
         $this->ofOrg = static::normalizeOrgOfArgument($value);
         return $this->owner;
     }
 
     public function orgOwner(?bool $value): UserQuery|static
     {
+        $this->orgMember = $value;
         $this->orgOwner = $value;
         return $this->owner;
     }
@@ -55,11 +57,17 @@ class UserQueryBehavior extends Behavior
         $this->owner->subQuery->leftJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.userId]] = [[users.id]]');
 
         if ($this->ofOrg) {
-            $this->owner->subQuery->andWhere(['orgsMembers.orgId' => $this->ofOrg]);
+            $this->owner->subQuery->andWhere([
+                'orgsMembers.orgId' => $this->ofOrg,
+            ]);
         }
 
         if ($this->orgMember !== null) {
             $this->owner->subQuery->andWhere($this->orgMember ? ['not', ['orgsMembers.orgId' => null]] : ['orgsMembers.orgId' => null]);
+
+            if ($this->orgMember) {
+                $this->owner->subQuery->andWhere(['orgsMembers.enabled' => true]);
+            }
         }
 
         if ($this->orgOwner !== null) {

@@ -89,8 +89,10 @@ return [
         'POST    orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/add-member',
         'DELETE  orgs/<orgId:\d+>/members/<memberId:\d+>' => 'craftnet/orgs/members/remove-member',
         'POST    orgs/<orgId:\d+>/members/<memberId:\d+>/set-role' => 'craftnet/orgs/members/set-role',
-        'POST    orgs/<orgId:\d+>/invitations' => 'craftnet/orgs/invitations/create-invitations',
+        'POST    orgs/<orgId:\d+>/invitations' => 'craftnet/orgs/invitations/send-invitation',
         'GET     orgs/<orgId:\d+>/invitations' => 'craftnet/orgs/invitations/get-invitations',
+        'POST    orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/accept-invitation',
+        'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
 
         'oauth/login' => 'oauth-server/oauth/login',
         'oauth/authorize' => 'oauth-server/oauth/authorize',

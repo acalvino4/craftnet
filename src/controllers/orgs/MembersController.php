@@ -57,42 +57,6 @@ class MembersController extends SiteController
     }
 
     /**
-     * @throws ForbiddenHttpException
-     * @throws BadRequestHttpException
-     * @throws Exception
-     */
-    public function actionAddMember(int $orgId): Response
-    {
-        $org = $this->_getOrgById($orgId);
-
-        if (!$org->canManageMembers($this->_currentUser)) {
-            throw new ForbiddenHttpException();
-        }
-
-        $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
-        $role = OrgMemberRole::tryFrom(Craft::$app->getRequest()->getBodyParam('role')) ?? OrgMemberRole::Member;
-        $user = Craft::$app->getUsers()->ensureUserByEmail($email);
-
-        if ($role === OrgMemberRole::Owner) {
-            $org->addOwner($user);
-        } else {
-            $org->addMember($user);
-        }
-
-        // TODO: split to different controller
-        $success = Craft::$app->getMailer()
-            ->composeFromKey(Module::MESSAGE_KEY_ORG_INVITE, [
-                'user' => $user,
-                'inviter' => Craft::$app->getUser()->getIdentity(),
-                'org' => $org,
-            ])
-            ->setTo($email)
-            ->send();
-
-        return $success ? $this->asSuccess() : $this->asFailure();
-    }
-
-    /**
      * @throws \yii\db\Exception
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
