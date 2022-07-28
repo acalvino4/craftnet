@@ -87,6 +87,7 @@ return [
         'GET     orgs/<orgId:\d+>/members' => 'craftnet/orgs/site/get-members',
         'POST    orgs/<orgId:\d+>/members' => 'craftnet/orgs/site/add-member',
         'DELETE  orgs/<orgId:\d+>/members/<memberId:\d+>' => 'craftnet/orgs/site/remove-member',
+        'POST    orgs/<orgId:\d+>/members/<memberId:\d+>/set-role' => 'craftnet/orgs/site/set-role',
         'POST    orgs/save-org' => 'craftnet/orgs/site/save-org',
 
         'oauth/login' => 'oauth-server/oauth/login',

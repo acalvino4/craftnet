@@ -11,10 +11,10 @@ use craft\fieldlayoutelements\TitleField;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
-use craft\models\Site;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
-use Illuminate\Support\Collection;
+use craftnet\enums\OrgMemberRole;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\base\UserException;
 use yii\db\Exception;
@@ -38,7 +38,6 @@ class Org extends Element
     {
         return Craft::t('app', 'Organizations');
     }
-
 
 
     public static function hasTitles(): bool
@@ -72,6 +71,7 @@ class Org extends Element
 
         return null;
     }
+
     public static function hasStatuses(): bool
     {
         return true;
@@ -242,21 +242,47 @@ class Org extends Element
 
     /**
      * @throws Exception
+     * @throws UserException
      */
-    public function addMember(int|User $user, array $insertColumns = []): bool
+    public function addMember(User $user, array $attributes = []): bool
     {
+        if (Org::find()->hasMember($user)) {
+            throw new UserException('User is already a member of this organization.');
+        }
+
         return (bool) Craft::$app->getDb()->createCommand()
-            ->upsert(Table::ORGS_MEMBERS, [
+            ->insert(Table::ORGS_MEMBERS, [
                 'orgId' => $this->id,
-                'userId' => $user instanceof User ? $user->id : $user,
-            ] + $insertColumns)
+                'userId' => $user->id,
+            ] + $attributes)
             ->execute();
     }
 
     /**
      * @throws Exception
+     * @throws UserException
      */
-    public function addOwner(int|User $user): bool
+    public function setMemberRole(User $user, OrgMemberRole $role): bool
+    {
+        $owner = $role === OrgMemberRole::Owner;
+
+        if (!$owner && $this->hasSoleOwner($user)) {
+            throw new UserException('Organizations must have at least one owner.');
+        }
+
+        return (bool) Craft::$app->getDb()->createCommand()
+            ->update(Table::ORGS_MEMBERS, ['owner' => $owner], [
+                'orgId' => $this->id,
+                'userId' => $user->id,
+            ])
+            ->execute();
+    }
+
+    /**
+     * @throws Exception
+     * @throws UserException
+     */
+    public function addOwner(User $user): bool
     {
         return $this->addMember($user, [
             'owner' => true
@@ -267,16 +293,16 @@ class Org extends Element
      * @throws Exception
      * @throws UserException
      */
-    public function removeMember(int|User $user): bool
+    public function removeMember(User $user): bool
     {
-        if ($this->hasOwner($user) && (int) $this->owners()->count() === 1) {
+        if ($this->hasSoleOwner($user)) {
             throw new UserException('Organizations must have at least one owner.');
         }
 
-        return (bool) Craft::$app->getDb()->createCommand()
+        return (bool)Craft::$app->getDb()->createCommand()
             ->delete(Table::ORGS_MEMBERS, [
                 'orgId' => $this->id,
-                'userId' => $user instanceof User ? $user->id : $user,
+                'userId' => $user->id,
             ])
             ->execute();
     }
@@ -333,6 +359,11 @@ class Org extends Element
         return $query->orgOwner(true)->ofOrg($this)->exists();
     }
 
+    public function canManageMembers(User $user): bool
+    {
+        return $user->admin || $this->hasOwner($user);
+    }
+
     public function canView(User $user): bool
     {
         return $user->admin || $this->hasMember($user);
@@ -356,5 +387,10 @@ class Org extends Element
     public function canDuplicate(User $user): bool
     {
         return $user->admin;
+    }
+
+    public function hasSoleOwner(User $user): bool
+    {
+        return $this->hasOwner($user) && (int) $this->owners()->count() === 1;
     }
 }

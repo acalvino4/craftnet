@@ -6,19 +6,18 @@ use Craft;
 use craft\base\Element;
 use craft\commerce\elements\Order;
 use craft\elements\db\UserQuery;
-use craft\elements\Entry;
 use craft\elements\User;
 use craft\errors\UnsupportedSiteException;
-use craft\services\Elements;
 use craft\web\Controller;
 use craftnet\behaviors\OrderQueryBehavior;
-use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
+use craftnet\enums\OrgMemberRole;
 use craftnet\Module;
 use craftnet\orgs\Org;
-use craftnet\orgs\OrgQuery;
 use Throwable;
+use ValueError;
 use yii\base\Exception;
+use yii\base\UserException;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -168,17 +167,25 @@ class SiteController extends Controller
         );
     }
 
-
     /**
      * @throws ForbiddenHttpException
      * @throws Exception
      */
-    public function actionRemoveMember($orgId, $memberId): Response
+    public function actionRemoveMember(int $orgId, int $memberId): Response
     {
         $org = $this->_getOrgById($orgId);
-        $success = $org->removeMember($memberId);
 
-        return $success ? $this->asSuccess('Member removed.') : $this->asFailure('Unable to remove member.');
+        if (!$org->canManageMembers($this->_currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+        $user = Craft::$app->getUsers()->getUserById($memberId);
+
+        if (!$user) {
+            throw new NotFoundHttpException();
+        }
+
+        return $org->removeMember($user) ? $this->asSuccess() : $this->asFailure();
     }
 
     /**
@@ -204,17 +211,26 @@ class SiteController extends Controller
      * @throws BadRequestHttpException
      * @throws Exception
      */
-    public function actionAddMember($orgId): Response
+    public function actionAddMember(int $orgId): Response
     {
-        $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
-        $asOwner = Craft::$app->getRequest()->getBodyParam('owner', false);
         $org = $this->_getOrgById($orgId);
+
+        if (!$org->canManageMembers($this->_currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+        $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
+        $role = OrgMemberRole::tryFrom(Craft::$app->getRequest()->getBodyParam('role')) ?? OrgMemberRole::Member;
         $user = Craft::$app->getUsers()->ensureUserByEmail($email);
 
-        if ($asOwner) {
-            $org->addOwner($user->id);
-        } else {
-            $org->addMember($user->id);
+        try {
+            if ($role === OrgMemberRole::Owner) {
+                $org->addOwner($user);
+            } else {
+                $org->addMember($user);
+            }
+        } catch (UserException $e) {
+            return $this->asFailure($e->getMessage());
         }
 
         // TODO: split to different controller
@@ -231,13 +247,49 @@ class SiteController extends Controller
     }
 
     /**
+     * @throws \yii\db\Exception
      * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
+     * @throws UserException
+     */
+    public function actionSetRole(int $orgId, int $memberId): Response
+    {
+        $org = $this->_getOrgById($orgId);
+
+        if (!$org->canManageMembers($this->_currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+        /** @var UserQuery|UserQueryBehavior $userQuery */
+        $userQuery = User::find()->id($memberId);
+        $user = $userQuery->ofOrg($org)->one();
+
+        if (!$user) {
+            throw new NotFoundHttpException();
+        }
+
+        try {
+            $role = OrgMemberRole::from($this->request->getRequiredBodyParam('role'));
+        } catch (ValueError $e) {
+            return $this->asFailure('Invalid role.');
+        }
+
+        return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     * @throws NotFoundHttpException
      */
     private function _getOrgById(int $id): Org
     {
         $org = Org::find()->id($id)->one();
 
-        if (!$org || !$org->canView($this->_currentUser)) {
+        if (!$org) {
+            throw new NotFoundHttpException();
+        }
+
+        if (!$org->canView($this->_currentUser)) {
             throw new ForbiddenHttpException();
         }
 
