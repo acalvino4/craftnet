@@ -101,6 +101,34 @@ class InvitationsController extends SiteController
     }
 
     /**
+     * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
+     */
+    public function actionCancelInvitation(int $orgId, int $memberId): Response
+    {
+        $org = $this->_getOrgById($orgId);
+
+        if (!$org->canManageMembers($this->_currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+        $user = Craft::$app->getUsers()->getUserById($memberId);
+
+        if (!$user) {
+            throw new NotFoundHttpException();
+        }
+
+        try {
+            // Invitation will be deleted by cascade
+            $org->removeMember($user);
+        } catch(Exception $e) {
+            return $this->asFailure('Unable to remove invitation');
+        }
+
+        return $this->asSuccess('Invitation canceled');
+    }
+
+    /**
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
