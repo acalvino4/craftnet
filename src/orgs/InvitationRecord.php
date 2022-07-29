@@ -38,8 +38,7 @@ class InvitationRecord extends ActiveRecord
     {
         return [
             [['expiryDate'], DateTimeValidator::class],
-            [['orgId', 'userId', 'token', 'expiryDate'], 'required'],
-            [['token'], 'string', 'length' => 32],
+            [['orgId', 'userId', 'expiryDate'], 'required'],
         ];
     }
 }

@@ -36,12 +36,12 @@ class InvitationsController extends SiteController
                 $org->addMember($user, ['enabled' => false]);
             }
         } catch (Exception $e) {
-            return $this->asFailure('Unable to add member.');
+            return $this->asFailure('Unable to add member');
         }
 
-        $token = Module::getInstance()?->getOrgs()->createInvitation($org, $user);
+        $created = Module::getInstance()?->getOrgs()->createInvitation($org, $user);
 
-        if (!$token) {
+        if (!$created) {
             return $this->asFailure('Unable to create invitation');
         }
 
@@ -54,7 +54,7 @@ class InvitationsController extends SiteController
             ->setTo($email)
             ->send();
 
-        return $sent ? $this->asSuccess() : $this->asFailure();
+        return $sent ? $this->asSuccess('Invitation sent') : $this->asFailure('Unable to send invitation');
     }
 
     /**
@@ -73,10 +73,10 @@ class InvitationsController extends SiteController
         } catch(UserException $e) {
             return $this->asFailure($e->getMessage());
         } catch(Exception $e) {
-            return $this->asFailure('Unable to accept invitation.');
+            return $this->asFailure('Unable to accept invitation');
         }
 
-        return $this->asSuccess('Invitation accepted.');
+        return $this->asSuccess('Invitation accepted');
     }
 
     /**
@@ -94,10 +94,10 @@ class InvitationsController extends SiteController
         } catch(UserException $e) {
             return $this->asFailure($e->getMessage());
         } catch(Exception $e) {
-            return $this->asFailure('Unable to decline invitation.');
+            return $this->asFailure('Unable to decline invitation');
         }
 
-        return $this->asSuccess('Invitation Declined.');
+        return $this->asSuccess('Invitation declined');
     }
 
     /**
@@ -117,7 +117,7 @@ class InvitationsController extends SiteController
         } catch(UserException $e) {
             return $this->asFailure($e->getMessage());
         } catch(Exception $e) {
-            return $this->asFailure('Unable to get invitations.');
+            return $this->asFailure('Unable to get invitations');
         }
 
         return $this->asSuccess(data: $invitations);

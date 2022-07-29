@@ -17,15 +17,8 @@ use yii\db\StaleObjectException;
 
 class OrgsService extends Component
 {
-    /**
-     * @throws Exception
-     */
-    public function createInvitation(Org $org, User $user, ?DateTime $expiryDate = null, ?string $token = null): string|false
+    public function createInvitation(Org $org, User $user, ?DateTime $expiryDate = null): bool
     {
-        if ($token !== null && strlen($token) !== 32) {
-            throw new InvalidArgumentException("Invalid token: $token");
-        }
-
         if (!$expiryDate) {
             $generalConfig = Craft::$app->getConfig()->getGeneral();
             $interval = DateTimeHelper::secondsToInterval($generalConfig->defaultTokenDuration);
@@ -37,21 +30,14 @@ class OrgsService extends Component
         $invitationRecord->orgId = $org->id;
         $invitationRecord->userId = $user->id;
 
-        // TODO: I don't think we actually need a token at all…
-        $invitationRecord->token = $token ?? Craft::$app->getSecurity()->generateRandomString();
-
         $invitationRecord->expiryDate = Db::prepareDateForDb($expiryDate);
-        $success = $invitationRecord->save();
 
-        if ($success) {
-            return $invitationRecord->token;
-        }
-
-        return false;
+        return $invitationRecord->save();
     }
 
     /**
      * @throws StaleObjectException
+     * @throws UserException
      */
     public function deleteInvitation(Org $org, User $user): bool
     {
