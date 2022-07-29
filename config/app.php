@@ -8,6 +8,7 @@ use MeadSteve\MonoSnag\BugsnagHandler;
 use Monolog\Logger;
 use samdark\log\PsrTarget;
 use yii\i18n\PhpMessageSource;
+use yii\web\Application as WebApplication;
 use yii\web\HttpException;
 
 return [
@@ -162,31 +163,34 @@ return [
                 $config['authAccessParam'] = $stateKeyPrefix . '__auth_access';
                 return Craft::createObject($config);
             },
+
             'db' => function() {
                 // Get the default component config
                 $config = craft\helpers\App::dbConfig();
 
-                // Use read/write query splitting
-                // (https://www.yiiframework.com/doc/guide/2.0/en/db-dao#read-write-splitting)
+                if (Craft::$app instanceof WebApplication) {
+                    // Use read/write query splitting
+                    // (https://www.yiiframework.com/doc/guide/2.0/en/db-dao#read-write-splitting)
 
-                // Define the default config for replica DB connections
-                $config['slaveConfig'] = [
-                    'username' => App::env('CRAFT_DB_USER'),
-                    'password' => App::env('CRAFT_DB_PASSWORD'),
-                    'tablePrefix' => App::env('CRAFT_DB_TABLE_PREFIX'),
-                    'attributes' => [
-                        // Use a smaller connection timeout
-                        PDO::ATTR_TIMEOUT => 10,
-                    ],
-                    'charset' => 'utf8',
-                ];
+                    // Define the default config for replica DB connections
+                    $config['replicaConfig'] = [
+                        'username' => App::env('CRAFT_DB_USER'),
+                        'password' => App::env('CRAFT_DB_PASSWORD'),
+                        'tablePrefix' => App::env('CRAFT_DB_TABLE_PREFIX'),
+                        'attributes' => [
+                            // Use a smaller connection timeout
+                            PDO::ATTR_TIMEOUT => 10,
+                        ],
+                        'charset' => 'utf8',
+                    ];
 
-                // Define the replica DB connections
-                $config['slaves'] = [
-                    [
-                        'dsn' => App::env('DB_READ_DSN_1')
-                    ],
-                ];
+                    // Define the replica DB connections
+                    $config['replicas'] = [
+                        [
+                            'dsn' => App::env('DB_READ_DSN_1')
+                        ],
+                    ];
+                }
 
                 // Instantiate and return it
                 return Craft::createObject($config);

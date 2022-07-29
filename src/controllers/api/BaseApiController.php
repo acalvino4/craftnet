@@ -40,7 +40,6 @@ use yii\base\UserException;
 use yii\helpers\Markdown;
 use yii\validators\EmailValidator;
 use yii\web\BadRequestHttpException;
-use yii\web\Controller as YiiController;
 use yii\web\HttpException;
 use yii\web\Response;
 
@@ -539,7 +538,7 @@ abstract class BaseApiController extends Controller
                 $responseHeaders->set('x-craft-plugin-license-editions', implode(',', $pluginLicenseEditions));
             }
 
-            if (($result = YiiController::runAction($id, $params)) instanceof Response) {
+            if (($result = parent::runAction($id, $params)) instanceof Response) {
                 $response = $result;
             }
         } catch (\Throwable $e) {

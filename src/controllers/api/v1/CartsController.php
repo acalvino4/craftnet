@@ -409,7 +409,7 @@ class CartsController extends BaseApiController
             'ownerId' => $cart->id,
             'fullName' => trim("$billingAddress->firstName $billingAddress->lastName") ?: null,
             'countryCode' => $country?->getCountryCode(),
-            'administrativeArea' => $state?->getIsoCode(),
+            'administrativeArea' => $state?->getCode(),
             'locality' => $billingAddress->city ?? null,
             'postalCode' => $billingAddress->zipCode ?? null,
             'addressLine1' => $billingAddress->address1 ?? null,

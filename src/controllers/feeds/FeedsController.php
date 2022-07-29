@@ -123,7 +123,7 @@ class FeedsController extends Controller
                 'pv.id',
                 'pv.version',
                 'pv.time',
-                'pv.date',
+                'pv.dateUpdated',
                 'pv.critical',
                 'pv.notes',
                 'pluginId' => 'pl.id',
@@ -175,7 +175,7 @@ class FeedsController extends Controller
                 'id' => $release['id'],
                 'title' => "$name {$release['version']}" . ($release['critical'] ? ' [CRITICAL]' : ''),
                 'link' => $link,
-                'updated' => $release['date'] ?? $release['time'],
+                'updated' => $release['dateUpdated'],
                 'author' => [
                     'name' => $developerName,
                     'url' => $developerUrl,

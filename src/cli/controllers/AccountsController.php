@@ -4,14 +4,16 @@ namespace craftnet\cli\controllers;
 
 use Craft;
 use craft\commerce\elements\Order;
+use craft\commerce\Plugin as Commerce;
+use craft\db\Query;
 use craft\elements\User;
+use craft\helpers\Console;
 use craft\i18n\Formatter;
 use craftnet\behaviors\UserBehavior;
 use craftnet\Module;
 use craftnet\plugins\Plugin;
 use yii\console\Controller;
 use yii\console\ExitCode;
-use yii\helpers\Console;
 
 /**
  * Show information about accounts
@@ -65,6 +67,39 @@ class AccountsController extends Controller
         $this->pluginLicenses($user);
         $this->plugins($user);
 
+        return ExitCode::OK;
+    }
+
+    public function actionReconcileOrphanedOrders(): int
+    {
+        $converted = (new Query())
+            ->select('*')
+            ->from(['{{%craftnet_user_order_email_mismatch}}'])
+            ->collect()
+            ->map(function(array $row) : ?array {
+                if (!$userByOrderEmail = Craft::$app->getUsers()->getUserByUsernameOrEmail($row['order_email'])) {
+                    $this->stderr("User not found: {$row['order_email']}." . PHP_EOL, Console::FG_RED);
+                    return null;
+                }
+                if (!$userByUserEmail = Craft::$app->getUsers()->getUserByUsernameOrEmail($row['user_email'])) {
+                    $this->stderr("User not found: {$row['user_email']}." . PHP_EOL, Console::FG_RED);
+                    return null;
+                }
+
+                if (!$userByOrderEmail->isCredentialed && $userByUserEmail->isCredentialed) {
+                    $this->stdout("Transferring Commerce data from #$userByOrderEmail->id to #$userByUserEmail->id ... ", Console::FG_CYAN);
+                    if (Commerce::getInstance()->getCustomers()->transferCustomerData($userByOrderEmail, $userByUserEmail)) {
+                        $this->stdout('done' . PHP_EOL, Console::FG_GREEN);
+                        return $row;
+                    }
+                    $this->stderr('failed' . PHP_EOL, Console::FG_RED);
+                }
+
+                return null;
+            })
+            ->filter();
+
+        $this->stdout(PHP_EOL . "Transferred Commerce data for {$converted->count()} users." . PHP_EOL, Console::FG_GREEN);
         return ExitCode::OK;
     }
 
