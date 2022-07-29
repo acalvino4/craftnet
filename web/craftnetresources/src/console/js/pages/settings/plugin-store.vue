@@ -7,26 +7,28 @@
     <div class="space-y-6">
       <template v-if="!showOld">
         <template v-if="!githubConnected">
-          <div class="max-w-screen-sm mt-24 mx-auto">
-            <div class="">
-              <div class="flex">
-                <div class="mt-2 mr-6 px-4">
-                  <icon
-                    class="text-blue-500 w-16 h-16"
-                    icon="plug" />
-                </div>
+          <empty>
+            <div class="max-w-screen-sm mt-24 mx-auto">
+              <div class="">
+                <div class="flex">
+                  <div class="mt-2 mr-6 px-4">
+                    <icon
+                      class="text-black/50 dark:text-white/50 w-16 h-16"
+                      icon="plug" />
+                  </div>
 
-                <div class="flex-1">
-                  <h3>Submit your plugins</h3>
-                  <p>You can start submitting plugins to the Plugin Store once you’ve connected your GitHub account.</p>
+                  <div class="flex-1">
+                    <h3>Submit your plugins</h3>
+                    <p class="mt-2">You can start submitting plugins to the Plugin Store once you’ve connected your GitHub account.</p>
 
-                  <div class="mt-4">
-                    <btn kind="primary" @click="githubConnected = true">Connect to GitHub</btn>
+                    <div class="mt-4">
+                      <btn kind="primary" @click="githubConnected = true">Connect to GitHub</btn>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </empty>
         </template>
 
         <template v-else>
@@ -236,6 +238,7 @@ import DeveloperPreferences from '../../components/developer/Preferences'
 import ConnectedApps from '../../components/developer/connected-apps/ConnectedApps'
 import PageHeader from '@/console/js/components/PageHeader'
 import helpers from '../../mixins/helpers';
+import Empty from '../../components/Empty';
 
 export default {
   mixins: [helpers],
@@ -245,7 +248,7 @@ export default {
       apiToken: '',
       loading: false,
       notice: false,
-      showOld: true,
+      showOld: false,
       githubConnected: false,
       selectedPayoutRegionHandle: '',
       payoutRegions: [
@@ -259,6 +262,7 @@ export default {
   },
 
   components: {
+    Empty,
     PaypalPayout,
     DeveloperPreferences,
     ConnectedApps,
