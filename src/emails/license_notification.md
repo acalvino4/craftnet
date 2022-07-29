@@ -12,28 +12,39 @@
 
 Hey {{ user.friendlyName ?? 'there' }},
 
-{% if renewedLicenses|length %}
-{% set pl = renewedLicenses|length != 1 %}
+{% if renewLicenses|length %}
+{% set pl = renewLicenses|length != 1 %}
+
+{% if autoRenewFailed %}
+The following {{ pl ? 'licenses were' : 'license was' }} due to be auto-renewed for another year of updates:
+{% elseif redirect %}
+The following {{ pl ? 'licenses are' : 'license is' }} due to be renewed for another year of updates:
+{% else %}
 The following {{ pl ? 'licenses have' : 'license has' }} been auto-renewed for another year of updates:
-
-{% for license in renewedLicenses %}
-- {{ showLicense(license, user) }}
-
-{% endfor %}
 {% endif %}
 
-{% if expiredLicenses|length %}
-{% set pl = expiredLicenses|length != 1 %}
-{{ renewedLicenses|length ? 'And the' : 'The' }} following {{ pl ? 'licenses have' : 'license has' }} expired:
-
-{% for license in expiredLicenses %}
+{% for license in renewLicenses %}
 - {{ showLicense(license, user) }}
 
 {% endfor %}
 
 {% if autoRenewFailed %}
-_(We attempted to auto-renew {{ pl ? 'some of them' : 'it' }}, however there was an issue with your [billing info](https://id.craftcms.com/account/billing).)_
+However, there was an issue with your billing info which prevented the payment from going through. Please go to the following URL to fix your billing info for future payments:<br>
+<https://id.craftcms.com/account/billing>
+{% elseif redirect %}
+However, your bank requires further action. Please go to the following URL to complete the renewal:<br>
+<{{ redirect }}>
 {% endif %}
+{% endif %}
+
+{% if expireLicenses|length %}
+{% set pl = expireLicenses|length != 1 %}
+The following {{ pl ? 'licenses have' : 'license has' }} expired:
+
+{% for license in expireLicenses %}
+- {{ showLicense(license, user) }}
+
+{% endfor %}
 
 {% if user %}
 To ensure you don’t miss any updates, click on the license key {{ pl ? 'links' : 'link' }} above, and click the “Renew your license” button in the “Updates” section.

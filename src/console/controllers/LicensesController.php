@@ -159,18 +159,23 @@ class LicensesController extends Controller
                     [$renewLicenses, $expireLicenses] = $this->_findRenewableLicenses($ownerLicenses);
                 }
 
+                $autoRenewFailed = false;
+                $redirect = null;
+                $licensesToExpire = array_merge($expireLicenses);
+
                 // If there are any licenses that should be auto-renewed, give that a shot
                 if (!empty($renewLicenses)) {
-                    if ($autoRenewFailed = !$this->_autoRenewLicenses($renewLicenses, $user)) {
-                        $expireLicenses = array_merge($renewLicenses, $expireLicenses);
+                    if (!$this->_autoRenewLicenses($renewLicenses, $user, $redirect)) {
+                        $licensesToExpire = array_merge($licensesToExpire, $renewLicenses);
+                        if (!$redirect) {
+                            $autoRenewFailed = true;
+                        }
                     }
-                } else {
-                    $autoRenewFailed = false;
                 }
 
-                // Expire the licenses
-                $this->stdout('    - Expiring ' . count($expireLicenses) . " licenses for {$email} ... ", Console::FG_YELLOW);
-                foreach ($expireLicenses as $license) {
+                // Expire the licenses, including any that couldn't auto-renew successfully.
+                $this->stdout('    - Expiring ' . count($licensesToExpire) . " licenses for {$email} ... ", Console::FG_YELLOW);
+                foreach ($licensesToExpire as $license) {
                     $license->markAsExpired();
                 }
                 $this->stdout('done' . PHP_EOL, Console::FG_GREEN);
@@ -180,9 +185,10 @@ class LicensesController extends Controller
 
                 $message = $mailer
                     ->composeFromKey(Module::MESSAGE_KEY_LICENSE_NOTIFICATION, [
-                        'renewedLicenses' => $autoRenewFailed ? [] : $renewLicenses,
-                        'expiredLicenses' => $expireLicenses,
+                        'renewLicenses' => $renewLicenses,
+                        'expireLicenses' => $expireLicenses,
                         'autoRenewFailed' => $autoRenewFailed,
+                        'redirect' => $redirect,
                         'note' => $note ?? null,
                     ])
                     ->setTo($user ?? $email);
@@ -258,9 +264,10 @@ class LicensesController extends Controller
      *
      * @param LicenseInterface[] $licenses
      * @param User $user
+     * @param string|null $redirect The redirect URL that can be used to complete the renewal
      * @return bool Whether it was successful
      */
-    private function _autoRenewLicenses(array $licenses, User $user): bool
+    private function _autoRenewLicenses(array $licenses, User $user, ?string &$redirect): bool
     {
         try {
             // Make sure they have a Commerce customer record
@@ -289,6 +296,9 @@ class LicensesController extends Controller
                 'customerId' => $user->id,
                 'email' => $user->email,
             ]);
+
+            $order->cancelUrl = App::parseEnv('$URL_ID') . 'payment';
+            $order->returnUrl = App::parseEnv('$URL_ID') . 'thank-you';
 
             // Save the cart so it gets an ID
             $elementsService = Craft::$app->getElements();
@@ -327,6 +337,11 @@ class LicensesController extends Controller
         } catch (\Throwable $e) {
             $this->stderr(PHP_EOL . 'error: ' . $e->getMessage() . PHP_EOL, Console::FG_RED);
             Craft::$app->getErrorHandler()->logException($e);
+            return false;
+        }
+
+        if (!$order->isCompleted) {
+            $this->stdout('incomplete' . PHP_EOL, Console::FG_GREY);
             return false;
         }
 
