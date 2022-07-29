@@ -8,17 +8,7 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\ElementHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
-use craftnet\controllers\Module;
-use craftnet\controllers\Order;
-use craftnet\controllers\OrderQueryBehavior;
-use craftnet\controllers\Throwable;
-use craftnet\controllers\User;
-use craftnet\controllers\UserBehavior;
-use craftnet\controllers\UserQueryBehavior;
 use craftnet\orgs\Org;
-use yii\base\Exception;
-use yii\web\BadRequestHttpException;
-use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 class CpController extends Controller
@@ -41,7 +31,7 @@ class CpController extends Controller
         $org->title = $this->request->getQueryParam('title');
         $org->slug = $this->request->getQueryParam('slug');
         if ($org->title && !$org->slug) {
-            $org->slug = ElementHelper::generateSlug($org->title, null);
+            $org->slug = ElementHelper::generateSlug($org->title);
         }
         if (!$org->slug) {
             $org->slug = ElementHelper::tempSlug();

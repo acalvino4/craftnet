@@ -8,16 +8,23 @@ use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craft\fieldlayoutelements\CustomField;
 use craft\fieldlayoutelements\TitleField;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
 use craftnet\enums\OrgMemberRole;
-use yii\base\InvalidConfigException;
+use DateTime;
 use yii\base\UserException;
 use yii\db\Exception;
+use yii\db\StaleObjectException;
 
+/**
+ *
+ * @property-read array $invitations
+ * @property-read null|string $invitationUrl
+ */
 class Org extends Element
 {
     public ?string $stripeAccessToken = null;
@@ -138,9 +145,6 @@ class Org extends Element
         ];
     }
 
-    /**
-     * @throws InvalidConfigException
-     */
     public function getFieldLayout(): ?FieldLayout
     {
         $titleElement = new TitleField();
@@ -232,6 +236,63 @@ class Org extends Element
         ]);
     }
 
+    public function getInvitation(User $user): ?InvitationRecord
+    {
+        return InvitationRecord::find()
+            ->where([
+                'orgId' => $this->id,
+                'userId' => $user->id,
+            ])
+            ->andWhere(['>', 'expiryDate', Db::prepareDateForDb(new DateTime())])
+            ->one();
+    }
+
+    /**
+     * @throws StaleObjectException
+     */
+    public function deleteInvitation(User $user): bool
+    {
+        $invitationRecord = InvitationRecord::findOne([
+            'orgId' => $this->id,
+            'userId' => $user->id,
+        ]);
+
+        return (bool) $invitationRecord?->delete();
+    }
+
+    public function getInvitations(): array
+    {
+        return InvitationRecord::find()->where([
+            'orgId' => $this->id,
+        ])->all();
+    }
+
+    /**
+     * @throws \yii\base\UserException
+     */
+    public function createInvitation(User $user, bool $owner = false, ?DateTime $expiryDate = null): bool
+    {
+        if ($this->getInvitation($user)) {
+            throw new UserException('User already has an existing invitation to this organization.');
+        }
+
+        if (!$expiryDate) {
+            $generalConfig = Craft::$app->getConfig()->getGeneral();
+            $interval = DateTimeHelper::secondsToInterval($generalConfig->defaultTokenDuration);
+            $expiryDate = DateTimeHelper::currentUTCDateTime();
+            $expiryDate->add($interval);
+        }
+
+        $invitationRecord = new InvitationRecord();
+        $invitationRecord->orgId = $this->id;
+        $invitationRecord->userId = $user->id;
+        $invitationRecord->owner = $owner;
+
+        $invitationRecord->expiryDate = Db::prepareDateForDb($expiryDate);
+
+        return $invitationRecord->save();
+    }
+
     protected function cpEditUrl(): ?string
     {
         $path = sprintf('orgs/%s', $this->getCanonicalId());
@@ -271,29 +332,14 @@ class Org extends Element
      * @throws Exception
      * @throws UserException
      */
-    public function setMemberRole(User $user, OrgMemberRole $role): bool
+    public function setMemberRole(User $user, bool $owner): bool
     {
-        $owner = $role === OrgMemberRole::Owner;
-
         if (!$owner && $this->hasSoleOwner($user)) {
             throw new UserException('Organizations must have at least one owner.');
         }
 
         return (bool) Craft::$app->getDb()->createCommand()
             ->update(Table::ORGS_MEMBERS, ['owner' => $owner], [
-                'orgId' => $this->id,
-                'userId' => $user->id,
-            ])
-            ->execute();
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function enableMember(User $user): bool
-    {
-        return (bool) Craft::$app->getDb()->createCommand()
-            ->update(Table::ORGS_MEMBERS, ['enabled' => true], [
                 'orgId' => $this->id,
                 'userId' => $user->id,
             ])

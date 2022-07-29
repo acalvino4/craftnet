@@ -64,10 +64,6 @@ class UserQueryBehavior extends Behavior
 
         if ($this->orgMember !== null) {
             $this->owner->subQuery->andWhere($this->orgMember ? ['not', ['orgsMembers.orgId' => null]] : ['orgsMembers.orgId' => null]);
-
-            if ($this->orgMember) {
-                $this->owner->subQuery->andWhere(['orgsMembers.enabled' => true]);
-            }
         }
 
         if ($this->orgOwner !== null) {

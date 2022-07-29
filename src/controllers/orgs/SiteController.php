@@ -8,7 +8,6 @@ use craft\web\Controller;
 use craftnet\orgs\Org;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\web\Response;
 
 class SiteController extends Controller
 {

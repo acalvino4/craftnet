@@ -5,7 +5,6 @@ namespace craftnet\controllers\orgs;
 use Craft;
 use craftnet\enums\OrgMemberRole;
 use craftnet\Module;
-use yii\base\Exception;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -14,15 +13,19 @@ use yii\web\Response;
 class InvitationsController extends SiteController
 {
     /**
-     * @throws Exception
-     * @throws ForbiddenHttpException
-     * @throws NotFoundHttpException
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\web\ForbiddenHttpException
+     * @throws \yii\web\BadRequestHttpException
+     * @throws \yii\db\Exception
+     * @throws \yii\base\Exception
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\base\UserException
      */
     public function actionSendInvitation(int $orgId): Response
     {
         $org = $this->_getOrgById($orgId);
         $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
-        $role = OrgMemberRole::tryFrom(Craft::$app->getRequest()->getBodyParam('role')) ?? OrgMemberRole::Member;
+        $owner = (bool) Craft::$app->getRequest()->getBodyParam('owner');
         $user = Craft::$app->getUsers()->ensureUserByEmail($email);
 
         if (!$org->canManageMembers($this->_currentUser)) {
@@ -30,19 +33,13 @@ class InvitationsController extends SiteController
         }
 
         try {
-            if ($role === OrgMemberRole::Owner) {
-                $org->addOwner($user, ['enabled' => false]);
-            } else {
-                $org->addMember($user, ['enabled' => false]);
-            }
-        } catch (Exception $e) {
-            return $this->asFailure('Unable to add member');
+            $created = $org->createInvitation($user, $owner);
+        } catch (UserException $e) {
+            return $this->asFailure($e->getMessage());
         }
 
-        $created = Module::getInstance()?->getOrgs()->createInvitation($org, $user);
-
         if (!$created) {
-            return $this->asFailure('Unable to create invitation');
+            return $this->asFailure();
         }
 
         $sent = Craft::$app->getMailer()
@@ -54,57 +51,61 @@ class InvitationsController extends SiteController
             ->setTo($email)
             ->send();
 
-        return $sent ? $this->asSuccess('Invitation sent') : $this->asFailure('Unable to send invitation');
+        return $sent ? $this->asSuccess() : $this->asFailure();
     }
 
     /**
-     * @throws ForbiddenHttpException
-     * @throws NotFoundHttpException
+     * @throws \yii\db\Exception
+     * @throws \yii\db\StaleObjectException
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
+     * @throws \yii\base\UserException
      */
     public function actionAcceptInvitation(int $orgId): Response
     {
         $org = $this->_getOrgById($orgId);
+        $invitation = $org->getInvitation($this->_currentUser);
 
-        try {
-            Module::getInstance()?->getOrgs()->deleteExpiredInvitations();
-            $org->enableMember($this->_currentUser);
-            Module::getInstance()?->getOrgs()->deleteInvitation($org, $this->_currentUser);
-            // TODO: should we notify org owners?
-        } catch(UserException $e) {
-            return $this->asFailure($e->getMessage());
-        } catch(Exception $e) {
-            return $this->asFailure('Unable to accept invitation');
+        if (!$invitation) {
+            throw new NotFoundHttpException();
         }
 
-        return $this->asSuccess('Invitation accepted');
+        if ($invitation->owner) {
+            $org->addOwner($this->_currentUser);
+        } else {
+            $org->addMember($this->_currentUser);
+        }
+
+        $org->deleteInvitation($this->_currentUser);
+
+        return $this->asSuccess();
     }
 
     /**
-     * @throws NotFoundHttpException
-     * @throws ForbiddenHttpException
+     * @throws \yii\db\StaleObjectException
+     * @throws \yii\web\NotFoundHttpException
+     * @throws \yii\web\ForbiddenHttpException
      */
     public function actionDeclineInvitation(int $orgId): Response
     {
         $org = $this->_getOrgById($orgId);
+        $invitation = $org->getInvitation($this->_currentUser);
 
-        try {
-            // Invitation will be deleted by cascade
-            $org->removeMember($this->_currentUser);
-            // TODO: should we notify org owners?
-        } catch(UserException $e) {
-            return $this->asFailure($e->getMessage());
-        } catch(Exception $e) {
-            return $this->asFailure('Unable to decline invitation');
+        if (!$invitation) {
+            throw new NotFoundHttpException();
         }
 
-        return $this->asSuccess('Invitation declined');
+        $deleted = $org->deleteInvitation($this->_currentUser);
+
+        return $deleted ? $this->asSuccess() : $this->asFailure();
     }
 
     /**
-     * @throws NotFoundHttpException
-     * @throws ForbiddenHttpException
+     * @throws \yii\db\StaleObjectException
+     * @throws \yii\web\ForbiddenHttpException
+     * @throws \yii\web\NotFoundHttpException
      */
-    public function actionCancelInvitation(int $orgId, int $memberId): Response
+    public function actionCancelInvitation(int $orgId, int $userId): Response
     {
         $org = $this->_getOrgById($orgId);
 
@@ -112,20 +113,15 @@ class InvitationsController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        $user = Craft::$app->getUsers()->getUserById($memberId);
+        $user = Craft::$app->getUsers()->getUserById($userId);
 
         if (!$user) {
             throw new NotFoundHttpException();
         }
 
-        try {
-            // Invitation will be deleted by cascade
-            $org->removeMember($user);
-        } catch(Exception $e) {
-            return $this->asFailure('Unable to remove invitation');
-        }
+        $deleted = $org->deleteInvitation($user);
 
-        return $this->asSuccess('Invitation canceled');
+        return $deleted ? $this->asSuccess() : $this->asFailure();
     }
 
     /**
@@ -140,13 +136,7 @@ class InvitationsController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        try {
-            $invitations = Module::getInstance()?->getOrgs()->getInvitationsForOrg($org);
-        } catch(UserException $e) {
-            return $this->asFailure($e->getMessage());
-        } catch(Exception $e) {
-            return $this->asFailure('Unable to get invitations');
-        }
+        $invitations = $org->getInvitations();
 
         return $this->asSuccess(data: $invitations);
     }

@@ -40,7 +40,6 @@ class m220526_183917_add_orgs extends Migration
             'userId' => $this->integer()->notNull(),
             'orgId' => $this->integer()->notNull(),
             'owner' => $this->boolean()->defaultValue(false),
-            'enabled' => $this->boolean()->defaultValue(true),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
@@ -67,6 +66,7 @@ class m220526_183917_add_orgs extends Migration
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
             'userId' => $this->integer()->notNull(),
+            'owner' => $this->boolean()->defaultValue(false),
             'expiryDate' => $this->dateTime()->notNull(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
@@ -74,7 +74,7 @@ class m220526_183917_add_orgs extends Migration
         ]);
 
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['userId', 'orgId'], Table::ORGS_MEMBERS, ['userId', 'orgId'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
         $this->createIndex(null, Table::ORGS_INVITATIONS, ['orgId', 'userId'], true);
 
         $this->dropForeignKey('craftcom_plugins_developerId_fk', Table::PLUGINS);

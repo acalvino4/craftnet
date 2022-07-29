@@ -70,7 +70,7 @@ class OrgsController extends SiteController
                 ->one();
 
             if (!$element) {
-                throw new NotFoundHttpException('Organization not found');
+                throw new NotFoundHttpException('Organization not found.');
             }
         }
 

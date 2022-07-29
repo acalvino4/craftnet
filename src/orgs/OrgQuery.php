@@ -7,9 +7,6 @@ use craft\elements\User;
 use craft\helpers\Db;
 use craftnet\db\Table;
 use Illuminate\Support\Collection;
-use ReflectionObject;
-use ReflectionProperty;
-use yii\db\Connection;
 
 class OrgQuery extends ElementQuery
 {
@@ -32,13 +29,13 @@ class OrgQuery extends ElementQuery
 
     public function paymentSourceId(?int $paymentSourceId): OrgQuery
     {
-        $this->paymentSourceId = $creatorId;
+        $this->paymentSourceId = $paymentSourceId;
         return $this;
     }
 
     public function billingAddressId(?int $billingAddressId): OrgQuery
     {
-        $this->billingAddressId = $creatorId;
+        $this->billingAddressId = $billingAddressId;
         return $this;
     }
 
@@ -85,9 +82,6 @@ class OrgQuery extends ElementQuery
 
         if ($this->joinMembers) {
             $this->subQuery->innerJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.orgId]] = [[elements.id]]');
-            $this->subQuery->andWhere([
-                'orgsMembers.enabled' => true,
-            ]);
         }
         if ($this->hasMemberId !== null) {
             $this->subQuery->andWhere([
