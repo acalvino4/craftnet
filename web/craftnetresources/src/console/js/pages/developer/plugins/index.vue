@@ -111,13 +111,15 @@
 
       <empty v-else>
         <empty>
-          <icon
-            icon="plug"
-            class="w-12 h-12 inline-block mb-4 text-blue-500" />
+          <div class="text-center">
+            <icon
+              icon="plug"
+              class="w-12 h-12 inline-block mb-4 text-blue-500" />
 
-          <div class="font-bold">No plugins</div>
-          <div class="mt-2">
-            <p>You don't have any plugins.</p>
+            <h2>No plugins</h2>
+            <div>
+              <p>You don't have any plugins.</p>
+            </div>
           </div>
         </empty>
       </empty>

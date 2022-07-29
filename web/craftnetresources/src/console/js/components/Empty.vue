@@ -12,7 +12,7 @@
   min-height: 500px;
 
   .empty-body {
-    @apply text-center py-8;
+    @apply py-8;
   }
 }
 </style>
