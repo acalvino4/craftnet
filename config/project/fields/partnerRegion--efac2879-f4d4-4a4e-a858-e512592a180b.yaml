@@ -1,0 +1,67 @@
+columnSuffix: mnawjoxi
+contentColumnType: string
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: partnerRegion
+instructions: null
+name: Region
+searchable: false
+settings:
+  options:
+    -
+      __assoc__:
+        -
+          - label
+          - 'Select a region…'
+        -
+          - value
+          - ''
+        -
+          - default
+          - '1'
+    -
+      __assoc__:
+        -
+          - label
+          - 'Asia Pacific'
+        -
+          - value
+          - asiaPacific
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - Europe
+        -
+          - value
+          - europe
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 'North America'
+        -
+          - value
+          - northAmerica
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 'South America'
+        -
+          - value
+          - southAmerica
+        -
+          - default
+          - ''
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Dropdown

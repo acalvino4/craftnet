@@ -1,17 +1,17 @@
-columnSuffix: null
+columnSuffix: rouvouod
 contentColumnType: text
 fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
-handle: location
+handle: partnerExpertise
 instructions: null
-name: Location
+name: Expertise
 searchable: true
 settings:
   byteLimit: null
   charLimit: null
   code: false
   columnType: null
-  initialRows: 4
-  multiline: false
+  initialRows: 10
+  multiline: true
   placeholder: null
   uiMode: normal
 translationKeyFormat: null

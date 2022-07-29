@@ -1,0 +1,17 @@
+columnSuffix: agvzzzow
+contentColumnType: datetime
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: partnerVerificationStartDate
+instructions: null
+name: 'Verification Start Date'
+searchable: false
+settings:
+  max: null
+  min: null
+  minuteIncrement: 30
+  showDate: true
+  showTime: false
+  showTimeZone: false
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Date

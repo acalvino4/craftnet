@@ -1,0 +1,14 @@
+columnSuffix: cxbpryhi
+contentColumnType: string(255)
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: externalUrl
+instructions: null
+name: 'External URL'
+searchable: false
+settings:
+  maxLength: 255
+  types:
+    - url
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Url

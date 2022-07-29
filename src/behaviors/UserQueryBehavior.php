@@ -4,23 +4,41 @@ namespace craftnet\behaviors;
 
 use craft\elements\db\ElementQuery;
 use craft\elements\db\UserQuery;
-use craft\elements\User;
 use craftnet\db\Table;
+use craftnet\orgs\Org;
+use craftnet\orgs\OrgQuery;
+use Illuminate\Support\Collection;
 use yii\base\Behavior;
+use yii\base\InvalidArgumentException;
 
 /**
  * @property UserQuery $owner
  */
 class UserQueryBehavior extends Behavior
 {
-    public ?bool $isOrg = null;
-    public ?bool $orgAdmin = null;
-    public ?int $orgMemberOf = null;
-    public ?int $hasOrgMember = null;
-    public ?int $hasOrgAdmin = null;
+    public ?bool $orgOwner = null;
+    public ?bool $orgMember = null;
+    private null|int|array $ofOrg = null;
 
-    private bool $_joinMembers = false;
-    private bool $_joinMembersByOrg = false;
+    public function ofOrg(mixed $value): UserQuery|static
+    {
+        $this->orgMember = true;
+        $this->ofOrg = static::normalizeOrgOfArgument($value);
+        return $this->owner;
+    }
+
+    public function orgOwner(?bool $value): UserQuery|static
+    {
+        $this->orgMember = $value;
+        $this->orgOwner = $value;
+        return $this->owner;
+    }
+
+    public function orgMember(?bool $value): UserQuery|static
+    {
+        $this->orgMember = $value;
+        return $this->owner;
+    }
 
     /**
      * @inheritdoc
@@ -32,104 +50,74 @@ class UserQueryBehavior extends Behavior
         ];
     }
 
-    public function isOrg(?bool $value): UserQuery|UserQueryBehavior
-    {
-        $this->isOrg = $value;
-
-        return $this->owner;
-    }
-
-    public function hasOrgMember(?int $value): UserQuery|UserQueryBehavior
-    {
-        $this->hasOrgMember = $value;
-
-        return $this->owner;
-    }
-
-    public function hasOrgAdmin(?int $value): UserQuery|UserQueryBehavior
-    {
-        $this->hasOrgAdmin = $value;
-
-        return $this->owner;
-    }
-
-    public function orgMemberOf(?int $value): UserQuery|UserQueryBehavior
-    {
-        $this->orgMemberOf = $value;
-
-        return $this->owner;
-    }
-
-    public function orgAdmin(?bool $value): UserQuery|UserQueryBehavior
-    {
-        $this->orgAdmin = $value;
-
-        return $this->owner;
-    }
-
-    /**
-     * Prepares the user query.
-     */
     public function beforePrepare(): void
     {
-        $this->owner->query->addSelect([
-            '(orgs.id is not null) AS isOrg',
-            'orgs.country',
-            'orgs.stripeAccessToken',
-            'orgs.stripeAccount',
-            'orgs.payPalEmail',
-            'orgs.apiToken',
-            'orgs.displayName',
-            'orgs.websiteUrl',
-            'orgs.websiteSlug',
-            'orgs.location',
-            'orgs.supportPlan',
-            'orgs.supportPlanExpiryDate',
-            'orgs.enableDeveloperFeatures',
-            'orgs.enablePartnerFeatures',
-        ]);
+        $this->beforePrepareLegacy();
 
-        $this->owner->query->leftJoin(['orgs' => Table::ORGS], '[[orgs.id]] = [[users.id]]');
-        $this->owner->subQuery->leftJoin(['orgs' => Table::ORGS], '[[orgs.id]] = [[users.id]]');
+        $this->owner->subQuery->leftJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.userId]] = [[users.id]]');
 
-        if ($this->isOrg !== null) {
-            $this->owner->subQuery->andWhere($this->isOrg ? '[[orgs.id]] is not null' : '[[orgs.id]] is null');
-        }
-
-        if ($this->orgMemberOf !== null) {
-            $this->_joinMembers = true;
-            $this->owner->subQuery->andWhere(['orgsMembers.orgId' => $this->orgMemberOf]);
-        }
-
-        if ($this->orgAdmin !== null) {
-            $this->_joinMembers = true;
-            $this->owner->subQuery->andWhere(['orgsMembers.admin' => $this->orgAdmin]);
-        }
-
-        if ($this->hasOrgMember !== null) {
-            $this->_joinMembersByOrg = true;
-            $this->owner->subQuery->andWhere(['orgsMembersByOrg.userId' => $this->hasOrgMember]);
-        }
-
-        if ($this->hasOrgAdmin !== null) {
-            $this->_joinMembersByOrg = true;
+        if ($this->ofOrg) {
             $this->owner->subQuery->andWhere([
-                'orgsMembersByOrg.userId' => $this->hasOrgAdmin,
-                'orgsMembersByOrg.admin' => true,
+                'orgsMembers.orgId' => $this->ofOrg,
             ]);
         }
 
-        if ($this->_joinMembers) {
-            $this->owner->subQuery->innerJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.userId]] = [[users.id]]');
+        if ($this->orgMember !== null) {
+            $this->owner->subQuery->andWhere($this->orgMember ? ['not', ['orgsMembers.orgId' => null]] : ['orgsMembers.orgId' => null]);
+
+            if ($this->orgMember) {
+                $this->owner->subQuery->andWhere(['orgsMembers.enabled' => true]);
+            }
         }
 
-        if ($this->_joinMembersByOrg) {
-            $this->owner->subQuery->innerJoin(['orgsMembersByOrg' => Table::ORGS_MEMBERS], '[[orgsMembersByOrg.orgId]] = [[users.id]]');
+        if ($this->orgOwner !== null) {
+            $this->owner->subQuery->andWhere(['orgsMembers.owner' => $this->orgOwner]);
         }
     }
 
-    public static function find(): UserQuery|UserQueryBehavior
+    /**
+     * TODO: remove this following org migration.
+     * @return void
+     */
+    public function beforePrepareLegacy(): void
     {
-        return User::find();
+        if ($this->owner->select === ['COUNT(*)']) {
+            return;
+        }
+
+        $this->owner->query->addSelect([
+            'developers.country',
+            'developers.stripeAccessToken',
+            'developers.stripeAccount',
+            'developers.payPalEmail',
+            'developers.apiToken',
+            'developers.balance',
+        ]);
+
+        $this->owner->query->leftJoin(['developers' => Table::DEVELOPERS], '[[developers.id]] = [[users.id]]');
+        $this->owner->subQuery->leftJoin(['developers' => Table::DEVELOPERS], '[[developers.id]] = [[users.id]]');
+    }
+
+    private static function normalizeOrgOfArgument(mixed $value, bool $recursive = true): null|bool|int|array
+    {
+        if (is_scalar($value)) {
+            return $value;
+        }
+
+        if ($value instanceof Org && $value->id) {
+            return $value->id;
+        }
+
+        if ($value instanceof OrgQuery) {
+            return $value->ids();
+        }
+
+        if ($recursive && is_array($value)) {
+            return Collection::make($value)
+                ->map(fn($org) => static::normalizeOrgOfArgument($org, false))
+                ->all();
+        }
+
+        throw new InvalidArgumentException('Invalid orgOf value');
     }
 }

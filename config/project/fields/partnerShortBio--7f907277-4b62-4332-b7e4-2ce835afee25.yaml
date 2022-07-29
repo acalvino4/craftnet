@@ -1,9 +1,9 @@
-columnSuffix: null
+columnSuffix: keucyoal
 contentColumnType: text
 fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
-handle: location
+handle: partnerShortBio
 instructions: null
-name: Location
+name: 'Short Bio'
 searchable: true
 settings:
   byteLimit: null
@@ -11,7 +11,7 @@ settings:
   code: false
   columnType: null
   initialRows: 4
-  multiline: false
+  multiline: true
   placeholder: null
   uiMode: normal
 translationKeyFormat: null

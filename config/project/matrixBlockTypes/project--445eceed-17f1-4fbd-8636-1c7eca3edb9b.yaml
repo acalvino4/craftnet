@@ -1,0 +1,244 @@
+field: dfce0b99-81e5-47e3-8a66-b58de4252b2a # Projects
+fieldLayouts:
+  c58339ff-9d88-45cc-9472-63c5a62c3569:
+    tabs:
+      -
+        elementCondition: null
+        elements:
+          -
+            elementCondition: null
+            fieldUid: e821bb9a-895a-4ab6-bef1-25e8e1041773 # Name
+            instructions: null
+            label: null
+            required: true
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 3c0092c7-b41e-4155-9cc4-3186e1cc35c4
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            elementCondition: null
+            fieldUid: 37297593-16ac-4741-97c3-82b263de333f # Project URL
+            instructions: null
+            label: null
+            required: true
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 4cfd6d0e-d632-47a9-b179-db45cba101a8
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            elementCondition: null
+            fieldUid: 927e0a7d-cded-4068-882e-c6b830b9714d # Link Type
+            instructions: null
+            label: null
+            required: true
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 0d55cd7e-301b-4549-ad3d-b03d17f1e430
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            elementCondition: null
+            fieldUid: eaae18df-c830-4e18-ba7c-8264d9b2f074 # Role
+            instructions: null
+            label: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 22619828-3ce7-4dda-ad36-f4d0d66262f4
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            elementCondition: null
+            fieldUid: b7bebf5e-5cf4-4085-b0eb-c3941a05a1d5 # With Craft Commerce
+            instructions: null
+            label: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 585986bc-6c61-41ce-849a-ae59ac4fa083
+            userCondition: null
+            warning: null
+            width: 100
+          -
+            elementCondition: null
+            fieldUid: 7d78e4ba-cf52-4a42-b561-eff956aa3bc7 # Screenshots
+            instructions: null
+            label: null
+            required: false
+            tip: null
+            type: craft\fieldlayoutelements\CustomField
+            uid: 436759f2-8bb8-49b4-826e-04506a431ed5
+            userCondition: null
+            warning: null
+            width: 100
+        name: Content
+        uid: dcb0e019-61e3-4bba-afac-920a79417ae3
+        userCondition: null
+fields:
+  7d78e4ba-cf52-4a42-b561-eff956aa3bc7: # Screenshots
+    columnSuffix: null
+    contentColumnType: string
+    fieldGroup: null
+    handle: screenshots
+    instructions: null
+    name: Screenshots
+    searchable: false
+    settings:
+      allowSelfRelations: false
+      allowSubfolders: true
+      allowUploads: true
+      allowedKinds: null
+      defaultUploadLocationSource: 'volume:e08a6ce3-ecbb-469e-b0e5-a03d2d9c6052' # Partner Images
+      defaultUploadLocationSubpath: '{owner.id}'
+      localizeRelations: false
+      maxRelations: null
+      minRelations: null
+      previewMode: full
+      restrictFiles: false
+      restrictLocation: true
+      restrictedDefaultUploadSubpath: '{owner.id}'
+      restrictedLocationSource: 'volume:e08a6ce3-ecbb-469e-b0e5-a03d2d9c6052' # Partner Images
+      restrictedLocationSubpath: '{owner.id}'
+      selectionCondition:
+        __assoc__:
+          -
+            - elementType
+            - craft\elements\Asset
+          -
+            - fieldContext
+            - global
+          -
+            - class
+            - craft\elements\conditions\assets\AssetCondition
+      selectionLabel: null
+      showSiteMenu: false
+      showUnpermittedFiles: false
+      showUnpermittedVolumes: false
+      source: null
+      sources:
+        - 'volume:e08a6ce3-ecbb-469e-b0e5-a03d2d9c6052' # Partner Images
+      targetSiteId: null
+      validateRelatedElements: false
+      viewMode: list
+    translationKeyFormat: null
+    translationMethod: site
+    type: craft\fields\Assets
+  927e0a7d-cded-4068-882e-c6b830b9714d: # Link Type
+    columnSuffix: hdhuxnci
+    contentColumnType: string
+    fieldGroup: null
+    handle: linkType
+    instructions: null
+    name: 'Link Type'
+    searchable: false
+    settings:
+      options:
+        -
+          __assoc__:
+            -
+              - label
+              - Website
+            -
+              - value
+              - website
+            -
+              - default
+              - ''
+        -
+          __assoc__:
+            -
+              - label
+              - 'Case Study'
+            -
+              - value
+              - caseStudy
+            -
+              - default
+              - ''
+    translationKeyFormat: null
+    translationMethod: none
+    type: craft\fields\Dropdown
+  37297593-16ac-4741-97c3-82b263de333f: # Project URL
+    columnSuffix: jmqxqvrs
+    contentColumnType: text
+    fieldGroup: null
+    handle: projectUrl
+    instructions: null
+    name: 'Project URL'
+    searchable: false
+    settings:
+      byteLimit: null
+      charLimit: null
+      code: false
+      columnType: null
+      initialRows: 4
+      multiline: false
+      placeholder: null
+      uiMode: normal
+    translationKeyFormat: null
+    translationMethod: none
+    type: craft\fields\PlainText
+  b7bebf5e-5cf4-4085-b0eb-c3941a05a1d5: # With Craft Commerce
+    columnSuffix: ceqmxvui
+    contentColumnType: boolean
+    fieldGroup: null
+    handle: withCraftCommerce
+    instructions: null
+    name: 'With Craft Commerce'
+    searchable: false
+    settings:
+      default: false
+      offLabel: null
+      onLabel: null
+    translationKeyFormat: null
+    translationMethod: none
+    type: craft\fields\Lightswitch
+  e821bb9a-895a-4ab6-bef1-25e8e1041773: # Name
+    columnSuffix: rklllfpc
+    contentColumnType: text
+    fieldGroup: null
+    handle: projectName
+    instructions: null
+    name: Name
+    searchable: true
+    settings:
+      byteLimit: null
+      charLimit: null
+      code: false
+      columnType: null
+      initialRows: 4
+      multiline: false
+      placeholder: null
+      uiMode: normal
+    translationKeyFormat: null
+    translationMethod: none
+    type: craft\fields\PlainText
+  eaae18df-c830-4e18-ba7c-8264d9b2f074: # Role
+    columnSuffix: huzvjpwc
+    contentColumnType: text
+    fieldGroup: null
+    handle: role
+    instructions: null
+    name: Role
+    searchable: false
+    settings:
+      byteLimit: null
+      charLimit: null
+      code: false
+      columnType: null
+      initialRows: 4
+      multiline: false
+      placeholder: null
+      uiMode: normal
+    translationKeyFormat: null
+    translationMethod: none
+    type: craft\fields\PlainText
+handle: project
+name: Project
+sortOrder: 1

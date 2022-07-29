@@ -1,10 +1,10 @@
-columnSuffix: null
+columnSuffix: ymbevoof
 contentColumnType: boolean
 fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
-handle: enablePartnerFeatures
-instructions: 'Enables partner fields in a user’s Craft ID account.'
-name: 'Enable Partner Features'
-searchable: true
+handle: partnerIsRegisteredBusiness
+instructions: null
+name: 'Is Registered Business?'
+searchable: false
 settings:
   default: false
   offLabel: null

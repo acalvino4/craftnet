@@ -1,4 +1,4 @@
-dateModified: 1655089084
+dateModified: 1658852995
 elementSources:
   craft\elements\Asset:
     -
@@ -154,6 +154,8 @@ meta:
     01fcd9d2-40bb-4f54-a225-7c9b674c3db9: Plugin # Plugin
     2a835d29-b3e4-4ef5-bf62-ad7285b4a4dd: API # API
     2b0be654-6b0a-454b-939c-86f528888ade: Title # Title
+    2e52616c-f9d9-4228-ba13-614a72c447f5: 'PayPal Email' # PayPal Email
+    2eb2f556-da31-449a-add4-6b5fb08c700b: 'Full Bio' # Full Bio
     2f57d7c9-711e-4173-a5b4-df89fb34e085: 'Craft Plugin Store' # Craft Plugin Store
     3be6f954-f541-4687-a94a-b2e02ba2e436: Index # Index
     3d8608c4-0726-4a47-8051-5319922c2a72: 'GitHub Repo URL' # GitHub Repo URL
@@ -164,31 +166,44 @@ meta:
     7a3462d0-f44c-4b28-a6b5-7b0dfde34886: Dynamic # Dynamic
     7b80e1c3-fc1b-447d-a346-872ec9b0b853: 'Card Token' # Card Token
     7d2d87bb-a137-40b3-a87e-84791b7503fa: Refunded # Refunded
+    7d78e4ba-cf52-4a42-b561-eff956aa3bc7: Screenshots # Screenshots
     7e55127b-d67b-4d6e-8737-e6370c3063fc: Attention # Attention
+    7f907277-4b62-4332-b7e4-2ce835afee25: 'Short Bio' # Short Bio
     8b796e49-612b-4477-9567-64c11f929737: 'Customer Email' # Customer Email
     8c77d2c1-8b2d-4175-894d-3360298ed704: Screenshots # Screenshots
+    9ccab6a8-d358-4d2c-af6b-c6edeb1dcb94: Logo # Avatar
+    9cd6a56e-5977-46e4-bbc1-d83db36fd39a: 'Has Full Time Dev?' # Has Full Time Dev?
     42b088ed-cffc-4382-aeb1-56e192d4138b: 'Support Plan' # Support Plan
     64f9978b-3086-49db-b59e-eced2a2dc63e: 'Manual Selection' # Manual Selection
     69a360da-0024-4460-a54a-b898d616b013: Orders # Orders
     69c15f3c-6ae1-4906-879f-495ab5c76102: 'Craft License' # Craft License
     189e8ac9-72ba-4340-a2ef-ce6165b29163: Disputed # Disputed
+    204a25ff-9eed-4785-82c9-ba92caadf2b0: Capabilities # Capabilities
     205a826f-1701-41c7-804d-f7998cec0442: 'Business Name' # Business Name
     238dc7f2-e863-4b8f-96fa-805a3324dc5d: Avatars # Avatars
     321ce103-d9dd-4d48-9191-5db9d312fc5b: Charged # Charged
+    445eceed-17f1-4fbd-8636-1c7eca3edb9b: Project # Project
     495fa280-74b9-49af-8737-986532450386: Screenshots # Screenshots
+    819ca083-b29a-4cec-9776-46201372f695: 'Is Craft Verified?' # Is Craft Verified?
+    927e0a7d-cded-4068-882e-c6b830b9714d: 'Link Type' # Link Type
     961e8a2b-92db-47d5-b4b4-d977acbbc5b6: 'Short Description' # Short Description
     02269d9f-bbaa-4ea2-8b91-909e27e6ce05: 'Business Zip Code' # Business Zip Code
     4234aa0a-59b0-4777-80ee-aeb7b931b924: 'Enable Partner Features' # Enable Partner Features
     4987fb8d-cf45-4b60-a94f-51c591336558: License # License
     8928c23a-7002-467d-af97-333694b8dad8: Console # Console
     8965f5ae-4c8e-4529-bfc5-e7345e40d7ce: 'Auto Renew' # Auto Renew
+    16934a9a-a4f8-451b-b37e-6b2e88b4e895: 'Verification Start Date' # Verification Start Date
     23676c77-087c-4f52-908d-3eee1deb6004: 'Business Country' # Business Country
     023855be-13c3-44c5-9a68-ba838275756a: 'Plugin License' # Plugin License
     34358d6d-9fda-49bb-a56d-f0fe2b05027f: 'Business VAT ID' # Business VAT ID
     68465f6c-a70b-4b6b-a3ab-feaece178361: 'Customer Name' # Customer Name
     112552be-dfb0-4cca-a725-b0c4ac73705a: 'Plugin Categories' # Plugin Categories
     149763f1-bd8b-4d8e-a8f0-8ce1b0c6d593: 'Featured Plugins' # Featured Plugins
+    215578bf-8a23-4dee-8dd0-1d3eb1f629bc: 'Primary Contact Phone' # Primary Contact Phone
+    833000d4-aee8-4e2e-b86b-ea7642aeb240: 'External URL' # External URL
     3729338a-bc60-4be2-9fc4-0e63b4a62d4a: Plugins # Plugins
+    15404041-1763-447f-a5f3-77ab36679bb1: 'Require Order Approval' # Require Order Approval
+    37297593-16ac-4741-97c3-82b263de333f: 'Project URL' # Project URL
     63801519-f6aa-468d-9ce9-1a0c289e5ddb: 'Craft Edition' # Craft Edition
     a1deff4e-43ef-4a67-870e-813cfa36700c: 'Enable showcase features' # Enable showcase features
     a2f14c14-960e-4f3a-a673-b505db22569b: 'Craft License' # Craft License
@@ -196,9 +211,13 @@ meta:
     a5c336d7-efe7-4bed-9e5f-5619084feb99: 'Plugin Handle' # Plugin Handle
     a773b9fb-cbc5-423a-977f-8210c987176c: Store # Store
     a8588216-5d01-4fea-ae5f-31e6836a0fc9: Price # Price
+    acc8ac95-72aa-4460-8d90-1805bd74fad3: 'Is Commerce Verified?' # Is Commerce Verified?
+    ad19995a-b5d4-48d3-86cb-be3bba74d657: Expertise # Expertise
     add7f1c8-5c4a-4d23-9398-8a9472f169e8: User # User
     b1a59dd4-5d0c-4d32-925c-8a2349747691: Order # Order
+    b7bebf5e-5cf4-4085-b0eb-c3941a05a1d5: 'With Craft Commerce' # With Craft Commerce
     b9fcbb50-cec0-46a4-a28f-4c93be8e0c95: Feeds # Feeds
+    b20bbbda-6008-40ad-bd08-fff827696050: Org # Org
     b64bf83a-40fd-48a4-ba39-455b7900f976: Staff # Staff
     b384f570-e131-42f9-8c20-8d0faacb734f: 'Business Address Line 2' # Business Address Line 2
     b597a3a5-88d2-4446-9f93-a28351a1b666: Index # Index
@@ -206,10 +225,12 @@ meta:
     be77d03c-2f5a-45f6-8232-a906c3ce49f6: API # API
     bf51e7f5-308e-4372-a6a7-6df2380e3fe6: Stripe # Stripe
     bf872170-c29f-4188-9225-90e97869758b: Licenses # Licenses
+    c3ec3f9f-7b1e-4ef2-9603-0559ca0c4ce0: 'Primary Contact Email' # Primary Contact Email
     c11bcd7d-378a-431e-912e-26ebc8f13545: Summit # Summit
     cc3f9ff0-2259-4ed0-bcfc-b19a91dc4d67: Customer # Customer
     cc57a07c-7225-4ed5-8db2-31898436abb2: Orders # Orders
     d17f6c64-5872-4457-8784-797b8c3e7ec8: Developers # Developers
+    d832f7b7-53a0-4d8a-b1ee-b2d57e5ee337: 'Primary Contact Name' # Primary Contact Name
     d94974be-5536-480a-b3c8-df3f7b634fc5: 'Phone Number' # Phone Number
     db4da419-ca41-4a13-b4a4-9c3f59c217fd: 'Developer Name' # Developer Name
     db86c368-a515-4a43-ab02-152bd51c9e9e: 'Craft ID' # Craft ID
@@ -217,13 +238,20 @@ meta:
     dd2601c5-8443-448c-980a-c9a1ee040ee9: Icon # Icon
     ddeba8ad-70bf-49cf-8a64-72affe458a48: 'Package Name' # Package Name
     dfc27822-23dd-49e2-ac3a-66a436674cf0: Composer # Composer
+    dfce0b99-81e5-47e3-8a66-b58de4252b2a: Projects # Projects
     e08a6ce3-ecbb-469e-b0e5-a03d2d9c6052: 'Partner Images' # Partner Images
     e76f9c9f-363c-476e-ae6d-c48eed173468: Location # Location
+    e84cc074-0e5e-4349-8f2e-8e3645637b63: 'Is Enterprise Verified?' # Is Enterprise Verified?
+    e821bb9a-895a-4ab6-bef1-25e8e1041773: Name # Name
     e9867fdd-c7b2-458c-b500-410b25166656: 'Update Price' # Update Price
     ea05b292-0026-4bec-a15c-1e09055223fc: 'Business State' # Business State
+    eaae18df-c830-4e18-ba7c-8264d9b2f074: Role # Role
     ec01a46c-7aae-4b10-95ce-6ae6648b9745: Plugin # Plugin
     ecbbfebe-c824-4e29-b927-a3bcc10c9e24: Items # Items
+    efac2879-f4d4-4a4e-a858-e512592a180b: Region # Region
+    f33eb90f-b996-4351-8d56-a70219b55545: 'Is Registered Business?' # Is Registered Business?
     fc4f52d6-458d-44cb-a2fd-f0042d715d64: Icons # Icons
+    fce49ec0-4ec2-4641-a6dd-965492f51b4f: 'Agency Size' # Agency Size
     fdc2e766-f2a8-4ee0-9ad8-9b7d64b8d86b: Description # Description
     fe7c44f8-b23b-4279-89b5-f72430c8ae22: Default # Default
 plugins:

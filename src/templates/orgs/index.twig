@@ -1,0 +1,7 @@
+{% extends "_layouts/elementindex" %}
+{% set elementType = 'craftnet\\orgs\\Org' %}
+{% set canHaveDrafts = true %}
+
+{% block actionButton %}
+    <a href="{{ url('orgs/new') }}" class="btn submit add icon">{{ "New #{elementInstance.lowerDisplayName()}"|t('app') }}</a>
+{% endblock %}

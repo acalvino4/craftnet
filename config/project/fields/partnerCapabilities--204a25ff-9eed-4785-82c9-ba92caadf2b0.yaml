@@ -1,0 +1,67 @@
+columnSuffix: ualmhitg
+contentColumnType: text
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: partnerCapabilities
+instructions: null
+name: Capabilities
+searchable: false
+settings:
+  options:
+    -
+      __assoc__:
+        -
+          - label
+          - Commerce
+        -
+          - value
+          - commerce
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 'Full Service'
+        -
+          - value
+          - fullService
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 'Custom Development'
+        -
+          - value
+          - customDevelopment
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 'Contract Work'
+        -
+          - value
+          - contractWork
+        -
+          - default
+          - ''
+    -
+      __assoc__:
+        -
+          - label
+          - 'Ongoing Maintenance'
+        -
+          - value
+          - ongoingMaintenance
+        -
+          - default
+          - ''
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Checkboxes

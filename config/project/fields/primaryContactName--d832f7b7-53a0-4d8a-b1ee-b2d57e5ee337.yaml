@@ -1,10 +1,10 @@
-columnSuffix: null
+columnSuffix: ajefwubp
 contentColumnType: text
 fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
-handle: location
+handle: primaryContactName
 instructions: null
-name: Location
-searchable: true
+name: 'Primary Contact Name'
+searchable: false
 settings:
   byteLimit: null
   charLimit: null

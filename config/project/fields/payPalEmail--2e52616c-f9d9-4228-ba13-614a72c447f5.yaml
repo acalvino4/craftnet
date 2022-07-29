@@ -1,0 +1,12 @@
+columnSuffix: bbhjdnip
+contentColumnType: string
+fieldGroup: b20bbbda-6008-40ad-bd08-fff827696050 # Org
+handle: payPalEmail
+instructions: null
+name: 'PayPal Email'
+searchable: false
+settings:
+  placeholder: null
+translationKeyFormat: null
+translationMethod: none
+type: craft\fields\Email

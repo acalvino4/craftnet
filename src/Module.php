@@ -95,7 +95,7 @@ class Module extends \yii\base\Module
     const MESSAGE_KEY_LICENSE_NOTIFICATION = 'license_notification';
     const MESSAGE_KEY_LICENSE_TRANSFER = 'license_transfer';
     const MESSAGE_KEY_SECURITY_ALERT = 'security_alert';
-    const MESSAGE_KEY_ORG_INVITE = 'org_invite';
+    const MESSAGE_KEY_ORG_INVITATION = 'org_invitation';
 
     /**
      * @inheritdoc
@@ -186,10 +186,10 @@ class Module extends \yii\base\Module
                 'body' => file_get_contents(__DIR__ . '/emails/security_alert.md'),
             ]);
             $e->messages[] = new SystemMessage([
-                'key' => self::MESSAGE_KEY_ORG_INVITE,
+                'key' => self::MESSAGE_KEY_ORG_INVITATION,
                 'heading' => 'When a member is invited to join an org.',
                 'subject' => '{{ inviter.friendlyName }} has invited you to join the {{ org.displayName }} organization',
-                'body' => file_get_contents(__DIR__ . '/emails/org_invite.md'),
+                'body' => file_get_contents(__DIR__ . '/emails/org_invitation.md'),
             ]);
         });
 
@@ -328,6 +328,11 @@ class Module extends \yii\base\Module
         return $this->get('payoutManager');
     }
 
+    public function getOrgs(): OrgsService
+    {
+        return $this->get('orgs');
+    }
+
     private function _initConsoleRequset()
     {
         Event::on(ResaveController::class, ConsoleController::EVENT_DEFINE_ACTIONS, function(DefineConsoleActionsEvent $e) {
@@ -364,6 +369,12 @@ class Module extends \yii\base\Module
                 'label' => 'Partners',
                 'icon' => __DIR__ . '/icons/partner.svg',
             ];
+
+            $e->navItems[] = [
+                'url' => 'orgs',
+                'label' => 'Organizations',
+                'fontIcon' => 'building',
+            ];
         });
 
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $e) {
@@ -379,6 +390,9 @@ class Module extends \yii\base\Module
                 'GET partners/history/<partnerId:\d+>' => 'craftnet/partners/fetch-history',
                 'POST partners/history' => 'craftnet/partners/save-history',
                 'DELETE partners/history/<id:\d+>' => 'craftnet/partners/delete-history',
+                'orgs' => ['template' => 'craftnet/orgs/index'],
+                'orgs/new' => 'craftnet/orgs/cp/create',
+                'orgs/<elementId:\d+><slug:(?:-[^\/]*)?>' => 'elements/edit',
             ]);
         });
 
