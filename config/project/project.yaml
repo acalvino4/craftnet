@@ -1,4 +1,4 @@
-dateModified: 1658852995
+dateModified: 1659104801
 elementSources:
   craft\elements\Asset:
     -
@@ -171,7 +171,7 @@ meta:
     7f907277-4b62-4332-b7e4-2ce835afee25: 'Short Bio' # Short Bio
     8b796e49-612b-4477-9567-64c11f929737: 'Customer Email' # Customer Email
     8c77d2c1-8b2d-4175-894d-3360298ed704: Screenshots # Screenshots
-    9ccab6a8-d358-4d2c-af6b-c6edeb1dcb94: Logo # Avatar
+    9ccab6a8-d358-4d2c-af6b-c6edeb1dcb94: Logo # Logo
     9cd6a56e-5977-46e4-bbc1-d83db36fd39a: 'Has Full Time Dev?' # Has Full Time Dev?
     42b088ed-cffc-4382-aeb1-56e192d4138b: 'Support Plan' # Support Plan
     64f9978b-3086-49db-b59e-eced2a2dc63e: 'Manual Selection' # Manual Selection
@@ -268,7 +268,7 @@ plugins:
     edition: pro
     enabled: true
     licenseKey: AX9Z8XL3CNFWOIA52P4CYXL4
-    schemaVersion: 4.0.1
+    schemaVersion: 4.1.0
     settings:
       activeCartDuration: PT1H
       allowEmptyCartOnCheckout: true
