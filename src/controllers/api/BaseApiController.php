@@ -396,7 +396,11 @@ abstract class BaseApiController extends Controller
                             try {
                                 $pluginLicense = $pluginLicenseManager->getLicenseByKey($pluginLicenseKey, $pluginHandle, true);
                             } catch (LicenseNotFoundException $e) {
-                                $this->pluginLicenseStatuses[$pluginHandle] = self::LICENSE_STATUS_INVALID;
+                                // Only a problem if they're runinng a commercial edition; otherwise ignore it
+                                $edition = $this->installedPluginEdition($pluginHandle);
+                                if ($edition->price != 0) {
+                                    $this->pluginLicenseStatuses[$pluginHandle] = self::LICENSE_STATUS_INVALID;
+                                }
                                 $e = null;
                             } catch (InvalidPluginException $e) {
                                 // Just ignore it

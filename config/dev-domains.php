@@ -81,6 +81,7 @@ return [
     'madebymasuga.com',
     'madebyshape-dev.co.uk',
     'madebyshape.dev',
+    'mambomambo.dev',
     'mandarindev.no',
     'manual.casa',
     'marbles.dev',
