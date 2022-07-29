@@ -187,8 +187,8 @@ class CartsController extends BaseApiController
             $cart->lastIp = $this->request->getUserIP();
 
             // update cancel/return URLs
-            $cart->cancelUrl = App::parseEnv('$URL_ID') . 'payment';
-            $cart->returnUrl = App::parseEnv('$URL_ID') . 'thank-you';
+            $cart->cancelUrl = App::parseEnv('$URL_CONSOLE') . 'payment';
+            $cart->returnUrl = App::parseEnv('$URL_CONSOLE') . 'thank-you';
 
             // set the email/customer before saving the cart, so the cart doesn't create its own customer record
             if (($user = Craft::$app->getUser()->getIdentity(false)) !== null) {

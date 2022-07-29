@@ -297,8 +297,8 @@ class LicensesController extends Controller
                 'email' => $user->email,
             ]);
 
-            $order->cancelUrl = App::parseEnv('$URL_ID') . 'payment';
-            $order->returnUrl = App::parseEnv('$URL_ID') . 'thank-you';
+            $order->cancelUrl = App::parseEnv('$URL_CONSOLE') . 'payment';
+            $order->returnUrl = App::parseEnv('$URL_CONSOLE') . 'thank-you';
 
             // Save the cart so it gets an ID
             $elementsService = Craft::$app->getElements();

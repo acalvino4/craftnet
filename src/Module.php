@@ -445,10 +445,10 @@ class Module extends \yii\base\Module
 
     private function _initSiteRequest(Request $request)
     {
-        $idOrigin = rtrim(App::env('URL_ID'), '/');
+        $consoleOrigin = rtrim(App::env('URL_CONSOLE'), '/');
 
-        if (Craft::$app->getRequest()->getOrigin() === $idOrigin) {
-            Craft::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Origin', $idOrigin);
+        if (Craft::$app->getRequest()->getOrigin() === $consoleOrigin) {
+            Craft::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Origin', $consoleOrigin);
             Craft::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Credentials', 'true');
         } else {
             Craft::$app->getResponse()->getHeaders()->set('Access-Control-Allow-Origin', '*');
