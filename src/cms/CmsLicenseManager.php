@@ -439,14 +439,13 @@ class CmsLicenseManager extends Component
     public function claimLicense(User|Org $owner, User $user, string $key)
     {
         $license = $this->getLicenseByKey($key);
-        $isOrg = $owner instanceof Org;
 
         // make sure the license doesn't already have an owner
         if ($license->ownerId) {
             throw new Exception('License has already been claimed.');
         }
 
-        if ($isOrg && !$owner->hasMember($user)) {
+        if (!$license->canManage($owner)) {
             throw new Exception('License cannot be claimed by this user .');
         }
 

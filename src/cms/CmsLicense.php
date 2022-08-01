@@ -113,12 +113,23 @@ class CmsLicense extends License
         return $this->ownerId;
     }
 
-    public function getOwner(): User|Org
+    public function getOwner(): User|Org|null
     {
-        return Craft::$app->getElements()->getElementById($this->ownerId);
+        return $this->ownerId ? Craft::$app->getElements()->getElementById($this->ownerId) : null;
     }
 
     public function canManage(User $user): bool
+    {
+        if ($this->ownerId === $user->id) {
+            return true;
+        }
+
+        $owner = $this->getOwner();
+
+        return $owner instanceof Org && $owner->hasMember($user);
+    }
+
+    public function canRelease(User $user): bool
     {
         if ($this->ownerId === $user->id) {
             return true;
