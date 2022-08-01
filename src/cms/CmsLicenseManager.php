@@ -439,20 +439,16 @@ class CmsLicenseManager extends Component
     public function claimLicense(User|Org $owner, string $key, ?User $user = null): void
     {
         $license = $this->getLicenseByKey($key);
+        $actingUser = $user ?? $owner;
 
         // make sure the license doesn't already have an owner
         if ($license->ownerId) {
             throw new Exception('License has already been claimed.');
         }
 
-        if (!$license->canManage($owner)) {
-            throw new Exception('License cannot be claimed by this user .');
-        }
-
         $isOrg = $owner instanceof Org;
-        $email = $user?->email ?? $owner?->email;
         $license->ownerId = $owner->id;
-        $license->email = $email;
+        $license->email = $actingUser->email;
 
         if (!$this->saveLicense($license, true, [
             'ownerId',
@@ -461,7 +457,7 @@ class CmsLicenseManager extends Component
             throw new Exception('Could not save Craft license: ' . implode(', ', $license->getErrorSummary(true)));
         }
 
-        $note = "claimed by {$email}";
+        $note = "claimed by $actingUser->email";
 
         if ($isOrg) {
             $note .= " for $owner->title";
