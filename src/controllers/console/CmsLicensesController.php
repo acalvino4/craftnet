@@ -7,8 +7,10 @@ use craft\errors\UploadFailedException;
 use craft\web\UploadedFile;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use Exception;
 use Throwable;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 use yii\web\UnauthorizedHttpException;
@@ -27,14 +29,15 @@ class CmsLicensesController extends BaseController
      * Claims a license.
      *
      * @return Response
+     * @throws BadRequestHttpException|Throwable
      */
     public function actionClaim(): Response
     {
         $key = $this->request->getBodyParam('key');
         $licenseFile = UploadedFile::getInstanceByName('licenseFile');
-
+        $user = Craft::$app->getUser()->getIdentity();
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
         try {
-            $user = Craft::$app->getUser()->getIdentity();
 
             if ($licenseFile) {
                 if ($licenseFile->getHasError()) {
@@ -47,13 +50,13 @@ class CmsLicensesController extends BaseController
             }
 
             if ($key) {
-                $this->module->getCmsLicenseManager()->claimLicense($user, $key);
-                return $this->asJson(['success' => true]);
+                $this->module->getCmsLicenseManager()->claimLicense($owner, $key, $user);
+                return $this->asSuccess();
             }
 
             throw new Exception("No license key provided.");
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -70,7 +73,7 @@ class CmsLicensesController extends BaseController
         $licenseId = $this->request->getParam('id');
         $license = $this->module->getCmsLicenseManager()->getLicenseById($licenseId);
 
-        if ($license->ownerId === $user->id) {
+        if ($license->canManage($user)) {
             return $this->response->sendContentAsFile(chunk_split($license->key, 50), 'license.key');
         }
 
@@ -89,9 +92,9 @@ class CmsLicensesController extends BaseController
         try {
             $total = Module::getInstance()->getCmsLicenseManager()->getExpiringLicensesTotal($user);
 
-            return $this->asJson($total);
+            return $this->asSuccess(data: ['total' => $total]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -105,19 +108,19 @@ class CmsLicensesController extends BaseController
     {
         $user = Craft::$app->getUser()->getIdentity();
         $id = $this->request->getRequiredParam('id');
-
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
         try {
             $license = Module::getInstance()->getCmsLicenseManager()->getLicenseById($id);
 
-            if ($license->ownerId !== $user->id) {
+            if (!$license->canManage($user)) {
                 throw new UnauthorizedHttpException('Not Authorized');
             }
 
-            $licenseArray = Module::getInstance()->getCmsLicenseManager()->transformLicenseForOwner($license, $user, ['pluginLicenses']);
+            $licenseArray = Module::getInstance()->getCmsLicenseManager()->transformLicenseForOwner($license, $owner, ['pluginLicenses']);
 
-            return $this->asJson($licenseArray);
+            return $this->asSuccess(data: ['license' => $licenseArray]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -128,8 +131,6 @@ class CmsLicensesController extends BaseController
      */
     public function actionGetLicenses(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
-
         $filter = $this->request->getParam('query');
         $perPage = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
@@ -137,8 +138,10 @@ class CmsLicensesController extends BaseController
         $ascending = (bool)$this->request->getParam('ascending');
 
         try {
-            $licenses = Module::getInstance()->getCmsLicenseManager()->getLicensesByOwner($user, $filter, $perPage, $page, $orderBy, $ascending);
-            $totalLicenses = Module::getInstance()->getCmsLicenseManager()->getTotalLicensesByOwner($user, $filter);
+            $user = Craft::$app->getUser()->getIdentity();
+            $owner = $this->getAllowedOrgFromRequest() ?? $user;
+            $licenses = Module::getInstance()->getCmsLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
+            $totalLicenses = Module::getInstance()->getCmsLicenseManager()->getTotalLicensesByOwner($owner, $filter);
 
             $lastPage = ceil($totalLicenses / $perPage);
             $nextPageUrl = '?next';
@@ -146,7 +149,7 @@ class CmsLicensesController extends BaseController
             $from = ($page - 1) * $perPage;
             $to = ($page * $perPage) - 1;
 
-            return $this->asJson([
+            return $this->asSuccess(data: [
                 'total' => $totalLicenses,
                 'per_page' => $perPage,
                 'count' => $totalLicenses,
@@ -159,7 +162,7 @@ class CmsLicensesController extends BaseController
                 'data' => $licenses,
             ]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -168,6 +171,7 @@ class CmsLicensesController extends BaseController
      *
      * @return Response
      * @throws LicenseNotFoundException
+     * @throws ForbiddenHttpException
      */
     public function actionRelease(): Response
     {
@@ -177,20 +181,26 @@ class CmsLicensesController extends BaseController
         $license = $manager->getLicenseByKey($key);
 
         try {
-            if ($user && $license->ownerId === $user->id) {
-                $license->ownerId = null;
-
-                if ($manager->saveLicense($license, true, ['ownerId'])) {
-                    $manager->addHistory($license->id, "released by {$user->email}");
-                    return $this->asJson(['success' => true]);
-                }
-
-                throw new Exception("Couldn't save license.");
+            if (!$license->canRelease($user)) {
+                throw new LicenseNotFoundException($key);
             }
 
-            throw new LicenseNotFoundException($key);
+            $owner = $license->getOwner();
+            $org = $owner instanceof Org ? $owner : null;
+            $license->ownerId = null;
+
+            if ($manager->saveLicense($license, true, ['ownerId'])) {
+                $note = "released by $user->email";
+                if ($org) {
+                    $note .= " for $org->title";
+                }
+                $manager->addHistory($license->id, $note);
+                return $this->asSuccess();
+            }
+
+            throw new Exception("Couldn't save license.");
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -206,9 +216,11 @@ class CmsLicensesController extends BaseController
         $user = Craft::$app->getUser()->getIdentity();
         $manager = $this->module->getCmsLicenseManager();
         $license = $manager->getLicenseByKey($key);
+        $owner = $license->getOwner();
+        $org = $owner instanceof Org ? $owner : null;
 
         try {
-            if ($user && $license->ownerId === $user->id) {
+            if ($license->canManage($user)) {
                 $domain = $this->request->getParam('domain');
                 $notes = $this->request->getParam('notes');
 
@@ -239,18 +251,21 @@ class CmsLicensesController extends BaseController
 
                 if ($domain !== null && $license->domain !== $oldDomain) {
                     $note = $license->domain ? "tied to domain {$license->domain}" : "untied from domain {$oldDomain}";
-                    $manager->addHistory($license->id, "{$note} by {$user->email}");
+                    $note = "{$note} by {$user->email}";
+                    if ($org) {
+                        $note .= " for $org->title";
+                    }
+                    $manager->addHistory($license->id, $note);
                 }
 
-                return $this->asJson([
-                    'success' => true,
+                return $this->asSuccess(data: [
                     'license' => $manager->transformLicenseForOwner($license, $user),
                 ]);
             }
 
             throw new LicenseNotFoundException($key);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 }

@@ -2,10 +2,12 @@
 
 namespace craftnet\controllers\console;
 
+use Craft;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\web\Controller;
 use craftnet\behaviors\UserBehavior;
+use craftnet\orgs\Org;
 use craftnet\plugins\Plugin;
 use yii\helpers\Markdown;
 
@@ -135,5 +137,23 @@ abstract class BaseController extends Controller
         }
 
         return $dates;
+    }
+
+
+    /**
+     * @throws \yii\web\BadRequestHttpException
+     */
+    protected function getAllowedOrgFromRequest(): ?Org
+    {
+        $this->requireLogin();
+        $user = Craft::$app->getUser()->getIdentity();
+        $orgId = $this->request->getParam('orgId');
+        $org = $orgId ? Org::find()->id($orgId)->hasMember($user)->one() : null;
+
+        if ($orgId && !$org) {
+            throw new BadRequestHttpException('Invalid organization');
+        }
+
+        return $org;
     }
 }
