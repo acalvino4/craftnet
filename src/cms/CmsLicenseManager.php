@@ -436,7 +436,7 @@ class CmsLicenseManager extends Component
      * @throws LicenseNotFoundException
      * @throws Exception
      */
-    public function claimLicense(User|Org $owner, User $user, string $key)
+    public function claimLicense(User|Org $owner, string $key, ?User $user = null): void
     {
         $license = $this->getLicenseByKey($key);
 
@@ -449,8 +449,10 @@ class CmsLicenseManager extends Component
             throw new Exception('License cannot be claimed by this user .');
         }
 
+        $isOrg = $owner instanceof Org;
+        $email = $user?->email ?? $owner?->email;
         $license->ownerId = $owner->id;
-        $license->email = $user->email;
+        $license->email = $email;
 
         if (!$this->saveLicense($license, true, [
             'ownerId',
@@ -459,7 +461,7 @@ class CmsLicenseManager extends Component
             throw new Exception('Could not save Craft license: ' . implode(', ', $license->getErrorSummary(true)));
         }
 
-        $note = "claimed by {$user->email}";
+        $note = "claimed by {$email}";
 
         if ($isOrg) {
             $note .= " for $owner->title";
