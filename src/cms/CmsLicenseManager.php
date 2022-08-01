@@ -13,6 +13,7 @@ use craftnet\errors\LicenseNotFoundException;
 use craftnet\helpers\LicenseHelper;
 use craftnet\helpers\OrderHelper;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginEdition;
 use LayerShifter\TLDExtract\Extract;
@@ -426,24 +427,30 @@ class CmsLicenseManager extends Component
     }
 
     /**
-     * Claims a license for a user.
+     * Claims a license for a user or org.
      *
      * @param User $user
      * @param string $key
+     * @param ?Org $org
      *
      * @throws LicenseNotFoundException
      * @throws Exception
      */
-    public function claimLicense(User $user, string $key)
+    public function claimLicense(User|Org $owner, User $user, string $key)
     {
         $license = $this->getLicenseByKey($key);
+        $isOrg = $owner instanceof Org;
 
         // make sure the license doesn't already have an owner
         if ($license->ownerId) {
             throw new Exception('License has already been claimed.');
         }
 
-        $license->ownerId = $user->id;
+        if ($isOrg && !$owner->hasOwner($user)) {
+            throw new Exception('License cannot be claimed by this user .');
+        }
+
+        $license->ownerId = $owner->id;
         $license->email = $user->email;
 
         if (!$this->saveLicense($license, true, [
@@ -453,7 +460,13 @@ class CmsLicenseManager extends Component
             throw new Exception('Could not save Craft license: ' . implode(', ', $license->getErrorSummary(true)));
         }
 
-        $this->addHistory($license->id, "claimed by {$user->email}");
+        $note = "claimed by {$user->email}";
+
+        if ($isOrg) {
+            $note .= " for $owner->title";
+        }
+
+        $this->addHistory($license->id, $note);
     }
 
     /**
@@ -478,7 +491,7 @@ class CmsLicenseManager extends Component
     /**
      * Get licenses by owner.
      *
-     * @param User $owner
+     * @param User|Org $owner
      * @param string|null $searchQuery
      * @param int|null $perPage
      * @param int $page
@@ -487,7 +500,7 @@ class CmsLicenseManager extends Component
      * @return array
      * @throws \Exception
      */
-    public function getLicensesByOwner(User $owner, string $searchQuery = null, int $perPage = null, int $page = 1, string $orderBy = null, bool $ascending = false): array
+    public function getLicensesByOwner(User|Org $owner, string $searchQuery = null, int $perPage = null, int $page = 1, string $orderBy = null, bool $ascending = false): array
     {
         $licenseQuery = $this->_createLicenseQueryForOwner($owner, $searchQuery);
 
@@ -513,11 +526,11 @@ class CmsLicenseManager extends Component
     /**
      * Returns licenses by owner as an array.
      *
-     * @param User $owner
+     * @param User|Org $owner
      * @param string|null $searchQuery
      * @return int
      */
-    public function getTotalLicensesByOwner(User $owner, string $searchQuery = null): int
+    public function getTotalLicensesByOwner(User|Org $owner, string $searchQuery = null): int
     {
         $licenseQuery = $this->_createLicenseQueryForOwner($owner, $searchQuery);
 
@@ -528,12 +541,12 @@ class CmsLicenseManager extends Component
      * Transforms licenses for the given owner.
      *
      * @param array $results
-     * @param User $owner
+     * @param User|Org $owner
      * @param array $include
      * @return array
      * @throws \Exception
      */
-    public function transformLicensesForOwner(array $results, User $owner, array $include = []): array
+    public function transformLicensesForOwner(array $results, User|Org $owner, array $include = []): array
     {
         $licenses = [];
 
@@ -548,12 +561,12 @@ class CmsLicenseManager extends Component
      * Transforms a license for the given owner.
      *
      * @param CmsLicense $result
-     * @param User $owner
+     * @param User|Org $owner
      * @param array $include
      * @return array
      * @throws \Exception
      */
-    public function transformLicenseForOwner(CmsLicense $result, User $owner, array $include = []): array
+    public function transformLicenseForOwner(CmsLicense $result, User|Org $owner, array $include = []): array
     {
         if ($result->ownerId === $owner->id) {
             $license = $result->getAttributes(['id', 'key', 'domain', 'notes', 'email', 'autoRenew', 'expirable', 'expired', 'expiresOn', 'dateCreated']);
@@ -678,11 +691,11 @@ class CmsLicenseManager extends Component
     /**
      * Returns the number of licenses expiring in the next 45 days.
      *
-     * @param User $owner
+     * @param User|Org $owner
      * @return int
      * @throws \Exception
      */
-    public function getExpiringLicensesTotal(User $owner): int
+    public function getExpiringLicensesTotal(User|Org $owner): int
     {
         $date = new \DateTime('now');
         $date->add(new \DateInterval('P45D'));
@@ -739,11 +752,11 @@ class CmsLicenseManager extends Component
     }
 
     /**
-     * @param User $owner
+     * @param User|Org $owner
      * @param string|null $searchQuery
      * @return Query
      */
-    private function _createLicenseQueryForOwner(User $owner, string $searchQuery = null)
+    private function _createLicenseQueryForOwner(User|Org $owner, string $searchQuery = null)
     {
         $query = $this->_createLicenseQuery()
             ->where(['l.ownerId' => $owner->id]);

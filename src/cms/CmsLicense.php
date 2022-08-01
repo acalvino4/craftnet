@@ -2,11 +2,14 @@
 
 namespace craftnet\cms;
 
+use Craft;
+use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craftnet\base\EditionInterface;
 use craftnet\base\License;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use craftnet\plugins\PluginLicense;
 use DateTime;
 
@@ -108,6 +111,22 @@ class CmsLicense extends License
     public function getOwnerId(): ?int
     {
         return $this->ownerId;
+    }
+
+    public function getOwner(): User|Org
+    {
+        return Craft::$app->getElements()->getElementById($this->ownerId);
+    }
+
+    public function canManage(User $user): bool
+    {
+        if ($this->ownerId === $user->id) {
+            return true;
+        }
+
+        $owner = $this->getOwner();
+
+        return $owner instanceof Org && $owner->hasOwner($user);
     }
 
     /**
