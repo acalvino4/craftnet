@@ -446,7 +446,7 @@ class CmsLicenseManager extends Component
             throw new Exception('License has already been claimed.');
         }
 
-        if ($isOrg && !$owner->hasOwner($user)) {
+        if ($isOrg && !$owner->hasMember($user)) {
             throw new Exception('License cannot be claimed by this user .');
         }
 
