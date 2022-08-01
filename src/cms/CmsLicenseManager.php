@@ -559,6 +559,17 @@ class CmsLicenseManager extends Component
     }
 
     /**
+     * @throws Exception
+     * @throws \yii\db\Exception
+     */
+    public function transferLicense(CmsLicense $license, User|Org $to): bool
+    {
+        $license->ownerId = $to->id;
+        // TODO: do we need to also transfer ownership of any attached plugins?
+        return $this->saveLicense($license);
+    }
+
+    /**
      * Transforms a license for the given owner.
      *
      * @param CmsLicense $result
