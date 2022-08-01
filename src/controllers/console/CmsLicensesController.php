@@ -37,6 +37,7 @@ class CmsLicensesController extends BaseController
         $licenseFile = UploadedFile::getInstanceByName('licenseFile');
         $user = Craft::$app->getUser()->getIdentity();
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
+
         try {
 
             if ($licenseFile) {
