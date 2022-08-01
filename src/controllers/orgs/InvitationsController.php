@@ -3,7 +3,6 @@
 namespace craftnet\controllers\orgs;
 
 use Craft;
-use craftnet\enums\OrgMemberRole;
 use craftnet\Module;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;

@@ -14,7 +14,6 @@ use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
-use craftnet\enums\OrgMemberRole;
 use DateTime;
 use yii\base\UserException;
 use yii\db\Exception;

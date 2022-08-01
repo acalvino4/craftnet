@@ -6,8 +6,6 @@ use Craft;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craftnet\behaviors\UserQueryBehavior;
-use craftnet\enums\OrgMemberRole;
-use ValueError;
 use yii\base\Exception;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
