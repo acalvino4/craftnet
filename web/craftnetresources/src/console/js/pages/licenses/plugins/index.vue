@@ -6,6 +6,7 @@
 
     <data-table
       :url="apiUrl"
+      :query="apiQuery"
       :columns="vtColumns"
       :options="vtOptions">
       <template v-slot:licenseKey="props">
@@ -99,6 +100,7 @@ import EditionBadge from '../../../components/EditionBadge'
 import helpers from '../../../mixins/helpers.js'
 import PageHeader from '@/console/js/components/PageHeader'
 import DataTable from '@/console/js/components/DataTable';
+import {mapGetters} from 'vuex';
 
 export default {
   mixins: [helpers],
@@ -125,9 +127,23 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+
     apiUrl() {
       return Craft.actionUrl + '/craftnet/console/plugin-licenses/get-licenses'
     },
+
+    apiQuery() {
+      if (!this.currentOrganization) {
+        return null
+      }
+
+      return {
+        orgId: this.currentOrganization.id,
+      }
+    }
   },
 
   mounted() {

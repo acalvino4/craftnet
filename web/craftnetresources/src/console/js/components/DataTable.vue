@@ -107,6 +107,7 @@ import debounce from 'lodash.debounce';
 export default {
   props: {
     url: String,
+    query: Object,
     columns: Array,
     options: Object,
     data: Array,
@@ -150,7 +151,16 @@ export default {
     fetchData() {
       this.loading = true
 
-      return axios.post(this.url, qs.stringify(this.requestData), {
+      const queryString = qs.stringify({
+        ...this.query,
+        ...this.requestData
+      })
+
+      console.log('this.query', this.query)
+      console.log('this.requestData', this.requestData)
+      console.log('queryString', queryString)
+
+      return axios.post(this.url, queryString, {
           headers: {
             'X-CSRF-Token': Craft.csrfTokenValue,
           }
