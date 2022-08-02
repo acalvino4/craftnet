@@ -55,7 +55,7 @@
       <checkbox
         class="mt-6"
         id="replaceCard"
-        label="Save as primary billing information"
+        label="Save as your primary billing information"
         :value="replaceCard"
         @input="$emit('update:replaceCard', !replaceCard)" />
     </template>
