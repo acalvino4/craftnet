@@ -26,6 +26,49 @@ class CmsLicensesController extends BaseController
     // =========================================================================
 
     /**
+     * @throws Throwable
+     * @throws LicenseNotFoundException
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionTransfer(): Response
+    {
+        $user = Craft::$app->getUser()->getIdentity();
+        $licenseId = $this->request->getRequiredParam('id');
+        $newOwnerId = $this->request->getRequiredParam('newOwnerId');
+        $includePlugins = (bool) $this->request->getParam('includePlugins', false);
+        $licenseManager = Module::getInstance()->getCmsLicenseManager();
+        $license = $licenseManager->getLicenseById($licenseId);
+        $newOwner = Craft::$app->getElements()->getElementById($newOwnerId);
+
+        if ($license->ownerId === $newOwner->id) {
+            return $this->asFailure('This license is already owned by the specified owner.');
+        }
+
+        if (!$license->canRelease($user)) {
+            throw new ForbiddenHttpException('User does not have permission to transfer this license.');
+        }
+
+        if ($newOwner instanceof Org && !$newOwner->hasMember($user)) {
+            throw new ForbiddenHttpException('User is not a member of organization.');
+        }
+
+        try {
+            if (!$licenseManager->transferLicense($license, $newOwner, $user)) {
+                return $this->asFailure('Unable to transfer license.');
+            }
+
+            if ($includePlugins) {
+                $licenseManager->transferPluginLicenses($license, $newOwner, $user);
+            }
+
+            return $this->asSuccess();
+        } catch(Throwable $e) {
+            return $this->asFailure($e->getMessage());
+        }
+    }
+
+    /**
      * Claims a license.
      *
      * @return Response
@@ -51,7 +94,7 @@ class CmsLicensesController extends BaseController
             }
 
             if ($key) {
-                $this->module->getCmsLicenseManager()->claimLicense($owner, $key, $user);
+                $this->module->getCmsLicenseManager()->claimLicense($owner, $user, $key);
                 return $this->asSuccess();
             }
 
@@ -110,6 +153,7 @@ class CmsLicensesController extends BaseController
         $user = Craft::$app->getUser()->getIdentity();
         $id = $this->request->getRequiredParam('id');
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
+
         try {
             $license = Module::getInstance()->getCmsLicenseManager()->getLicenseById($id);
 
@@ -193,7 +237,7 @@ class CmsLicensesController extends BaseController
             if ($manager->saveLicense($license, true, ['ownerId'])) {
                 $note = "released by $user->email";
                 if ($org) {
-                    $note .= " for $org->title";
+                    $note .= " for organization $org->title";
                 }
                 $manager->addHistory($license->id, $note);
                 return $this->asSuccess();
@@ -254,7 +298,7 @@ class CmsLicensesController extends BaseController
                     $note = $license->domain ? "tied to domain {$license->domain}" : "untied from domain {$oldDomain}";
                     $note = "{$note} by {$user->email}";
                     if ($org) {
-                        $note .= " for $org->title";
+                        $note .= " for organization $org->title";
                     }
                     $manager->addHistory($license->id, $note);
                 }

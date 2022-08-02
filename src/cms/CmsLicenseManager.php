@@ -3,12 +3,12 @@
 namespace craftnet\cms;
 
 use Craft;
+use craft\commerce\db\Table as CommerceTable;
 use craft\db\Query;
 use craft\elements\User;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craftnet\db\Table;
-use craft\commerce\db\Table as CommerceTable;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\helpers\LicenseHelper;
 use craftnet\helpers\OrderHelper;
@@ -18,7 +18,6 @@ use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginEdition;
 use LayerShifter\TLDExtract\Extract;
 use LayerShifter\TLDExtract\IDN;
-use Pdp\Domain;
 use Pdp\Idna;
 use Pdp\Rules;
 use yii\base\Component;
@@ -436,19 +435,18 @@ class CmsLicenseManager extends Component
      * @throws LicenseNotFoundException
      * @throws Exception
      */
-    public function claimLicense(User|Org $owner, string $key, ?User $user = null): void
+    public function claimLicense(User|Org $forOwner, User $byUser, string $key): void
     {
         $license = $this->getLicenseByKey($key);
-        $actingUser = $user ?? $owner;
 
         // make sure the license doesn't already have an owner
         if ($license->ownerId) {
             throw new Exception('License has already been claimed.');
         }
 
-        $isOrg = $owner instanceof Org;
-        $license->ownerId = $owner->id;
-        $license->email = $actingUser->email;
+        $isOrg = $forOwner instanceof Org;
+        $license->ownerId = $forOwner->id;
+        $license->email = $byUser->email;
 
         if (!$this->saveLicense($license, true, [
             'ownerId',
@@ -457,10 +455,10 @@ class CmsLicenseManager extends Component
             throw new Exception('Could not save Craft license: ' . implode(', ', $license->getErrorSummary(true)));
         }
 
-        $note = "claimed by $actingUser->email";
+        $note = "claimed by $byUser->email";
 
         if ($isOrg) {
-            $note .= " for $owner->title";
+            $note .= " for organization $forOwner->title";
         }
 
         $this->addHistory($license->id, $note);
@@ -558,11 +556,34 @@ class CmsLicenseManager extends Component
      * @throws Exception
      * @throws \yii\db\Exception
      */
-    public function transferLicense(CmsLicense $license, User|Org $to): bool
+    public function transferLicense(CmsLicense $license, User|Org $to, User $by): bool
     {
         $license->ownerId = $to->id;
-        // TODO: do we need to also transfer ownership of any attached plugins?
-        return $this->saveLicense($license);
+        $license->email = $by->email;
+
+        if (!$this->saveLicense($license, true, [
+            'ownerId',
+            'email',
+        ])) {
+            return false;
+        }
+
+        $toNote = $to instanceof Org ? "organization $to->title" : $to->email;
+        $note = "transferred to $toNote by $by->email";
+
+        $this->addHistory($license->id, $note);
+
+        return true;
+    }
+
+    public function transferPluginLicenses(CmsLicense $license, User|Org $to, User $by): void
+    {
+        $pluginLicenseManager = Module::getInstance()->getPluginLicenseManager();
+        $pluginLicenses = $pluginLicenseManager->getLicensesByCmsLicenseId($license->id);
+
+        foreach ($pluginLicenses as $pluginLicense) {
+            $pluginLicenseManager->transferLicense($pluginLicense, $to, $by);
+        }
     }
 
     /**

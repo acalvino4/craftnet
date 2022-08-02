@@ -3,11 +3,13 @@
 namespace craftnet\controllers\console;
 
 use Craft;
-use craft\web\Controller;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use Exception;
 use Throwable;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 use yii\web\UnauthorizedHttpException;
 
@@ -16,7 +18,7 @@ use yii\web\UnauthorizedHttpException;
  *
  * @property Module $module
  */
-class PluginLicensesController extends Controller
+class PluginLicensesController extends BaseController
 {
     // Public Methods
     // =========================================================================
@@ -30,12 +32,13 @@ class PluginLicensesController extends Controller
     {
         $key = $this->request->getParam('key');
         $user = Craft::$app->getUser()->getIdentity();
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
-            $this->module->getPluginLicenseManager()->claimLicense($user, $key);
-            return $this->asJson(['success' => true]);
+            $this->module->getPluginLicenseManager()->claimLicense($owner, $user, $key);
+            return $this->asSuccess();
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -49,19 +52,58 @@ class PluginLicensesController extends Controller
     {
         $user = Craft::$app->getUser()->getIdentity();
         $id = $this->request->getRequiredParam('id');
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
             $license = Module::getInstance()->getPluginLicenseManager()->getLicenseById($id);
 
-            if ($license->ownerId !== $user->id) {
+            if (!$license->canManage($user)) {
                 throw new UnauthorizedHttpException('Not Authorized');
             }
 
-            $licenseArray = Module::getInstance()->getPluginLicenseManager()->transformLicenseForOwner($license, $user);
+            $licenseArray = Module::getInstance()->getPluginLicenseManager()->transformLicenseForOwner($license, $owner);
 
-            return $this->asJson($licenseArray);
+            return $this->asSuccess(data: ['license' => $licenseArray]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
+        }
+    }
+
+    /**
+     * @throws Throwable
+     * @throws LicenseNotFoundException
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionTransfer(): Response
+    {
+        $user = Craft::$app->getUser()->getIdentity();
+        $licenseId = $this->request->getRequiredParam('id');
+        $newOwnerId = $this->request->getRequiredParam('newOwnerId');
+        $licenseManager = Module::getInstance()->getPluginLicenseManager();
+        $license = $licenseManager->getLicenseById($licenseId);
+        $newOwner = Craft::$app->getElements()->getElementById($newOwnerId);
+
+        if ($license->ownerId === $newOwner->id) {
+            return $this->asFailure('This license is already owned by the specified owner.');
+        }
+
+        if (!$license->canRelease($user)) {
+            throw new ForbiddenHttpException('User does not have permission to transfer this license.');
+        }
+
+        if ($newOwner instanceof Org && !$newOwner->hasMember($user)) {
+            throw new ForbiddenHttpException('User is not a member of organization.');
+        }
+
+        try {
+            if (!$licenseManager->transferLicense($license, $newOwner, $user)) {
+                return $this->asFailure('Unable to transfer license.');
+            }
+
+            return $this->asSuccess();
+        } catch(Throwable $e) {
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -82,8 +124,10 @@ class PluginLicensesController extends Controller
         $ascending = (bool)$this->request->getParam('ascending');
 
         try {
-            $licenses = Module::getInstance()->getPluginLicenseManager()->getLicensesByOwner($user, $filter, $perPage, $page, $orderBy, $ascending);
-            $totalLicenses = Module::getInstance()->getPluginLicenseManager()->getTotalLicensesByOwner($user, $filter);
+            $user = Craft::$app->getUser()->getIdentity();
+            $owner = $this->getAllowedOrgFromRequest() ?? $user;
+            $licenses = Module::getInstance()->getPluginLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
+            $totalLicenses = Module::getInstance()->getPluginLicenseManager()->getTotalLicensesByOwner($owner, $filter);
 
             $lastPage = ceil($totalLicenses / $perPage);
             $nextPageUrl = '?next';
@@ -91,7 +135,7 @@ class PluginLicensesController extends Controller
             $from = ($page - 1) * $perPage;
             $to = ($page * $perPage) - 1;
 
-            return $this->asJson([
+            return $this->asSuccess(data: [
                 'total' => $totalLicenses,
                 'count' => $totalLicenses,
                 'per_page' => $perPage,
@@ -104,7 +148,7 @@ class PluginLicensesController extends Controller
                 'data' => $licenses,
             ]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -120,9 +164,9 @@ class PluginLicensesController extends Controller
         try {
             $total = Module::getInstance()->getPluginLicenseManager()->getExpiringLicensesTotal($user);
 
-            return $this->asJson($total);
+            return $this->asJson(data: ['total' => $total]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -141,20 +185,26 @@ class PluginLicensesController extends Controller
         $license = $manager->getLicenseByKey($key, $pluginHandle);
 
         try {
-            if ($license && $user && $license->ownerId === $user->id) {
-                $license->ownerId = null;
-
-                if ($manager->saveLicense($license, true, ['ownerId'])) {
-                    $manager->addHistory($license->id, "released by {$user->email}");
-                    return $this->asJson(['success' => true]);
-                }
-
-                throw new Exception("Couldn't save license.");
+            if (!$license->canRelease($user)) {
+                throw new LicenseNotFoundException($key);
             }
 
-            throw new LicenseNotFoundException($key);
+            $owner = $license->getOwner();
+            $org = $owner instanceof Org ? $owner : null;
+            $license->ownerId = null;
+
+            if ($manager->saveLicense($license, true, ['ownerId'])) {
+                $note = "released by $user->email";
+                if ($org) {
+                    $note .= " for organization $org->title";
+                }
+                $manager->addHistory($license->id, $note);
+                return $this->asSuccess();
+            }
+
+            throw new Exception("Couldn't save license.");
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -172,9 +222,11 @@ class PluginLicensesController extends Controller
         $user = Craft::$app->getUser()->getIdentity();
         $manager = $this->module->getPluginLicenseManager();
         $license = $manager->getLicenseByKey($key, $pluginHandle);
+        $owner = $license->getOwner();
+        $org = $owner instanceof Org ? $owner : null;
 
         try {
-            if ($user && $license->ownerId === $user->id) {
+            if ($license->canManage($user)) {
                 $notes = $this->request->getParam('notes');
 
                 if ($notes !== null) {
@@ -199,18 +251,24 @@ class PluginLicensesController extends Controller
 
                 if ($manager->saveLicense($license)) {
                     if ($oldCmsLicenseId != $license->cmsLicenseId) {
+                        $byLine = "by {$user->email}";
+
+                        if ($org) {
+                            $byLine .= " for organization $org->title";
+                        }
+
                         if ($oldCmsLicenseId) {
                             $oldCmsLicense = $this->module->getCmsLicenseManager()->getLicenseById($oldCmsLicenseId);
-                            $manager->addHistory($license->id, "detached from Craft license {$oldCmsLicense->shortKey} by {$user->email}");
+                            $manager->addHistory($license->id, "detached from Craft license {$oldCmsLicense->shortKey} $byLine");
                         }
 
                         if ($license->cmsLicenseId) {
                             $newCmsLicense = $this->module->getCmsLicenseManager()->getLicenseById($license->cmsLicenseId);
-                            $manager->addHistory($license->id, "attached to Craft license {$newCmsLicense->shortKey} by {$user->email}");
+                            $manager->addHistory($license->id, "attached to Craft license {$newCmsLicense->shortKey} $byLine");
                         }
                     }
 
-                    return $this->asJson(['success' => true]);
+                    return $this->asSuccess();
                 }
 
                 throw new Exception("Couldn't save license.");
@@ -218,7 +276,7 @@ class PluginLicensesController extends Controller
 
             throw new LicenseNotFoundException($key);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 }

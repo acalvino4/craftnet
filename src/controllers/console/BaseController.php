@@ -9,7 +9,9 @@ use craft\web\Controller;
 use craftnet\behaviors\UserBehavior;
 use craftnet\orgs\Org;
 use craftnet\plugins\Plugin;
+use Throwable;
 use yii\helpers\Markdown;
+use yii\web\BadRequestHttpException;
 
 /**
  * Class BaseController
@@ -139,9 +141,9 @@ abstract class BaseController extends Controller
         return $dates;
     }
 
-
     /**
-     * @throws \yii\web\BadRequestHttpException
+     * @throws Throwable
+     * @throws BadRequestHttpException
      */
     protected function getAllowedOrgFromRequest(): ?Org
     {

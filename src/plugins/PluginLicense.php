@@ -2,12 +2,15 @@
 
 namespace craftnet\plugins;
 
+use Craft;
+use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
 use craftnet\base\EditionInterface;
 use craftnet\base\License;
 use craftnet\cms\CmsLicense;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use DateTime;
 
 /**
@@ -42,6 +45,33 @@ class PluginLicense extends License
     public $dateCreated;
     public $dateUpdated;
     public $uid;
+
+    public function getOwner(): User|Org|null
+    {
+        return $this->ownerId ? Craft::$app->getElements()->getElementById($this->ownerId) : null;
+    }
+
+    public function canManage(User $user): bool
+    {
+        if ($this->ownerId === $user->id) {
+            return true;
+        }
+
+        $owner = $this->getOwner();
+
+        return $owner instanceof Org && $owner->hasMember($user);
+    }
+
+    public function canRelease(User $user): bool
+    {
+        if ($this->ownerId === $user->id) {
+            return true;
+        }
+
+        $owner = $this->getOwner();
+
+        return $owner instanceof Org && $owner->hasOwner($user);
+    }
 
     /**
      * @inheritdoc

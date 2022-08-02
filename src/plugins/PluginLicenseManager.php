@@ -3,16 +3,17 @@
 namespace craftnet\plugins;
 
 use Craft;
+use craft\commerce\db\Table as CommerceTable;
 use craft\db\Query;
 use craft\elements\User;
 use craft\errors\InvalidPluginException;
 use craft\helpers\Db;
 use craftnet\db\Table;
-use craft\commerce\db\Table as CommerceTable;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\helpers\LicenseHelper;
 use craftnet\helpers\OrderHelper;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
@@ -49,7 +50,7 @@ class PluginLicenseManager extends Component
      * @param bool $ascending
      * @return array
      */
-    public function getLicensesByOwner(User $owner, string $searchQuery = null, int $perPage = null, int $page = 1, string $orderBy = null, bool $ascending = false): array
+    public function getLicensesByOwner(User|Org $owner, string $searchQuery = null, int $perPage = null, int $page = 1, string $orderBy = null, bool $ascending = false): array
     {
         $licenseQuery = $this->_createLicenseQueryForOwner($owner, $searchQuery);
 
@@ -508,7 +509,7 @@ class PluginLicenseManager extends Component
      * @throws LicenseNotFoundException
      * @throws Exception
      */
-    public function claimLicense(User $user, string $key)
+    public function claimLicense(User|Org $forOwner, User $byUser, string $key): void
     {
         $key = $this->normalizeKey($key);
 
@@ -527,8 +528,9 @@ class PluginLicenseManager extends Component
             throw new Exception('License has already been claimed.');
         }
 
-        $license->ownerId = $user->id;
-        $license->email = $user->email;
+        $isOrg = $forOwner instanceof Org;
+        $license->ownerId = $forOwner->id;
+        $license->email = $byUser->email;
 
         if (!$this->saveLicense($license, true, [
             'ownerId',
@@ -537,8 +539,13 @@ class PluginLicenseManager extends Component
             throw new Exception('Could not save plugin license: ' . implode(', ', $license->getErrorSummary(true)));
         }
 
-        $this->addHistory($license->id, "claimed by {$user->email}");
-    }
+        $note = "claimed by $byUser->email";
+
+        if ($isOrg) {
+            $note .= " for organization $forOwner->title";
+        }
+
+        $this->addHistory($license->id, $note);    }
 
     /**
      * Finds unclaimed licenses that are associated with orders placed by the given user's email,
@@ -559,13 +566,32 @@ class PluginLicenseManager extends Component
         ], updateTimestamp: false);
     }
 
+    public function transferLicense(PluginLicense $license, User|Org $to, User $by): bool
+    {
+        $license->ownerId = $to->id;
+        $license->email = $by->email;
+
+        if (!$this->saveLicense($license, true, [
+            'ownerId',
+            'email',
+        ])) {
+            return false;
+        }
+
+        $toNote = $to instanceof Org ? "organization $to->title" : $to->email;
+        $note = "transferred to $toNote by $by->email";
+
+        $this->addHistory($license->id, $note);
+
+        return true;
+    }
     /**
      * Returns licenses by owner as an array.
      *
      * @param User $owner
      * @return array
      */
-    public function getLicensesArrayByOwner(User $owner)
+    public function getLicensesArrayByOwner(User|Org $owner)
     {
         $results = $this->getLicensesByOwner($owner);
 
@@ -579,7 +605,7 @@ class PluginLicenseManager extends Component
      * @param User $owner
      * @return array
      */
-    public function transformLicensesForOwner(array $results, User $owner)
+    public function transformLicensesForOwner(array $results, User|Org $owner)
     {
         $licenses = [];
 
@@ -597,7 +623,7 @@ class PluginLicenseManager extends Component
      * @param string|null $searchQuery
      * @return int
      */
-    public function getTotalLicensesByOwner(User $owner, string $searchQuery = null): int
+    public function getTotalLicensesByOwner(User|Org $owner, string $searchQuery = null): int
     {
         $licenseQuery = $this->_createLicenseQueryForOwner($owner, $searchQuery);
 
@@ -611,7 +637,7 @@ class PluginLicenseManager extends Component
      * @param User $owner
      * @return array
      */
-    public function transformLicenseForOwner(PluginLicense $result, User $owner)
+    public function transformLicenseForOwner(PluginLicense $result, User|Org $owner)
     {
         if ($result->ownerId === $owner->id) {
             $license = $result->getAttributes(['id', 'editionId', 'key', 'cmsLicenseId', 'email', 'notes', 'autoRenew', 'expirable', 'expired', 'expiresOn', 'dateCreated']);
@@ -722,7 +748,7 @@ class PluginLicenseManager extends Component
      * @return int
      * @throws \Exception
      */
-    public function getExpiringLicensesTotal(User $owner): int
+    public function getExpiringLicensesTotal(User|Org $owner): int
     {
         $date = new \DateTime('now');
         $date->add(new \DateInterval('P45D'));
@@ -815,7 +841,7 @@ class PluginLicenseManager extends Component
      * @param string|null $searchQuery
      * @return Query
      */
-    private function _createLicenseQueryForOwner(User $owner, string $searchQuery = null)
+    private function _createLicenseQueryForOwner(User|Org $owner, string $searchQuery = null)
     {
         $query = $this->_createLicenseQuery()
             ->andWhere(['l.ownerId' => $owner->id]);
