@@ -120,6 +120,7 @@ return [
     'preproduction.io',
     'preview.dev',
     'preview-it.com',
+    'propeller-dev2.com',
     'psclients.net',
     'putyourlightson.dev',
     'rantsports.org',
