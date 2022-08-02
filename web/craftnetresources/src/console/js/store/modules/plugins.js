@@ -56,9 +56,9 @@ const actions = {
     })
   },
 
-  getPlugins({commit}) {
+  getPlugins({commit}, {orgId}) {
     return new Promise((resolve, reject) => {
-      pluginsApi.getPlugins()
+      pluginsApi.getPlugins({orgId})
         .then((response) => {
           commit('updatePlugins', {plugins: response.data})
           resolve(response)

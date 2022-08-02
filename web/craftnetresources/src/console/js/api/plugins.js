@@ -74,7 +74,7 @@ export default {
     })
   },
 
-  getPlugins() {
-    return axios.get(Craft.actionUrl + '/craftnet/console/plugins/get-plugins')
+  getPlugins(params) {
+    return axios.get(Craft.actionUrl + '/craftnet/console/plugins/get-plugins', {params})
   },
 }

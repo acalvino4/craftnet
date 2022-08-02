@@ -128,7 +128,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 import Empty from '../../../components/Empty'
 import PageHeader from '@/console/js/components/PageHeader'
 
@@ -147,6 +147,10 @@ export default {
   computed: {
     ...mapState({
       plugins: state => state.plugins.plugins,
+    }),
+
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization',
     }),
 
     computedPlugins() {
@@ -229,7 +233,9 @@ export default {
     if (this.plugins.length === 0) {
       this.loading = true
 
-      this.$store.dispatch('plugins/getPlugins')
+      this.$store.dispatch('plugins/getPlugins', {
+          orgId: this.currentOrganization ? this.currentOrganization.id : null,
+        })
         .then(() => {
           this.loading = false
         })
