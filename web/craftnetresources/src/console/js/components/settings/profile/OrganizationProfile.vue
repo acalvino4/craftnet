@@ -16,13 +16,13 @@
 
     <pane class="mt-6">
       <field
-        label-for="displayName"
+        label-for="title"
         label="Name"
         :first="true">
         <textbox
-          id="displayName"
-          v-model="currentOrganizationDraft.displayName"
-          :errors="errors.displayName" />
+          id="title"
+          v-model="currentOrganizationDraft.title"
+          :errors="errors.title" />
       </field>
 
       <field

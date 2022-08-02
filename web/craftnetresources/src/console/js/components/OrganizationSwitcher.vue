@@ -77,7 +77,7 @@
                       fallback="org"
                     />
                     <div class="truncate">
-                      {{ organization.displayName }}
+                      {{ organization.title }}
                     </div>
                   </div>
                 </organization-switcher-menu-item>
@@ -137,7 +137,7 @@ export default {
 
     orgName() {
       if (this.currentOrganization) {
-        return this.currentOrganization.displayName
+        return this.currentOrganization.title
       }
 
       if (this.user && (this.user.firstName || this.user.lastName)) {

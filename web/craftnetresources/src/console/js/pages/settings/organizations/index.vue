@@ -32,7 +32,7 @@
                     />
                   </div>
                   <div class="font-medium">
-                    {{ organization.displayName }}
+                    {{ organization.title }}
                   </div>
                 </div>
                 <div>

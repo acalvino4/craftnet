@@ -14,12 +14,12 @@
         <field
           label-for="name"
           label="Organization name"
-          :errors="errors.displayName"
+          :errors="errors.title"
           :first="true">
           <textbox
             id="name"
-            v-model="organization.displayName"
-            :invalid="!!errors.displayName" />
+            v-model="organization.title"
+            :invalid="!!errors.title" />
         </field>
         <field
           label-for="slug"
