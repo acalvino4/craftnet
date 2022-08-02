@@ -38,7 +38,7 @@ export default {
       vtColumns: ['number', 'price', 'date', 'receipt'],
       vtOptions: {
         texts: {
-          filterPlaceholder: 'Invoice number…'
+          filterPlaceholder: 'Order number…'
         },
       },
     }

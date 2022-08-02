@@ -38,7 +38,7 @@ export default {
       vtColumns: ['date', 'amount', 'url'],
       vtOptions: {
         texts: {
-          filterPlaceholder: 'Invoice number…'
+          filterPlaceholder: 'Order number…'
         },
         headings: {
           'url': "Download",

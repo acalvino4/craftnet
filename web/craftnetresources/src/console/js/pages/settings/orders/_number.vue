@@ -10,11 +10,11 @@
             Orders
           </router-link>
         </p>
-        <h1>Invoice {{ invoice.shortNumber }}</h1>
+        <h1>Order {{ invoice.shortNumber }}</h1>
 
         <pane>
           <dl>
-            <dt>Invoice Number</dt>
+            <dt>Order Number</dt>
             <dd>{{ invoice.number }}</dd>
 
             <dt>Date Paid</dt>
