@@ -3,6 +3,7 @@
 namespace craft\contentmigrations;
 
 use Craft;
+use craft\commerce\db\Table as CommerceTable;
 use craft\db\Migration;
 use craft\db\Table as CraftTable;
 use craftnet\db\Table;
@@ -34,6 +35,9 @@ class m220526_183917_add_orgs extends Migration
 
         $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id'], 'SET NULL');
+        $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS, ['locationAddressId'], CraftTable::ADDRESSES, ['id'], 'CASCADE');
 
         $this->createTable(Table::ORGS_MEMBERS, [
             'id' => $this->primaryKey(),
@@ -59,7 +63,7 @@ class m220526_183917_add_orgs extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], \craft\commerce\db\Table::ORDERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], CommerceTable::ORDERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
 
         $this->createTable(Table::ORGS_INVITATIONS, [
