@@ -11,7 +11,7 @@
           <div class="mr-2">
             <template v-if="currentOrganization">
               <profile-photo
-                :photo-url="currentOrganization.photoUrl"
+                :photo-url="(currentOrganization.orgLogo ? currentOrganization.orgLogo.url : null)"
                 fallback="org"
                 />
             </template>
@@ -73,7 +73,7 @@
                   <div class="flex items-center min-w-0">
                     <profile-photo
                       class="mr-2"
-                      :photo-url="organization.photoUrl"
+                      :photo-url="(organization.orgLogo ? organization.orgLogo.url : null)"
                       fallback="org"
                     />
                     <div class="truncate">
