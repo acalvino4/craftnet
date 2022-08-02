@@ -4,6 +4,8 @@ namespace craftnet\orgs;
 
 use Craft;
 use craft\base\Element;
+use craft\commerce\models\PaymentSource;
+use craft\commerce\Plugin as Commerce;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craft\fieldlayoutelements\CustomField;
@@ -14,6 +16,7 @@ use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
+use craftnet\plugins\Plugin;
 use DateTime;
 use yii\base\UserException;
 use yii\db\Exception;
@@ -22,6 +25,7 @@ use yii\db\StaleObjectException;
 /**
  *
  * @property-read array $invitations
+ * @property-read null|\craft\commerce\models\PaymentSource $paymentSource
  * @property-read null|string $invitationUrl
  */
 class Org extends Element
@@ -33,6 +37,11 @@ class Org extends Element
     public ?int $creatorId = null;
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;
+
+    /**
+     * @var Plugin[]|null
+     */
+    private ?array $_plugins = null;
 
     public static function displayName(): string
     {
@@ -379,6 +388,33 @@ class Org extends Element
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find();
         return $query->ofOrg($this)->orgOwner(true);
+    }
+
+    /**
+     * @return Plugin[]
+     */
+    public function getPlugins(): array
+    {
+        if ($this->_plugins !== null) {
+            return $this->_plugins;
+        }
+
+        /** @var Plugin[] $plugins */
+        $plugins = Plugin::find()
+            ->developerId($this->id)
+            ->status(null)
+            ->all();
+
+        return $this->_plugins = $plugins;
+    }
+
+    public function getPaymentSource(): ?PaymentSource
+    {
+        if (!$this->paymentSourceId) {
+            return null;
+        }
+
+        return Commerce::getInstance()->getPaymentSources()->getPaymentSourceById($this->paymentSourceId);
     }
 
     /**

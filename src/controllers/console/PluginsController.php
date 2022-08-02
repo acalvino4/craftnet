@@ -6,6 +6,10 @@ use Craft;
 use craft\elements\Category;
 use craft\elements\User;
 use craftnet\behaviors\UserBehavior;
+use Throwable;
+use yii\base\InvalidConfigException;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 /**
@@ -17,23 +21,26 @@ class PluginsController extends BaseController
     // =========================================================================
 
     /**
-     * Get plugins.
-     *
-     * @return Response
+     * @throws Throwable
+     * @throws InvalidConfigException
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
      */
     public function actionGetPlugins(): Response
     {
         $this->requireLogin();
-
-        /** @var User|UserBehavior $currentUser */
-        $currentUser = Craft::$app->getUser()->getIdentity();
+        $org = $this->getAllowedOrgFromRequest();
         $data = [];
 
-        foreach ($currentUser->getPlugins() as $plugin) {
+        if (!$org) {
+            throw new ForbiddenHttpException();
+        }
+
+        foreach ($org->getPlugins() as $plugin) {
             $data[] = $this->pluginTransformer($plugin);
         }
 
-        return $this->asJson($data);
+        return $this->asSuccess(data: ['plugins' => $data]);
     }
 
     /**
@@ -57,6 +64,6 @@ class PluginsController extends BaseController
             ];
         }
 
-        return $this->asJson($data);
+        return $this->asSuccess(data: ['categories' => $data]);
     }
 }

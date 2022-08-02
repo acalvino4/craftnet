@@ -32,7 +32,6 @@ abstract class BaseController extends Controller
     protected function pluginTransformer(Plugin $plugin): array
     {
         $icon = $plugin->getIcon();
-        /** @var User|UserBehavior $developer */
         $developer = $plugin->getDeveloper();
 
         // Screenshots
@@ -100,8 +99,8 @@ abstract class BaseController extends Controller
 
             // 'iconUrl' => $iconUrl,
             'developerId' => $developer->id,
-            'developerName' => $developer->getDeveloperName(),
-            'developerUrl' => $developer->developerUrl,
+            'developerName' => $developer->title,
+            'developerUrl' => $developer->externalUrl,
 
             'screenshotUrls' => $screenshotUrls,
             'screenshotIds' => $screenshotIds,

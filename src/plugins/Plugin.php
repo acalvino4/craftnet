@@ -18,6 +18,7 @@ use craftnet\behaviors\UserBehavior;
 use craftnet\composer\Package;
 use craftnet\db\Table;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use craftnet\records\Plugin as PluginRecord;
 use DateTime;
 use yii\base\InvalidArgumentException;
@@ -401,9 +402,9 @@ class Plugin extends Element
     private ?array $_allEditions = null;
 
     /**
-     * @var User|null
+     * @var Org|null
      */
-    private ?User $_developer = null;
+    private ?Org $_developer = null;
 
     /**
      * @var Package|null
@@ -616,10 +617,10 @@ class Plugin extends Element
     }
 
     /**
-     * @return User
+     * @return Org
      * @throws InvalidConfigException
      */
-    public function getDeveloper(): User
+    public function getDeveloper(): Org
     {
         if ($this->_developer !== null) {
             return $this->_developer;
@@ -627,12 +628,12 @@ class Plugin extends Element
         if ($this->developerId === null) {
             throw new InvalidConfigException('Plugin is missing its developer ID');
         }
-        /** @var User|null $user */
-        $user = User::find()->id($this->developerId)->status(null)->one();
-        if ($user === null) {
+
+        $org = Org::find()->id($this->developerId)->status(null)->one();
+        if ($org === null) {
             throw new InvalidConfigException('Invalid developer ID: ' . $this->developerId);
         }
-        return $this->_developer = $user;
+        return $this->_developer = $org;
     }
 
     /**

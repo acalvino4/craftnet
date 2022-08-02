@@ -80,9 +80,9 @@ class InvoicesController extends Controller
         try {
             $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($user, $number);
 
-            return $this->asJson($invoice);
+            return $this->asSuccess(data: ['invoice' => $invoice]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -117,6 +117,6 @@ class InvoicesController extends Controller
             ];
         }
 
-        return $this->asJson($data);
+        return $this->asSuccess($data);
     }
 }
