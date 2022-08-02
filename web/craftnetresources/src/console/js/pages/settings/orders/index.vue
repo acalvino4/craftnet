@@ -41,13 +41,13 @@
       </template>
 
       <pane>
-        <h2>Invoices</h2>
+        <h2>Orders</h2>
 
         <invoices-table class="mt-4"></invoices-table>
       </pane>
 
       <pane>
-        <h2>Subscription Invoices</h2>
+        <h2>Subscription Orders</h2>
         <subscription-invoices-table class="mt-4"></subscription-invoices-table>
       </pane>
     </div>
