@@ -9,6 +9,7 @@ use craft\commerce\events\MatchLineItemEvent;
 use craft\commerce\events\PdfEvent;
 use craft\commerce\events\PdfRenderEvent;
 use craft\commerce\models\Discount;
+use craft\commerce\models\PaymentSource;
 use craft\commerce\services\Discounts;
 use craft\commerce\services\OrderAdjustments;
 use craft\commerce\services\Pdfs;
@@ -50,6 +51,7 @@ use craftnet\behaviors\AssetBehavior;
 use craftnet\behaviors\DiscountBehavior;
 use craftnet\behaviors\OrderBehavior;
 use craftnet\behaviors\OrderQueryBehavior;
+use craftnet\behaviors\PaymentSourceBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\cms\CmsEdition;
@@ -122,6 +124,9 @@ class Module extends \yii\base\Module
         });
         Event::on(Discount::class, Discount::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
             $e->behaviors['cn.discount'] = DiscountBehavior::class;
+        });
+        Event::on(PaymentSource::class, PaymentSource::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
+            $e->behaviors['cn.paymentSource'] = PaymentSourceBehavior::class;
         });
 
         // register custom component types

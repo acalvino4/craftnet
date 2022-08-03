@@ -22,7 +22,7 @@ class InvitationsController extends SiteController
      */
     public function actionSendInvitation(int $orgId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
         $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
         $owner = (bool) Craft::$app->getRequest()->getBodyParam('owner');
         $user = Craft::$app->getUsers()->ensureUserByEmail($email);
@@ -62,7 +62,7 @@ class InvitationsController extends SiteController
      */
     public function actionAcceptInvitation(int $orgId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
         $invitation = $org->getInvitation($this->_currentUser);
 
         if (!$invitation) {
@@ -87,7 +87,7 @@ class InvitationsController extends SiteController
      */
     public function actionDeclineInvitation(int $orgId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
         $invitation = $org->getInvitation($this->_currentUser);
 
         if (!$invitation) {
@@ -106,7 +106,7 @@ class InvitationsController extends SiteController
      */
     public function actionCancelInvitation(int $orgId, int $userId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
 
         if (!$org->canManageMembers($this->_currentUser)) {
             throw new ForbiddenHttpException();
@@ -129,7 +129,7 @@ class InvitationsController extends SiteController
      */
     public function actionGetInvitations(int $orgId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
 
         if (!$org->canManageMembers($this->_currentUser)) {
             throw new ForbiddenHttpException();

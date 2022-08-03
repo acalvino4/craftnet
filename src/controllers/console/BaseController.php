@@ -12,6 +12,7 @@ use craftnet\plugins\Plugin;
 use Throwable;
 use yii\helpers\Markdown;
 use yii\web\BadRequestHttpException;
+use yii\web\NotFoundHttpException;
 
 /**
  * Class BaseController
@@ -156,5 +157,41 @@ abstract class BaseController extends Controller
         }
 
         return $org;
+    }
+
+    protected static function transformOrg(Org $org): array
+    {
+        return $org->getAttributes([
+                'id',
+                'title',
+                'requireOrderApproval',
+            ]) + [
+                'orgLogo' => $org->orgLogo->one()?->getAttributes(['id', 'url']),
+            ];
+    }
+
+    /**
+     * @param int $id
+     * @return Org
+     * @throws NotFoundHttpException
+     */
+    protected static function getOrgById(int $id): Org
+    {
+        $org = Org::find()->id($id)->one();
+
+        if (!$org) {
+            throw new NotFoundHttpException();
+        }
+
+        return $org;
+    }
+
+    protected static function transformUser(User $user): array
+    {
+        return $user->getAttributes([
+            'id',
+        ]) + [
+            'photo' => $user->photo?->getAttributes(['id', 'url']),
+        ];
     }
 }
