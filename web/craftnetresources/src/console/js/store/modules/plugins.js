@@ -60,7 +60,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       pluginsApi.getPlugins({orgId})
         .then((response) => {
-          commit('updatePlugins', {plugins: response.data})
+          commit('updatePlugins', {plugins: response.data.plugins})
           resolve(response)
         })
         .catch((error) => {
