@@ -95,6 +95,8 @@ return [
         'POST    orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/accept-invitation',
         'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
 
+        'POST    addresses/info' => 'craftnet/console/addresses/get-address-info',
+
         'oauth/login' => 'oauth-server/oauth/login',
         'oauth/authorize' => 'oauth-server/oauth/authorize',
         'oauth/access-token' => 'oauth-server/oauth/access-token',
