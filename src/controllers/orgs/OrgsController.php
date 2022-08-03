@@ -30,7 +30,7 @@ class OrgsController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        return $this->asSuccess(data: static::_transformOrg($org));
+        return $this->asSuccess(data: static::transformOrg($org));
     }
 
     /**
@@ -41,7 +41,7 @@ class OrgsController extends SiteController
     public function actionGetOrgs(): Response
     {
         $orgs = Org::find()->hasMember($this->_currentUser)->collect()
-            ->map(fn($org) => static::_transformOrg($org));
+            ->map(fn($org) => static::transformOrg($org));
 
         return $this->asSuccess(data: $orgs->all());
     }

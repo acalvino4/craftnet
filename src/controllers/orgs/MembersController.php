@@ -20,7 +20,7 @@ class MembersController extends SiteController
      */
     public function actionRemoveMember(int $orgId, int $userId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
 
         if (!$org->canManageMembers($this->_currentUser)) {
             throw new ForbiddenHttpException();
@@ -41,12 +41,12 @@ class MembersController extends SiteController
      */
     public function actionGetMembers($orgId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
 
         /** @var UserQuery|UserQueryBehavior $userQuery */
         $userQuery = User::find();
         $members = $userQuery->ofOrg($org->id)->collect()
-            ->map(fn($member) => $this->_transformMember($member) + [
+            ->map(fn($member) => $this->transformUser($member) + [
                     'owner' => (clone $userQuery)->orgOwner(true)->id($member->id)->exists(),
                 ]);
 
@@ -61,7 +61,7 @@ class MembersController extends SiteController
      */
     public function actionSetRole(int $orgId, int $userId): Response
     {
-        $org = $this->_getOrgById($orgId);
+        $org = SiteController::getOrgById($orgId);
 
         if (!$org->canManageMembers($this->_currentUser)) {
             throw new ForbiddenHttpException();

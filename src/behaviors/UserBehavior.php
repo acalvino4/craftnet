@@ -5,6 +5,8 @@ namespace craftnet\behaviors;
 use Craft;
 use craft\base\Element;
 use craft\behaviors\CustomFieldBehavior;
+use craft\commerce\models\PaymentSource;
+use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
 use craft\events\DefineRulesEvent;
 use craft\events\ModelEvent;
@@ -13,8 +15,10 @@ use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
+use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
+use Illuminate\Support\Collection;
 use yii\base\Behavior;
 use yii\base\Exception;
 
@@ -57,11 +61,6 @@ class UserBehavior extends Behavior
     public ?float $balance = null;
 
     /**
-     * @var Plugin[]|null
-     */
-    private $_plugins;
-
-    /**
      * @inheritdoc
      */
     public function events()
@@ -99,27 +98,28 @@ class UserBehavior extends Behavior
 
     /**
      * @return string
+     * TODO: cleanup after Org migration
      */
     public function getDeveloperName(): string
     {
         return $this->owner->getFieldValue('developerName') ?: $this->owner->getName();
     }
 
-    /**
-     * @return Plugin[]
-     */
-    public function getPlugins(): array
+    public function getPaymentSources(): Collection
     {
-        if ($this->_plugins !== null) {
-            return $this->_plugins;
-        }
+        $userSources = Commerce::getInstance()->getPaymentSources()->getAllPaymentSourcesByCustomerId($this->owner->id);
 
-        /** @var Plugin[] $plugins */
-        $plugins = Plugin::find()
-            ->developerId($this->owner->id)
-            ->status(null)
-            ->all();
-        return $this->_plugins = $plugins;
+        $orgSources = Org::find()->hasMember($this->owner)->collect()
+            ->map(function(Org $org) {
+
+                /** @var PaymentSource|PaymentSourceBehavior $paymentSource */
+                $paymentSource = $org->getPaymentSource();
+
+                return $paymentSource?->setOrg($org);
+            })
+            ->filter();
+
+        return Collection::make($userSources)->concat($orgSources);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace craftnet\controllers\console;
 use Craft;
 use craft\base\Element;
 use craft\commerce\behaviors\CustomerBehavior;
+use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
 use craft\elements\Asset;
@@ -15,8 +16,10 @@ use craft\helpers\FileHelper;
 use craft\helpers\Json;
 use craft\web\Controller;
 use craft\web\UploadedFile;
+use craftnet\behaviors\PaymentSourceBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\helpers\Address as AddressHelper;
+use craftnet\orgs\Org;
 use Throwable;
 use yii\base\UserException;
 use yii\web\BadRequestHttpException;
@@ -26,7 +29,7 @@ use yii\web\Response;
 /**
  * Class AccountController
  */
-class AccountController extends Controller
+class AccountController extends BaseController
 {
     // Public Methods
     // =========================================================================
@@ -256,6 +259,26 @@ class AccountController extends Controller
         } catch (Throwable $e) {
             return $this->asErrorJson($e->getMessage());
         }
+    }
+
+    public function actionGetPaymentSources()
+    {
+
+        /** @var User|UserBehavior $user */
+        $user = Craft::$app->getUser()->getIdentity();
+        $paymentSources = $user->getPaymentSources()
+            ->map(function(PaymentSource|PaymentSourceBehavior $paymentSource) {
+                $org = $paymentSource->getOrg();
+                return $paymentSource->getAttributes([
+                    'id',
+                    'token',
+                ]) + [
+                    'card' => $paymentSource->getCard(),
+                    'org' => $org ? static::transformOrg($org) : null,
+                ];
+            });
+
+        return $this->asSuccess(data: ['paymentSources' => $paymentSources->all()]);
     }
 
     // Private Methods
