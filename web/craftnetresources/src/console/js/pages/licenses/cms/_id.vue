@@ -158,7 +158,7 @@ export default {
 
     cmsLicensesApi.getCmsLicense(licenseId)
       .then((response) => {
-        this.license = response.data
+        this.license = response.data.license
         this.$store.commit('app/updateRenewLicense', this.license)
         this.loading = false
       })
