@@ -11,15 +11,27 @@
 
               <dt>License Key</dt>
               <dd>
-                <code>{{ license.key.slice(0, 10) }}…</code>
-                <a
-                  href="#copy"
-                  class="ml-2"
-                  @click="copyLicense">Copy</a>
-                <a
-                  :href="downloadLicenseUrl"
-                  class="ml-2"
-                  target="_blank">Download</a>
+                <template v-if="license.key || license.shortKey">
+                  <code>
+                    <template v-if="license.key">
+                      {{ license.key.slice(0, 10) }}…
+                    </template>
+                    <template v-else-if="license.shortKey">
+                        {{ license.shortKey }}
+                    </template>
+                  </code>
+
+                  <template v-if="license.key">
+                    <a
+                      href="#copy"
+                      class="ml-2"
+                      @click="copyLicense">Copy</a>
+                    <a
+                      :href="downloadLicenseUrl"
+                      class="ml-2"
+                      target="_blank">Download</a>
+                  </template>
+                </template>
               </dd>
 
               <dt>Domain Name</dt>
@@ -65,9 +77,11 @@
               <dd>{{ license.email }}</dd>
 
               <dt>Created</dt>
-              <dd>{{
-                  $filters.parseDate(license.dateCreated.date).toFormat('yyyy-MM-dd')
-                }}
+              <dd>
+                <pre>{{license}}</pre>
+                <template v-if="license.dateCreated">
+                  {{ $filters.parseDate(license.dateCreated.date).toFormat('yyyy-MM-dd') }}
+                </template>
               </dd>
 
               <dt>Updates Until</dt>
