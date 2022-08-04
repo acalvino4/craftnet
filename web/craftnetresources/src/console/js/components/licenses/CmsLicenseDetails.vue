@@ -78,7 +78,6 @@
 
               <dt>Created</dt>
               <dd>
-                <pre>{{license}}</pre>
                 <template v-if="license.dateCreated">
                   {{ $filters.parseDate(license.dateCreated.date).toFormat('yyyy-MM-dd') }}
                 </template>
