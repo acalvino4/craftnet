@@ -280,8 +280,15 @@ class Org extends Element
     /**
      * @throws \yii\base\UserException
      */
-    public function createInvitation(User $user, bool $admin = false, ?DateTime $expiryDate = null): bool
+    public function createInvitation(User $user, ?MemberRoleEnum $role, ?DateTime $expiryDate = null): bool
     {
+        $role = $role ?? MemberRoleEnum::Member();
+        $admin = $role === MemberRoleEnum::Admin();
+
+        if ($role === MemberRoleEnum::Owner()) {
+            throw new UserException('Owners cannot be invited to organizations.');
+        }
+
         if ($this->getInvitation($user)) {
             throw new UserException('User already has an existing invitation to this organization.');
         }
@@ -362,14 +369,8 @@ class Org extends Element
      * @throws Exception
      * @throws UserException
      */
-    public function setMemberRole(User $user, string|MemberRoleEnum $role): bool
+    public function setMemberRole(User $user, MemberRoleEnum $role): bool
     {
-        $role = is_string($role) ? MemberRoleEnum::tryFrom($role) : $role;
-
-        if (!$role) {
-            throw new UserException('Invalid role.');
-        }
-
         $admin = $role === MemberRoleEnum::Admin();
 
         if ($role === MemberRoleEnum::Owner()) {

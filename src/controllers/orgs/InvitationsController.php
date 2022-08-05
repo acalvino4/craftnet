@@ -24,7 +24,7 @@ class InvitationsController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
         $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
-        $admin = (bool) Craft::$app->getRequest()->getBodyParam('admin');
+        $role = $this->getOrgMemberRoleFromRequest();
         $user = Craft::$app->getUsers()->ensureUserByEmail($email);
 
         if (!$org->canManageMembers($this->_currentUser)) {
@@ -32,7 +32,7 @@ class InvitationsController extends SiteController
         }
 
         try {
-            $created = $org->createInvitation($user, $admin);
+            $created = $org->createInvitation($user, $role);
         } catch (UserException $e) {
             return $this->asFailure($e->getMessage());
         }

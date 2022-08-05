@@ -6,7 +6,6 @@ use Craft;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craftnet\behaviors\UserQueryBehavior;
-use craftnet\orgs\MemberRoleEnum;
 use yii\base\Exception;
 use yii\base\UserException;
 use yii\web\BadRequestHttpException;
@@ -77,7 +76,7 @@ class MembersController extends SiteController
             throw new NotFoundHttpException();
         }
 
-        $role = $this->request->getRequiredBodyParam('role');
+        $role = $this->getOrgMemberRoleFromRequest(required: true);
 
         return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
     }
