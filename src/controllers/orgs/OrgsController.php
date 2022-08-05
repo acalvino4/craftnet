@@ -58,6 +58,7 @@ class OrgsController extends SiteController
 
         if ($isNew) {
             $element = new Org();
+            $element->ownerId = $this->_currentUser->id;
             if ($siteId) {
                 $element->siteId = $siteId;
             }
@@ -80,10 +81,6 @@ class OrgsController extends SiteController
         $element->slug = $this->request->getBodyParam('slug', $element->slug);
         $element->title = $this->request->getBodyParam('title', $element->title);
         $element->setFieldValuesFromRequest('fields');
-
-        if ($isNew) {
-            $element->ownerId = $this->_currentUser->id;
-        }
 
         if ($element->enabled && $element->getEnabledForSite()) {
             $element->setScenario(Element::SCENARIO_LIVE);

@@ -48,6 +48,7 @@ class MembersController extends SiteController
         $members = $userQuery->ofOrg($org->id)->collect()
             ->map(fn($member) => $this->transformUser($member) + [
                 'isAdmin' => (clone $userQuery)->orgAdmin(true)->id($member->id)->exists(),
+                'isOwner' => $org->hasOwner($member),
             ]);
 
         return $this->asSuccess(data: $members->all());

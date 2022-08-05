@@ -38,6 +38,7 @@ class Org extends Element
     public float $balance = 0;
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;
+    public ?int $locationAddressId = null;
 
     /**
      * @var Plugin[]|null
@@ -437,10 +438,6 @@ class Org extends Element
     {
         parent::afterSave($isNew);
 
-        if ($isNew) {
-            $this->addAdmin($this->getOwner());
-        }
-
         $data = $this->getAttributes([
             'id',
             'stripeAccessToken',
@@ -451,6 +448,12 @@ class Org extends Element
         ]);
 
         Db::upsert(Table::ORGS, $data);
+
+        $owner = $this->getOwner();
+
+        if ($isNew && $owner) {
+            $this->addAdmin($owner);
+        }
     }
 
     /**
@@ -464,10 +467,6 @@ class Org extends Element
 
     public function hasMember(User $user): bool
     {
-        if ($this->hasOwner($user)) {
-            return true;
-        }
-
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find()->id($user->id);
         return $query->orgMember(true)->ofOrg($this)->exists();
@@ -475,10 +474,6 @@ class Org extends Element
 
     public function hasAdmin(User $user): bool
     {
-        if ($this->hasOwner($user)) {
-            return true;
-        }
-
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find()->id($user->id);
         return $query->orgAdmin(true)->ofOrg($this)->exists();

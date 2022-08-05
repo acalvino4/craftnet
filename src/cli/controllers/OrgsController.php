@@ -138,18 +138,15 @@ class OrgsController extends Controller
                 Craft::$app->getElements()->saveElement($user);
                 $this->stdout('done' . PHP_EOL);
 
-                $this->stdout("    > Adding user as owner of org ... ");
-                $org->addAdmin($user);
-                $this->stdout('done' . PHP_EOL);
-
                 $this->stdout("    > Relating orders to org ... ");
                 $rows = Order::find()->customer($user)->collect()
                     ->map(fn($order) => [
                         $order->id,
                         $org->id,
+                        $order->customerId,
                     ]);
                 Craft::$app->getDb()->createCommand()
-                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId'], $rows->all())
+                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId', 'purchaserId'], $rows->all())
                     ->execute();
                 $this->stdout('done' . PHP_EOL);
 

@@ -26,6 +26,7 @@ class CpController extends Controller
 
         // Create & populate the draft
         $org = Craft::createObject(Org::class);
+        $org->ownerId = $this->request->getQueryParam('ownerId', $user->id);
 
         // Title & slug
         $org->title = $this->request->getQueryParam('title');
@@ -42,7 +43,7 @@ class CpController extends Controller
 
         // Save it
         $org->setScenario(Element::SCENARIO_ESSENTIALS);
-        $success = Craft::$app->getDrafts()->saveElementAsDraft($org, $user->getId(), null, null, false);
+        $success = Craft::$app->getDrafts()->saveElementAsDraft($org, $user->id, null, null, false);
 
         // Resume time
         DateTimeHelper::resume();

@@ -19,7 +19,7 @@ class m220526_183917_add_orgs extends Migration
     {
         $this->createTable(TABLE::ORGS, [
             'id' => $this->primaryKey(),
-            'ownerId' => $this->integer(),
+            'ownerId' => $this->integer()->notNull(),
             'balance' => $this->decimal(14, 4)->notNull()->defaultValue(0),
             'stripeAccessToken' => $this->text()->null(),
             'stripeAccount' => $this->string()->null(),
