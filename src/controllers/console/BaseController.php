@@ -167,7 +167,7 @@ abstract class BaseController extends Controller
     {
         $roleFromRequest = $required ? $this->request->getRequiredParam($name) : $this->request->getBodyParam($name);
 
-        if (!$roleFromRequest) {
+        if ($roleFromRequest === null) {
             return null;
         }
 

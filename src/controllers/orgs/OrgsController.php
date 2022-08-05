@@ -17,7 +17,7 @@ class OrgsController extends SiteController
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
-    public function actionGetOrg($id): Response
+    public function actionGetOrg(int $id): Response
     {
         $org = Org::find()->id($id)->one();
 
@@ -58,7 +58,7 @@ class OrgsController extends SiteController
 
         if ($isNew) {
             $element = new Org();
-            $element->ownerId = $this->_currentUser->id;
+            $element->setOwner($this->_currentUser);
             if ($siteId) {
                 $element->siteId = $siteId;
             }

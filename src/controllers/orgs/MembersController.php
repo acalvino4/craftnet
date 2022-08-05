@@ -5,7 +5,10 @@ namespace craftnet\controllers\orgs;
 use Craft;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
+use craft\errors\ElementNotFoundException;
 use craftnet\behaviors\UserQueryBehavior;
+use craftnet\orgs\MemberRoleEnum;
+use Throwable;
 use yii\base\Exception;
 use yii\base\UserException;
 use yii\web\BadRequestHttpException;
@@ -55,10 +58,16 @@ class MembersController extends SiteController
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @param int $orgId
+     * @param int $userId
+     * @return Response
+     * @throws Exception
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      * @throws UserException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws \yii\db\Exception
      */
     public function actionSetRole(int $orgId, int $userId): Response
     {
@@ -76,13 +85,13 @@ class MembersController extends SiteController
             throw new NotFoundHttpException();
         }
 
+        /** @var MemberRoleEnum $role */
         $role = $this->getOrgMemberRoleFromRequest(required: true);
 
         return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
     }
 
     /**
-     * @throws \yii\db\Exception
      * @throws NotFoundHttpException
      * @throws ForbiddenHttpException
      * @throws BadRequestHttpException

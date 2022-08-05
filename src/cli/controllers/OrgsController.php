@@ -4,13 +4,10 @@ namespace craftnet\cli\controllers;
 
 use Craft;
 use craft\commerce\elements\Order;
-use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\StringHelper;
-use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
-use craftnet\Module;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
@@ -78,7 +75,7 @@ class OrgsController extends Controller
                 $org->stripeAccount = $user->stripeAccount;
                 $org->apiToken = $user->apiToken;
                 $org->balance = $user->balance ?? 0;
-                $org->ownerId = $user->id;
+                $org->setOwner($user->id);
 
                 $projectsAsMatrix = Collection::make($partner?->getProjects())
                     ->flatMap(function($project, $index) {
