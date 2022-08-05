@@ -82,8 +82,9 @@ return [
         'POST    stripe/remove-card' => 'craftnet/console/stripe/remove-card',
 
         'GET     orgs' => 'craftnet/orgs/orgs/get-orgs',
-        'GET     orgs/<id:\d+>' => 'craftnet/orgs/orgs/get-org',
-        'POST    orgs/save-org' => 'craftnet/orgs/orgs/save-org',
+        'GET     orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/get-org',
+        'POST    orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/save-org',
+        'POST    orgs/new' => 'craftnet/orgs/orgs/save-org',
         'GET     orgs/<orgId:\d+>/orders' => 'craftnet/orgs/orders/get-orders',
         'GET     orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/get-members',
         'POST    orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/add-member',

@@ -17,9 +17,9 @@ class OrgsController extends SiteController
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
-    public function actionGetOrg(int $id): Response
+    public function actionGetOrg(int $orgId): Response
     {
-        $org = Org::find()->id($id)->one();
+        $org = Org::find()->id($orgId)->one();
 
         if (!$org) {
             throw new NotFoundHttpException();
@@ -49,12 +49,11 @@ class OrgsController extends SiteController
      * @throws Throwable
      * @throws ForbiddenHttpException
      */
-    public function actionSaveOrg(): Response
+    public function actionSaveOrg(?int $orgId = null): Response
     {
         $this->requirePostRequest();
-        $elementId = $this->request->getBodyParam('orgId');
+        $isNew = !$orgId;
         $siteId = $this->request->getBodyParam('siteId');
-        $isNew = !$elementId;
 
         if ($isNew) {
             $element = new Org();
@@ -66,7 +65,7 @@ class OrgsController extends SiteController
             $element = Org::find()
                 ->status(null)
                 ->siteId($siteId)
-                ->id($elementId)
+                ->id($orgId)
                 ->one();
 
             if (!$element) {
@@ -105,7 +104,7 @@ class OrgsController extends SiteController
 
         return $this->asModelSuccess(
             $element,
-            'Organization saved.',
+            $isNew ? 'Organization created.' : 'Organization saved.',
         );
     }
 }
