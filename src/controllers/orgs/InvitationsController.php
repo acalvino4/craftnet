@@ -24,7 +24,7 @@ class InvitationsController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
         $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
-        $owner = (bool) Craft::$app->getRequest()->getBodyParam('owner');
+        $role = $this->getOrgMemberRoleFromRequest();
         $user = Craft::$app->getUsers()->ensureUserByEmail($email);
 
         if (!$org->canManageMembers($this->_currentUser)) {
@@ -32,7 +32,7 @@ class InvitationsController extends SiteController
         }
 
         try {
-            $created = $org->createInvitation($user, $owner);
+            $created = $org->createInvitation($user, $role);
         } catch (UserException $e) {
             return $this->asFailure($e->getMessage());
         }
@@ -69,8 +69,8 @@ class InvitationsController extends SiteController
             throw new NotFoundHttpException();
         }
 
-        if ($invitation->owner) {
-            $org->addOwner($this->_currentUser);
+        if ($invitation->admin) {
+            $org->addAdmin($this->_currentUser);
         } else {
             $org->addMember($this->_currentUser);
         }

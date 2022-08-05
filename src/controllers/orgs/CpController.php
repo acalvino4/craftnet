@@ -9,6 +9,9 @@ use craft\helpers\ElementHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use craftnet\orgs\Org;
+use Throwable;
+use yii\base\InvalidConfigException;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 class CpController extends Controller
@@ -20,12 +23,22 @@ class CpController extends Controller
         return parent::beforeAction($action);
     }
 
+    /**
+     * @throws Throwable
+     * @throws InvalidConfigException
+     * @throws ForbiddenHttpException
+     */
     public function actionCreate(): ?Response
     {
         $user = Craft::$app->getUser()->getIdentity();
 
         // Create & populate the draft
         $org = Craft::createObject(Org::class);
+        $org->setOwner($this->request->getQueryParam('ownerId', $user->id));
+
+        if (!$org->canSave($user)) {
+            throw new ForbiddenHttpException('User not authorized to save this organization.');
+        }
 
         // Title & slug
         $org->title = $this->request->getQueryParam('title');
@@ -42,7 +55,7 @@ class CpController extends Controller
 
         // Save it
         $org->setScenario(Element::SCENARIO_ESSENTIALS);
-        $success = Craft::$app->getDrafts()->saveElementAsDraft($org, $user->getId(), null, null, false);
+        $success = Craft::$app->getDrafts()->saveElementAsDraft($org, $user->id, null, null, false);
 
         // Resume time
         DateTimeHelper::resume();

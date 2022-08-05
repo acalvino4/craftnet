@@ -6,10 +6,11 @@ use Craft;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\web\Controller;
-use craftnet\behaviors\UserBehavior;
+use craftnet\orgs\MemberRoleEnum;
 use craftnet\orgs\Org;
 use craftnet\plugins\Plugin;
 use Throwable;
+use yii\base\UserException;
 use yii\helpers\Markdown;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
@@ -145,11 +146,11 @@ abstract class BaseController extends Controller
      * @throws Throwable
      * @throws BadRequestHttpException
      */
-    protected function getAllowedOrgFromRequest(): ?Org
+    protected function getAllowedOrgFromRequest($required = false, string $name = 'orgId'): ?Org
     {
         $this->requireLogin();
         $user = Craft::$app->getUser()->getIdentity();
-        $orgId = $this->request->getParam('orgId');
+        $orgId = $required ? $this->request->getRequiredParam($name) : $this->request->getParam($name);
         $org = $orgId ? Org::find()->id($orgId)->hasMember($user)->one() : null;
 
         if ($orgId && !$org) {
@@ -157,6 +158,26 @@ abstract class BaseController extends Controller
         }
 
         return $org;
+    }
+
+    /**
+     * @throws UserException
+     */
+    protected function getOrgMemberRoleFromRequest($required = false, string $name = 'role'): ?MemberRoleEnum
+    {
+        $roleFromRequest = $required ? $this->request->getRequiredParam($name) : $this->request->getBodyParam($name);
+
+        if ($roleFromRequest === null) {
+            return null;
+        }
+
+        $role = MemberRoleEnum::tryFrom($roleFromRequest);
+
+        if (!$role) {
+            throw new BadRequestHttpException('Invalid role.');
+        }
+
+        return $role;
     }
 
     protected static function transformOrg(Org $org): array

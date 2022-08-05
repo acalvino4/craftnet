@@ -17,10 +17,9 @@ class OrgsController extends SiteController
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
-    public function actionGetOrg($id): Response
+    public function actionGetOrg(int $orgId): Response
     {
-        /** @var Org $org */
-        $org = Org::find()->id($id)->one();
+        $org = Org::find()->id($orgId)->one();
 
         if (!$org) {
             throw new NotFoundHttpException();
@@ -50,15 +49,15 @@ class OrgsController extends SiteController
      * @throws Throwable
      * @throws ForbiddenHttpException
      */
-    public function actionSaveOrg(): Response
+    public function actionSaveOrg(?int $orgId = null): Response
     {
         $this->requirePostRequest();
-        $elementId = $this->request->getBodyParam('orgId');
+        $isNew = !$orgId;
         $siteId = $this->request->getBodyParam('siteId');
-        $isNew = !$elementId;
 
         if ($isNew) {
             $element = new Org();
+            $element->setOwner($this->_currentUser);
             if ($siteId) {
                 $element->siteId = $siteId;
             }
@@ -66,7 +65,7 @@ class OrgsController extends SiteController
             $element = Org::find()
                 ->status(null)
                 ->siteId($siteId)
-                ->id($elementId)
+                ->id($orgId)
                 ->one();
 
             if (!$element) {
@@ -81,10 +80,6 @@ class OrgsController extends SiteController
         $element->slug = $this->request->getBodyParam('slug', $element->slug);
         $element->title = $this->request->getBodyParam('title', $element->title);
         $element->setFieldValuesFromRequest('fields');
-
-        if ($isNew) {
-            $element->creatorId = $this->_currentUser->id;
-        }
 
         if ($element->enabled && $element->getEnabledForSite()) {
             $element->setScenario(Element::SCENARIO_LIVE);
@@ -102,18 +97,14 @@ class OrgsController extends SiteController
         if (!$success) {
             return $this->asModelFailure(
                 $element,
-                Craft::t('app', 'Couldn’t save organization.'),
-                'org'
+                'Couldn’t save organization.',
+                'org',
             );
-        }
-
-        if ($isNew) {
-            $element->addOwner($this->_currentUser);
         }
 
         return $this->asModelSuccess(
             $element,
-            Craft::t('app', 'Organization saved.'),
+            $isNew ? 'Organization created.' : 'Organization saved.',
         );
     }
 }

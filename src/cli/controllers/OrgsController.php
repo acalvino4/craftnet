@@ -4,13 +4,10 @@ namespace craftnet\cli\controllers;
 
 use Craft;
 use craft\commerce\elements\Order;
-use craft\commerce\Plugin as Commerce;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\StringHelper;
-use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
-use craftnet\Module;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
@@ -64,7 +61,7 @@ class OrgsController extends Controller
             ->each(function (User $user) {
                 $this->stdout("Creating an org for user #$user->id ($user->email) ..." . PHP_EOL);
 
-                if (Org::find()->creatorId($user->id)->exists()) {
+                if (Org::find()->ownerId($user->id)->exists()) {
                     $this->stdout("Org already converted, skipping." . PHP_EOL);
                     return;
                 }
@@ -78,7 +75,7 @@ class OrgsController extends Controller
                 $org->stripeAccount = $user->stripeAccount;
                 $org->apiToken = $user->apiToken;
                 $org->balance = $user->balance ?? 0;
-                $org->creatorId = $user->id;
+                $org->setOwner($user->id);
 
                 $projectsAsMatrix = Collection::make($partner?->getProjects())
                     ->flatMap(function($project, $index) {
@@ -138,18 +135,15 @@ class OrgsController extends Controller
                 Craft::$app->getElements()->saveElement($user);
                 $this->stdout('done' . PHP_EOL);
 
-                $this->stdout("    > Adding user as owner of org ... ");
-                $org->addOwner($user);
-                $this->stdout('done' . PHP_EOL);
-
                 $this->stdout("    > Relating orders to org ... ");
                 $rows = Order::find()->customer($user)->collect()
                     ->map(fn($order) => [
                         $order->id,
                         $org->id,
+                        $order->customerId,
                     ]);
                 Craft::$app->getDb()->createCommand()
-                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId'], $rows->all())
+                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId', 'purchaserId'], $rows->all())
                     ->execute();
                 $this->stdout('done' . PHP_EOL);
 

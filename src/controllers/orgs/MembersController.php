@@ -5,9 +5,13 @@ namespace craftnet\controllers\orgs;
 use Craft;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
+use craft\errors\ElementNotFoundException;
 use craftnet\behaviors\UserQueryBehavior;
+use craftnet\orgs\MemberRoleEnum;
+use Throwable;
 use yii\base\Exception;
 use yii\base\UserException;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -47,17 +51,23 @@ class MembersController extends SiteController
         $userQuery = User::find();
         $members = $userQuery->ofOrg($org->id)->collect()
             ->map(fn($member) => $this->transformUser($member) + [
-                    'owner' => (clone $userQuery)->orgOwner(true)->id($member->id)->exists(),
-                ]);
+                'role' => $org->getMemberRole($member),
+            ]);
 
         return $this->asSuccess(data: $members->all());
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @param int $orgId
+     * @param int $userId
+     * @return Response
+     * @throws Exception
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      * @throws UserException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws \yii\db\Exception
      */
     public function actionSetRole(int $orgId, int $userId): Response
     {
@@ -75,8 +85,34 @@ class MembersController extends SiteController
             throw new NotFoundHttpException();
         }
 
-        $owner = $this->request->getRequiredBodyParam('owner');
+        /** @var MemberRoleEnum $role */
+        $role = $this->getOrgMemberRoleFromRequest(required: true);
 
-        return $org->setMemberRole($user, $owner) ? $this->asSuccess() : $this->asFailure();
+        return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     * @throws UserException
+     */
+    public function actionGetRole(int $orgId, int $userId): Response
+    {
+        $org = SiteController::getOrgById($orgId);
+
+        if (!$org->hasMember($this->_currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+    /** @var UserQuery|UserQueryBehavior $userQuery */
+        $userQuery = User::find()->id($userId);
+        $user = $userQuery->ofOrg($org)->one();
+
+        if (!$user) {
+            throw new NotFoundHttpException();
+        }
+
+        return $this->asSuccess(data: ['role' => $org->getMemberRole($user)]);
     }
 }
