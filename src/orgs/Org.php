@@ -18,6 +18,7 @@ use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
 use craftnet\plugins\Plugin;
 use DateTime;
+use yii\base\InvalidConfigException;
 use yii\base\UserException;
 use yii\db\Exception;
 use yii\db\StaleObjectException;
@@ -25,16 +26,16 @@ use yii\db\StaleObjectException;
 /**
  *
  * @property-read array $invitations
- * @property-read null|\craft\commerce\models\PaymentSource $paymentSource
+ * @property-read null|PaymentSource $paymentSource
  * @property-read null|string $invitationUrl
  */
 class Org extends Element
 {
+    public ?int $ownerId = null;
     public ?string $stripeAccessToken = null;
     public ?string $stripeAccount = null;
     public ?string $apiToken = null;
     public float $balance = 0;
-    public ?int $creatorId = null;
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;
 
@@ -278,7 +279,7 @@ class Org extends Element
     /**
      * @throws \yii\base\UserException
      */
-    public function createInvitation(User $user, bool $owner = false, ?DateTime $expiryDate = null): bool
+    public function createInvitation(User $user, bool $admin = false, ?DateTime $expiryDate = null): bool
     {
         if ($this->getInvitation($user)) {
             throw new UserException('User already has an existing invitation to this organization.');
@@ -294,7 +295,7 @@ class Org extends Element
         $invitationRecord = new InvitationRecord();
         $invitationRecord->orgId = $this->id;
         $invitationRecord->userId = $user->id;
-        $invitationRecord->owner = $owner;
+        $invitationRecord->isAdmin = $admin;
 
         $invitationRecord->expiryDate = Db::prepareDateForDb($expiryDate);
 
@@ -340,14 +341,14 @@ class Org extends Element
      * @throws Exception
      * @throws UserException
      */
-    public function setMemberRole(User $user, bool $owner): bool
+    public function setMemberRole(User $user, bool $admin): bool
     {
-        if (!$owner && $this->hasSoleOwner($user)) {
-            throw new UserException('Organizations must have at least one owner.');
+        if (!$admin && $this->hasOwner($user)) {
+            throw new UserException('Organization owners must have at admin privileges.');
         }
 
         return (bool) Craft::$app->getDb()->createCommand()
-            ->update(Table::ORGS_MEMBERS, ['owner' => $owner], [
+            ->update(Table::ORGS_MEMBERS, ['isAdmin' => $admin], [
                 'orgId' => $this->id,
                 'userId' => $user->id,
             ])
@@ -358,10 +359,10 @@ class Org extends Element
      * @throws Exception
      * @throws UserException
      */
-    public function addOwner(User $user, array $attributes = []): bool
+    public function addAdmin(User $user, array $attributes = []): bool
     {
         return $this->addMember($user, [
-            'owner' => true
+            'isAdmin' => true
         ] + $attributes);
     }
 
@@ -371,8 +372,8 @@ class Org extends Element
      */
     public function removeMember(User $user): bool
     {
-        if ($this->hasSoleOwner($user)) {
-            throw new UserException('Organizations must have at least one owner.');
+        if ($this->hasOwner($user)) {
+            throw new UserException('Organization owners cannot be removed.');
         }
 
         return (bool)Craft::$app->getDb()->createCommand()
@@ -383,11 +384,9 @@ class Org extends Element
             ->execute();
     }
 
-    public function owners(): UserQuery
+    public function getOwner(): ?User
     {
-        /** @var UserQuery|UserQueryBehavior $query */
-        $query = User::find();
-        return $query->ofOrg($this)->orgOwner(true);
+        return $this->ownerId ? Craft::$app->getUsers()->getUserById($this->ownerId) : null;
     }
 
     /**
@@ -418,18 +417,37 @@ class Org extends Element
     }
 
     /**
+     * @inheritdoc
+     * @throws InvalidConfigException
+     */
+    public function beforeSave(bool $isNew): bool
+    {
+        if (!$this->ownerId) {
+            throw new InvalidConfigException('No owner ID assigned to the Organization.');
+        }
+
+        return parent::beforeSave($isNew);
+    }
+
+    /**
      * @throws Exception
+     * @throws UserException
      */
     public function afterSave(bool $isNew): void
     {
         parent::afterSave($isNew);
+
+        if ($isNew) {
+            $this->addAdmin($this->getOwner());
+        }
+
         $data = $this->getAttributes([
             'id',
             'stripeAccessToken',
             'stripeAccount',
             'apiToken',
             'balance',
-            'creatorId',
+            'ownerId',
         ]);
 
         Db::upsert(Table::ORGS, $data);
@@ -446,21 +464,34 @@ class Org extends Element
 
     public function hasMember(User $user): bool
     {
+        if ($this->hasOwner($user)) {
+            return true;
+        }
+
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find()->id($user->id);
         return $query->orgMember(true)->ofOrg($this)->exists();
     }
 
-    public function hasOwner(User $user): bool
+    public function hasAdmin(User $user): bool
     {
+        if ($this->hasOwner($user)) {
+            return true;
+        }
+
         /** @var UserQuery|UserQueryBehavior $query */
         $query = User::find()->id($user->id);
-        return $query->orgOwner(true)->ofOrg($this)->exists();
+        return $query->orgAdmin(true)->ofOrg($this)->exists();
+    }
+
+    public function hasOwner(User $user): bool
+    {
+        return $user->id === $this->ownerId;
     }
 
     public function canManageMembers(User $user): bool
     {
-        return $user->admin || $this->hasOwner($user);
+        return $user->admin || $this->hasAdmin($user);
     }
 
     public function canView(User $user): bool
@@ -470,7 +501,7 @@ class Org extends Element
 
     public function canSave(User $user): bool
     {
-        return $user->admin || !$this->id || $this->hasOwner($user);
+        return !$this->id || $user->admin || $this->hasAdmin($user);
     }
 
     public function canCreateDrafts(User $user): bool
@@ -486,10 +517,5 @@ class Org extends Element
     public function canDuplicate(User $user): bool
     {
         return $user->admin;
-    }
-
-    public function hasSoleOwner(User $user): bool
-    {
-        return $this->hasOwner($user) && (int) $this->owners()->count() === 1;
     }
 }

@@ -2,7 +2,6 @@
 
 namespace craft\contentmigrations;
 
-use Craft;
 use craft\commerce\db\Table as CommerceTable;
 use craft\db\Migration;
 use craft\db\Table as CraftTable;
@@ -20,7 +19,7 @@ class m220526_183917_add_orgs extends Migration
     {
         $this->createTable(TABLE::ORGS, [
             'id' => $this->primaryKey(),
-            'creatorId' => $this->integer(),
+            'ownerId' => $this->integer(),
             'balance' => $this->decimal(14, 4)->notNull()->defaultValue(0),
             'stripeAccessToken' => $this->text()->null(),
             'stripeAccount' => $this->string()->null(),
@@ -33,29 +32,20 @@ class m220526_183917_add_orgs extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id'], 'SET NULL');
-        $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS, ['locationAddressId'], CraftTable::ADDRESSES, ['id'], 'CASCADE');
-
         $this->createTable(Table::ORGS_MEMBERS, [
             'id' => $this->primaryKey(),
             'userId' => $this->integer()->notNull(),
             'orgId' => $this->integer()->notNull(),
-            'owner' => $this->boolean()->defaultValue(false),
+            'isAdmin' => $this->boolean()->defaultValue(false),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
 
-        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
-        $this->createIndex(null, Table::ORGS_MEMBERS, ['userId', 'orgId'], true);
-
         $this->createTable(Table::ORGS_ORDERS, [
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
+            'purchaserId' => $this->integer()->notNull(),
             'isPending' => $this->boolean()->defaultValue(false),
             'isRejected' => $this->boolean()->defaultValue(false),
             'dateCreated' => $this->dateTime()->notNull(),
@@ -63,19 +53,30 @@ class m220526_183917_add_orgs extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], CommerceTable::ORDERS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
-
         $this->createTable(Table::ORGS_INVITATIONS, [
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
             'userId' => $this->integer()->notNull(),
-            'owner' => $this->boolean()->defaultValue(false),
+            'isAdmin' => $this->boolean()->defaultValue(false),
             'expiryDate' => $this->dateTime()->notNull(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
+
+        $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS, ['ownerId'], CraftTable::USERS, ['id']);
+        $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'SET NULL');
+        $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
+        $this->addForeignKey(null, Table::ORGS, ['locationAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
+
+        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+        $this->createIndex(null, Table::ORGS_MEMBERS, ['userId', 'orgId'], true);
+
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], CommerceTable::ORDERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['purchaserId'], CraftTable::USERS, ['id']);
 
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
@@ -93,6 +94,7 @@ class m220526_183917_add_orgs extends Migration
         $this->dropForeignKey('craftnet_packages_developerId_fk', Table::PACKAGES);
         $this->addForeignKey('craftnet_packages_developerId_fk', Table::PACKAGES, ['developerId'], CraftTable::ELEMENTS, ['id'], 'SET NULL');
 
+        // TODO: Confirm developerId should be the org…
         $this->dropForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER);
         $this->addForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER, ['developerId'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
 

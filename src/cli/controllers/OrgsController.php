@@ -64,7 +64,7 @@ class OrgsController extends Controller
             ->each(function (User $user) {
                 $this->stdout("Creating an org for user #$user->id ($user->email) ..." . PHP_EOL);
 
-                if (Org::find()->creatorId($user->id)->exists()) {
+                if (Org::find()->ownerId($user->id)->exists()) {
                     $this->stdout("Org already converted, skipping." . PHP_EOL);
                     return;
                 }
@@ -78,7 +78,7 @@ class OrgsController extends Controller
                 $org->stripeAccount = $user->stripeAccount;
                 $org->apiToken = $user->apiToken;
                 $org->balance = $user->balance ?? 0;
-                $org->creatorId = $user->id;
+                $org->ownerId = $user->id;
 
                 $projectsAsMatrix = Collection::make($partner?->getProjects())
                     ->flatMap(function($project, $index) {
@@ -139,7 +139,7 @@ class OrgsController extends Controller
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("    > Adding user as owner of org ... ");
-                $org->addOwner($user);
+                $org->addAdmin($user);
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("    > Relating orders to org ... ");

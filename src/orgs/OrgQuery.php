@@ -14,16 +14,17 @@ class OrgQuery extends ElementQuery
     public ?string $stripeAccount = null;
     public ?string $apiToken = null;
     public ?int $balance = null;
-    public ?int $creatorId = null;
+    public ?int $ownerId = null;
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;
+    public ?int $locationAddressId = null;
     private ?int $hasMemberId = null;
-    private ?int $hasOwnerId = null;
+    private ?int $hasAdminId = null;
     private bool $joinMembers = false;
 
-    public function creatorId(?int $creatorId): OrgQuery
+    public function ownerId(?int $ownerId): OrgQuery
     {
-        $this->creatorId = $creatorId;
+        $this->ownerId = $ownerId;
         return $this;
     }
 
@@ -39,6 +40,12 @@ class OrgQuery extends ElementQuery
         return $this;
     }
 
+    public function locationAddressId(?int $locationAddressId): OrgQuery
+    {
+        $this->locationAddressId = $locationAddressId;
+        return $this;
+    }
+
     public function hasMember(null|int|User $value): static
     {
         $this->joinMembers = true;
@@ -47,10 +54,18 @@ class OrgQuery extends ElementQuery
         return $this;
     }
 
+    public function hasAdmin(null|int|User $value): static
+    {
+        $this->joinMembers = true;
+        $this->hasAdminId = $value instanceof User ? $value->id : $value;
+
+        return $this;
+    }
+
     public function hasOwner(null|int|User $value): static
     {
         $this->joinMembers = true;
-        $this->hasOwnerId = $value instanceof User ? $value->id : $value;
+        $this->ownerId = $value instanceof User ? $value->id : $value;
 
         return $this;
     }
@@ -63,9 +78,10 @@ class OrgQuery extends ElementQuery
             'stripeAccount',
             'apiToken',
             'balance',
-            'creatorId',
+            'ownerId',
             'paymentSourceId',
             'billingAddressId',
+            'locationAddressId',
         ]);
 
         $this->query->select(
@@ -88,12 +104,14 @@ class OrgQuery extends ElementQuery
                 'orgsMembers.userId' => $this->hasMemberId,
             ]);
         }
-        if ($this->hasOwnerId !== null) {
+        if ($this->hasAdminId !== null) {
             $this->subQuery->andWhere([
-                'orgsMembers.userId' => $this->hasOwnerId,
-                'orgsMembers.owner' => true,
+                'orgsMembers.userId' => $this->hasAdminId,
+                'orgsMembers.isAdmin' => true,
             ]);
         }
+
+        // TODO: test owner query/hasOwner
 
         return parent::beforePrepare();
     }

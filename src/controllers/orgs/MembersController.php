@@ -47,8 +47,8 @@ class MembersController extends SiteController
         $userQuery = User::find();
         $members = $userQuery->ofOrg($org->id)->collect()
             ->map(fn($member) => $this->transformUser($member) + [
-                    'owner' => (clone $userQuery)->orgOwner(true)->id($member->id)->exists(),
-                ]);
+                'isAdmin' => (clone $userQuery)->orgAdmin(true)->id($member->id)->exists(),
+            ]);
 
         return $this->asSuccess(data: $members->all());
     }
@@ -75,8 +75,8 @@ class MembersController extends SiteController
             throw new NotFoundHttpException();
         }
 
-        $owner = $this->request->getRequiredBodyParam('owner');
+        $admin = $this->request->getRequiredBodyParam('admin');
 
-        return $org->setMemberRole($user, $owner) ? $this->asSuccess() : $this->asFailure();
+        return $org->setMemberRole($user, $admin) ? $this->asSuccess() : $this->asFailure();
     }
 }

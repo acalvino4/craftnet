@@ -137,7 +137,7 @@ class CmsLicense extends License
 
         $owner = $this->getOwner();
 
-        return $owner instanceof Org && $owner->hasOwner($user);
+        return $owner instanceof Org && $owner->hasAdmin($user);
     }
 
     /**

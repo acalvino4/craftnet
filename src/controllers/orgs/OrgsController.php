@@ -19,7 +19,6 @@ class OrgsController extends SiteController
      */
     public function actionGetOrg($id): Response
     {
-        /** @var Org $org */
         $org = Org::find()->id($id)->one();
 
         if (!$org) {
@@ -83,7 +82,7 @@ class OrgsController extends SiteController
         $element->setFieldValuesFromRequest('fields');
 
         if ($isNew) {
-            $element->creatorId = $this->_currentUser->id;
+            $element->ownerId = $this->_currentUser->id;
         }
 
         if ($element->enabled && $element->getEnabledForSite()) {
@@ -102,18 +101,14 @@ class OrgsController extends SiteController
         if (!$success) {
             return $this->asModelFailure(
                 $element,
-                Craft::t('app', 'Couldn’t save organization.'),
-                'org'
+                'Couldn’t save organization.',
+                'org',
             );
-        }
-
-        if ($isNew) {
-            $element->addOwner($this->_currentUser);
         }
 
         return $this->asModelSuccess(
             $element,
-            Craft::t('app', 'Organization saved.'),
+            'Organization saved.',
         );
     }
 }
