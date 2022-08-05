@@ -69,7 +69,7 @@ class InvitationsController extends SiteController
             throw new NotFoundHttpException();
         }
 
-        if ($invitation->isAdmin) {
+        if ($invitation->admin) {
             $org->addAdmin($this->_currentUser);
         } else {
             $org->addMember($this->_currentUser);

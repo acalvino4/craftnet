@@ -107,7 +107,7 @@ class OrgQuery extends ElementQuery
         if ($this->hasAdminId !== null) {
             $this->subQuery->andWhere([
                 'orgsMembers.userId' => $this->hasAdminId,
-                'orgsMembers.isAdmin' => true,
+                'orgsMembers.admin' => true,
             ]);
         }
 

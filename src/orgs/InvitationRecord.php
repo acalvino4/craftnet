@@ -16,7 +16,7 @@ use DateTime;
  * @property int $id
  * @property int $orgId
  * @property int $userId
- * @property string $isAdmin
+ * @property string $admin
  * @property DateTime $expiryDate
  */
 class InvitationRecord extends ActiveRecord
@@ -38,7 +38,7 @@ class InvitationRecord extends ActiveRecord
     {
         return [
             [['expiryDate'], DateTimeValidator::class],
-            [['orgId', 'userId', 'expiryDate', 'isAdmin'], 'required'],
+            [['orgId', 'userId', 'expiryDate', 'admin'], 'required'],
         ];
     }
 }

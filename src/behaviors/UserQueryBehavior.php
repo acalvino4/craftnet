@@ -84,7 +84,7 @@ class UserQueryBehavior extends Behavior
         }
 
         if ($this->orgAdmin !== null) {
-            $this->owner->subQuery->andWhere(['orgsMembers.isAdmin' => $this->orgAdmin]);
+            $this->owner->subQuery->andWhere(['orgsMembers.admin' => $this->orgAdmin]);
         }
     }
 

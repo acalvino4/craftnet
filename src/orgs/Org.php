@@ -296,11 +296,31 @@ class Org extends Element
         $invitationRecord = new InvitationRecord();
         $invitationRecord->orgId = $this->id;
         $invitationRecord->userId = $user->id;
-        $invitationRecord->isAdmin = $admin;
+        $invitationRecord->admin = $admin;
 
         $invitationRecord->expiryDate = Db::prepareDateForDb($expiryDate);
 
         return $invitationRecord->save();
+    }
+
+    /**
+     * @throws UserException
+     */
+    public function getMemberRole(User $user): string
+    {
+        if (!$this->hasMember($user)) {
+            throw new UserException('User is not a member of this organization.');
+        }
+
+        if ($this->hasOwner($user)) {
+            return MemberRoleEnum::Owner()->value;
+        }
+
+        if ($this->hasAdmin($user)) {
+            return MemberRoleEnum::Admin()->value;
+        }
+
+        return MemberRoleEnum::Member()->value;
     }
 
     protected function cpEditUrl(): ?string
@@ -342,14 +362,27 @@ class Org extends Element
      * @throws Exception
      * @throws UserException
      */
-    public function setMemberRole(User $user, bool $admin): bool
+    public function setMemberRole(User $user, string|MemberRoleEnum $role): bool
     {
+        $role = is_string($role) ? MemberRoleEnum::tryFrom($role) : $role;
+
+        if (!$role) {
+            throw new UserException('Invalid role.');
+        }
+
+        $admin = $role === MemberRoleEnum::Admin();
+
+        if ($role === MemberRoleEnum::Owner()) {
+            // TODO: transfer ownership
+            throw new UserException('Nope…');
+        }
+
         if (!$admin && $this->hasOwner($user)) {
             throw new UserException('Organization owners must have at admin privileges.');
         }
 
         return (bool) Craft::$app->getDb()->createCommand()
-            ->update(Table::ORGS_MEMBERS, ['isAdmin' => $admin], [
+            ->update(Table::ORGS_MEMBERS, ['admin' => $admin], [
                 'orgId' => $this->id,
                 'userId' => $user->id,
             ])
@@ -363,7 +396,7 @@ class Org extends Element
     public function addAdmin(User $user, array $attributes = []): bool
     {
         return $this->addMember($user, [
-            'isAdmin' => true
+            'admin' => true
         ] + $attributes);
     }
 
@@ -449,10 +482,8 @@ class Org extends Element
 
         Db::upsert(Table::ORGS, $data);
 
-        $owner = $this->getOwner();
-
-        if ($isNew && $owner) {
-            $this->addAdmin($owner);
+        if ($isNew) {
+            $this->addAdmin($this->getOwner());
         }
     }
 
@@ -486,17 +517,17 @@ class Org extends Element
 
     public function canManageMembers(User $user): bool
     {
-        return $user->admin || $this->hasAdmin($user);
+        return $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
     }
 
     public function canView(User $user): bool
     {
-        return $user->admin || $this->hasMember($user);
+        return $user->admin || $this->hasOwner($user) || $this->hasMember($user);
     }
 
     public function canSave(User $user): bool
     {
-        return !$this->id || $user->admin || $this->hasAdmin($user);
+        return !$this->id || $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
     }
 
     public function canCreateDrafts(User $user): bool

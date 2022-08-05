@@ -6,8 +6,10 @@ use Craft;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craftnet\behaviors\UserQueryBehavior;
+use craftnet\orgs\MemberRoleEnum;
 use yii\base\Exception;
 use yii\base\UserException;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -47,8 +49,7 @@ class MembersController extends SiteController
         $userQuery = User::find();
         $members = $userQuery->ofOrg($org->id)->collect()
             ->map(fn($member) => $this->transformUser($member) + [
-                'isAdmin' => (clone $userQuery)->orgAdmin(true)->id($member->id)->exists(),
-                'isOwner' => $org->hasOwner($member),
+                'role' => $org->getMemberRole($member),
             ]);
 
         return $this->asSuccess(data: $members->all());
@@ -76,8 +77,34 @@ class MembersController extends SiteController
             throw new NotFoundHttpException();
         }
 
-        $admin = $this->request->getRequiredBodyParam('admin');
+        $role = $this->request->getRequiredBodyParam('role');
 
-        return $org->setMemberRole($user, $admin) ? $this->asSuccess() : $this->asFailure();
+        return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
+     * @throws BadRequestHttpException
+     * @throws UserException
+     */
+    public function actionGetRole(int $orgId, int $userId): Response
+    {
+        $org = SiteController::getOrgById($orgId);
+
+        if (!$org->hasMember($this->_currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+    /** @var UserQuery|UserQueryBehavior $userQuery */
+        $userQuery = User::find()->id($userId);
+        $user = $userQuery->ofOrg($org)->one();
+
+        if (!$user) {
+            throw new NotFoundHttpException();
+        }
+
+        return $this->asSuccess(data: ['role' => $org->getMemberRole($user)]);
     }
 }
