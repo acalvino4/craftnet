@@ -128,17 +128,16 @@ class OrgsController extends Controller
                 // Previously, users only had one stored payment sources
                 $org->paymentSourceId = Commerce::getInstance()
                     ?->getPaymentSources()
-                    ?->getAllPaymentSourcesByCustomerId()[0]?->id ?? null;
+                    ?->getAllPaymentSourcesByCustomerId($user->id)[0]?->id ?? null;
 
                 $org->billingAddressId = $user->primaryBillingAddressId;
-                $legacyLocation = $partner->getLocations()[0] ?? null;
+                $legacyLocation = $partner?->getLocations()[0] ?? null;
 
                 if ($legacyLocation) {
                     $location = new Address();
                     $location->ownerId = $user->id;
                     $location->title = $legacyLocation->title;
-                    $location->firstName = $user->firstName;
-                    $location->lastName = $user->lastName;
+                    $location->fullName = $partner->primaryContactName;
                     $location->countryCode = $legacyLocation->country;
                     $location->administrativeArea = $legacyLocation->state;
                     $location->locality = $legacyLocation->city;
@@ -216,11 +215,17 @@ class OrgsController extends Controller
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("    > Deleting redundant addresses ... ");
-                Address::find()
+                $query = Address::find()
                     ->ownerId($user->id)
-                    ->id(["not $org->paymentSourceId", "not $org->locationAddressId"])
+                    ->id([
+                        'not',
+                        $org->billingAddressId,
+                        $org->locationAddressId,
+                    ])
                     ->collect()
-                    ->each(fn($address) => Craft::$app->getElements()->deleteElementById($address->id));
+                    ->each(function ($address) {
+                        return Craft::$app->getElements()->deleteElementById($address->id, hardDelete: true);
+                    });
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("Done creating org #$org->id" . PHP_EOL . PHP_EOL);
