@@ -267,6 +267,7 @@ class AccountController extends BaseController
         $paymentSources = Collection::make($user->getPaymentSources())
             ->map(function(PaymentSource|PaymentSourceBehavior $paymentSource) {
                 $orgs = $paymentSource->getOrgs()->collect();
+
                 return $paymentSource->getAttributes([
                     'id',
                     'token',

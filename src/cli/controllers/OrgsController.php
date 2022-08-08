@@ -3,7 +3,10 @@
 namespace craftnet\cli\controllers;
 
 use Craft;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\elements\Order;
+use craft\commerce\Plugin as Commerce;
+use craft\elements\Address;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\StringHelper;
@@ -58,7 +61,7 @@ class OrgsController extends Controller
             ->status('credentialed')
             ->id($userIds)
             ->collect()
-            ->each(function (User $user) {
+            ->each(function (User|CustomerBehavior $user) {
                 $this->stdout("Creating an org for user #$user->id ($user->email) ..." . PHP_EOL);
 
                 if (Org::find()->ownerId($user->id)->exists()) {
@@ -122,7 +125,36 @@ class OrgsController extends Controller
                     'partnerProjects' => $projectsAsMatrix,
                 ]);
 
-                // TODO: migrate $partner->locations to an address field (orgs.locationAddressId)
+                // Previously, users only had one stored payment sources
+                $org->paymentSourceId = Commerce::getInstance()
+                    ?->getPaymentSources()
+                    ?->getAllPaymentSourcesByCustomerId()[0]?->id ?? null;
+
+                $org->billingAddressId = $user->primaryBillingAddressId;
+                $legacyLocation = $partner->getLocations()[0] ?? null;
+
+                if ($legacyLocation) {
+                    $location = new Address();
+                    $location->ownerId = $user->id;
+                    $location->title = $legacyLocation->title;
+                    $location->firstName = $user->firstName;
+                    $location->lastName = $user->lastName;
+                    $location->countryCode = $legacyLocation->country;
+                    $location->administrativeArea = $legacyLocation->state;
+                    $location->locality = $legacyLocation->city;
+                    $location->postalCode = $legacyLocation->zip;
+                    $location->addressLine1 = $legacyLocation->addressLine1 ?? null;
+                    $location->addressLine2 = $legacyLocation->addressLine2 ?? null;
+                    $location->organization = $org->title;
+                    $location->organizationTaxId = $user->businessVatId ?? null;
+                    $location->addressPhone = $legacyLocation->phone ?? null;
+                    $location->addressAttention = $legacyLocation->attention ?? null;
+
+                    // Not validating because these addresses won't validate until normalized
+                    if (Craft::$app->getElements()->saveElement($location, false)) {
+                        $org->locationAddressId = $location->id;
+                    }
+                }
 
                 $this->stdout("    > Saving org ... ");
                 if (!Craft::$app->getElements()->saveElement($org)) {
