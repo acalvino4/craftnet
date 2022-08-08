@@ -3,6 +3,7 @@
 namespace craftnet\controllers\api\v1;
 
 use Composer\Semver\Semver;
+use Craft;
 use craft\behaviors\CustomFieldBehavior;
 use craft\db\Query;
 use craft\elements\Asset;
@@ -54,6 +55,9 @@ class PluginStoreController extends BaseApiController
         $pluginStoreData = Cache::get($cacheKey);
 
         if (!$pluginStoreData) {
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
+
             $featuredPlugins = [];
 
             foreach ($this->_createFeaturedSectionQuery()->all() as $entry) {
@@ -82,7 +86,8 @@ class PluginStoreController extends BaseApiController
                 'expiryDateOptions' => $this->_expiryDateOptions(),
             ];
 
-            $this->_cache($cacheKey, $pluginStoreData);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $pluginStoreData, $tags);
         }
 
         return $this->asJson($pluginStoreData);
@@ -120,12 +125,16 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
+
             $featuredSectionEntry = $this->_createFeaturedSectionQuery()
                 ->slug($handle)
                 ->one();
 
             $data = $this->_transformFeaturedSection($featuredSectionEntry);
-            $this->_cache($cacheKey, $data);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $data, $tags);
         }
 
         return $this->asJson($data);
@@ -142,6 +151,9 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
+
             $data = [];
 
             foreach ($this->_createFeaturedSectionQuery()->all() as $entry) {
@@ -159,7 +171,8 @@ class PluginStoreController extends BaseApiController
                 }
             }
 
-            $this->_cache($cacheKey, $data);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $data, $tags);
         }
 
         return $this->asJson($data);
@@ -179,6 +192,9 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
+
             $plugin = $this->_plugin($handle);
 
             if (!$plugin) {
@@ -186,7 +202,8 @@ class PluginStoreController extends BaseApiController
             }
 
             $data = $this->transformPlugin($plugin, true);
-            $this->_cache($cacheKey, $data);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $data, $tags);
         }
 
         // Add the latest compatible version
@@ -269,6 +286,9 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
+
             /** @var PluginQuery $query */
             $query = $this->_createPluginQuery()
                 ->orderBy([Table::PLUGINS . '.abandoned' => SORT_ASC])
@@ -339,7 +359,8 @@ class PluginStoreController extends BaseApiController
                 'total' => $totalPages,
             ];
 
-            $this->_cache($cacheKey, $data);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $data, $tags);
         }
 
         return $this->asJson($data);
@@ -358,6 +379,9 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
+
             $entry = $this->_createFeaturedSectionQuery()
                 ->slug($handle)
                 ->one();
@@ -381,7 +405,8 @@ class PluginStoreController extends BaseApiController
                 'totalResults' => count($plugins),
             ];
 
-            $this->_cache($cacheKey, $data);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $data, $tags);
         }
 
         return $this->asJson($data);
@@ -402,14 +427,17 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
-            $pluginHandles = explode(',', $pluginHandles);
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
 
             $plugins = $this->_createPluginQuery()
                 ->andWhere([Table::PLUGINS . '.handle' => $pluginHandles])
+                ->handle($pluginHandles)
                 ->all();
 
             $data = $this->transformPlugins($plugins);
-            $this->_cache($cacheKey, $data);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $data, $tags);
         }
 
         return $this->asJson($data);
@@ -449,6 +477,9 @@ class PluginStoreController extends BaseApiController
         $data = Cache::get($cacheKey);
 
         if (!$data) {
+            $elementsService = Craft::$app->getElements();
+            $elementsService->startCollectingCacheTags();
+
             $data = [];
 
             /** @var Category[] $categories */
@@ -470,7 +501,8 @@ class PluginStoreController extends BaseApiController
                 ];
             }
 
-            $this->_cache($cacheKey, $data);
+            $tags = $elementsService->stopCollectingCacheTags()->tags;
+            $this->_cache($cacheKey, $data, $tags);
         }
 
         return $data;
@@ -585,10 +617,11 @@ class PluginStoreController extends BaseApiController
     /**
      * @param string $key
      * @param mixed $value
+     * @param string[] $tags
      */
-    private function _cache(string $key, mixed $value): void
+    private function _cache(string $key, mixed $value, array $tags = []): void
     {
-        Cache::set($key, $value, $this->_cacheTags());
+        Cache::set($key, $value, $this->_cacheTags(...$tags));
     }
 
     private function _cacheTags(?string ...$tags): array

@@ -37,6 +37,8 @@ class Plugin extends Element
     const STATUS_PENDING = 'pending';
     const STATUS_ABANDONED = 'abandoned';
 
+    const HANDLE_PATTERN = '/^[a-z]([a-z0-9\-]*[a-z0-9])?$/';
+
     /**
      * @event Event The event that is triggered when the plugin is first published to the Plugin Store.
      */
@@ -459,11 +461,25 @@ class Plugin extends Element
     private ?PluginHistory $_history = null;
 
     /**
+     * @var string|null
+     */
+    private ?string $_oldHandle = null;
+
+    /**
      * @return string
      */
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function init(): void
+    {
+        parent::init();
+        $this->_oldHandle = $this->handle;
     }
 
     /**
@@ -867,7 +883,7 @@ class Plugin extends Element
     {
         $this->handle = mb_strtolower($this->handle);
 
-        if (!preg_match('/^[a-z]([a-z0-9\-]*[a-z0-9])?$/', $this->handle)) {
+        if (!preg_match(self::HANDLE_PATTERN, $this->handle)) {
             $this->addError('handle', "“{$this->handle}” isn’t a valid plugin handle.");
             return;
         }
@@ -926,6 +942,24 @@ class Plugin extends Element
         }
 
         return !$this->hasErrors();
+    }
+
+    /**
+     * @inheritdoc
+     * @since 3.5.0
+     */
+    protected function cacheTags(): array
+    {
+        $tags = [
+            $this->handle,
+        ];
+
+        // Did the handle just change?
+        if ($this->handle !== $this->_oldHandle) {
+            $tags[] = $this->_oldHandle;
+        }
+
+        return $tags;
     }
 
     /**

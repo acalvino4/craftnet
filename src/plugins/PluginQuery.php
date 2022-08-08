@@ -6,9 +6,12 @@ use craft\db\Query;
 use craft\db\Table as CraftTable;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use craftnet\db\Table;
 use craftnet\Module;
+use Illuminate\Support\Collection;
 use yii\db\Connection;
+use yii\helpers\ArrayHelper;
 
 /**
  * @method Plugin[]|array all($db = null)
@@ -326,5 +329,30 @@ class PluginQuery extends ElementQuery
         }
 
         return parent::statusCondition($status);
+    }
+
+    /**
+     * @inheritdoc
+     * @since 3.5.0
+     */
+    protected function cacheTags(): array
+    {
+        $tags = [];
+
+        if ($this->handle && (is_string($this->handle) || is_array($this->handle))) {
+            if (is_string($this->handle)) {
+                $handles = StringHelper::split($this->handle);
+            } else {
+                $handles = $this->handle;
+            }
+
+            if (Collection::make($handles)->every(fn($v) => preg_match(Plugin::HANDLE_PATTERN, $v))) {
+                foreach ($handles as $handle) {
+                    $tags[] = $handle;
+                }
+            }
+        }
+
+        return $tags;
     }
 }
