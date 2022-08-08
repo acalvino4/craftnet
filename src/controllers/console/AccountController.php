@@ -14,12 +14,11 @@ use craft\errors\UploadFailedException;
 use craft\helpers\Assets;
 use craft\helpers\FileHelper;
 use craft\helpers\Json;
-use craft\web\Controller;
 use craft\web\UploadedFile;
 use craftnet\behaviors\PaymentSourceBehavior;
 use craftnet\behaviors\UserBehavior;
 use craftnet\helpers\Address as AddressHelper;
-use craftnet\orgs\Org;
+use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\UserException;
 use yii\web\BadRequestHttpException;
@@ -261,20 +260,20 @@ class AccountController extends BaseController
         }
     }
 
-    public function actionGetPaymentSources()
+    public function actionGetPaymentSources(): ?Response
     {
-
         /** @var User|UserBehavior $user */
         $user = Craft::$app->getUser()->getIdentity();
-        $paymentSources = $user->getPaymentSources()
+        $paymentSources = Collection::make($user->getPaymentSources())
             ->map(function(PaymentSource|PaymentSourceBehavior $paymentSource) {
-                $org = $paymentSource->getOrg();
+                $orgs = $paymentSource->getOrgs()->collect();
                 return $paymentSource->getAttributes([
                     'id',
                     'token',
                 ]) + [
                     'card' => $paymentSource->getCard(),
-                    'org' => $org ? static::transformOrg($org) : null,
+                    'orgs' => $orgs->isEmpty() ? null : $paymentSource->getOrgs()->collect()
+                        ->map(fn($org) => static::transformOrg($org)),
                 ];
             });
 

@@ -5,6 +5,7 @@ namespace craftnet\behaviors;
 use craft\commerce\models\PaymentSource;
 use craft\helpers\Json;
 use craftnet\orgs\Org;
+use craftnet\orgs\OrgQuery;
 use yii\base\Behavior;
 
 /**
@@ -13,20 +14,6 @@ use yii\base\Behavior;
  */
 class PaymentSourceBehavior extends Behavior
 {
-    private ?Org $org = null;
-
-    public function setOrg(?Org $org): PaymentSource
-    {
-        $this->org = $org;
-
-        return $this->owner;
-    }
-
-    public function getOrg(): ?Org
-    {
-        return $this->org;
-    }
-
     public function getCard(): ?array
     {
         $response = Json::decode($this->owner->response);
@@ -37,5 +24,10 @@ class PaymentSourceBehavior extends Behavior
             'source', 'payment_method' => $response['card'],
             default => null,
         };
+    }
+
+    public function getOrgs(): OrgQuery
+    {
+        return Org::find()->paymentSourceId($this->owner->id);
     }
 }
