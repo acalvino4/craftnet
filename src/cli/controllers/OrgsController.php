@@ -215,6 +215,14 @@ class OrgsController extends Controller
                     ->execute();
                 $this->stdout('done' . PHP_EOL);
 
+                $this->stdout("    > Deleting redundant addresses ... ");
+                Address::find()
+                    ->ownerId($user->id)
+                    ->id(["not $org->paymentSourceId", "not $org->locationAddressId"])
+                    ->collect()
+                    ->each(fn($address) => Craft::$app->getElements()->deleteElementById($address->id));
+                $this->stdout('done' . PHP_EOL);
+
                 $this->stdout("Done creating org #$org->id" . PHP_EOL . PHP_EOL);
             });
     }
