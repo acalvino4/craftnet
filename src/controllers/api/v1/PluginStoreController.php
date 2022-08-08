@@ -427,10 +427,10 @@ class PluginStoreController extends BaseApiController
     }
 
     /**
-     * @param $featuredSectionEntry
+     * @param Entry $featuredSectionEntry
      * @return array
      */
-    private function _transformFeaturedSection($featuredSectionEntry): array
+    private function _transformFeaturedSection(Entry $featuredSectionEntry): array
     {
         return [
             'id' => $featuredSectionEntry->id,
