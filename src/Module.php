@@ -99,6 +99,8 @@ class Module extends \yii\base\Module
     const MESSAGE_KEY_LICENSE_TRANSFER = 'license_transfer';
     const MESSAGE_KEY_SECURITY_ALERT = 'security_alert';
     const MESSAGE_KEY_ORG_INVITATION = 'org_invitation';
+    const MESSAGE_KEY_ORG_REQUEST_ORDER_APPROVAL = 'org_request_order_approval';
+    const MESSAGE_KEY_ORG_REJECT_ORDER_APPROVAL = 'org_reject_order_approval';
 
     /**
      * @inheritdoc
@@ -197,8 +199,20 @@ class Module extends \yii\base\Module
             $e->messages[] = new SystemMessage([
                 'key' => self::MESSAGE_KEY_ORG_INVITATION,
                 'heading' => 'When a member is invited to join an org.',
-                'subject' => '{{ inviter.friendlyName }} has invited you to join the {{ org.displayName }} organization',
+                'subject' => '{{ inviter.friendlyName }} has invited you to join the {{ org.title }} organization',
                 'body' => file_get_contents(__DIR__ . '/emails/org_invitation.md'),
+            ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_REQUEST_ORDER_APPROVAL,
+                'heading' => 'When a member requests an order approval.',
+                'subject' => 'Order approval request for the {{ org.title }} organization',
+                'body' => file_get_contents(__DIR__ . '/emails/org_request_order_approval.md'),
+            ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_REJECT_ORDER_APPROVAL,
+                'heading' => 'When an owner rejects an order approval request',
+                'subject' => 'Your order approval request for the {{ org.title }} organization has been rejected',
+                'body' => file_get_contents(__DIR__ . '/emails/org_request_reject_approval.md'),
             ]);
         });
 

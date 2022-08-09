@@ -3,7 +3,6 @@
 namespace craftnet\behaviors;
 
 use craft\commerce\elements\db\OrderQuery;
-use craft\commerce\elements\Order;
 use craft\elements\db\ElementQuery;
 use craftnet\db\Table;
 use yii\base\Behavior;
@@ -15,6 +14,12 @@ class OrderQueryBehavior extends Behavior
 {
 
     public ?int $orgId = null;
+
+    public function orgId(?int $orgId): self
+    {
+        $this->orgId = $orgId;
+        return $this;
+    }
 
     /**
      * @inheritdoc
@@ -35,11 +40,16 @@ class OrderQueryBehavior extends Behavior
 
     public function beforePrepare(): void
     {
-        if (!$this->owner->orgId) {
-            return;
-        }
+        $this->owner->query->addSelect([
+            'orgsOrders.orgId',
+            'orgsOrders.approvalPending',
+            'orgsOrders.approvalRejected',
+        ]);
+        $this->owner->query->leftJoin(['orgsOrders' => Table::ORGS_ORDERS], '[[orgsOrders.id]] = [[commerce_orders.id]]');
+        $this->owner->subQuery->leftJoin(['orgsOrders' => Table::ORGS_ORDERS], '[[orgsOrders.id]] = [[commerce_orders.id]]');
 
-        $this->owner->subQuery->innerJoin(['orgs_orders' => Table::ORGS_ORDERS], '[[orgs_orders.id]] = [[commerce_orders.id]]');
-        $this->owner->subQuery->andWhere(['orgs_orders.orgId' => $this->owner->orgId]);
+        if ($this->owner->orgId) {
+            $this->owner->subQuery->andWhere(['orgsOrders.orgId' => $this->owner->orgId]);
+        }
     }
 }

@@ -18,9 +18,16 @@ class OrgQuery extends ElementQuery
     public ?int $paymentSourceId = null;
     public ?int $billingAddressId = null;
     public ?int $locationAddressId = null;
+    public ?int $orderId = null;
     private ?int $hasMemberId = null;
     private ?int $hasAdminId = null;
     private bool $joinMembers = false;
+
+    public function orderId(?int $orderId): OrgQuery
+    {
+        $this->orderId = $orderId;
+        return $this;
+    }
 
     public function ownerId(?int $ownerId): OrgQuery
     {

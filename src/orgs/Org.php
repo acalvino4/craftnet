@@ -90,6 +90,17 @@ class Org extends Element
     }
 
     /**
+     * @throws \yii\base\Exception
+     */
+    public function getOrdersUrl(): ?string
+    {
+        return match ($this->site->handle) {
+            'console' => UrlHelper::siteUrl("$this->uri/orders"),
+            default => null,
+        };
+    }
+
+    /**
      * @inheritdoc
      */
     public function getUriFormat(): ?string
@@ -583,6 +594,11 @@ class Org extends Element
     public function canManageMembers(User $user): bool
     {
         return $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
+    }
+
+    public function canApproveOrders(?User $_currentUser): bool
+    {
+        return $user->admin || $this->hasOwner($user);
     }
 
     public function canView(User $user): bool

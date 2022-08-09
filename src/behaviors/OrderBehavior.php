@@ -3,25 +3,35 @@
 namespace craftnet\behaviors;
 
 use Craft;
+use craft\base\Element;
 use craft\commerce\elements\Order;
 use craft\commerce\records\Transaction as TransactionRecord;
 use craft\elements\User;
 use craft\helpers\App;
+use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craftnet\cms\CmsLicense;
+use craftnet\db\Table;
 use craftnet\Module;
 use craftnet\orders\PdfRenderer;
+use craftnet\orgs\Org;
 use craftnet\plugins\PluginLicense;
 use craftnet\plugins\PluginPurchasable;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use yii\base\Behavior;
+use yii\db\Exception;
 
 /**
  * @property Order $owner
+ * @property bool $approvalRejected
  */
 class OrderBehavior extends Behavior
 {
+    public ?int $orgId = null;
+    public bool $approvalPending = false;
+    private bool $approvalRejected = false;
+
     /**
      * @inheritdoc
      */
@@ -30,7 +40,19 @@ class OrderBehavior extends Behavior
         // todo: we should probably be listening for a transaction event here
         return [
             Order::EVENT_AFTER_COMPLETE_ORDER => [$this, 'afterComplete'],
+            Element::EVENT_AFTER_SAVE => [$this, 'afterSave'],
         ];
+    }
+
+    public function getOrg(): ?Org
+    {
+        if (!$this->orgId) {
+            return null;
+        }
+
+        return Org::find()
+            ->id($this->orgId)
+            ->one();
     }
 
     /**
@@ -53,6 +75,11 @@ class OrderBehavior extends Behavior
         return Module::getInstance()->getPluginLicenseManager()->getLicensesByOrder($this->owner->id);
     }
 
+    public function afterSave(): void
+    {
+        $this->_updateOrgOrders();
+    }
+
     /**
      * Handles post-order-complete stuff.
      */
@@ -61,6 +88,10 @@ class OrderBehavior extends Behavior
         if (!$this->owner->getIsPaid()) {
             return;
         }
+
+        $this->approvalPending = false;
+        $this->approvalRejected = false;
+        $this->_updateOrgOrders();
 
         $this->_updateDeveloperFunds();
         $this->_sendReceipt();
@@ -181,5 +212,46 @@ class OrderBehavior extends Behavior
                 'contentType' => 'application/pdf',
             ])
             ->send();
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function _updateOrgOrders(): bool
+    {
+        if (!$this->orgId) {
+            return false;
+        }
+
+        return (bool) Db::update(Table::ORGS_ORDERS, [
+            'approvalPending' => $this->approvalRequested,
+            'approvalRejected' => $this->approvalRejected,
+        ], [
+            'id' => $this->owner->id,
+            'orgId' => $this->orgId,
+        ]);
+    }
+
+    /**
+     * @param bool $approvalRejected
+     * @return OrderBehavior
+     */
+    public function setApprovalRejected(bool $approvalRejected): static
+    {
+        $this->approvalRejected = $approvalRejected;
+
+        if ($approvalRejected) {
+            $this->approvalPending = false;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getApprovalRejected(): bool
+    {
+        return $this->approvalRejected;
     }
 }
