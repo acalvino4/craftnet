@@ -82,9 +82,9 @@ return [
         'POST    stripe/remove-card' => 'craftnet/console/stripe/remove-card',
 
         'GET     orgs' => 'craftnet/orgs/orgs/get-orgs',
+        'POST    orgs' => 'craftnet/orgs/orgs/save-org',
         'GET     orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/get-org',
         'POST    orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/save-org',
-        'POST    orgs/new' => 'craftnet/orgs/orgs/save-org',
         'GET     orgs/<orgId:\d+>/orders' => 'craftnet/orgs/orders/get-orders',
         'GET     orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/get-members',
         'POST    orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/add-member',
@@ -97,6 +97,13 @@ return [
         'POST    orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/accept-invitation',
         'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
 
+        'GET     cards' => 'craftnet/console/stripe/get-cards',
+        'POST    cards' => 'craftnet/console/stripe/add-card',
+        'DELETE  cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/remove-card',
+
+        'GET     addresses' => 'craftnet/console/addresses/get-addresses',
+        'POST    addresses' => 'craftnet/console/addresses/save-address',
+        'DELETE  addresses/<addressId:\d+>' => 'craftnet/console/addresses/remove-address',
         'POST    addresses/info' => 'craftnet/console/addresses/get-address-info',
 
         'oauth/login' => 'oauth-server/oauth/login',
