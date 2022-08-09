@@ -161,6 +161,7 @@ class OrgsController extends Controller
                         Craft::$app->getElements()->saveElement($org);
                     }
                 }
+                $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("    > Removing avatar from user ... ");
                 $user->setPhoto(null);
