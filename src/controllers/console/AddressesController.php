@@ -6,11 +6,16 @@ use CommerceGuys\Addressing\AddressFormat\AddressFormat;
 use CommerceGuys\Addressing\Subdivision\Subdivision;
 use Craft;
 use craft\elements\Address;
-use craftnet\controllers\api\BaseApiController;
+use craft\elements\User;
+use craft\errors\ElementNotFoundException;
+use craftnet\behaviors\AddressBehavior;
+use craftnet\behaviors\UserBehavior;
 use Illuminate\Support\Collection;
-use Moccalotto\Eu\CountryInfo;
-use yii\base\InvalidParamException;
+use Throwable;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -48,6 +53,83 @@ class AddressesController extends BaseController
         ], self::FORMAT_CACHE_DURATION);
 
         return $this->asSuccess(data: ['addressInfo' => $addressInfo]);
+    }
+
+    /**
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws InvalidConfigException
+     * @throws Exception
+     * @throws NotFoundHttpException
+     */
+    public function actionSaveAddress(?int $addressId = null): ?Response
+    {
+        $user = Craft::$app->getUser()->getIdentity();
+        $address = $addressId ?
+            Address::find()
+                ->id($addressId)
+                ->ownerId($user->id)
+                ->one() :
+            new Address();
+
+        if (!$address) {
+            throw new NotFoundHttpException('Address not found.');
+        }
+
+        $address->ownerId = Craft::$app->getUser()->getIdentity()->id;
+        $address->setAttributes($this->request->getBodyParams());
+        $saved = Craft::$app->getElements()->saveElement($address);
+
+        return $saved ?
+            $this->asModelSuccess($address, 'Address saved.') :
+            $this->asModelFailure($address, 'Could not save address.');
+    }
+
+    /**
+     * @throws Throwable
+     * @throws NotFoundHttpException
+     */
+    public function actionRemoveAddress(int $addressId = null): ?Response
+    {
+        $user = Craft::$app->getUser()->getIdentity();
+
+        /** @var Address|AddressBehavior $address */
+        $address = Address::find()
+            ->id($addressId)
+            ->ownerId($user->id)
+            ->one();
+
+        if (!$address) {
+            throw new NotFoundHttpException('Address not found.');
+        }
+
+        if ($address->getOrgs()->exists()) {
+            $this->requireElevatedSession();
+        }
+
+        $deleted = Craft::$app->getElements()->deleteElementById($addressId);
+
+        return $deleted ?
+            $this->asModelSuccess($address, 'Address removed.') :
+            $this->asModelFailure($address, 'Could not remove address.');
+    }
+
+    public function actionGetAddresses(): ?Response
+    {
+        /** @var User|UserBehavior $user */
+        $user = Craft::$app->getUser()->getIdentity();
+
+        $addresses = Collection::make($user->getAddresses())
+            ->map(function(Address|AddressBehavior $address) {
+                $orgs = $address->getOrgs()->collect();
+
+                return $address->getAttributes() + [
+                        'orgs' => $orgs->isEmpty() ? null : $address->getOrgs()->collect()
+                            ->map(fn($org) => static::transformOrg($org)),
+                    ];
+            });
+
+        return $this->asSuccess(data: ['addresses' => $addresses->all()]);
     }
 
     /**

@@ -6,7 +6,6 @@ use Craft;
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\events\MatchLineItemEvent;
-use craft\commerce\events\PdfEvent;
 use craft\commerce\events\PdfRenderEvent;
 use craft\commerce\models\Discount;
 use craft\commerce\models\PaymentSource;
@@ -17,6 +16,7 @@ use craft\commerce\services\Purchasables;
 use craft\console\Controller as ConsoleController;
 use craft\console\controllers\ResaveController;
 use craft\controllers\UsersController;
+use craft\elements\Address;
 use craft\elements\Asset;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
@@ -47,6 +47,7 @@ use craft\web\Request;
 use craft\web\twig\variables\Cp;
 use craft\web\UrlManager;
 use craft\web\View;
+use craftnet\behaviors\AddressBehavior;
 use craftnet\behaviors\AssetBehavior;
 use craftnet\behaviors\DiscountBehavior;
 use craftnet\behaviors\OrderBehavior;
@@ -127,6 +128,9 @@ class Module extends \yii\base\Module
         });
         Event::on(PaymentSource::class, PaymentSource::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
             $e->behaviors['cn.paymentSource'] = PaymentSourceBehavior::class;
+        });
+        Event::on(Address::class, Address::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
+            $e->behaviors['cn.address'] = AddressBehavior::class;
         });
 
         // register custom component types

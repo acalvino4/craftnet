@@ -131,11 +131,17 @@ class OrgsController extends Controller
                     ?->getAllPaymentSourcesByCustomerId($user->id)[0]?->id ?? null;
 
                 $org->billingAddressId = $user->primaryBillingAddressId;
-                $legacyLocation = $partner?->getLocations()[0] ?? null;
 
-                if ($legacyLocation) {
+                $this->stdout("    > Saving org ... ");
+                if (!Craft::$app->getElements()->saveElement($org)) {
+                    throw new Exception("Couldn't save org: " . implode(', ', $org->getFirstErrors()));
+                }
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Adding partner address as address element ... ");
+                if ($legacyLocation = $partner?->getLocations()[0] ?? null) {
                     $location = new Address();
-                    $location->ownerId = $user->id;
+                    $location->ownerId = $org->id;
                     $location->title = $legacyLocation->title;
                     $location->fullName = $partner->primaryContactName;
                     $location->countryCode = $legacyLocation->country;
@@ -152,14 +158,9 @@ class OrgsController extends Controller
                     // Not validating because these addresses won't validate until normalized
                     if (Craft::$app->getElements()->saveElement($location, false)) {
                         $org->locationAddressId = $location->id;
+                        Craft::$app->getElements()->saveElement($org);
                     }
                 }
-
-                $this->stdout("    > Saving org ... ");
-                if (!Craft::$app->getElements()->saveElement($org)) {
-                    throw new Exception("Couldn't save org: " . implode(', ', $org->getFirstErrors()));
-                }
-                $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("    > Removing avatar from user ... ");
                 $user->setPhoto(null);

@@ -209,7 +209,7 @@ class StripeController extends BaseController
             throw new NotFoundHttpException('Credit card not found.');
         }
 
-        if ($paymentSource->getOrgs()) {
+        if ($paymentSource->getOrgs()->exists()) {
             $this->requireElevatedSession();
         }
 

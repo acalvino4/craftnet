@@ -68,6 +68,8 @@ class m220526_183917_add_orgs extends Migration
         $this->addForeignKey(null, Table::ORGS, ['ownerId'], CraftTable::USERS, ['id']);
         $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'SET NULL');
         $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
+
+        // TODO: Ideally this would be a custom field, but currently only user elements can have addresses
         $this->addForeignKey(null, Table::ORGS, ['locationAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
 
         $this->addForeignKey(null, Table::ORGS_MEMBERS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
