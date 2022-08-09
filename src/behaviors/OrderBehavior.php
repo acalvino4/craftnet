@@ -29,7 +29,7 @@ use yii\db\Exception;
 class OrderBehavior extends Behavior
 {
     public ?int $orgId = null;
-    public bool $approvalPending = false;
+    private bool $approvalPending = false;
     private bool $approvalRejected = false;
 
     /**
@@ -232,13 +232,9 @@ class OrderBehavior extends Behavior
         ]);
     }
 
-    /**
-     * @param bool $approvalRejected
-     * @return OrderBehavior
-     */
-    public function setApprovalRejected(bool $approvalRejected): static
+    public function setApprovalRejected(?bool $approvalRejected): static
     {
-        $this->approvalRejected = $approvalRejected;
+        $this->approvalRejected = (bool)$approvalRejected;
 
         if ($approvalRejected) {
             $this->approvalPending = false;
@@ -247,11 +243,19 @@ class OrderBehavior extends Behavior
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function getApprovalRejected(): bool
     {
         return $this->approvalRejected;
+    }
+
+    public function getApprovalPending(): bool
+    {
+        return $this->approvalPending;
+    }
+
+    public function setApprovalPending(?bool $approvalPending): static
+    {
+        $this->approvalPending = (bool)$approvalPending;
+        return $this;
     }
 }

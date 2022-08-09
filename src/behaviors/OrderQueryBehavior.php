@@ -15,12 +15,6 @@ class OrderQueryBehavior extends Behavior
 
     public ?int $orgId = null;
 
-    public function orgId(?int $orgId): self
-    {
-        $this->orgId = $orgId;
-        return $this;
-    }
-
     /**
      * @inheritdoc
      */
@@ -31,7 +25,7 @@ class OrderQueryBehavior extends Behavior
         ];
     }
 
-    public function orgId(int $orgId): OrderQuery
+    public function orgId(?int $orgId): OrderQuery
     {
         $this->orgId = $orgId;
 
