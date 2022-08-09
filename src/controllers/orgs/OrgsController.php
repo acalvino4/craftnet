@@ -77,8 +77,15 @@ class OrgsController extends SiteController
             throw new ForbiddenHttpException('User not authorized to save this organization.');
         }
 
+        // Native element attributes
         $element->slug = $this->request->getBodyParam('slug', $element->slug);
         $element->title = $this->request->getBodyParam('title', $element->title);
+
+        // Org attributes
+        $element->paymentSourceId = $this->request->getBodyParam('paymentSourceId', $element->paymentSourceId);
+        $element->billingAddressId = $this->request->getBodyParam('billingAddressId', $element->billingAddressId);
+        $element->locationAddressId = $this->request->getBodyParam('locationAddressId', $element->locationAddressId);
+
         $element->setFieldValuesFromRequest('fields');
 
         if ($element->enabled && $element->getEnabledForSite()) {

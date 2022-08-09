@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Element;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\Address;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
@@ -493,8 +494,32 @@ class Org extends Element
      */
     public function beforeSave(bool $isNew): bool
     {
-        if (!$this->getOwner()) {
+        $owner = $this->getOwner();
+        if (!$owner) {
             throw new InvalidConfigException('No owner is assigned to the Organization.');
+        }
+
+        if (
+            $this->paymentSourceId &&
+            !Commerce::getInstance()
+                ->getPaymentSources()
+                ->getPaymentSourceByIdAndUserId($this->paymentSourceId, $owner->id)
+        ) {
+            throw new InvalidConfigException('Invalid payment source.');
+        }
+
+        if (
+            $this->billingAddressId &&
+            !Address::find()->id($this->billingAddressId)->ownerId($owner->id)->exists()
+        ) {
+            throw new InvalidConfigException('Invalid billing address.');
+        }
+
+        if (
+            $this->locationAddressId &&
+            !Address::find()->id($this->locationAddressId)->ownerId($this->id)->exists()
+        ) {
+            throw new InvalidConfigException('Invalid location address.');
         }
 
         return parent::beforeSave($isNew);
