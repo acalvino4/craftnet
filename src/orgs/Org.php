@@ -465,6 +465,8 @@ class Org extends Element
             throw new UserException('User must be a member of the organization before becoming the owner.');
         }
 
+        $this->paymentSourceId = null;
+        $this->billingAddressId = null;
         $saved = $this->setOwner($owner)->save();
 
         // TODO: email notifications
@@ -490,15 +492,6 @@ class Org extends Element
         return $this->_plugins = $plugins;
     }
 
-    public function getPaymentSource(): ?PaymentSource
-    {
-        if (!$this->paymentSourceId) {
-            return null;
-        }
-
-        return Commerce::getInstance()->getPaymentSources()->getPaymentSourceById($this->paymentSourceId);
-    }
-
     /**
      * @inheritdoc
      * @throws InvalidConfigException
@@ -506,6 +499,7 @@ class Org extends Element
     public function beforeSave(bool $isNew): bool
     {
         $owner = $this->getOwner();
+
         if (!$owner) {
             throw new InvalidConfigException('No owner is assigned to the Organization.');
         }
@@ -596,6 +590,13 @@ class Org extends Element
         return $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
     }
 
+    public function canPurchase(User $user): bool
+    {
+        return $this->requireOrderApproval
+            ? $this->hasOwner($user) || $this->hasAdmin($user)
+            : $this->hasMember($user);
+    }
+
     public function canApproveOrders(User $user): bool
     {
         return $user->admin || $this->hasOwner($user);
@@ -634,5 +635,25 @@ class Org extends Element
     public function save(...$args): bool
     {
         return Craft::$app->getElements()->saveElement($this, ...$args);
+    }
+
+    public function getPaymentSource(): ?PaymentSource
+    {
+        if (!$this->paymentSourceId) {
+            return null;
+        }
+
+        return Commerce::getInstance()
+            ->getPaymentSources()
+            ->getPaymentSourceById($this->paymentSourceId);
+    }
+
+    public function getBillingAddress(): ?Address
+    {
+        if (!$this->billingAddressId) {
+            return null;
+        }
+
+        return Address::find()->id($this->billingAddressId)->one();
     }
 }

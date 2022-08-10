@@ -234,15 +234,6 @@ class PaymentsController extends CartsController
             return;
         }
 
-        // We get this far if this is an existing source OR user wants to make it primary
-        $existingPaymentSources = $paymentSourcesService->getAllPaymentSourcesByCustomerId($user->id);
-
-        // delete any existing payment sources
-        // todo: remove this if we ever add support for multiple cards
-        foreach ($existingPaymentSources as $paymentSource) {
-            $paymentSourcesService->deletePaymentSourceById($paymentSource->id);
-        }
-
         // Retrieve the freshest of data
         if ($this->_isPaymentMethod($paymentForm)) {
             $stripeResponse = StripePaymentMethod::retrieve($paymentForm->paymentMethodId);

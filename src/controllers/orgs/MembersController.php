@@ -88,6 +88,10 @@ class MembersController extends SiteController
         /** @var MemberRoleEnum $role */
         $role = $this->getOrgMemberRoleFromRequest(required: true);
 
+        if ($role === MemberRoleEnum::Owner()) {
+            $this->requireElevatedSession();
+        }
+
         return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
     }
 

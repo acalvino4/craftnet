@@ -25,14 +25,14 @@ class InvitationsController extends SiteController
         $org = SiteController::getOrgById($orgId);
         $email = Craft::$app->getRequest()->getRequiredBodyParam('email');
         $role = $this->getOrgMemberRoleFromRequest();
-        $user = Craft::$app->getUsers()->ensureUserByEmail($email);
+        $recipient = Craft::$app->getUsers()->ensureUserByEmail($email);
 
         if (!$org->canManageMembers($this->_currentUser)) {
             throw new ForbiddenHttpException();
         }
 
         try {
-            $created = $org->createInvitation($user, $role);
+            $created = $org->createInvitation($recipient, $role);
         } catch (UserException $e) {
             return $this->asFailure($e->getMessage());
         }
@@ -43,8 +43,8 @@ class InvitationsController extends SiteController
 
         $sent = Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_INVITATION, [
-                'user' => $user,
-                'inviter' => $this->_currentUser,
+                'recipient' => $recipient,
+                'sender' => $this->_currentUser,
                 'org' => $org,
             ])
             ->setTo($email)

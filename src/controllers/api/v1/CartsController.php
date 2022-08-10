@@ -11,6 +11,9 @@ use craft\commerce\models\LineItem;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
 use craft\elements\User;
+use craft\errors\ElementNotFoundException;
+use craft\errors\InvalidElementException;
+use craft\errors\UnsupportedSiteException;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craftnet\cms\CmsEdition;
@@ -20,14 +23,17 @@ use craftnet\controllers\api\RateLimiterTrait;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\errors\ValidationException;
 use craftnet\helpers\KeyHelper;
+use craftnet\orgs\Org;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginRenewal;
 use Ddeboer\Vatin\Validator;
 use Moccalotto\Eu\CountryInfo;
+use Throwable;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 use yii\validators\EmailValidator;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -190,9 +196,33 @@ class CartsController extends BaseApiController
             $cart->cancelUrl = App::parseEnv('$URL_CONSOLE') . 'payment';
             $cart->returnUrl = App::parseEnv('$URL_CONSOLE') . 'thank-you';
 
+            $currentUser = Craft::$app->getUser()->getIdentity(false);
+            $customer = $currentUser;
+            $orgId = $this->request->getBodyParam('orgId');
+            $billingAddress = null;
+
+            if ($orgId) {
+                $this->requireLogin();
+                $org = Org::find()->id($orgId)->hasMember($currentUser)->one();
+
+                if ($org) {
+                    if (!$org->canPurchase($currentUser)) {
+                        throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
+                    }
+
+                    $cart->orgId = $org->id;
+                    $cart->purchaserId = $currentUser->id;
+
+                    $customer = $org->owner;
+                    $billingAddress = $org->getBillingAddress();
+                } else {
+                    throw new BadRequestHttpException('Invalid organization');
+                }
+            }
+
             // set the email/customer before saving the cart, so the cart doesn't create its own customer record
-            if (($user = Craft::$app->getUser()->getIdentity(false)) !== null) {
-                $this->_updateCartEmailAndCustomer($cart, $user, null, $errors);
+            if ($customer !== null) {
+                $this->_updateCartEmailAndCustomer($cart, $customer, null, $errors);
             } else if (isset($payload->email)) {
                 $this->_updateCartEmailAndCustomer($cart, null, $payload->email, $errors);
             }
@@ -203,8 +233,13 @@ class CartsController extends BaseApiController
             }
 
             // billing address
-            if (isset($payload->billingAddress)) {
-                $this->_updateCartBillingAddress($cart, $payload->billingAddress, $errors);
+            if ($billingAddress) {
+                $this->_updateCartBillingAddress($cart, $billingAddress);
+            } else if (isset($payload->billingAddress)) {
+                $this->_updateCartBillingAddress(
+                    $cart,
+                    $this->_createCartBillingAddress($cart, $payload->billingAddress, $errors)
+                );
             }
 
             // coupon code
@@ -333,12 +368,26 @@ class CartsController extends BaseApiController
 
     /**
      * @param Order $cart
-     * @param \stdClass $billingAddress
-     * @param array $errors
+     * @param Address $billingAddress
      * @throws Exception
-     * @throws \yii\base\InvalidConfigException
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws InvalidElementException
+     * @throws UnsupportedSiteException
      */
-    private function _updateCartBillingAddress(Order $cart, \stdClass $billingAddress, array &$errors)
+    private function _updateCartBillingAddress(Order $cart, Address $billingAddress): void
+    {
+        $address = $billingAddress->ownerId === $cart->id
+            ? $billingAddress
+            : Craft::$app->getElements()->duplicateElement($billingAddress, [
+                'ownerId' => $cart->id,
+            ]);
+
+        $cart->sourceBillingAddressId = $billingAddress->id;
+        $cart->setBillingAddress($address);
+    }
+
+    private function _createCartBillingAddress(Order $cart, \stdClass $billingAddress, array &$errors): ?Address
     {
         $addressErrors = [];
         $country = null;
@@ -440,7 +489,7 @@ class CartsController extends BaseApiController
 
         if (!empty($addressErrors)) {
             array_push($errors, ...$addressErrors);
-            return;
+            return null;
         }
 
         // save the address
@@ -448,9 +497,7 @@ class CartsController extends BaseApiController
             throw new Exception('Could not save address: ' . implode(', ', $address->getErrorSummary(true)));
         }
 
-        // TODO: If we add a primary option in the UI, then remove the primaryBillingAddressId check
-        // Only save to customer addresses if specified AND they don't already have a primary address
-        if (!empty($billingAddress->makePrimary) && !$customer->primaryBillingAddressId) {
+        if ($billingAddress?->makePrimary ?? false) {
             /** @var Address $userBillingAddress */
             $userBillingAddress = Craft::$app->getElements()->duplicateElement(
                 $address,
@@ -460,7 +507,7 @@ class CartsController extends BaseApiController
             $cart->makePrimaryBillingAddress = true;
         }
 
-        $cart->setBillingAddress($address);
+        return $address;
     }
 
     /**

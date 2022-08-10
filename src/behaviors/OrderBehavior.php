@@ -30,6 +30,7 @@ use yii\db\Exception;
 class OrderBehavior extends Behavior
 {
     public ?int $orgId = null;
+    public ?int $purchaserId = null;
     private bool $approvalPending = false;
     private bool $approvalRejected = false;
 
@@ -227,9 +228,9 @@ class OrderBehavior extends Behavior
         return (bool) Db::upsert(Table::ORGS_ORDERS, [
             'id' => $this->owner->id,
             'orgId' => $this->orgId,
-            'purchaserId' => $this->owner->customerId,
             'approvalPending' => $this->approvalPending,
             'approvalRejected' => $this->approvalRejected,
+            'purchaserId' => $this->purchaserId,
         ]);
     }
 
