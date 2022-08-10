@@ -25,6 +25,7 @@ use yii\db\Exception;
 /**
  * @property Order $owner
  * @property bool $approvalRejected
+ * @property bool $approvalPending
  */
 class OrderBehavior extends Behavior
 {

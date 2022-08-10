@@ -53,6 +53,10 @@ class OrdersController extends SiteController
 
         $order = static::getOrderById($orderId);
 
+        if ($order->approvalPending) {
+            throw new ForbiddenHttpException('Order already has a pending approval request.');
+        }
+
         if ($order->customerId !== $this->_currentUser->id) {
             throw new ForbiddenHttpException('Order does not belong to this user');
         }
@@ -69,7 +73,7 @@ class OrdersController extends SiteController
         $sent = Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_REQUEST, [
                 'recipient' => $owner,
-                'requester' => $this->_currentUser,
+                'sender' => $this->_currentUser,
                 'order' => $order,
                 'org' => $org,
             ])
@@ -92,6 +96,11 @@ class OrdersController extends SiteController
         }
 
         $order = static::getOrderById($orderId);
+
+        if (!$order->approvalPending) {
+            throw new ForbiddenHttpException('Order has no pending approval request.');
+        }
+
         $order->setApprovalRejected(true);
         $saved = Craft::$app->getElements()->saveElement($order);
 
@@ -103,7 +112,7 @@ class OrdersController extends SiteController
         $sent = Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_REJECT, [
                 'recipient' => $recipient,
-                'rejector' => $this->_currentUser,
+                'sender' => $this->_currentUser,
                 'order' => $order,
                 'org' => $org,
             ])
@@ -126,7 +135,12 @@ class OrdersController extends SiteController
         }
 
         $order = static::getOrderById($orderId);
-        $requestor = $order->customer;
+
+        if (!$order->approvalPending) {
+            throw new ForbiddenHttpException('Order has no pending approval request.');
+        }
+
+        $requester = $order->customer;
         $order->setApprovalPending(false);
 
         // TODO: Complete order
@@ -138,13 +152,13 @@ class OrdersController extends SiteController
         }
 
         $sent = Craft::$app->getMailer()
-            ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_REQUEST, [
-                'recipient' => $requestor,
-                'approver' => $this->_currentUser,
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE, [
+                'recipient' => $requester,
+                'sender' => $this->_currentUser,
                 'order' => $order,
                 'org' => $org,
             ])
-            ->setTo($requestor->email)
+            ->setTo($requester->email)
             ->send();
 
         return $sent ? $this->asSuccess('Request approved.') : $this->asFailure();

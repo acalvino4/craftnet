@@ -1,5 +1,5 @@
 Hi {{ recipient.friendlyName }},
 
-{{ approver.friendlyName }} has approved your order approval request for the {{ org.title }} organization.
+{{ sender.friendlyName }} has approved your order approval request for the {{ org.title }} organization.
 
 [View orders]({{ org.getOrdersUrl() }})

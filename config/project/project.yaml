@@ -1,4 +1,4 @@
-dateModified: 1659104801
+dateModified: 1660142854
 elementSources:
   craft\elements\Asset:
     -
@@ -38,8 +38,14 @@ email:
   replyToEmail: null
   template: ''
   transportSettings:
-    token: $POSTMARK_TOKEN
-  transportType: craftcms\postmark\Adapter
+    encryptionMethod: none
+    host: localhost
+    password: ''
+    port: '1025'
+    timeout: '10'
+    useAuthentication: '0'
+    username: ''
+  transportType: craft\mail\transportadapters\Smtp
 fs:
   avatars:
     hasUrls: true

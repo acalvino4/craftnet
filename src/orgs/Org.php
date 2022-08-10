@@ -596,7 +596,7 @@ class Org extends Element
         return $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
     }
 
-    public function canApproveOrders(?User $_currentUser): bool
+    public function canApproveOrders(User $user): bool
     {
         return $user->admin || $this->hasOwner($user);
     }
