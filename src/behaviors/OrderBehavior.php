@@ -236,7 +236,7 @@ class OrderBehavior extends Behavior
     {
         $this->approvalRejected = (bool)$approvalRejected;
 
-        if ($approvalRejected) {
+        if ($this->approvalRejected) {
             $this->approvalPending = false;
         }
 
@@ -256,6 +256,11 @@ class OrderBehavior extends Behavior
     public function setApprovalPending(?bool $approvalPending): static
     {
         $this->approvalPending = (bool)$approvalPending;
+
+        if ($this->approvalPending) {
+            $this->approvalRejected = false;
+        }
+
         return $this;
     }
 }

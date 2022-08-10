@@ -99,8 +99,9 @@ class Module extends \yii\base\Module
     const MESSAGE_KEY_LICENSE_TRANSFER = 'license_transfer';
     const MESSAGE_KEY_SECURITY_ALERT = 'security_alert';
     const MESSAGE_KEY_ORG_INVITATION = 'org_invitation';
-    const MESSAGE_KEY_ORG_REQUEST_ORDER_APPROVAL = 'org_request_order_approval';
-    const MESSAGE_KEY_ORG_REJECT_ORDER_APPROVAL = 'org_reject_order_approval';
+    const MESSAGE_KEY_ORG_ORDER_APPROVAL_REQUEST = 'org_order_approval_request';
+    const MESSAGE_KEY_ORG_ORDER_APPROVAL_REJECT = 'org_order_approval_reject';
+    const MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE = 'org_order_approval_approve';
 
     /**
      * @inheritdoc
@@ -203,16 +204,22 @@ class Module extends \yii\base\Module
                 'body' => file_get_contents(__DIR__ . '/emails/org_invitation.md'),
             ]);
             $e->messages[] = new SystemMessage([
-                'key' => self::MESSAGE_KEY_ORG_REQUEST_ORDER_APPROVAL,
+                'key' => self::MESSAGE_KEY_ORG_ORDER_APPROVAL_REQUEST,
                 'heading' => 'When a member requests an order approval.',
                 'subject' => 'Order approval request for the {{ org.title }} organization',
-                'body' => file_get_contents(__DIR__ . '/emails/org_request_order_approval.md'),
+                'body' => file_get_contents(__DIR__ . '/emails/org_order_approval_request.md'),
             ]);
             $e->messages[] = new SystemMessage([
-                'key' => self::MESSAGE_KEY_ORG_REJECT_ORDER_APPROVAL,
+                'key' => self::MESSAGE_KEY_ORG_ORDER_APPROVAL_REJECT,
                 'heading' => 'When an owner rejects an order approval request',
                 'subject' => 'Your order approval request for the {{ org.title }} organization has been rejected',
-                'body' => file_get_contents(__DIR__ . '/emails/org_request_reject_approval.md'),
+                'body' => file_get_contents(__DIR__ . '/emails/org_order_approval_reject.md'),
+            ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE,
+                'heading' => 'When an owner approves an order approval request',
+                'subject' => 'Your order approval request for the {{ org.title }} organization has been approved',
+                'body' => file_get_contents(__DIR__ . '/emails/org_order_approval_approve.md'),
             ]);
         });
 

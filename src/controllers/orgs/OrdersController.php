@@ -41,7 +41,7 @@ class OrdersController extends SiteController
      * @throws NotFoundHttpException
      * @throws ForbiddenHttpException
      */
-    public function actionRequestOrderApproval(int $orgId, int $orderId): ?Response
+    public function actionRequestApproval(int $orgId, int $orderId): ?Response
     {
         $org = static::getOrgById($orgId);
 
@@ -79,12 +79,12 @@ class OrdersController extends SiteController
      * @throws NotFoundHttpException
      * @throws ForbiddenHttpException
      */
-    public function actionRejectOrderApproval(int $orgId, int $orderId): ?Response
+    public function actionRejectRequest(int $orgId, int $orderId): ?Response
     {
         $org = static::getOrgById($orgId);
 
         if (!$org->canApproveOrders($this->_currentUser)) {
-            throw new ForbiddenHttpException('Only owners may reject approval requests.');
+            throw new ForbiddenHttpException('Only organization owners may reject approval requests.');
         }
 
         $order = static::getOrderById($orderId);
@@ -106,16 +106,38 @@ class OrdersController extends SiteController
             ->setTo($recipient->email)
             ->send();
 
-        return $sent ? $this->asSuccess('Order approval rejected.') : $this->asFailure();
+        return $sent ? $this->asSuccess('Approval request rejected.') : $this->asFailure();
     }
 
-    public function actionApproveOrder(): ?Response
+    /**
+     * @throws ForbiddenHttpException
+     */
+    public function actionApproveRequest(int $orgId, int $orderId): ?Response
     {
         if (!$org->canApproveOrders($this->_currentUser)) {
-            throw new ForbiddenHttpException('Only owners may reject approval requests.');
+            throw new ForbiddenHttpException('Only owners may approve approval requests.');
         }
 
-        // TODO: do we need this to send "approved" emails?
+        $order = static::getOrderById($orderId);
+        $requestor = $order->customer;
+        $order->setApprovalPending(false);
+
+        // TODO: Complete
+
+        $saved = Craft::$app->getElements()->saveElement($order);
+
+        $recipient = $order->getCustomer();
+        $sent = Craft::$app->getMailer()
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_REJECT_ORDER_APPROVAL, [
+                'recipient' => $recipient,
+                'approver' => $this->_currentUser,
+                'order' => $order,
+                'org' => $org,
+            ])
+            ->setTo($recipient->email)
+            ->send();
+
+        return $sent ? $this->asSuccess('Request approved.') : $this->asFailure();
     }
 
     private static function getOrderById(int $orderId): Order|OrderBehavior
