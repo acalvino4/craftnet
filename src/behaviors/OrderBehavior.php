@@ -223,12 +223,12 @@ class OrderBehavior extends Behavior
             return false;
         }
 
-        return (bool) Db::update(Table::ORGS_ORDERS, [
-            'approvalPending' => $this->approvalPending,
-            'approvalRejected' => $this->approvalRejected,
-        ], [
+        return (bool) Db::upsert(Table::ORGS_ORDERS, [
             'id' => $this->owner->id,
             'orgId' => $this->orgId,
+            'purchaserId' => $this->owner->customerId,
+            'approvalPending' => $this->approvalPending,
+            'approvalRejected' => $this->approvalRejected,
         ]);
     }
 

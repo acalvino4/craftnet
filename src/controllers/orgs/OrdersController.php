@@ -32,6 +32,8 @@ class OrdersController extends SiteController
                 'id',
                 'number',
                 'dateOrdered',
+                'approvalPending',
+                'approvalRejected',
             ]));
 
         return $this->asSuccess(data: $orders->all());
@@ -51,10 +53,11 @@ class OrdersController extends SiteController
 
         $order = static::getOrderById($orderId);
 
-        if ($order->ownerId !== $this->_currentUser->id) {
+        if ($order->customerId !== $this->_currentUser->id) {
             throw new ForbiddenHttpException('Order does not belong to this user');
         }
 
+        $order->orgId = $org->id;
         $order->setApprovalPending(true);
         $saved = Craft::$app->getElements()->saveElement($order);
 
