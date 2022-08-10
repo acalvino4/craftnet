@@ -224,7 +224,7 @@ class OrderBehavior extends Behavior
         }
 
         return (bool) Db::update(Table::ORGS_ORDERS, [
-            'approvalPending' => $this->approvalRequested,
+            'approvalPending' => $this->approvalPending,
             'approvalRejected' => $this->approvalRejected,
         ], [
             'id' => $this->owner->id,
