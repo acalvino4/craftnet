@@ -29,6 +29,7 @@ return [
     'craftdemos.io',
     'crudecode.com',
     'ddev.site',
+    'dative.dev',
     'deltablue.io',
     'designandbuildsandbox.com',
     'destinationcore.io',
