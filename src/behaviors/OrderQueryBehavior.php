@@ -38,6 +38,7 @@ class OrderQueryBehavior extends Behavior
             'orgsOrders.orgId',
             'orgsOrders.approvalPending',
             'orgsOrders.approvalRejected',
+            'orgsOrders.purchaserId',
         ]);
         $this->owner->query->leftJoin(['orgsOrders' => Table::ORGS_ORDERS], '[[orgsOrders.id]] = [[commerce_orders.id]]');
         $this->owner->subQuery->leftJoin(['orgsOrders' => Table::ORGS_ORDERS], '[[orgsOrders.id]] = [[commerce_orders.id]]');
