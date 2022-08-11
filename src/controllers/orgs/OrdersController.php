@@ -3,6 +3,7 @@
 namespace craftnet\controllers\orgs;
 
 use Craft;
+use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craftnet\behaviors\OrderBehavior;
 use craftnet\behaviors\OrderQueryBehavior;
@@ -25,16 +26,17 @@ class OrdersController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        /** @var Order|OrderQueryBehavior $orders */
+        /** @var OrderQuery|OrderQueryBehavior $orders */
         $orders = Order::find();
         $orders = $orders->orgId($org->id)->collect()
-            ->map(fn(Order $order) => $order->getAttributes([
+            ->map(fn(Order|OrderBehavior $order) => $order->getAttributes([
                 'id',
                 'number',
                 'dateOrdered',
-                'approvalPending',
-                'approvalRejected',
-            ]));
+            ]) + [
+                'approvalRequestBy' => static::transformUser($order->getApprovalRequestedBy()),
+                'approvalRejectedBy' => static::transformUser($order->getApprovalRejectedBy()),
+            ]);
 
         return $this->asSuccess(data: $orders->all());
     }
@@ -53,17 +55,16 @@ class OrdersController extends SiteController
 
         $order = static::getOrderByNumber($orderNumber);
 
-        if ($order->approvalPending) {
+        if ($order->isPendingApproval()) {
             throw new ForbiddenHttpException('Order already has a pending approval request.');
         }
 
-        if ($order->customerId !== $this->_currentUser->id) {
+        if (!$order->hasCustomer($this->_currentUser)) {
             throw new ForbiddenHttpException('Order does not belong to this user');
         }
 
         $order->orgId = $org->id;
-        $order->purchaserId = $org->ownerId;
-        $order->setApprovalPending(true);
+        $order->setApprovalRequestedBy($this->_currentUser);
         $saved = Craft::$app->getElements()->saveElement($order);
 
         if (!$saved) {
@@ -98,11 +99,15 @@ class OrdersController extends SiteController
 
         $order = static::getOrderByNumber($orderNumber);
 
-        if (!$order->approvalPending) {
+        if (!$order->getApprovalRequestedBy()) {
             throw new ForbiddenHttpException('Order has no pending approval request.');
         }
 
-        $order->setApprovalRejected(true);
+        if ($order->getApprovalRejectedBy()) {
+            throw new ForbiddenHttpException('Order has already been rejected.');
+        }
+
+        $order->setApprovalRejectedBy($this->_currentUser);
         $saved = Craft::$app->getElements()->saveElement($order);
 
         if (!$saved) {
@@ -121,47 +126,6 @@ class OrdersController extends SiteController
             ->send();
 
         return $sent ? $this->asSuccess('Approval request rejected.') : $this->asFailure();
-    }
-
-    /**
-     * @throws ForbiddenHttpException
-     * @throws NotFoundHttpException
-     */
-    public function actionApproveRequest(int $orgId, string $orderNumber): ?Response
-    {
-        $org = static::getOrgById($orgId);
-
-        if (!$org->canApproveOrders($this->_currentUser)) {
-            throw new ForbiddenHttpException('Only owners may approve approval requests.');
-        }
-
-        $order = static::getOrderByNumber($orderNumber);
-
-        if (!$order->approvalPending) {
-            // throw new ForbiddenHttpException('Order has no pending approval request.');
-        }
-
-        // $order->setApprovalPending(false);
-        // $saved = Craft::$app->getElements()->saveElement($order);
-        // return $saved ? $this->asSuccess('Request approved.') : $this->asFailure();
-
-        // $cartUpdateResponse = $this->run('api/v1/carts/update', [
-        //     'orderNumber' => $orderNumber
-        // ]);
-
-        $paymentResponse = $this->run('api/v1/payments/pay');
-
-        // $sent = Craft::$app->getMailer()
-        //     ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE, [
-        //         'recipient' => $requester,
-        //         'sender' => $this->_currentUser,
-        //         'order' => $order,
-        //         'org' => $org,
-        //     ])
-        //     ->setTo($requester->email)
-        //     ->send();
-        //
-        // return $sent ? $this->asSuccess('Request approved.') : $this->asFailure();
     }
 
     private static function getOrderByNumber(string $orderNumber): Order|OrderBehavior

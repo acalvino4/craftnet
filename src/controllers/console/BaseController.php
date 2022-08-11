@@ -207,12 +207,12 @@ abstract class BaseController extends Controller
         return $org;
     }
 
-    protected static function transformUser(User $user): array
+    protected static function transformUser(?User $user): ?array
     {
-        return $user->getAttributes([
+        return $user ? $user->getAttributes([
             'id',
         ]) + [
             'photo' => $user->photo?->getAttributes(['id', 'url']),
-        ];
+        ] : null;
     }
 }

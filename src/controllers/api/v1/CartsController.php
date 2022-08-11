@@ -214,10 +214,17 @@ class CartsController extends BaseApiController
                         throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
                     }
 
-                    $cart->purchaserId = $currentUser->id;
+                    $cart->setPurchaser($currentUser);
 
                     $customer = $org->owner;
                     $billingAddress = $org->getBillingAddress();
+
+                    // TODO: we can't do this, because the payment source isn't owned by the user of the order
+                    // $cart->setPaymentSource($org->getPaymentSource());
+
+                    if (isset($payload->billingAddress)) {
+                        throw new BadRequestHttpException('Organizations must use their specified billing address');
+                    }
                 } else {
                     throw new BadRequestHttpException('Invalid organization');
                 }
@@ -505,6 +512,9 @@ class CartsController extends BaseApiController
         }
 
         if ($billingAddress?->makePrimary ?? false) {
+            // TODO: makePrimary should probably be on the payload, like it is for payments?
+            // Eventually we will need to set $cart->makePrimaryPaymentSource = true
+
             /** @var Address $userBillingAddress */
             $userBillingAddress = Craft::$app->getElements()->duplicateElement(
                 $address,

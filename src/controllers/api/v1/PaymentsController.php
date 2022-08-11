@@ -133,6 +133,8 @@ class PaymentsController extends CartsController
 
             try {
                 $this->_populatePaymentForm($cart, $payload, $gateway, $paymentForm);
+
+                // TODO: why does calling this lose our paymentSourceId on the order?
                 $commerce->getPayments()->processPayment($cart, $paymentForm, $redirect, $transaction);
             } catch (ApiErrorException $e) {
                 throw new BadRequestHttpException($e->getMessage(), 0, $e);
@@ -214,12 +216,16 @@ class PaymentsController extends CartsController
 
             // If a user is logged in and they wish to store this card
             if ($user && $makePrimary) {
+                // TODO: update this when we have makePrimaryPaymentSource
+                $cart->makePrimaryBillingAddress = true;
+
                 // Fetch a customer
                 $customer = $customersService->getCustomer($gateway->id, $user);
 
                 // Update the customer data
                 $stripeCustomer = StripeCustomer::update($customer->reference, $customerData);
                 $customer->response = $stripeCustomer->jsonSerialize();
+
                 $customersService->saveCustomer($customer);
             } else {
                 // Otherwise create an anonymous customer

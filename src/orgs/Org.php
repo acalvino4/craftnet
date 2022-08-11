@@ -640,31 +640,23 @@ class Org extends Element
 
     public function getPaymentSource(): ?PaymentSource
     {
-        if (!$this->paymentSourceId) {
-            return null;
-        }
-
-        return Commerce::getInstance()
-            ->getPaymentSources()
-            ->getPaymentSourceById($this->paymentSourceId);
+        return $this->paymentSourceId
+            ? Commerce::getInstance()->getPaymentSources()->getPaymentSourceById($this->paymentSourceId)
+            : null;
     }
 
     public function getBillingAddress(): ?Address
     {
-        if (!$this->billingAddressId) {
-            return null;
-        }
-
-        return Address::find()->id($this->billingAddressId)->one();
+        return $this->billingAddressId
+            ? Address::find()->id($this->billingAddressId)->one()
+            : null;
     }
 
     public function getLocationAddress(): ?Address
     {
-        if (!$this->locationAddressId) {
-            return null;
-        }
-
-        return Address::find()->id($this->locationAddressId)->one();
+        return $this->locationAddressId
+            ? Address::find()->id($this->locationAddressId)->one()
+            : null;
     }
 
     /**

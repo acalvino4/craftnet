@@ -17,23 +17,24 @@ use craftnet\orders\PdfRenderer;
 use craftnet\orgs\Org;
 use craftnet\plugins\PluginLicense;
 use craftnet\plugins\PluginPurchasable;
+use DateTime;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;
+use yii\base\UserException;
 use yii\db\Exception;
 
 /**
  * @property Order $owner
- * @property bool $approvalRejected
- * @property bool $approvalPending
  */
 class OrderBehavior extends Behavior
 {
     public ?int $orgId = null;
-    public ?int $purchaserId = null;
-    private bool $approvalPending = false;
-    private bool $approvalRejected = false;
+    private ?int $purchaserId = null;
+    private ?int $approvalRequestedById = null;
+    private ?int $approvalRejectedById = null;
+    private ?DateTime $approvalRejectedDate = null;
 
     /**
      * @inheritdoc
@@ -47,27 +48,50 @@ class OrderBehavior extends Behavior
         ];
     }
 
-    public function getOrg(): ?Org
+    // TODO: shouldn't have to do this…
+    public function setApprovalRejectedDate(string|DateTime|null $approvalRejectedDate): static
     {
-        if (!$this->orgId) {
-            return null;
-        }
+        $this->approvalRejectedDate = is_string($approvalRejectedDate)
+            ? new DateTime($approvalRejectedDate)
+            : $approvalRejectedDate;
 
-        return Org::find()
-            ->id($this->orgId)
-            ->one();
+        return $this;
     }
 
+    public function getApprovalRejectedDate(): ?DateTime
+    {
+        return $this->approvalRejectedDate;
+    }
+
+    public function isPendingApproval(): bool
+    {
+        return $this->approvalRequestedById && !$this->approvalRejectedById;
+    }
+
+    public function getOrg(): ?Org
+    {
+        return $this->orgId
+            ? Org::find()->id($this->orgId)->one()
+            : null;
+    }
 
     public function getPurchaser(): ?User
     {
-        if (!$this->purchaserId) {
-            return null;
-        }
+        return $this->purchaserId
+            ? User::find()->id($this->purchaserId)->one()
+            : null;
+    }
 
-        return User::find()
-            ->id($this->purchaserId)
-            ->one();
+    public function setPurchaser(int|User|null $purchaser): static
+    {
+        $this->purchaserId = $purchaser instanceof User ? $purchaser->id : $purchaser;
+
+        return $this;
+    }
+
+    public function setPurchaserId(?int $purchaserId): static
+    {
+        return $this->setPurchaser($purchaserId);
     }
 
     /**
@@ -109,36 +133,59 @@ class OrderBehavior extends Behavior
         $this->_sendReceipt();
     }
 
-    public function setApprovalRejected(?bool $approvalRejected): static
+    public function setApprovalRejectedBy(int|User|null $approvalRejectedBy): static
     {
-        $this->approvalRejected = (bool)$approvalRejected;
+        $this->approvalRejectedById = $approvalRejectedBy instanceof User ? $approvalRejectedBy->id : $approvalRejectedBy;
 
-        if ($this->approvalRejected) {
-            $this->approvalPending = false;
+        if (!$this->approvalRejectedById) {
+            $this->approvalRejectedDate = null;
+        } else if (!$this->approvalRejectedDate) {
+            $this->approvalRejectedDate = new DateTime();
         }
 
         return $this;
     }
 
-    public function getApprovalRejected(): bool
+    public function getApprovalRejectedBy(): ?User
     {
-        return $this->approvalRejected;
+        return $this->approvalRejectedById
+            ? User::find()->id($this->approvalRejectedById)->one()
+            : null;
     }
 
-    public function getApprovalPending(): bool
+    public function setApprovalRejectedById(?int $approvalRejectedById): static
     {
-        return $this->approvalPending;
+        return $this->setApprovalRejectedBy($approvalRejectedById);
     }
 
-    public function setApprovalPending(?bool $approvalPending): static
+    public function setApprovalRequestedBy(int|User|null $approvalRequestedBy): static
     {
-        $this->approvalPending = (bool)$approvalPending;
+        $this->approvalRequestedById = $approvalRequestedBy instanceof User ? $approvalRequestedBy->id : $approvalRequestedBy;
+        $this->setApprovalRejectedBy(null);
 
-        if ($this->approvalPending) {
-            $this->approvalRejected = false;
+        // Ensure we have a purchaser when requesting approval
+        if (!$this->purchaserId) {
+            $this->setPurchaser($this->owner->customer);
         }
 
         return $this;
+    }
+
+    public function getApprovalRequestedBy(): ?User
+    {
+        return $this->approvalRequestedById
+            ? User::find()->id($this->approvalRequestedById)->one()
+            : null;
+    }
+
+    public function setApprovalRequestedById(?int $approvalRequestedById): static
+    {
+        return $this->setApprovalRequestedBy($approvalRequestedById);
+    }
+
+    public function hasCustomer(User $user): bool
+    {
+        return $user->id === $this->owner->customerId;
     }
 
     /**
@@ -269,13 +316,26 @@ class OrderBehavior extends Behavior
             ]);
         }
 
-        return (bool) Db::upsert(Table::ORGS_ORDERS, [
+        Db::upsert(Table::ORGS_ORDERS, [
             'id' => $this->owner->id,
             'orgId' => $this->orgId,
-            'approvalPending' => $this->approvalPending,
-            'approvalRejected' => $this->approvalRejected,
             'purchaserId' => $this->purchaserId,
         ]);
+
+        if ($this->approvalRequestedById) {
+            Db::upsert(Table::ORGS_ORDERAPPROVALS, [
+                'orderId' => $this->owner->id,
+                'requestedById' => $this->approvalRequestedById,
+                'rejectedById' => $this->approvalRejectedById,
+                'dateRejected' => Db::prepareDateForDb($this->approvalRejectedDate),
+            ]);
+        } else {
+            return (bool) Db::delete(Table::ORGS_ORDERAPPROVALS, [
+                'orderId' => $this->owner->id,
+            ]);
+        }
+
+        return true;
     }
 
     /**
@@ -291,14 +351,11 @@ class OrderBehavior extends Behavior
 
         $org = $this->getOrg();
         $purchaser = $this->getPurchaser();
-        $this->setApprovalRejected(false);
-        $this->setApprovalPending(false);
         $this->_updateOrgOrders();
 
-        // TODO: change col to approvalRequestedBy and check against that
-        // if ($this->purchaserId === $this->owner->customerId) {
-        //     // return false;
-        // }
+        if (!$this->approvalRequestedById) {
+            return false;
+        }
 
         $sent = Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE, [
@@ -311,7 +368,7 @@ class OrderBehavior extends Behavior
             ->send();
 
         if (!$sent) {
-            throw new \yii\base\Exception('Unable to send approval email.');
+            throw new UserException('Unable to send approval email.');
         }
 
         return true;

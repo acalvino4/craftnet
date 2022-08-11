@@ -46,8 +46,17 @@ class m220526_183917_add_orgs extends Migration
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
             'purchaserId' => $this->integer()->notNull(),
-            'approvalPending' => $this->boolean()->defaultValue(false),
-            'approvalRejected' => $this->boolean()->defaultValue(false),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
+
+        $this->createTable(Table::ORGS_ORDERAPPROVALS, [
+            'id' => $this->primaryKey(),
+            'orderId' => $this->integer()->notNull(),
+            'requestedById' => $this->integer()->notNull(),
+            'rejectedById' => $this->integer()->null(),
+            'dateRejected' => $this->dateTime()->null(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
@@ -79,6 +88,11 @@ class m220526_183917_add_orgs extends Migration
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], CommerceTable::ORDERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['purchaserId'], CraftTable::USERS, ['id']);
+
+        $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['orderId'], Table::ORGS_ORDERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['requestedById'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['rejectedById'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->createIndex(null, Table::ORGS_ORDERAPPROVALS, ['orderId', 'requestedById'], true);
 
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
