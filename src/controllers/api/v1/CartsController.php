@@ -200,7 +200,9 @@ class CartsController extends BaseApiController
             $currentUser = Craft::$app->getUser()->getIdentity(false);
             $customer = $currentUser;
             $orgId = $this->request->getBodyParam('orgId', $cart->orgId);
-            $billingAddress = $cart->getBillingAddress();
+            $orgRemoved = $cart->orgId && !$orgId;
+            $billingAddress = null;
+
             $cart->orgId = $orgId ? (int) $orgId : null;
 
             if ($cart->orgId) {
@@ -234,7 +236,7 @@ class CartsController extends BaseApiController
             }
 
             // billing address
-            if ($billingAddress) {
+            if ($billingAddress || $orgRemoved) {
                 $this->_updateCartBillingAddress($cart, $billingAddress);
             } else if (isset($payload->billingAddress)) {
                 $this->_updateCartBillingAddress(
@@ -369,22 +371,26 @@ class CartsController extends BaseApiController
 
     /**
      * @param Order $cart
-     * @param Address $billingAddress
+     * @param ?Address $billingAddress
      * @throws Exception
      * @throws Throwable
      * @throws ElementNotFoundException
      * @throws InvalidElementException
      * @throws UnsupportedSiteException
      */
-    private function _updateCartBillingAddress(Order $cart, Address $billingAddress): void
+    private function _updateCartBillingAddress(Order $cart, ?Address $billingAddress): void
     {
-        $address = $billingAddress->ownerId === $cart->id
-            ? $billingAddress
-            : Craft::$app->getElements()->duplicateElement($billingAddress, [
-                'ownerId' => $cart->id,
-            ]);
+        $address = null;
 
-        $cart->sourceBillingAddressId = $billingAddress->id;
+        if ($billingAddress) {
+            $address = $billingAddress->ownerId === $cart->id
+                ? $billingAddress
+                : Craft::$app->getElements()->duplicateElement($billingAddress, [
+                    'ownerId' => $cart->id,
+                ]);
+        }
+
+        $cart->sourceBillingAddressId = $billingAddress?->id;
         $cart->setBillingAddress($address);
     }
 
