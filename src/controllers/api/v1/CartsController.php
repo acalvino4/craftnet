@@ -16,6 +16,7 @@ use craft\errors\InvalidElementException;
 use craft\errors\UnsupportedSiteException;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
+use craftnet\behaviors\OrderBehavior;
 use craftnet\cms\CmsEdition;
 use craftnet\cms\CmsRenewal;
 use craftnet\controllers\api\BaseApiController;
@@ -181,7 +182,7 @@ class CartsController extends BaseApiController
      * @throws \Throwable
      * @throws \yii\db\Exception
      */
-    private function _updateCart(Order $cart, \stdClass $payload): void
+    private function _updateCart(Order|OrderBehavior $cart, \stdClass $payload): void
     {
         $db = Craft::$app->getDb();
 
@@ -198,10 +199,11 @@ class CartsController extends BaseApiController
 
             $currentUser = Craft::$app->getUser()->getIdentity(false);
             $customer = $currentUser;
-            $orgId = $this->request->getBodyParam('orgId');
-            $billingAddress = null;
+            $orgId = $this->request->getBodyParam('orgId', $cart->orgId);
+            $billingAddress = $cart->getBillingAddress();
+            $cart->orgId = $orgId ? (int) $orgId : null;
 
-            if ($orgId) {
+            if ($cart->orgId) {
                 $this->requireLogin();
                 $org = Org::find()->id($orgId)->hasMember($currentUser)->one();
 
@@ -210,7 +212,6 @@ class CartsController extends BaseApiController
                         throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
                     }
 
-                    $cart->orgId = $org->id;
                     $cart->purchaserId = $currentUser->id;
 
                     $customer = $org->owner;
@@ -535,7 +536,7 @@ class CartsController extends BaseApiController
      * @param $errors
      * @return LineItem|null
      */
-    private function _cmsEditionLineItem(Order $cart, \stdClass $item, string $paramPrefix, &$errors): ?LineItem
+    private function _cmsEditionLineItem(Order $cart, \stdClass $item, string $_aramPrefix, &$errors): ?LineItem
     {
         $edition = CmsEdition::find()
             ->handle($item->edition)

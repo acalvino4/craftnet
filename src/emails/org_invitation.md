@@ -1,4 +1,4 @@
-Hi {{ user.friendlyName }},
+Hi {{ recipient.friendlyName }},
 
 {{ sender.friendlyName }} has invited you to join the {{ org.title }} organization on Craft Console.
 

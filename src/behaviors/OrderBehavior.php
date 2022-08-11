@@ -221,7 +221,9 @@ class OrderBehavior extends Behavior
     private function _updateOrgOrders(): bool
     {
         if (!$this->orgId) {
-            return false;
+            return (bool) Db::delete(Table::ORGS_ORDERS, [
+                'id' => $this->owner->id,
+            ]);
         }
 
         return (bool) Db::upsert(Table::ORGS_ORDERS, [

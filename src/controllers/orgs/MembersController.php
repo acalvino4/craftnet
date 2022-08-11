@@ -51,7 +51,7 @@ class MembersController extends SiteController
         $userQuery = User::find();
         $members = $userQuery->ofOrg($org->id)->collect()
             ->map(fn($member) => $this->transformUser($member) + [
-                'role' => $org->getMemberRole($member),
+                'role' => $org->getMemberRole($member)->value,
             ]);
 
         return $this->asSuccess(data: $members->all());
@@ -88,7 +88,11 @@ class MembersController extends SiteController
         /** @var MemberRoleEnum $role */
         $role = $this->getOrgMemberRoleFromRequest(required: true);
 
-        if ($role === MemberRoleEnum::Owner()) {
+        if ($org->getMemberRole($user) === $role) {
+            throw new BadRequestHttpException('Member is already specified role.');
+        }
+
+        if ($role === MemberRoleEnum::Owner() || $this->_currentUser->id === $user->id) {
             $this->requireElevatedSession();
         }
 
@@ -117,6 +121,6 @@ class MembersController extends SiteController
             throw new NotFoundHttpException();
         }
 
-        return $this->asSuccess(data: ['role' => $org->getMemberRole($user)]);
+        return $this->asSuccess(data: ['role' => $org->getMemberRole($user)->value]);
     }
 }

@@ -328,21 +328,21 @@ class Org extends Element
     /**
      * @throws UserException
      */
-    public function getMemberRole(User $user): string
+    public function getMemberRole(User $user): MemberRoleEnum
     {
         if (!$this->hasMember($user)) {
             throw new UserException('User is not a member of this organization.');
         }
 
         if ($this->hasOwner($user)) {
-            return MemberRoleEnum::Owner()->value;
+            return MemberRoleEnum::Owner();
         }
 
         if ($this->hasAdmin($user)) {
-            return MemberRoleEnum::Admin()->value;
+            return MemberRoleEnum::Admin();
         }
 
-        return MemberRoleEnum::Member()->value;
+        return MemberRoleEnum::Member();
     }
 
     protected function cpEditUrl(): ?string

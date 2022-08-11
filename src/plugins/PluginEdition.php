@@ -13,6 +13,7 @@ use craft\helpers\Db;
 use craft\helpers\Json;
 use craftnet\base\EditionInterface;
 use craftnet\base\RenewalInterface;
+use craftnet\behaviors\OrderBehavior;
 use craftnet\db\Table;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\helpers\OrderHelper;
@@ -459,7 +460,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
      * @param Order $order
      * @param LineItem $lineItem
      */
-    private function _upgradeOrderLicense(Order $order, LineItem $lineItem)
+    private function _upgradeOrderLicense(Order|OrderBehavior $order, LineItem $lineItem)
     {
         $manager = Module::getInstance()->getPluginLicenseManager();
         $options = $lineItem->getOptions();
@@ -522,10 +523,10 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
             $license->autoRenew = $options['autoRenew'];
         }
 
-        // if the license doesn't have an owner yet, reassign it to the order's customer
+        // if the license doesn't have an owner yet, reassign it to the order's customer or the org
         if (!$license->ownerId) {
             $license->email = $order->getEmail();
-            $license->ownerId = $order->getCustomer()->id;
+            $license->ownerId = $order->orgId ?? $order->getCustomer()->id;
         }
 
         try {
