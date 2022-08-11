@@ -65,19 +65,25 @@ class AddressesController extends BaseController
     public function actionSaveAddress(?int $addressId = null): ?Response
     {
         $user = Craft::$app->getUser()->getIdentity();
+        $isPrimaryBilling = (bool) $this->request->getBodyParam('isPrimaryBilling');
+        $isPrimaryShipping = (bool) $this->request->getBodyParam('isPrimaryShipping');
+
+        /** @var Address $address */
         $address = $addressId ?
             Address::find()
                 ->id($addressId)
                 ->ownerId($user->id)
                 ->one() :
-            new Address();
+            new Address(['ownerId' => $user->id]);
 
         if (!$address) {
             throw new NotFoundHttpException('Address not found.');
         }
 
-        $address->ownerId = Craft::$app->getUser()->getIdentity()->id;
+
         $address->setAttributes($this->request->getBodyParams());
+        $address->isPrimaryBilling = $isPrimaryBilling;
+        $address->isPrimaryShipping = $isPrimaryShipping;
         $saved = Craft::$app->getElements()->saveElement($address);
 
         return $saved ?

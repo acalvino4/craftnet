@@ -1,5 +1,5 @@
 {% if lineItems|length > 1 %}{% set purchaseString = 'several of your plugins' %}{% else %}{% set purchaseString = 'one of your plugins' %}{% endif %}
-Congratulations, {{ developer.username }}! Looks like someone just purchased {{ purchaseString }}:
+Congratulations, {{ developer.title }}! Looks like someone just purchased {{ purchaseString }}:
 
 ---
 

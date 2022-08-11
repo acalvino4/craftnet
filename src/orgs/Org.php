@@ -18,6 +18,7 @@ use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
+use craftnet\developers\FundsManager;
 use craftnet\plugins\Plugin;
 use DateTime;
 use Throwable;
@@ -655,5 +656,22 @@ class Org extends Element
         }
 
         return Address::find()->id($this->billingAddressId)->one();
+    }
+
+    public function getLocationAddress(): ?Address
+    {
+        if (!$this->locationAddressId) {
+            return null;
+        }
+
+        return Address::find()->id($this->locationAddressId)->one();
+    }
+
+    /**
+     * @return FundsManager
+     */
+    public function getFundsManager(): FundsManager
+    {
+        return new FundsManager($this);
     }
 }

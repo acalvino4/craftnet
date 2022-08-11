@@ -118,14 +118,6 @@ class UserBehavior extends Behavior
     }
 
     /**
-     * @return FundsManager
-     */
-    public function getFundsManager(): FundsManager
-    {
-        return new FundsManager($this->owner);
-    }
-
-    /**
      * Generates a new API token for the developer.
      *
      * @return string the new API token

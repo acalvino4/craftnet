@@ -6,7 +6,6 @@ use Craft;
 use craft\base\Element;
 use craft\commerce\elements\Order;
 use craft\commerce\records\Transaction as TransactionRecord;
-use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
@@ -105,7 +104,7 @@ class OrderBehavior extends Behavior
     private function _updateDeveloperFunds()
     {
         // See if any plugin licenses were purchased/renewed
-        /** @var User[]|UserBehavior[] $developers */
+        /** @var Org[] $developers */
         $developers = [];
         $developerTotals = [];
         $developerLineItems = [];
@@ -156,7 +155,7 @@ class OrderBehavior extends Behavior
         // Try transferring funds to them
         foreach ($developers as $developerId => $developer) {
             // ignore if this is us
-            if ($developer->username === 'pixelandtonic') {
+            if ($developer->slug === 'pixelandtonic') {
                 continue;
             }
 
@@ -175,11 +174,11 @@ class OrderBehavior extends Behavior
     }
 
     /**
-     * @param $developer
+     * @param Org $developer
      * @param $lineItems
      * @throws \yii\base\InvalidConfigException
      */
-    private function _sendDeveloperSaleEmail($developer, $lineItems)
+    private function _sendDeveloperSaleEmail(Org $developer, $lineItems)
     {
         $mailer = Craft::$app->getMailer();
 
@@ -189,7 +188,7 @@ class OrderBehavior extends Behavior
                 'lineItems' => $lineItems,
             ])
             ->setFrom($mailer->from)
-            ->setTo($developer->email)
+            ->setTo($developer->owner->email)
             ->send();
     }
 

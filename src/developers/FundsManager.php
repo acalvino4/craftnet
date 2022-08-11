@@ -4,7 +4,6 @@ namespace craftnet\developers;
 
 use Craft;
 use craft\commerce\models\LineItem;
-use craft\db\Query;
 use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
@@ -14,6 +13,7 @@ use craftnet\db\Table;
 use craftnet\errors\InaccessibleFundsException;
 use craftnet\errors\InsufficientFundsException;
 use craftnet\errors\MissingStripeAccountException;
+use craftnet\orgs\Org;
 use Moccalotto\Eu\CountryInfo;
 use Stripe\Charge;
 use Stripe\Exception\ApiErrorException;
@@ -49,7 +49,7 @@ class FundsManager extends BaseObject
     /**
      * @inheritdoc
      */
-    public function __construct(User $developer, array $config = [])
+    public function __construct(Org $developer, array $config = [])
     {
         $this->developer = $developer;
         $this->_lockName = 'funds:' . $developer->id;
@@ -61,11 +61,7 @@ class FundsManager extends BaseObject
      */
     public function getBalance(): float
     {
-        return (new Query())
-            ->select(['balance'])
-            ->from(Table::DEVELOPERS)
-            ->where(['id' => $this->developer->id])
-            ->scalar(Craft::$app->getDb()->getPrimary());
+        return Org::find()->id($this->developer->id)->one()?->balance ?? 0;
     }
 
     /**
@@ -305,7 +301,7 @@ class FundsManager extends BaseObject
         }
 
         if ($adjustment !== false) {
-            Db::update(Table::DEVELOPERS, [
+            Db::update(Table::ORGS, [
                 'balance' => new Expression("[[balance]] {$operator} :adjustment", [':adjustment' => $adjustment]),
             ], ['id' => $this->developer->id], updateTimestamp: false);
         }
@@ -330,7 +326,7 @@ insert into {{craftnet_developerledger}} (
     :fee,
     (
         select [[balance]]
-        from {{craftnet_developers}}
+        from {{craftnet_orgs}}
         where [[id]] = :developerId
     ),
     :type,
@@ -339,7 +335,9 @@ insert into {{craftnet_developerledger}} (
     :dateCreated
 )
 SQL;
-
+        // TODO: can we just drop country, isEuMember?
+        // $country = $this->developer->country;
+        $country = null;
         $db->createCommand($ledgerSql, [
             'developerId' => $this->developer->id,
             'note' => $note,
@@ -347,8 +345,8 @@ SQL;
             'debit' => $debit,
             'fee' => $fee,
             'type' => $type,
-            'country' => $this->developer->country,
-            'isEuMember' => $this->developer->country ? (new CountryInfo())->isEuMember($this->developer->country) : null,
+            'country' => $country,
+            'isEuMember' => $country ? (new CountryInfo())->isEuMember($country) : null,
             'dateCreated' => Db::prepareDateForDb(new \DateTime()),
         ])->execute();
 
