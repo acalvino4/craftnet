@@ -8,6 +8,7 @@ use craft\commerce\elements\Order;
 use craft\commerce\records\Transaction as TransactionRecord;
 use craft\elements\User;
 use craft\helpers\App;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craftnet\cms\CmsLicense;
@@ -48,12 +49,9 @@ class OrderBehavior extends Behavior
         ];
     }
 
-    // TODO: shouldn't have to do this…
     public function setApprovalRejectedDate(string|DateTime|null $approvalRejectedDate): static
     {
-        $this->approvalRejectedDate = is_string($approvalRejectedDate)
-            ? new DateTime($approvalRejectedDate)
-            : $approvalRejectedDate;
+        $this->approvalRejectedDate = DateTimeHelper::toDateTime($approvalRejectedDate) ?: null;
 
         return $this;
     }
