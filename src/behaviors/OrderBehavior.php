@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Element;
 use craft\commerce\elements\Order;
 use craft\commerce\records\Transaction as TransactionRecord;
+use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
@@ -19,6 +20,7 @@ use craftnet\plugins\PluginPurchasable;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use yii\base\Behavior;
+use yii\base\InvalidConfigException;
 use yii\db\Exception;
 
 /**
@@ -56,6 +58,18 @@ class OrderBehavior extends Behavior
             ->one();
     }
 
+
+    public function getPurchaser(): ?User
+    {
+        if (!$this->purchaserId) {
+            return null;
+        }
+
+        return User::find()
+            ->id($this->purchaserId)
+            ->one();
+    }
+
     /**
      * Returns any Craft licenses that were purchased by this order.
      *
@@ -90,12 +104,41 @@ class OrderBehavior extends Behavior
             return;
         }
 
-        $this->approvalPending = false;
-        $this->approvalRejected = false;
-        $this->_updateOrgOrders();
-
+        $this->_approveOrgOrder();
         $this->_updateDeveloperFunds();
         $this->_sendReceipt();
+    }
+
+    public function setApprovalRejected(?bool $approvalRejected): static
+    {
+        $this->approvalRejected = (bool)$approvalRejected;
+
+        if ($this->approvalRejected) {
+            $this->approvalPending = false;
+        }
+
+        return $this;
+    }
+
+    public function getApprovalRejected(): bool
+    {
+        return $this->approvalRejected;
+    }
+
+    public function getApprovalPending(): bool
+    {
+        return $this->approvalPending;
+    }
+
+    public function setApprovalPending(?bool $approvalPending): static
+    {
+        $this->approvalPending = (bool)$approvalPending;
+
+        if ($this->approvalPending) {
+            $this->approvalRejected = false;
+        }
+
+        return $this;
     }
 
     /**
@@ -235,35 +278,42 @@ class OrderBehavior extends Behavior
         ]);
     }
 
-    public function setApprovalRejected(?bool $approvalRejected): static
+    /**
+     * @throws Exception
+     * @throws \yii\base\Exception
+     * @throws InvalidConfigException
+     */
+    private function _approveOrgOrder(): bool
     {
-        $this->approvalRejected = (bool)$approvalRejected;
-
-        if ($this->approvalRejected) {
-            $this->approvalPending = false;
+        if (!$this->orgId) {
+            return false;
         }
 
-        return $this;
-    }
+        $org = $this->getOrg();
+        $purchaser = $this->getPurchaser();
+        $this->setApprovalRejected(false);
+        $this->setApprovalPending(false);
+        $this->_updateOrgOrders();
 
-    public function getApprovalRejected(): bool
-    {
-        return $this->approvalRejected;
-    }
+        // TODO: change col to approvalRequestedBy and check against that
+        // if ($this->purchaserId === $this->owner->customerId) {
+        //     // return false;
+        // }
 
-    public function getApprovalPending(): bool
-    {
-        return $this->approvalPending;
-    }
+        $sent = Craft::$app->getMailer()
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE, [
+                'recipient' => $purchaser,
+                'sender' => $org->owner,
+                'order' => $this->owner,
+                'org' => $org,
+            ])
+            ->setTo($purchaser->email)
+            ->send();
 
-    public function setApprovalPending(?bool $approvalPending): static
-    {
-        $this->approvalPending = (bool)$approvalPending;
-
-        if ($this->approvalPending) {
-            $this->approvalRejected = false;
+        if (!$sent) {
+            throw new \yii\base\Exception('Unable to send approval email.');
         }
 
-        return $this;
+        return true;
     }
 }
