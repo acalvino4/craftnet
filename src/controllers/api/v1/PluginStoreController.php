@@ -431,8 +431,7 @@ class PluginStoreController extends BaseApiController
             $elementsService->startCollectingCacheTags();
 
             $plugins = $this->_createPluginQuery()
-                ->andWhere([Table::PLUGINS . '.handle' => $pluginHandles])
-                ->handle($pluginHandles)
+                ->handle(explode(',', $pluginHandles))
                 ->all();
 
             $data = $this->transformPlugins($plugins);
