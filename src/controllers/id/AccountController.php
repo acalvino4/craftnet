@@ -261,7 +261,7 @@ class AccountController extends Controller
      */
     private function getCard(User $user): ?array
     {
-        $paymentSources = Commerce::getInstance()->getPaymentSources()->getAllPaymentSourcesByUserId($user->id);
+        $paymentSources = Commerce::getInstance()->getPaymentSources()->getAllPaymentSourcesByCustomerId($user->id);
 
         if (\count($paymentSources) === 0) {
             return null;
@@ -292,7 +292,7 @@ class AccountController extends Controller
      */
     private function getCardToken(User $user): ?string
     {
-        $paymentSources = Commerce::getInstance()->getPaymentSources()->getAllPaymentSourcesByUserId($user->id);
+        $paymentSources = Commerce::getInstance()->getPaymentSources()->getAllPaymentSourcesByCustomerId($user->id);
 
         if (\count($paymentSources) === 0) {
             return null;

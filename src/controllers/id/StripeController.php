@@ -198,7 +198,7 @@ class StripeController extends BaseController
 
         $paymentSourcesService = Commerce::getInstance()->getPaymentSources();
 
-        $paymentSources = $paymentSourcesService->getAllPaymentSourcesByUserId($user->id);
+        $paymentSources = $paymentSourcesService->getAllPaymentSourcesByCustomerId($user->id);
 
         if (count($paymentSources)) {
             $result = $paymentSourcesService->deletePaymentSourceById($paymentSources[0]->id);
