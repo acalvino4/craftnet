@@ -207,6 +207,7 @@ class CartsController extends BaseApiController
 
             if ($cart->orgId) {
                 $this->requireLogin();
+
                 $org = Org::find()->id($orgId)->hasMember($currentUser)->one();
 
                 if ($org) {
@@ -221,6 +222,7 @@ class CartsController extends BaseApiController
 
                     // TODO: we can't do this, because the payment source isn't owned by the user of the order
                     // $cart->setPaymentSource($org->getPaymentSource());
+                    $cart->paymentSourceId = $org->paymentSourceId;
 
                     if (isset($payload->billingAddress)) {
                         throw new BadRequestHttpException('Organizations must use their specified billing address');
