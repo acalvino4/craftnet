@@ -200,12 +200,8 @@ class CartsController extends BaseApiController
             $cart->returnUrl = App::parseEnv('$URL_CONSOLE') . 'thank-you';
 
             $currentUser = Craft::$app->getUser()->getIdentity(false);
-            $customer = $currentUser;
             $orgId = $this->request->getBodyParam('orgId');
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : $cart->getOrg();
-            $billingAddress = null;
-
-            // $orgRemoved = $cart->orgId && !$orgId;
 
             if ($org) {
                 if (!$org->canPurchase($currentUser)) {
@@ -214,14 +210,8 @@ class CartsController extends BaseApiController
 
                 $cart->setOrg($org);
                 $cart->setPurchaser($currentUser);
-                $customer = $org->owner;
 
-                if (!$cart->getCreator()) {
-                    $cart->setCreator($currentUser);
-                }
-
-                // TODO: set this in setOrg?
-                $billingAddress = $org->getBillingAddress();
+                // TODO: review now that we're doing this in OrderBehavior
 
                 if (isset($payload->billingAddress)) {
                     throw new BadRequestHttpException('Organizations must use their specified billing address.');
@@ -229,6 +219,9 @@ class CartsController extends BaseApiController
             } else {
                 throw new BadRequestHttpException('Invalid organization');
             }
+
+            $customer = $cart->getCustomer() ?? $currentUser;
+            $billingAddress = $org?->getBillingAddress();
 
             // set the email/customer before saving the cart, so the cart doesn't create its own customer record
             if ($customer !== null) {
@@ -243,13 +236,13 @@ class CartsController extends BaseApiController
             }
 
             // billing address
-            if (isset($payload->billingAddress)) {
+            if ($billingAddress) {
+                $this->_updateCartBillingAddress($cart, $billingAddress);
+            } else if (isset($payload->billingAddress)) {
                 $this->_updateCartBillingAddress(
                     $cart,
                     $this->_createCartBillingAddress($cart, $payload->billingAddress, $errors)
                 );
-            } else {
-                $this->_updateCartBillingAddress($cart, $billingAddress);
             }
 
             // coupon code
