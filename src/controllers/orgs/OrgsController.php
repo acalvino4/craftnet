@@ -58,6 +58,7 @@ class OrgsController extends SiteController
         if ($isNew) {
             $element = new Org();
             $element->setOwner($this->_currentUser);
+            $element->creatorId = $this->_currentUser->id;
             if ($siteId) {
                 $element->siteId = $siteId;
             }
@@ -91,8 +92,6 @@ class OrgsController extends SiteController
         if ($element->enabled && $element->getEnabledForSite()) {
             $element->setScenario(Element::SCENARIO_LIVE);
         }
-
-        // TODO: do we need mutex?
 
         try {
             $success = Craft::$app->getElements()->saveElement($element);

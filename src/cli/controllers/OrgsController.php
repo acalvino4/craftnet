@@ -72,6 +72,7 @@ class OrgsController extends Controller
                 $partner = Partner::find()->ownerId($user->id)->status(null)->one();
 
                 $org = new Org();
+                $org->creatorId = $user->id;
                 $org->title = $partner->businessName ?? $user->developerName ?? $user->username;
                 $org->slug = $partner?->websiteSlug ?? $user->username;
                 $org->stripeAccessToken = $user->stripeAccessToken;
@@ -174,9 +175,10 @@ class OrgsController extends Controller
                         $order->id,
                         $org->id,
                         $order->customerId,
+                        $order->customerId,
                     ]);
                 Craft::$app->getDb()->createCommand()
-                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId', 'purchaserId'], $rows->all())
+                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId', 'creatorId', 'purchaserId'], $rows->all())
                     ->execute();
                 $this->stdout('done' . PHP_EOL);
 

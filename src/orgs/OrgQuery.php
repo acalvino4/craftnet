@@ -86,6 +86,7 @@ class OrgQuery extends ElementQuery
             'apiToken',
             'balance',
             'ownerId',
+            'creatorId',
             'paymentSourceId',
             'billingAddressId',
             'locationAddressId',

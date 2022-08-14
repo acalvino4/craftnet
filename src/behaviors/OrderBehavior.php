@@ -32,6 +32,7 @@ use yii\db\Exception;
 class OrderBehavior extends Behavior
 {
     public ?int $orgId = null;
+    private ?int $creatorId = null;
     private ?int $purchaserId = null;
     private ?int $approvalRequestedById = null;
     private ?int $approvalRejectedById = null;
@@ -71,6 +72,25 @@ class OrderBehavior extends Behavior
         return $this->orgId
             ? Org::find()->id($this->orgId)->one()
             : null;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->creatorId
+            ? User::find()->id($this->creatorId)->one()
+            : null;
+    }
+
+    public function setCreator(int|User|null $creator): static
+    {
+        $this->creatorId = $creator instanceof User ? $creator->id : $creator;
+
+        return $this;
+    }
+
+    public function setCreatorId(?int $creatorId): static
+    {
+        return $this->setCreator($creatorId);
     }
 
     public function getPurchaser(): ?User
@@ -160,11 +180,6 @@ class OrderBehavior extends Behavior
     {
         $this->approvalRequestedById = $approvalRequestedBy instanceof User ? $approvalRequestedBy->id : $approvalRequestedBy;
         $this->setApprovalRejectedBy(null);
-
-        // Ensure we have a purchaser when requesting approval
-        if (!$this->purchaserId) {
-            $this->setPurchaser($this->owner->customer);
-        }
 
         return $this;
     }
@@ -317,6 +332,7 @@ class OrderBehavior extends Behavior
         Db::upsert(Table::ORGS_ORDERS, [
             'id' => $this->owner->id,
             'orgId' => $this->orgId,
+            'creatorId' => $this->creatorId,
             'purchaserId' => $this->purchaserId,
         ]);
 
@@ -348,21 +364,21 @@ class OrderBehavior extends Behavior
         }
 
         $org = $this->getOrg();
-        $purchaser = $this->getPurchaser();
+        $requestedBy = $this->getApprovalRequestedBy();
         $this->_updateOrgOrders();
 
-        if (!$this->approvalRequestedById) {
+        if (!$requestedBy) {
             return false;
         }
 
         $sent = Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE, [
-                'recipient' => $purchaser,
+                'recipient' => $requestedBy,
                 'sender' => $org->owner,
                 'order' => $this->owner,
                 'org' => $org,
             ])
-            ->setTo($purchaser->email)
+            ->setTo($requestedBy->email)
             ->send();
 
         if (!$sent) {

@@ -19,6 +19,7 @@ class m220526_183917_add_orgs extends Migration
     {
         $this->createTable(TABLE::ORGS, [
             'id' => $this->primaryKey(),
+            'creatorId' => $this->integer()->notNull(),
             'ownerId' => $this->integer()->notNull(),
             'balance' => $this->decimal(14, 4)->notNull()->defaultValue(0),
             'stripeAccessToken' => $this->text()->null(),
@@ -45,7 +46,8 @@ class m220526_183917_add_orgs extends Migration
         $this->createTable(Table::ORGS_ORDERS, [
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
-            'purchaserId' => $this->integer()->notNull(),
+            'creatorId' => $this->integer()->notNull(),
+            'purchaserId' => $this->integer(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
@@ -75,6 +77,7 @@ class m220526_183917_add_orgs extends Migration
 
         $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS, ['ownerId'], CraftTable::USERS, ['id']);
+        $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id']);
         $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'SET NULL');
         $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
 
@@ -87,6 +90,7 @@ class m220526_183917_add_orgs extends Migration
 
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], CommerceTable::ORDERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['creatorId'], CraftTable::USERS, ['id']);
         $this->addForeignKey(null, Table::ORGS_ORDERS, ['purchaserId'], CraftTable::USERS, ['id']);
 
         $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['orderId'], Table::ORGS_ORDERS, ['id'], 'CASCADE');
@@ -110,7 +114,6 @@ class m220526_183917_add_orgs extends Migration
         $this->dropForeignKey('craftnet_packages_developerId_fk', Table::PACKAGES);
         $this->addForeignKey('craftnet_packages_developerId_fk', Table::PACKAGES, ['developerId'], CraftTable::ELEMENTS, ['id'], 'SET NULL');
 
-        // TODO: Confirm developerId should be the org…
         $this->dropForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER);
         $this->addForeignKey('craftnet_developerledger_developerId_fk', Table::DEVELOPERLEDGER, ['developerId'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
 

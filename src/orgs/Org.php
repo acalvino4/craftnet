@@ -36,6 +36,7 @@ use yii\db\StaleObjectException;
 class Org extends Element
 {
     public ?int $ownerId = null;
+    public ?int $creatorId = null;
     public ?string $stripeAccessToken = null;
     public ?string $stripeAccount = null;
     public ?string $apiToken = null;
@@ -549,6 +550,7 @@ class Org extends Element
             'apiToken',
             'balance',
             'ownerId',
+            'creatorId',
         ]);
 
         Db::upsert(Table::ORGS, $data);

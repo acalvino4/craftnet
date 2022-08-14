@@ -15,6 +15,8 @@ use yii\base\Behavior;
 class OrderQueryBehavior extends Behavior
 {
     public ?int $orgId = null;
+    public ?int $creatorId = null;
+    public ?int $purchaserId = null;
     public ?int $approvalRejectedById = null;
     public ?int $approvalRequestedById = null;
     public mixed $approvalRejectedDate = null;
@@ -63,6 +65,7 @@ class OrderQueryBehavior extends Behavior
     {
         $this->owner->query->addSelect([
             'orgsOrders.orgId',
+            'orgsOrders.creatorId',
             'orgsOrders.purchaserId',
             'orgsOrderApprovals.requestedById AS approvalRequestedById',
             'orgsOrderApprovals.rejectedById AS approvalRejectedById',
@@ -73,6 +76,14 @@ class OrderQueryBehavior extends Behavior
 
         if ($this->orgId) {
             $this->owner->subQuery->andWhere(['orgsOrders.orgId' => $this->orgId]);
+        }
+
+        if ($this->creatorId) {
+            $this->owner->subQuery->andWhere(['orgsOrders.creatorId' => $this->creatorId]);
+        }
+
+        if ($this->purchaserId) {
+            $this->owner->subQuery->andWhere(['orgsOrders.purchaserId' => $this->purchaserId]);
         }
 
         $this->owner->query->leftJoin(['orgsOrderApprovals' => Table::ORGS_ORDERAPPROVALS], '[[orgsOrderApprovals.orderId]] = [[orgsOrders.id]]');
