@@ -526,7 +526,7 @@ class PluginEdition extends PluginPurchasable implements EditionInterface
         // if the license doesn't have an owner yet, reassign it to the order's customer or the org
         if (!$license->ownerId) {
             $license->email = $order->getEmail();
-            $license->ownerId = $order->orgId ?? $order->getCustomer()->id;
+            $license->ownerId = $order->getOrg()?->id ?? $order->getCustomer()->id;
         }
 
         try {

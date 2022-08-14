@@ -279,7 +279,7 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
         // if the license doesn't have an owner yet, reassign it to the order's customer
         if (!$license->ownerId) {
             $license->email = $order->getEmail();
-            $license->ownerId = $order->orgId ?? $order->getCustomer()->id;
+            $license->ownerId = $order->getOrg()?->id ?? $order->getCustomer()->id;
         }
 
         try {
