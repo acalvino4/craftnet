@@ -63,7 +63,8 @@ class OrdersController extends SiteController
             throw new ForbiddenHttpException('Order does not belong to this user');
         }
 
-        $order->orgId = $org->id;
+        $order->setOrg($org);
+        $order->setCreator($this->_currentUser);
         $order->setApprovalRequestedBy($this->_currentUser);
         $saved = Craft::$app->getElements()->saveElement($order);
 

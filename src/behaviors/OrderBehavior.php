@@ -31,7 +31,7 @@ use yii\db\Exception;
  */
 class OrderBehavior extends Behavior
 {
-    public ?int $orgId = null;
+    private ?int $orgId = null;
     private ?int $creatorId = null;
     private ?int $purchaserId = null;
     private ?int $approvalRequestedById = null;
@@ -72,6 +72,16 @@ class OrderBehavior extends Behavior
         return $this->orgId
             ? Org::find()->id($this->orgId)->one()
             : null;
+    }
+
+    public function setOrg(Org|int|null $org): static
+    {
+        $this->orgId = $org instanceof Org ? $org->id : $org;
+        $org = $this->getOrg();
+
+        // TODO: set creator?
+        $this->owner->paymentSourceId = $org?->paymentSourceId;
+        $this->owner->billingAddressId = $org?->billingAddressId;
     }
 
     public function getCreator(): ?User

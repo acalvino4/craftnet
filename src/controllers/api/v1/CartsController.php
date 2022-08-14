@@ -63,6 +63,8 @@ class CartsController extends BaseApiController
     {
         $payload = $this->getPayload('update-cart-request');
 
+
+        /** @var Order|OrderBehavior $cart */
         $cart = new Order([
             'number' => Commerce::getInstance()->getCarts()->generateCartNumber(),
             'currency' => 'USD',
@@ -199,37 +201,33 @@ class CartsController extends BaseApiController
 
             $currentUser = Craft::$app->getUser()->getIdentity(false);
             $customer = $currentUser;
-            $orgId = $this->request->getBodyParam('orgId', $cart->orgId);
-            $orgRemoved = $cart->orgId && !$orgId;
+            $orgId = $this->request->getBodyParam('orgId');
+            $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : $cart->getOrg();
             $billingAddress = null;
 
-            $cart->orgId = $orgId ? (int) $orgId : null;
+            // $orgRemoved = $cart->orgId && !$orgId;
 
-            if ($cart->orgId) {
-                $this->requireLogin();
-
-                $org = Org::find()->id($orgId)->hasMember($currentUser)->one();
-
-                if ($org) {
-                    if (!$org->canPurchase($currentUser)) {
-                        throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
-                    }
-
-                    $cart->setPurchaser($currentUser);
-
-                    $customer = $org->owner;
-                    $billingAddress = $org->getBillingAddress();
-
-                    // TODO: we can't do this, because the payment source isn't owned by the user of the order
-                    // $cart->setPaymentSource($org->getPaymentSource());
-                    $cart->paymentSourceId = $org->paymentSourceId;
-
-                    if (isset($payload->billingAddress)) {
-                        throw new BadRequestHttpException('Organizations must use their specified billing address');
-                    }
-                } else {
-                    throw new BadRequestHttpException('Invalid organization');
+            if ($org) {
+                if (!$org->canPurchase($currentUser)) {
+                    throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
                 }
+
+                $cart->setOrg($org);
+                $cart->setPurchaser($currentUser);
+                $customer = $org->owner;
+
+                if (!$cart->getCreator()) {
+                    $cart->setCreator($currentUser);
+                }
+
+                // TODO: set this in setOrg?
+                $billingAddress = $org->getBillingAddress();
+
+                if (isset($payload->billingAddress)) {
+                    throw new BadRequestHttpException('Organizations must use their specified billing address.');
+                }
+            } else {
+                throw new BadRequestHttpException('Invalid organization');
             }
 
             // set the email/customer before saving the cart, so the cart doesn't create its own customer record
@@ -245,13 +243,13 @@ class CartsController extends BaseApiController
             }
 
             // billing address
-            if ($billingAddress || $orgRemoved) {
-                $this->_updateCartBillingAddress($cart, $billingAddress);
-            } else if (isset($payload->billingAddress)) {
+            if (isset($payload->billingAddress)) {
                 $this->_updateCartBillingAddress(
                     $cart,
                     $this->_createCartBillingAddress($cart, $payload->billingAddress, $errors)
                 );
+            } else {
+                $this->_updateCartBillingAddress($cart, $billingAddress);
             }
 
             // coupon code
