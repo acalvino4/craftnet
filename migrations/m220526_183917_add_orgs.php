@@ -2,7 +2,6 @@
 
 namespace craft\contentmigrations;
 
-use Craft;
 use craft\commerce\db\Table as CommerceTable;
 use craft\db\Migration;
 use craft\db\Table as CraftTable;
@@ -20,7 +19,8 @@ class m220526_183917_add_orgs extends Migration
     {
         $this->createTable(TABLE::ORGS, [
             'id' => $this->primaryKey(),
-            'creatorId' => $this->integer(),
+            'creatorId' => $this->integer()->notNull(),
+            'ownerId' => $this->integer()->notNull(),
             'balance' => $this->decimal(14, 4)->notNull()->defaultValue(0),
             'stripeAccessToken' => $this->text()->null(),
             'stripeAccount' => $this->string()->null(),
@@ -33,49 +33,70 @@ class m220526_183917_add_orgs extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id'], 'SET NULL');
-        $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS, ['locationAddressId'], CraftTable::ADDRESSES, ['id'], 'CASCADE');
-
         $this->createTable(Table::ORGS_MEMBERS, [
             'id' => $this->primaryKey(),
             'userId' => $this->integer()->notNull(),
             'orgId' => $this->integer()->notNull(),
-            'owner' => $this->boolean()->defaultValue(false),
+            'admin' => $this->boolean()->defaultValue(false),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
-
-        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
-        $this->createIndex(null, Table::ORGS_MEMBERS, ['userId', 'orgId'], true);
 
         $this->createTable(Table::ORGS_ORDERS, [
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
-            'isPending' => $this->boolean()->defaultValue(false),
-            'isRejected' => $this->boolean()->defaultValue(false),
+            'creatorId' => $this->integer()->notNull(),
+            'purchaserId' => $this->integer(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
 
-        $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], CommerceTable::ORDERS, ['id'], 'CASCADE');
-        $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+        $this->createTable(Table::ORGS_ORDERAPPROVALS, [
+            'id' => $this->primaryKey(),
+            'orderId' => $this->integer()->notNull(),
+            'requestedById' => $this->integer()->notNull(),
+            'rejectedById' => $this->integer()->null(),
+            'dateRejected' => $this->dateTime()->null(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
 
         $this->createTable(Table::ORGS_INVITATIONS, [
             'id' => $this->primaryKey(),
             'orgId' => $this->integer()->notNull(),
             'userId' => $this->integer()->notNull(),
-            'owner' => $this->boolean()->defaultValue(false),
+            'admin' => $this->boolean()->defaultValue(false),
             'expiryDate' => $this->dateTime()->notNull(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
         ]);
+
+        $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS, ['ownerId'], CraftTable::USERS, ['id']);
+        $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id']);
+        $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'SET NULL');
+        $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
+
+        // TODO: Ideally this would be a custom field, but currently only user elements can have addresses
+        $this->addForeignKey(null, Table::ORGS, ['locationAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
+
+        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_MEMBERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+        $this->createIndex(null, Table::ORGS_MEMBERS, ['userId', 'orgId'], true);
+
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['id'], CommerceTable::ORDERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['creatorId'], CraftTable::USERS, ['id']);
+        $this->addForeignKey(null, Table::ORGS_ORDERS, ['purchaserId'], CraftTable::USERS, ['id']);
+
+        $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['orderId'], Table::ORGS_ORDERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['requestedById'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['rejectedById'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->createIndex(null, Table::ORGS_ORDERAPPROVALS, ['orderId', 'requestedById'], true);
 
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');

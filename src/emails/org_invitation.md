@@ -1,5 +1,5 @@
-Hi {{ user.friendlyName }},
+Hi {{ recipient.friendlyName }},
 
-{{ inviter.friendlyName }} has invited you to join the {{ org.title }} organization on Craft Console.
+{{ sender.friendlyName }} has invited you to join the {{ org.title }} organization on Craft Console.
 
 [Join {{ org.title }}]({{ org.invitationUrl }})

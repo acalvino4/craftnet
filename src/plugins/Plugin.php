@@ -14,7 +14,6 @@ use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\validators\UniqueValidator;
-use craftnet\behaviors\UserBehavior;
 use craftnet\composer\Package;
 use craftnet\db\Table;
 use craftnet\Module;
@@ -656,9 +655,9 @@ class Plugin extends Element
      */
     public function getDeveloperName(): string
     {
-        /** @var User|UserBehavior $developer */
+        /** @var Org $developer */
         $developer = $this->getDeveloper();
-        return $developer->getDeveloperName();
+        return $developer->title;
     }
 
     /**

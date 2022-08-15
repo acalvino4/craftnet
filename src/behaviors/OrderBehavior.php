@@ -3,25 +3,41 @@
 namespace craftnet\behaviors;
 
 use Craft;
+use craft\base\Element;
 use craft\commerce\elements\Order;
 use craft\commerce\records\Transaction as TransactionRecord;
 use craft\elements\User;
 use craft\helpers\App;
+use craft\helpers\DateTimeHelper;
+use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craftnet\cms\CmsLicense;
+use craftnet\db\Table;
 use craftnet\Module;
 use craftnet\orders\PdfRenderer;
+use craftnet\orgs\Org;
 use craftnet\plugins\PluginLicense;
 use craftnet\plugins\PluginPurchasable;
+use DateTime;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use yii\base\Behavior;
+use yii\base\InvalidConfigException;
+use yii\base\UserException;
+use yii\db\Exception;
 
 /**
  * @property Order $owner
  */
 class OrderBehavior extends Behavior
 {
+    private ?int $orgId = null;
+    private ?int $creatorId = null;
+    private ?int $purchaserId = null;
+    private ?int $approvalRequestedById = null;
+    private ?int $approvalRejectedById = null;
+    private ?DateTime $approvalRejectedDate = null;
+
     /**
      * @inheritdoc
      */
@@ -30,7 +46,82 @@ class OrderBehavior extends Behavior
         // todo: we should probably be listening for a transaction event here
         return [
             Order::EVENT_AFTER_COMPLETE_ORDER => [$this, 'afterComplete'],
+            Element::EVENT_AFTER_SAVE => [$this, 'afterSave'],
         ];
+    }
+
+    public function setApprovalRejectedDate(string|DateTime|null $approvalRejectedDate): static
+    {
+        $this->approvalRejectedDate = DateTimeHelper::toDateTime($approvalRejectedDate) ?: null;
+
+        return $this;
+    }
+
+    public function getApprovalRejectedDate(): ?DateTime
+    {
+        return $this->approvalRejectedDate;
+    }
+
+    public function isPendingApproval(): bool
+    {
+        return $this->approvalRequestedById && !$this->approvalRejectedById;
+    }
+
+    public function getOrg(): ?Org
+    {
+        return $this->orgId
+            ? Org::find()->id($this->orgId)->one()
+            : null;
+    }
+
+    public function setOrg(Org|int|null $org): static
+    {
+        $this->orgId = $org instanceof Org ? $org->id : $org;
+
+        $this->setCreator($this->getCreator() ?? $this->owner->customer);
+        $this->owner->setCustomer($org?->owner);
+
+        // TODO: should we be cloning and setting sourcePaymentSourceId? (ditto for address)
+        $this->owner->paymentSourceId = $org?->paymentSourceId;
+        $this->owner->billingAddressId = $org?->billingAddressId;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->creatorId
+            ? User::find()->id($this->creatorId)->one()
+            : null;
+    }
+
+    public function setCreator(int|User|null $creator): static
+    {
+        $this->creatorId = $creator instanceof User ? $creator->id : $creator;
+
+        return $this;
+    }
+
+    public function setCreatorId(?int $creatorId): static
+    {
+        return $this->setCreator($creatorId);
+    }
+
+    public function getPurchaser(): ?User
+    {
+        return $this->purchaserId
+            ? User::find()->id($this->purchaserId)->one()
+            : null;
+    }
+
+    public function setPurchaser(int|User|null $purchaser): static
+    {
+        $this->purchaserId = $purchaser instanceof User ? $purchaser->id : $purchaser;
+
+        return $this;
+    }
+
+    public function setPurchaserId(?int $purchaserId): static
+    {
+        return $this->setPurchaser($purchaserId);
     }
 
     /**
@@ -53,6 +144,11 @@ class OrderBehavior extends Behavior
         return Module::getInstance()->getPluginLicenseManager()->getLicensesByOrder($this->owner->id);
     }
 
+    public function afterSave(): void
+    {
+        $this->_updateOrgOrders();
+    }
+
     /**
      * Handles post-order-complete stuff.
      */
@@ -62,8 +158,59 @@ class OrderBehavior extends Behavior
             return;
         }
 
+        $this->_approveOrgOrder();
         $this->_updateDeveloperFunds();
         $this->_sendReceipt();
+    }
+
+    public function setApprovalRejectedBy(int|User|null $approvalRejectedBy): static
+    {
+        $this->approvalRejectedById = $approvalRejectedBy instanceof User ? $approvalRejectedBy->id : $approvalRejectedBy;
+
+        if (!$this->approvalRejectedById) {
+            $this->approvalRejectedDate = null;
+        } else if (!$this->approvalRejectedDate) {
+            $this->approvalRejectedDate = new DateTime();
+        }
+
+        return $this;
+    }
+
+    public function getApprovalRejectedBy(): ?User
+    {
+        return $this->approvalRejectedById
+            ? User::find()->id($this->approvalRejectedById)->one()
+            : null;
+    }
+
+    public function setApprovalRejectedById(?int $approvalRejectedById): static
+    {
+        return $this->setApprovalRejectedBy($approvalRejectedById);
+    }
+
+    public function setApprovalRequestedBy(int|User|null $approvalRequestedBy): static
+    {
+        $this->approvalRequestedById = $approvalRequestedBy instanceof User ? $approvalRequestedBy->id : $approvalRequestedBy;
+        $this->setApprovalRejectedBy(null);
+
+        return $this;
+    }
+
+    public function getApprovalRequestedBy(): ?User
+    {
+        return $this->approvalRequestedById
+            ? User::find()->id($this->approvalRequestedById)->one()
+            : null;
+    }
+
+    public function setApprovalRequestedById(?int $approvalRequestedById): static
+    {
+        return $this->setApprovalRequestedBy($approvalRequestedById);
+    }
+
+    public function hasCustomer(User $user): bool
+    {
+        return $user->id === $this->owner->customerId;
     }
 
     /**
@@ -72,7 +219,7 @@ class OrderBehavior extends Behavior
     private function _updateDeveloperFunds()
     {
         // See if any plugin licenses were purchased/renewed
-        /** @var User[]|UserBehavior[] $developers */
+        /** @var Org[] $developers */
         $developers = [];
         $developerTotals = [];
         $developerLineItems = [];
@@ -123,7 +270,7 @@ class OrderBehavior extends Behavior
         // Try transferring funds to them
         foreach ($developers as $developerId => $developer) {
             // ignore if this is us
-            if ($developer->username === 'pixelandtonic') {
+            if ($developer->slug === 'pixelandtonic') {
                 continue;
             }
 
@@ -142,11 +289,11 @@ class OrderBehavior extends Behavior
     }
 
     /**
-     * @param $developer
+     * @param Org $developer
      * @param $lineItems
      * @throws \yii\base\InvalidConfigException
      */
-    private function _sendDeveloperSaleEmail($developer, $lineItems)
+    private function _sendDeveloperSaleEmail(Org $developer, $lineItems)
     {
         $mailer = Craft::$app->getMailer();
 
@@ -156,7 +303,7 @@ class OrderBehavior extends Behavior
                 'lineItems' => $lineItems,
             ])
             ->setFrom($mailer->from)
-            ->setTo($developer->email)
+            ->setTo($developer->owner->email)
             ->send();
     }
 
@@ -181,5 +328,75 @@ class OrderBehavior extends Behavior
                 'contentType' => 'application/pdf',
             ])
             ->send();
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function _updateOrgOrders(): bool
+    {
+        if (!$this->orgId) {
+            return (bool) Db::delete(Table::ORGS_ORDERS, [
+                'id' => $this->owner->id,
+            ]);
+        }
+
+        Db::upsert(Table::ORGS_ORDERS, [
+            'id' => $this->owner->id,
+            'orgId' => $this->orgId,
+            'creatorId' => $this->creatorId,
+            'purchaserId' => $this->purchaserId,
+        ]);
+
+        if ($this->approvalRequestedById) {
+            Db::upsert(Table::ORGS_ORDERAPPROVALS, [
+                'orderId' => $this->owner->id,
+                'requestedById' => $this->approvalRequestedById,
+                'rejectedById' => $this->approvalRejectedById,
+                'dateRejected' => Db::prepareDateForDb($this->approvalRejectedDate),
+            ]);
+        } else {
+            return (bool) Db::delete(Table::ORGS_ORDERAPPROVALS, [
+                'orderId' => $this->owner->id,
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws Exception
+     * @throws \yii\base\Exception
+     * @throws InvalidConfigException
+     */
+    private function _approveOrgOrder(): bool
+    {
+        if (!$this->orgId) {
+            return false;
+        }
+
+        $org = $this->getOrg();
+        $requestedBy = $this->getApprovalRequestedBy();
+        $this->_updateOrgOrders();
+
+        if (!$requestedBy) {
+            return false;
+        }
+
+        $sent = Craft::$app->getMailer()
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE, [
+                'recipient' => $requestedBy,
+                'sender' => $org->owner,
+                'order' => $this->owner,
+                'org' => $org,
+            ])
+            ->setTo($requestedBy->email)
+            ->send();
+
+        if (!$sent) {
+            throw new UserException('Unable to send approval email.');
+        }
+
+        return true;
     }
 }

@@ -14,6 +14,7 @@ use craft\commerce\stripe\models\forms\payment\PaymentIntent as PaymentForm;
 use craft\commerce\stripe\Plugin as Stripe;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
+use craftnet\behaviors\OrderBehavior;
 use craftnet\controllers\api\RateLimiterTrait;
 use craftnet\errors\ValidationException;
 use Stripe\Customer as StripeCustomer;
@@ -55,6 +56,8 @@ class PaymentsController extends CartsController
         $payload = $this->getPayload('payment-request');
 
         try {
+
+            /** @var Order|OrderBehavior $cart */
             $cart = $this->getCart($payload->orderNumber);
         } catch (UserException $e) {
             throw new ValidationException([
@@ -130,6 +133,8 @@ class PaymentsController extends CartsController
 
             try {
                 $this->_populatePaymentForm($cart, $payload, $gateway, $paymentForm);
+
+                // TODO: why does calling this lose our paymentSourceId on the order?
                 $commerce->getPayments()->processPayment($cart, $paymentForm, $redirect, $transaction);
             } catch (ApiErrorException $e) {
                 throw new BadRequestHttpException($e->getMessage(), 0, $e);
@@ -176,7 +181,7 @@ class PaymentsController extends CartsController
         $paymentSourcesService = $commerce->getPaymentSources();
         $customersService = $stripe->getCustomers();
         $user = Craft::$app->getUser()->getIdentity(false);
-
+        $makePrimary = $payload->makePrimary ?? false;
         $address = $cart->getBillingAddress();
         $customerData = [
             'address' => [
@@ -210,13 +215,17 @@ class PaymentsController extends CartsController
             $customerData['description'] = 'Guest customer created for order #' . $payload->orderNumber;
 
             // If a user is logged in and they wish to store this card
-            if ($user && $payload->makePrimary) {
+            if ($user && $makePrimary) {
+                // TODO: update this when we have makePrimaryPaymentSource
+                $cart->makePrimaryBillingAddress = true;
+
                 // Fetch a customer
                 $customer = $customersService->getCustomer($gateway->id, $user);
 
                 // Update the customer data
                 $stripeCustomer = StripeCustomer::update($customer->reference, $customerData);
                 $customer->response = $stripeCustomer->jsonSerialize();
+
                 $customersService->saveCustomer($customer);
             } else {
                 // Otherwise create an anonymous customer
@@ -230,17 +239,8 @@ class PaymentsController extends CartsController
         $paymentForm->customer = $stripeCustomer->id;
 
         // If there's no need to make anything primary - bye!
-        if (!$user || !$payload->makePrimary) {
+        if (!$user || !$makePrimary) {
             return;
-        }
-
-        // We get this far if this is an existing source OR user wants to make it primary
-        $existingPaymentSources = $paymentSourcesService->getAllPaymentSourcesByCustomerId($user->id);
-
-        // delete any existing payment sources
-        // todo: remove this if we ever add support for multiple cards
-        foreach ($existingPaymentSources as $paymentSource) {
-            $paymentSourcesService->deletePaymentSourceById($paymentSource->id);
         }
 
         // Retrieve the freshest of data

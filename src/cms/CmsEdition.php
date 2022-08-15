@@ -10,6 +10,7 @@ use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Db;
 use craftnet\base\EditionInterface;
 use craftnet\base\RenewalInterface;
+use craftnet\behaviors\OrderBehavior;
 use craftnet\db\Table;
 use craftnet\errors\LicenseNotFoundException;
 use craftnet\helpers\OrderHelper;
@@ -227,7 +228,7 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
      * @param Order $order
      * @param LineItem $lineItem
      */
-    private function _updateOrderLicense(Order $order, LineItem $lineItem)
+    private function _updateOrderLicense(Order|OrderBehavior $order, LineItem $lineItem)
     {
         $manager = Module::getInstance()->getCmsLicenseManager();
         $options = $lineItem->getOptions();
@@ -278,7 +279,7 @@ class CmsEdition extends CmsPurchasable implements EditionInterface
         // if the license doesn't have an owner yet, reassign it to the order's customer
         if (!$license->ownerId) {
             $license->email = $order->getEmail();
-            $license->ownerId = $order->getCustomer()->id;
+            $license->ownerId = $order->getOrg()?->id ?? $order->getCustomer()->id;
         }
 
         try {

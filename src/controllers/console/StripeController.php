@@ -4,16 +4,20 @@ namespace craftnet\controllers\console;
 
 use AdamPaterson\OAuth2\Client\Provider\Stripe as StripeOauthProvider;
 use Craft;
+use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\gateways\PaymentIntents;
 use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\UrlHelper;
+use craftnet\behaviors\PaymentSourceBehavior;
 use craftnet\behaviors\UserBehavior;
+use Illuminate\Support\Collection;
 use League\OAuth2\Client\Token\AccessToken;
 use Stripe\Account;
 use Stripe\Stripe;
-use yii\web\HttpException;
+use Throwable;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 
@@ -126,64 +130,64 @@ class StripeController extends BaseController
     }
 
     /**
+     * @throws Throwable
+     */
+    public function actionGetCards(): ?Response
+    {
+        /** @var User|UserBehavior $user */
+        $user = Craft::$app->getUser()->getIdentity();
+
+        $paymentSources = Collection::make($user->getPaymentSources())
+            ->map(function(PaymentSource|PaymentSourceBehavior $paymentSource) {
+                $orgs = $paymentSource->getOrgs()->collect();
+
+                return $paymentSource->getAttributes([
+                        'id',
+                        'token',
+                    ]) + [
+                        'card' => $paymentSource->getCard(),
+                        'orgs' => $orgs->isEmpty() ? null : $paymentSource->getOrgs()->collect()
+                            ->map(fn($org) => static::transformOrg($org)),
+                    ];
+            });
+
+        return $this->asSuccess(data: ['cards' => $paymentSources->all()]);
+    }
+
+    /**
      * Saves a new credit card and sets it as default source for the Stripe customer.
      *
      * @return Response
      * @throws \Throwable if something went wrong when adding the payment source
      */
-    public function actionSaveCard(): Response
+    public function actionAddCard(): Response
     {
         $this->requirePostRequest();
-
-        $order = null;
-
-        $plugin = Commerce::getInstance();
-        $paymentSources = $plugin->getPaymentSources();
-
-        // Are we paying anonymously?
-        $userId = Craft::$app->getUser()->getId();
-
-        if (!$userId) {
-            throw new HttpException(401, Craft::t('commerce', 'Not authorized to save a credit card.'));
-        }
+        $user = Craft::$app->getUser()->getIdentity();
 
         /** @var PaymentIntents $gateway */
-        $gateway = $plugin->getGateways()->getGatewayById(App::env('STRIPE_GATEWAY_ID'));
+        $gateway = Commerce::getInstance()?->getGateways()->getGatewayById(App::env('STRIPE_GATEWAY_ID'));
 
         if (!$gateway || !$gateway->supportsPaymentSources()) {
-            $error = Craft::t('commerce', 'There is no gateway selected that supports payment sources.');
-            return $this->asErrorJson($error);
+            return $this->asFailure();
         }
 
-        // Remove existing payment sources
-        $existingPaymentSources = $paymentSources->getAllPaymentSourcesByCustomerId($userId);
-        foreach ($existingPaymentSources as $paymentSource) {
-            $paymentSources->deletePaymentSourceById($paymentSource->id);
-        }
-
-        // Get the payment method' gateway adapter's expected form model
         $paymentForm = $gateway->getPaymentFormModel();
         $paymentForm->setAttributes($this->request->getBodyParams(), false);
-        $description = 'Default Source';
-
-        $error = '';
+        $description = $this->request->getBodyParam('description');
 
         try {
-            $paymentSource = $paymentSources->createPaymentSource($userId, $gateway, $paymentForm, $description);
+            $paymentSource = Commerce::getInstance()
+                ->getPaymentSources()
+                ->createPaymentSource($user->id, $gateway, $paymentForm, $description);
 
-            if ($paymentSource) {
-                $card = $paymentSource->response;
+            // TODO: test
+            $card = $paymentSource->response;
 
-                return $this->asJson([
-                    'success' => true,
-                    'card' => $card,
-                ]);
-            }
-        } catch (\Throwable $exception) {
-            $error = $exception->getMessage();
+            return $this->asSuccess(data: ['card' => $card]);
+        } catch (\Throwable $t) {
+            return $this->asFailure($t->getMessage());
         }
-
-        return $this->asJson(['error' => $error, 'paymentForm' => $paymentForm->getErrors()]);
     }
 
     /**
@@ -192,23 +196,30 @@ class StripeController extends BaseController
      * @return Response
      * @throws \Throwable
      */
-    public function actionRemoveCard(): Response
+    public function actionRemoveCard(int $paymentSourceId): Response
     {
         $user = Craft::$app->getUser()->getIdentity();
 
-        $paymentSourcesService = Commerce::getInstance()->getPaymentSources();
+        /** @var PaymentSource|PaymentSourceBehavior $paymentSource */
+        $paymentSource = Commerce::getInstance()
+            ->getPaymentSources()
+            ->getPaymentSourceByIdAndUserId($paymentSourceId, $user->id);
 
-        $paymentSources = $paymentSourcesService->getAllPaymentSourcesByUserId($user->id);
-
-        if (count($paymentSources)) {
-            $result = $paymentSourcesService->deletePaymentSourceById($paymentSources[0]->id);
-
-            if (!$result) {
-                return $this->asErrorJson('Couldn’t delete credit card.');
-            }
+        if (!$paymentSource) {
+            throw new NotFoundHttpException('Credit card not found.');
         }
 
-        return $this->asJson(['success' => true]);
+        if ($paymentSource->getOrgs()->exists()) {
+            $this->requireElevatedSession();
+        }
+
+        $success = Commerce::getInstance()
+            ->getPaymentSources()
+            ->deletePaymentSourceById($paymentSourceId);
+
+        return $success ?
+            $this->asSuccess('Credit card removed.') :
+            $this->asFailure('Could not remove credit card.');
     }
 
     // Private Methods

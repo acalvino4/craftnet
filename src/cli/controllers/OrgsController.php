@@ -3,14 +3,14 @@
 namespace craftnet\cli\controllers;
 
 use Craft;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\Address;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\StringHelper;
-use craftnet\behaviors\UserBehavior;
 use craftnet\db\Table;
-use craftnet\Module;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
@@ -61,10 +61,10 @@ class OrgsController extends Controller
             ->status('credentialed')
             ->id($userIds)
             ->collect()
-            ->each(function (User $user) {
+            ->each(function (User|CustomerBehavior $user) {
                 $this->stdout("Creating an org for user #$user->id ($user->email) ..." . PHP_EOL);
 
-                if (Org::find()->creatorId($user->id)->exists()) {
+                if (Org::find()->ownerId($user->id)->exists()) {
                     $this->stdout("Org already converted, skipping." . PHP_EOL);
                     return;
                 }
@@ -72,13 +72,14 @@ class OrgsController extends Controller
                 $partner = Partner::find()->ownerId($user->id)->status(null)->one();
 
                 $org = new Org();
+                $org->creatorId = $user->id;
                 $org->title = $partner->businessName ?? $user->developerName ?? $user->username;
                 $org->slug = $partner?->websiteSlug ?? $user->username;
                 $org->stripeAccessToken = $user->stripeAccessToken;
                 $org->stripeAccount = $user->stripeAccount;
                 $org->apiToken = $user->apiToken;
                 $org->balance = $user->balance ?? 0;
-                $org->creatorId = $user->id;
+                $org->setOwner($user->id);
 
                 $projectsAsMatrix = Collection::make($partner?->getProjects())
                     ->flatMap(function($project, $index) {
@@ -125,11 +126,41 @@ class OrgsController extends Controller
                     'partnerProjects' => $projectsAsMatrix,
                 ]);
 
-                // TODO: migrate $partner->locations to an address field (orgs.locationAddressId)
+                // Previously, users only had one stored payment sources
+                $org->paymentSourceId = Commerce::getInstance()
+                    ?->getPaymentSources()
+                    ?->getAllPaymentSourcesByCustomerId($user->id)[0]?->id ?? null;
+
+                $org->billingAddressId = $user->primaryBillingAddressId;
 
                 $this->stdout("    > Saving org ... ");
                 if (!Craft::$app->getElements()->saveElement($org)) {
                     throw new Exception("Couldn't save org: " . implode(', ', $org->getFirstErrors()));
+                }
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Adding partner address as address element ... ");
+                if ($legacyLocation = $partner?->getLocations()[0] ?? null) {
+                    $location = new Address();
+                    $location->ownerId = $org->id;
+                    $location->title = $legacyLocation->title;
+                    $location->fullName = $partner->primaryContactName;
+                    $location->countryCode = $legacyLocation->country;
+                    $location->administrativeArea = $legacyLocation->state;
+                    $location->locality = $legacyLocation->city;
+                    $location->postalCode = $legacyLocation->zip;
+                    $location->addressLine1 = $legacyLocation->addressLine1 ?? null;
+                    $location->addressLine2 = $legacyLocation->addressLine2 ?? null;
+                    $location->organization = $org->title;
+                    $location->organizationTaxId = $user->businessVatId ?? null;
+                    $location->addressPhone = $legacyLocation->phone ?? null;
+                    $location->addressAttention = $legacyLocation->attention ?? null;
+
+                    // Not validating because these addresses won't validate until normalized
+                    if (Craft::$app->getElements()->saveElement($location, false)) {
+                        $org->locationAddressId = $location->id;
+                        Craft::$app->getElements()->saveElement($org);
+                    }
                 }
                 $this->stdout('done' . PHP_EOL);
 
@@ -138,18 +169,16 @@ class OrgsController extends Controller
                 Craft::$app->getElements()->saveElement($user);
                 $this->stdout('done' . PHP_EOL);
 
-                $this->stdout("    > Adding user as owner of org ... ");
-                $org->addOwner($user);
-                $this->stdout('done' . PHP_EOL);
-
                 $this->stdout("    > Relating orders to org ... ");
                 $rows = Order::find()->customer($user)->collect()
                     ->map(fn($order) => [
                         $order->id,
                         $org->id,
+                        $order->customerId,
+                        $order->customerId,
                     ]);
                 Craft::$app->getDb()->createCommand()
-                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId'], $rows->all())
+                    ->batchInsert(Table::ORGS_ORDERS, ['id', 'orgId', 'creatorId', 'purchaserId'], $rows->all())
                     ->execute();
                 $this->stdout('done' . PHP_EOL);
 
@@ -187,6 +216,20 @@ class OrgsController extends Controller
                 Craft::$app->getDb()->createCommand()
                     ->update(Table::DEVELOPERLEDGER, ['developerId' => $org->id], ['developerId' => $user->id])
                     ->execute();
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Deleting redundant addresses ... ");
+                $query = Address::find()
+                    ->ownerId($user->id)
+                    ->id([
+                        'not',
+                        $org->billingAddressId,
+                        $org->locationAddressId,
+                    ])
+                    ->collect()
+                    ->each(function ($address) {
+                        return Craft::$app->getElements()->deleteElementById($address->id, hardDelete: true);
+                    });
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("Done creating org #$org->id" . PHP_EOL . PHP_EOL);

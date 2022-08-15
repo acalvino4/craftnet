@@ -6,7 +6,6 @@ use Craft;
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\events\MatchLineItemEvent;
-use craft\commerce\events\PdfEvent;
 use craft\commerce\events\PdfRenderEvent;
 use craft\commerce\models\Discount;
 use craft\commerce\models\PaymentSource;
@@ -17,6 +16,7 @@ use craft\commerce\services\Purchasables;
 use craft\console\Controller as ConsoleController;
 use craft\console\controllers\ResaveController;
 use craft\controllers\UsersController;
+use craft\elements\Address;
 use craft\elements\Asset;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
@@ -47,6 +47,7 @@ use craft\web\Request;
 use craft\web\twig\variables\Cp;
 use craft\web\UrlManager;
 use craft\web\View;
+use craftnet\behaviors\AddressBehavior;
 use craftnet\behaviors\AssetBehavior;
 use craftnet\behaviors\DiscountBehavior;
 use craftnet\behaviors\OrderBehavior;
@@ -98,6 +99,9 @@ class Module extends \yii\base\Module
     const MESSAGE_KEY_LICENSE_TRANSFER = 'license_transfer';
     const MESSAGE_KEY_SECURITY_ALERT = 'security_alert';
     const MESSAGE_KEY_ORG_INVITATION = 'org_invitation';
+    const MESSAGE_KEY_ORG_ORDER_APPROVAL_REQUEST = 'org_order_approval_request';
+    const MESSAGE_KEY_ORG_ORDER_APPROVAL_REJECT = 'org_order_approval_reject';
+    const MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE = 'org_order_approval_approve';
 
     /**
      * @inheritdoc
@@ -127,6 +131,9 @@ class Module extends \yii\base\Module
         });
         Event::on(PaymentSource::class, PaymentSource::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
             $e->behaviors['cn.paymentSource'] = PaymentSourceBehavior::class;
+        });
+        Event::on(Address::class, Address::EVENT_DEFINE_BEHAVIORS, function(DefineBehaviorsEvent $e) {
+            $e->behaviors['cn.address'] = AddressBehavior::class;
         });
 
         // register custom component types
@@ -193,8 +200,26 @@ class Module extends \yii\base\Module
             $e->messages[] = new SystemMessage([
                 'key' => self::MESSAGE_KEY_ORG_INVITATION,
                 'heading' => 'When a member is invited to join an org.',
-                'subject' => '{{ inviter.friendlyName }} has invited you to join the {{ org.displayName }} organization',
+                'subject' => '{{ sender.friendlyName }} has invited you to join the {{ org.title }} organization',
                 'body' => file_get_contents(__DIR__ . '/emails/org_invitation.md'),
+            ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_ORDER_APPROVAL_REQUEST,
+                'heading' => 'When a member requests an order approval.',
+                'subject' => '{{ sender.friendlyName }} has requested an order approval for the {{ org.title }} organization',
+                'body' => file_get_contents(__DIR__ . '/emails/org_order_approval_request.md'),
+            ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_ORDER_APPROVAL_REJECT,
+                'heading' => 'When an owner rejects an order approval request',
+                'subject' => '{{ sender.friendlyName }} has rejected your order approval request for the {{ org.title }} organization',
+                'body' => file_get_contents(__DIR__ . '/emails/org_order_approval_reject.md'),
+            ]);
+            $e->messages[] = new SystemMessage([
+                'key' => self::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE,
+                'heading' => 'When an owner approves an order approval request',
+                'subject' => '{{ sender.friendlyName }} has approved your order approval request for the {{ org.title }} organization',
+                'body' => file_get_contents(__DIR__ . '/emails/org_order_approval_approve.md'),
             ]);
         });
 
