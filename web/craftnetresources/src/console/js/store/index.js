@@ -1,4 +1,5 @@
 import {createStore} from 'vuex'
+import addresses from './modules/addresses'
 import account from './modules/account'
 import app from './modules/app'
 import apps from './modules/apps'
@@ -17,6 +18,7 @@ import organizations from './modules/organizations'
 const store = createStore({
   strict: true,
   modules: {
+    addresses,
     account,
     app,
     apps,
