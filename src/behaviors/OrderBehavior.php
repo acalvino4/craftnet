@@ -86,6 +86,16 @@ class OrderBehavior extends Behavior
         $this->owner->billingAddressId = $org?->billingAddressId;
     }
 
+    public function getOrgId(?int $orgId): ?int
+    {
+        return $this->orgId;
+    }
+
+    public function setOrgId(?int $orgId): static
+    {
+        return $this->setOrg($orgId);
+    }
+
     public function getCreator(): ?User
     {
         return $this->creatorId
