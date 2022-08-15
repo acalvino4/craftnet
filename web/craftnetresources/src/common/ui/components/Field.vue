@@ -14,7 +14,7 @@
         :class="{
                 'text-sm font-medium text-black dark:text-white mb-0': true,
                 'block leading-5 sm:mt-px sm:pt-2': !vertical
-            }">{{ label }}</label>
+            }">{{ label }}{{required ? '*' : ''}}</label>
 
       <div
         v-if="instructions"
@@ -72,6 +72,10 @@ export default {
       default: false,
     },
     first: {
+      type: Boolean,
+      default: false,
+    },
+    required: {
       type: Boolean,
       default: false,
     }
