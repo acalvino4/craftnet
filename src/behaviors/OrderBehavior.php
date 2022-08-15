@@ -84,6 +84,8 @@ class OrderBehavior extends Behavior
         // TODO: should we be cloning and setting sourcePaymentSourceId? (ditto for address)
         $this->owner->paymentSourceId = $org?->paymentSourceId;
         $this->owner->billingAddressId = $org?->billingAddressId;
+
+        return $this;
     }
 
     public function getOrgId(?int $orgId): ?int
