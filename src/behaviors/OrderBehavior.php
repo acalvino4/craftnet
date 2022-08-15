@@ -79,11 +79,11 @@ class OrderBehavior extends Behavior
         $this->orgId = $org instanceof Org ? $org->id : $org;
 
         $this->setCreator($this->getCreator() ?? $this->owner->customer);
-        $this->owner->setCustomer($org?->owner);
+        $this->owner->setCustomer($this->getOrg()?->owner);
 
         // TODO: should we be cloning and setting sourcePaymentSourceId? (ditto for address)
-        $this->owner->paymentSourceId = $org?->paymentSourceId;
-        $this->owner->billingAddressId = $org?->billingAddressId;
+        $this->owner->paymentSourceId = $this->getOrg()?->paymentSourceId;
+        $this->owner->billingAddressId = $this->getOrg()?->billingAddressId;
 
         return $this;
     }
