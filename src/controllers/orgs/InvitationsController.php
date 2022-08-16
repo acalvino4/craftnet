@@ -11,15 +11,6 @@ use yii\web\Response;
 
 class InvitationsController extends SiteController
 {
-    /**
-     * @throws \yii\base\InvalidConfigException
-     * @throws \yii\web\ForbiddenHttpException
-     * @throws \yii\web\BadRequestHttpException
-     * @throws \yii\db\Exception
-     * @throws \yii\base\Exception
-     * @throws \yii\web\NotFoundHttpException
-     * @throws \yii\base\UserException
-     */
     public function actionSendInvitation(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
@@ -50,23 +41,20 @@ class InvitationsController extends SiteController
             ->setTo($email)
             ->send();
 
-        return $sent ? $this->asSuccess() : $this->asFailure();
+        return $sent ? $this->asSuccess('Invitation sent.') : $this->asFailure();
     }
 
-    /**
-     * @throws \yii\db\Exception
-     * @throws \yii\db\StaleObjectException
-     * @throws \yii\web\NotFoundHttpException
-     * @throws \yii\web\ForbiddenHttpException
-     * @throws \yii\base\UserException
-     */
     public function actionAcceptInvitation(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
-        $invitation = $org->getInvitation($this->_currentUser);
+        $invitation = $org->getInvitationForUser($this->_currentUser);
 
         if (!$invitation) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException('Invitation not found.');
+        }
+
+        if ($org->hasMember($this->_currentUser)) {
+            return $this->asFailure('User is already a member of this organization.');
         }
 
         if ($invitation->admin) {
@@ -75,9 +63,9 @@ class InvitationsController extends SiteController
             $org->addMember($this->_currentUser);
         }
 
-        $org->deleteInvitation($this->_currentUser);
+        $invitation->delete();
 
-        return $this->asSuccess();
+        return $this->asSuccess('Invitation accepted.');
     }
 
     /**
@@ -88,15 +76,13 @@ class InvitationsController extends SiteController
     public function actionDeclineInvitation(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
-        $invitation = $org->getInvitation($this->_currentUser);
+        $invitation = $org->getInvitationForUser($this->_currentUser);
 
         if (!$invitation) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException('Invitation not found.');
         }
 
-        $deleted = $org->deleteInvitation($this->_currentUser);
-
-        return $deleted ? $this->asSuccess() : $this->asFailure();
+        return $invitation->delete() ? $this->asSuccess('Invitation declined.') : $this->asFailure();
     }
 
     /**
@@ -115,12 +101,16 @@ class InvitationsController extends SiteController
         $user = Craft::$app->getUsers()->getUserById($userId);
 
         if (!$user) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException('User not found.');
         }
 
-        $deleted = $org->deleteInvitation($user);
+        $invitation = $org->getInvitationForUser($user);
 
-        return $deleted ? $this->asSuccess() : $this->asFailure();
+        if (!$invitation) {
+            throw new NotFoundHttpException('Invitation not found.');
+        }
+
+        return $invitation->delete() ? $this->asSuccess('Invitation cancelled.') : $this->asFailure();
     }
 
     /**
@@ -137,6 +127,6 @@ class InvitationsController extends SiteController
 
         $invitations = $org->getInvitations();
 
-        return $this->asSuccess(data: $invitations);
+        return $this->asSuccess(data: ['invitations' => $invitations]);
     }
 }

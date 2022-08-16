@@ -6,7 +6,9 @@ use Craft;
 use craft\base\Element;
 use craft\commerce\elements\Order;
 use craft\commerce\records\Transaction as TransactionRecord;
+use craft\elements\Address;
 use craft\elements\User;
+use craft\errors\ElementNotFoundException;
 use craft\helpers\App;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
@@ -21,6 +23,7 @@ use craftnet\plugins\PluginPurchasable;
 use DateTime;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
+use Throwable;
 use yii\base\Behavior;
 use yii\base\InvalidConfigException;
 use yii\base\UserException;
@@ -34,6 +37,7 @@ class OrderBehavior extends Behavior
     private ?int $orgId = null;
     private ?int $creatorId = null;
     private ?int $purchaserId = null;
+    private ?int $approvalRequestedForOrgId = null;
     private ?int $approvalRequestedById = null;
     private ?int $approvalRejectedById = null;
     private ?DateTime $approvalRejectedDate = null;
@@ -47,6 +51,7 @@ class OrderBehavior extends Behavior
         return [
             Order::EVENT_AFTER_COMPLETE_ORDER => [$this, 'afterComplete'],
             Element::EVENT_AFTER_SAVE => [$this, 'afterSave'],
+            Element::EVENT_BEFORE_SAVE => [$this, 'beforeSave'],
         ];
     }
 
@@ -67,6 +72,86 @@ class OrderBehavior extends Behavior
         return $this->approvalRequestedById && !$this->approvalRejectedById;
     }
 
+    /**
+     * @throws \yii\base\Exception
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     */
+    public function requestApproval(User $member, Org $org): bool
+    {
+        if (!$org->hasMember($member)) {
+            throw new UserException('User is not a member of this organization.');
+        }
+
+        if ($this->isPendingApproval()) {
+            throw new UserException('Order already has a pending approval request.');
+        }
+
+        if (!$this->hasCustomer($member)) {
+            throw new UserException('Order does not belong to this user');
+        }
+
+        $this->setApprovalRequestedBy($member);
+        $this->approvalRequestedForOrgId = $org->id;
+
+        $saved = Craft::$app->getElements()->saveElement($this->owner);
+
+        if (!$saved) {
+            return false;
+        }
+
+        return Craft::$app->getMailer()
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_REQUEST, [
+                'recipient' => $org->getOwner(),
+                'sender' => $member,
+                'order' => $this->owner,
+                'org' => $org,
+            ])
+            ->setTo($org->getOwner()->email)
+            ->send();
+    }
+
+    /**
+     * @throws Throwable
+     * @throws ElementNotFoundException
+     * @throws InvalidConfigException
+     * @throws \yii\base\Exception
+     * @throws UserException
+     */
+    public function rejectApproval(User $user, Org $org): bool
+    {
+        if (!$org->canRejectOrders($user)) {
+            throw new UserException('Only organization owners may reject approval requests.');
+        }
+
+        if (!$this->getApprovalRequestedBy()) {
+            throw new UserException('Order has no pending approval request.');
+        }
+
+        if ($this->getApprovalRejectedBy()) {
+            throw new UserException('Order has already been rejected.');
+        }
+
+        $this->setApprovalRejectedBy($user);
+        $saved = Craft::$app->getElements()->saveElement($this->owner);
+
+        if (!$saved) {
+            return false;
+        }
+
+        $recipient = $this->getApprovalRequestedBy();
+
+        return Craft::$app->getMailer()
+            ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_REJECT, [
+                'recipient' => $recipient,
+                'sender' => $this->_currentUser,
+                'order' => $this->owner,
+                'org' => $org,
+            ])
+            ->setTo($recipient->email)
+            ->send();
+    }
+
     public function getOrg(): ?Org
     {
         return $this->orgId
@@ -76,17 +161,43 @@ class OrderBehavior extends Behavior
 
     public function setOrg(Org|int|null $org): static
     {
+        $removingOrg = !$org && $this->orgId;
         $this->orgId = $org instanceof Org ? $org->id : $org;
+        $org = $this->getOrg();
 
-        $this->setCreator($this->getCreator() ?? $this->owner->customer);
-        $this->owner->setCustomer($this->getOrg()?->owner);
+        if ($org) {
+            // TODO: 4.2 will allow setPaymentSource
+            // $this->owner->setPaymentSource($this->getOrg()->getPaymentSource());
+            $this->owner->paymentSourceId = $this->getOrg()->paymentSourceId;
 
-        // TODO: should we clean up any addresses/paymentsources that have been cloned, when removing an address?
-        // TODO: should we be cloning and setting sourcePaymentSourceId? (ditto for address)
-        $this->owner->paymentSourceId = $this->getOrg()?->paymentSourceId;
-        $this->owner->billingAddressId = $this->getOrg()?->billingAddressId;
+            // Only set if we didn't already duplicate from org
+            if ($this->owner->sourceBillingAddressId !== $org->getBillingAddress()?->id) {
+                $this->setBillingAddress($org->getBillingAddress());
+            }
+
+        } else if ($removingOrg) {
+            // TODO: should we clean up any addresses/paymentsources that have been cloned, when removing an address?
+            $this->owner->paymentSourceId = null;
+            $this->owner->billingAddressId = null;
+            $this->owner->sourceBillingAddressId = null;
+        }
 
         return $this;
+    }
+
+    /**
+     * TODO: Commerce 4.2 may do this for us
+     */
+    public function setBillingAddress(?Address $address): void
+    {
+        if ($address && $address->ownerId !== $this->owner->id) {
+            $this->owner->sourceBillingAddressId = $address->id;
+            $address = Craft::$app->getElements()->duplicateElement($address, [
+                'ownerId' => $this->owner->id,
+            ]);
+        }
+
+        $this->owner->setBillingAddress($address);
     }
 
     public function getOrgId(?int $orgId): ?int
@@ -155,6 +266,14 @@ class OrderBehavior extends Behavior
     public function getPluginLicenses(): array
     {
         return Module::getInstance()->getPluginLicenseManager()->getLicensesByOrder($this->owner->id);
+    }
+
+    public function beforeSave(): void
+    {
+        // Set org again before saving to ensure billingAddress, paymentSource, etc are correct
+        if ($this->orgId) {
+            $this->setOrg($this->orgId);
+        }
     }
 
     public function afterSave(): void

@@ -12,7 +12,6 @@ use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\fieldlayoutelements\CustomField;
 use craft\fieldlayoutelements\TitleField;
-use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use craft\models\FieldLayout;
@@ -20,12 +19,10 @@ use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
 use craftnet\developers\FundsManager;
 use craftnet\plugins\Plugin;
-use DateTime;
 use Throwable;
 use yii\base\InvalidConfigException;
 use yii\base\UserException;
 use yii\db\Exception;
-use yii\db\StaleObjectException;
 
 /**
  *
@@ -262,28 +259,14 @@ class Org extends Element
         ]);
     }
 
-    public function getInvitation(User $user): ?InvitationRecord
+    public function getInvitationForUser(User $user): ?InvitationRecord
     {
         return InvitationRecord::find()
             ->where([
                 'orgId' => $this->id,
                 'userId' => $user->id,
             ])
-            ->andWhere(['>', 'expiryDate', Db::prepareDateForDb(new DateTime())])
             ->one();
-    }
-
-    /**
-     * @throws StaleObjectException
-     */
-    public function deleteInvitation(User $user): bool
-    {
-        $invitationRecord = InvitationRecord::findOne([
-            'orgId' => $this->id,
-            'userId' => $user->id,
-        ]);
-
-        return (bool)$invitationRecord?->delete();
     }
 
     public function getInvitations(): array
@@ -296,32 +279,27 @@ class Org extends Element
     /**
      * @throws \yii\base\UserException
      */
-    public function createInvitation(User $user, ?MemberRoleEnum $role, ?DateTime $expiryDate = null): bool
+    public function createInvitation(User $user, ?MemberRoleEnum $role): bool
     {
         $role = $role ?? MemberRoleEnum::Member();
         $admin = $role === MemberRoleEnum::Admin();
+
+        if ($this->hasMember($user)) {
+            throw new UserException('User is already a member of this organization.');
+        }
 
         if ($role === MemberRoleEnum::Owner()) {
             throw new UserException('Owners cannot be invited to organizations.');
         }
 
-        if ($this->getInvitation($user)) {
+        if ($this->getInvitationForUser($user)) {
             throw new UserException('User already has an existing invitation to this organization.');
-        }
-
-        if (!$expiryDate) {
-            $generalConfig = Craft::$app->getConfig()->getGeneral();
-            $interval = DateTimeHelper::secondsToInterval($generalConfig->defaultTokenDuration);
-            $expiryDate = DateTimeHelper::currentUTCDateTime();
-            $expiryDate->add($interval);
         }
 
         $invitationRecord = new InvitationRecord();
         $invitationRecord->orgId = $this->id;
         $invitationRecord->userId = $user->id;
         $invitationRecord->admin = $admin;
-
-        $invitationRecord->expiryDate = Db::prepareDateForDb($expiryDate);
 
         return $invitationRecord->save();
     }
@@ -440,9 +418,9 @@ class Org extends Element
             ->execute();
     }
 
-    public function getOwner(): ?User
+    public function getOwner(): User
     {
-        return $this->ownerId ? Craft::$app->getUsers()->getUserById($this->ownerId) : null;
+        return Craft::$app->getUsers()->getUserById($this->ownerId);
     }
 
     public function setOwner(User|int $user): static
@@ -598,6 +576,11 @@ class Org extends Element
         return $this->requireOrderApproval
             ? $this->hasOwner($user) || $this->hasAdmin($user)
             : $this->hasMember($user);
+    }
+
+    public function canRejectOrders(User $user): bool
+    {
+        return $user->admin || $this->hasOwner($user);
     }
 
     public function canApproveOrders(User $user): bool

@@ -11,9 +11,6 @@ use craft\commerce\models\LineItem;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
 use craft\elements\User;
-use craft\errors\ElementNotFoundException;
-use craft\errors\InvalidElementException;
-use craft\errors\UnsupportedSiteException;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craftnet\behaviors\OrderBehavior;
@@ -73,7 +70,11 @@ class CartsController extends BaseApiController
             'orderLanguage' => Craft::$app->language,
         ]);
 
-        $this->_updateCart($cart, $payload);
+        try {
+            $this->_updateCart($cart, $payload);
+        } catch (Throwable $e) {
+            return $this->asFailure($e->getMessage());
+        }
 
         return $this->asJson([
             'cart' => $this->cartArray($cart),
@@ -107,7 +108,12 @@ class CartsController extends BaseApiController
     {
         $cart = $this->getCart($orderNumber);
         $payload = $this->getPayload('update-cart-request');
-        $this->_updateCart($cart, $payload);
+
+        try {
+            $this->_updateCart($cart, $payload);
+        } catch (Throwable $e) {
+            return $this->asFailure($e->getMessage());
+        }
 
         return $this->asJson([
             'updated' => true,
@@ -204,30 +210,11 @@ class CartsController extends BaseApiController
             $orgId = $this->request->getBodyParam('orgId', $existingOrgFromCart?->id);
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
             $orgRemoved = !$org && $existingOrgFromCart;
-            $customer = $org?->getOwner() ?? $currentUser;
-            $billingAddress = $org?->getBillingAddress() ?? $cart->billingAddress;
             $makePrimary = $payload?->makePrimary ?? false;
 
-            if ($orgRemoved) {
-                $cart->setOrg(null);
-            } else if ($org) {
-                if (!$org->canPurchase($currentUser)) {
-                    throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
-                }
-
-                if (isset($payload->billingAddress)) {
-                    throw new BadRequestHttpException('Organizations must use their specified billing address.');
-                }
-
-                $cart->setOrg($org);
-                $cart->setPurchaser($currentUser);
-            } else if ($orgId) {
-                throw new BadRequestHttpException('Invalid organization');
-            }
-
             // set the email/customer before saving the cart, so the cart doesn't create its own customer record
-            if ($customer !== null) {
-                $this->_updateCartEmailAndCustomer($cart, $customer, null, $errors);
+            if ($currentUser !== null) {
+                $this->_updateCartEmailAndCustomer($cart, $currentUser, null, $errors);
             } else if (isset($payload->email)) {
                 $this->_updateCartEmailAndCustomer($cart, null, $payload->email, $errors);
             }
@@ -237,24 +224,44 @@ class CartsController extends BaseApiController
                 throw new Exception('Could not save the cart: ' . implode(', ', $cart->getErrorSummary(true)));
             }
 
+            if ($orgRemoved) {
+                $cart->setOrg(null);
+            } else if ($org) {
+                $this->requireLogin();
+
+                if ($cart->isPendingApproval() && !$org->canApproveOrders($currentUser)) {
+                    throw new ForbiddenHttpException('Member does not have permission to approve orders for thie organization.');
+                }
+
+                if (!$org->canPurchase($currentUser)) {
+                    throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
+                }
+
+                if (isset($payload->billingAddress) || $makePrimary) {
+                    throw new BadRequestHttpException('Organizations must use their specified billing information.');
+                }
+
+                $cart->setOrg($org);
+                $cart->setCreator($cart->customer);
+                $cart->setCustomer($org->getOwner());
+                $cart->setPurchaser($currentUser);
+            } else if ($orgId) {
+                throw new BadRequestHttpException('Invalid organization');
+            }
+
             // billing address
-            if ($billingAddress) {
-                $this->_updateCartBillingAddress($cart, $billingAddress);
-            } else if (isset($payload->billingAddress)) {
-                $this->_updateCartBillingAddress(
-                    $cart,
-                    $this->_createCartBillingAddress($cart, $payload->billingAddress, $errors),
-                );
+            if (isset($payload->billingAddress)) {
+                $this->_updateCartBillingAddress($cart, $payload->billingAddress, $errors);
             }
 
             if ($makePrimary) {
-                // TODO: https://github.com/craftcms/commerce/pull/
+                // TODO: Commerce 4.2
                 // $customer->setPrimaryPaymentSourceId();
 
                 /** @var Address $userBillingAddress */
                 $userBillingAddress = Craft::$app->getElements()->duplicateElement(
                     $cart->getBillingAddress(),
-                    ['ownerId' => $customer->id],
+                    ['ownerId' => $currentUser->id],
                 );
                 $cart->sourceBillingAddressId = $userBillingAddress->id;
                 $cart->makePrimaryBillingAddress = true;
@@ -384,28 +391,7 @@ class CartsController extends BaseApiController
         ];
     }
 
-    /**
-     * @param Order $cart
-     * @param ?Address $billingAddress
-     * @throws Exception
-     * @throws Throwable
-     * @throws ElementNotFoundException
-     * @throws InvalidElementException
-     * @throws UnsupportedSiteException
-     */
-    private function _updateCartBillingAddress(Order $cart, ?Address $billingAddress): void
-    {
-        if ($billingAddress && $billingAddress->ownerId !== $cart->id) {
-            $cart->sourceBillingAddressId = $billingAddress?->id;
-            $billingAddress = Craft::$app->getElements()->duplicateElement($billingAddress, [
-                'ownerId' => $cart->id,
-            ]);
-        }
-
-        $cart->setBillingAddress($billingAddress);
-    }
-
-    private function _createCartBillingAddress(Order $cart, \stdClass $billingAddress, array &$errors): ?Address
+    private function _updateCartBillingAddress(Order $cart, \stdClass $billingAddress, array &$errors): void
     {
         $addressErrors = [];
         $country = null;
@@ -507,7 +493,7 @@ class CartsController extends BaseApiController
 
         if (!empty($addressErrors)) {
             array_push($errors, ...$addressErrors);
-            return null;
+            return;
         }
 
         // save the address
@@ -528,7 +514,20 @@ class CartsController extends BaseApiController
             $cart->makePrimaryBillingAddress = true;
         }
 
-        return $address;
+        /**
+         * @deprecated makePrimary should be set on top-level payload
+         */
+        if (!empty($billingAddress->makePrimary)) {
+            /** @var Address $userBillingAddress */
+            $userBillingAddress = Craft::$app->getElements()->duplicateElement(
+                $address,
+                ['ownerId' => $customer->id],
+            );
+            $cart->sourceBillingAddressId = $userBillingAddress->id;
+            $cart->makePrimaryBillingAddress = true;
+        }
+
+        $cart->setBillingAddress($address);
     }
 
     /**
@@ -556,7 +555,7 @@ class CartsController extends BaseApiController
      * @param $errors
      * @return LineItem|null
      */
-    private function _cmsEditionLineItem(Order $cart, \stdClass $item, string $_aramPrefix, &$errors): ?LineItem
+    private function _cmsEditionLineItem(Order $cart, \stdClass $item, string $paramPrefix, &$errors): ?LineItem
     {
         $edition = CmsEdition::find()
             ->handle($item->edition)

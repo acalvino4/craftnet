@@ -127,6 +127,7 @@ class OrgsController extends Controller
                 ]);
 
                 // Previously, users only had one stored payment sources
+                // TODO: revisit with Commerce 4.2
                 $org->paymentSourceId = Commerce::getInstance()
                     ?->getPaymentSources()
                     ?->getAllPaymentSourcesByCustomerId($user->id)[0]?->id ?? null;

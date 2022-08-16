@@ -73,9 +73,12 @@ class OrderQueryBehavior extends Behavior
         ]);
         $this->owner->query->leftJoin(['orgsOrders' => Table::ORGS_ORDERS], '[[orgsOrders.id]] = [[commerce_orders.id]]');
         $this->owner->subQuery->leftJoin(['orgsOrders' => Table::ORGS_ORDERS], '[[orgsOrders.id]] = [[commerce_orders.id]]');
+        $this->owner->query->leftJoin(['orgsOrderApprovals' => Table::ORGS_ORDERAPPROVALS], '[[orgsOrderApprovals.orderId]] = [[orgsOrders.id]]');
+        $this->owner->subQuery->leftJoin(['orgsOrderApprovals' => Table::ORGS_ORDERAPPROVALS], '[[orgsOrderApprovals.orderId]] = [[orgsOrders.id]]');
 
         if ($this->orgId) {
             $this->owner->subQuery->andWhere(['orgsOrders.orgId' => $this->orgId]);
+            // $this->owner->subQuery->orWhere(['orgsOrderApprovals.orgId' => $this->orgId]);
         }
 
         if ($this->creatorId) {
@@ -85,9 +88,6 @@ class OrderQueryBehavior extends Behavior
         if ($this->purchaserId) {
             $this->owner->subQuery->andWhere(['orgsOrders.purchaserId' => $this->purchaserId]);
         }
-
-        $this->owner->query->leftJoin(['orgsOrderApprovals' => Table::ORGS_ORDERAPPROVALS], '[[orgsOrderApprovals.orderId]] = [[orgsOrders.id]]');
-        $this->owner->subQuery->leftJoin(['orgsOrderApprovals' => Table::ORGS_ORDERAPPROVALS], '[[orgsOrderApprovals.orderId]] = [[orgsOrders.id]]');
 
         if ($this->approvalRequestedById) {
             $this->owner->subQuery->andWhere(['orgsOrderApprovals.requestedById' => $this->approvalRequestedById]);
