@@ -200,28 +200,30 @@ class CartsController extends BaseApiController
             $cart->returnUrl = App::parseEnv('$URL_CONSOLE') . 'thank-you';
 
             $currentUser = Craft::$app->getUser()->getIdentity(false);
-            $orgId = $this->request->getBodyParam('orgId');
-            $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : $cart->getOrg();
+            $existingOrgFromCart = $cart->getOrg();
+            $orgId = $this->request->getBodyParam('orgId', $existingOrgFromCart?->id);
+            $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
+            $orgRemoved = !$org && $existingOrgFromCart;
+            $customer = $org?->getOwner() ?? $currentUser;
+            $billingAddress = $org?->getBillingAddress() ?? $cart->billingAddress;
+            $makePrimary = $payload?->makePrimary ?? false;
 
-            if ($org) {
+            if ($orgRemoved) {
+                $cart->setOrg(null);
+            } else if ($org) {
                 if (!$org->canPurchase($currentUser)) {
                     throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
                 }
 
-                $cart->setOrg($org);
-                $cart->setPurchaser($currentUser);
-
-                // TODO: review now that we're doing this in OrderBehavior
-
                 if (isset($payload->billingAddress)) {
                     throw new BadRequestHttpException('Organizations must use their specified billing address.');
                 }
-            } else {
+
+                $cart->setOrg($org);
+                $cart->setPurchaser($currentUser);
+            } else if ($orgId) {
                 throw new BadRequestHttpException('Invalid organization');
             }
-
-            $customer = $cart->getCustomer() ?? $currentUser;
-            $billingAddress = $org?->getBillingAddress();
 
             // set the email/customer before saving the cart, so the cart doesn't create its own customer record
             if ($customer !== null) {
@@ -241,8 +243,21 @@ class CartsController extends BaseApiController
             } else if (isset($payload->billingAddress)) {
                 $this->_updateCartBillingAddress(
                     $cart,
-                    $this->_createCartBillingAddress($cart, $payload->billingAddress, $errors)
+                    $this->_createCartBillingAddress($cart, $payload->billingAddress, $errors),
                 );
+            }
+
+            if ($makePrimary) {
+                // TODO: https://github.com/craftcms/commerce/pull/
+                // $customer->setPrimaryPaymentSourceId();
+
+                /** @var Address $userBillingAddress */
+                $userBillingAddress = Craft::$app->getElements()->duplicateElement(
+                    $cart->getBillingAddress(),
+                    ['ownerId' => $customer->id],
+                );
+                $cart->sourceBillingAddressId = $userBillingAddress->id;
+                $cart->makePrimaryBillingAddress = true;
             }
 
             // coupon code
@@ -504,10 +519,10 @@ class CartsController extends BaseApiController
             throw new Exception('Could not save address: ' . implode(', ', $address->getErrorSummary(true)));
         }
 
+        /**
+         * @deprecated makePrimary should be set on the top-level payload
+         */
         if ($billingAddress?->makePrimary ?? false) {
-            // TODO: makePrimary should probably be on the payload, like it is for payments?
-            // Eventually we will need to set $cart->makePrimaryPaymentSource = true
-
             /** @var Address $userBillingAddress */
             $userBillingAddress = Craft::$app->getElements()->duplicateElement(
                 $address,

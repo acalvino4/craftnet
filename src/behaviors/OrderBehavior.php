@@ -81,6 +81,7 @@ class OrderBehavior extends Behavior
         $this->setCreator($this->getCreator() ?? $this->owner->customer);
         $this->owner->setCustomer($this->getOrg()?->owner);
 
+        // TODO: should we clean up any addresses/paymentsources that have been cloned, when removing an address?
         // TODO: should we be cloning and setting sourcePaymentSourceId? (ditto for address)
         $this->owner->paymentSourceId = $this->getOrg()?->paymentSourceId;
         $this->owner->billingAddressId = $this->getOrg()?->billingAddressId;
