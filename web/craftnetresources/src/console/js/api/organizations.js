@@ -74,7 +74,7 @@ export default {
   },
 
   getOrganizations() {
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/all')
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs')
   },
 
   removeMember({organizationId, memberId}) {
