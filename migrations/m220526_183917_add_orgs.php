@@ -95,9 +95,13 @@ class m220526_183917_add_orgs extends Migration
 
         $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['orderId'], CommerceTable::ORDERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
+
+        // Referencing CraftTable::USERS and not Table::ORGS_MEMBERS intentionally:
+        // When members leave an org, we want to keep requestedById/rejectedById references
         $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['requestedById'], CraftTable::USERS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['rejectedById'], CraftTable::USERS, ['id'], 'CASCADE');
-        $this->createIndex(null, Table::ORGS_ORDERAPPROVALS, ['orderId', 'requestedById'], true);
+
+        $this->createIndex(null, Table::ORGS_ORDERAPPROVALS, ['orderId', 'orgId', 'requestedById'], true);
 
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');
