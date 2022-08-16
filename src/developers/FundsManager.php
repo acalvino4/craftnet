@@ -14,7 +14,6 @@ use craftnet\errors\InaccessibleFundsException;
 use craftnet\errors\InsufficientFundsException;
 use craftnet\errors\MissingStripeAccountException;
 use craftnet\orgs\Org;
-use Moccalotto\Eu\CountryInfo;
 use Stripe\Charge;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;
@@ -315,8 +314,6 @@ insert into {{craftnet_developerledger}} (
     [[fee]],
     [[balance]],
     [[type]],
-    [[country]],
-    [[isEuMember]],
     [[dateCreated]]
 ) values (
     :developerId,
@@ -330,14 +327,9 @@ insert into {{craftnet_developerledger}} (
         where [[id]] = :developerId
     ),
     :type,
-    :country,
-    :isEuMember,
     :dateCreated
 )
 SQL;
-        // TODO: can we just drop country, isEuMember?
-        // $country = $this->developer->country;
-        $country = null;
         $db->createCommand($ledgerSql, [
             'developerId' => $this->developer->id,
             'note' => $note,
@@ -345,8 +337,6 @@ SQL;
             'debit' => $debit,
             'fee' => $fee,
             'type' => $type,
-            'country' => $country,
-            'isEuMember' => $country ? (new CountryInfo())->isEuMember($country) : null,
             'dateCreated' => Db::prepareDateForDb(new \DateTime()),
         ])->execute();
 

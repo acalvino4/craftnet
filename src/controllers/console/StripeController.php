@@ -68,11 +68,7 @@ class StripeController extends BaseController
         $user->stripeAccessToken = $accessToken->getToken();
         $user->stripeAccount = $resourceOwner->getId();
 
-        // set their country
-        Stripe::setApiKey($user->stripeAccessToken);
-        $account = Account::retrieve();
-        $user->country = $account->country;
-
+        // TODO: do we still need this?
         $user->saveDeveloperInfo();
 
         $referrer = Craft::$app->getSession()->get('stripe.referrer');
