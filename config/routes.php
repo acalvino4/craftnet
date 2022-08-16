@@ -109,6 +109,7 @@ return [
         'POST    addresses/<addressId:\d+>' => 'craftnet/console/addresses/save-address',
         'DELETE  addresses/<addressId:\d+>' => 'craftnet/console/addresses/remove-address',
         'POST    addresses/info' => 'craftnet/console/addresses/get-address-info',
+        'GET     addresses/countries' => 'craftnet/console/addresses/get-countries',
 
         'oauth/login' => 'oauth-server/oauth/login',
         'oauth/authorize' => 'oauth-server/oauth/authorize',

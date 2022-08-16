@@ -3,6 +3,7 @@
 namespace craftnet\controllers\console;
 
 use CommerceGuys\Addressing\AddressFormat\AddressFormat;
+use CommerceGuys\Addressing\Country\Country;
 use CommerceGuys\Addressing\Subdivision\Subdivision;
 use Craft;
 use craft\elements\Address;
@@ -23,8 +24,22 @@ use yii\web\Response;
  */
 class AddressesController extends BaseController
 {
-    protected const FORMAT_CACHE_KEY_PREFIX = 'formatData';
-    protected const FORMAT_CACHE_DURATION = 60 * 60 * 24 * 7;
+    protected const ADDRESS_INFO_CACHE_DURATION = 60 * 60 * 24 * 7;
+    protected const COUNTRIES_CACHE_DURATION = 60 * 60 * 24 * 7;
+
+    public function actionGetCountries(): Response
+    {
+        $countries = Craft::$app->getCache()->getOrSet(__METHOD__, function() {
+            return Collection::make(Craft::$app->getAddresses()->getCountryRepository()->getAll())
+                ->map(fn(Country $country) => [
+                    'countryCode' => $country->getCountryCode(),
+                    'name' => $country->getName(),
+                ])
+                ->all();
+        }, self::COUNTRIES_CACHE_DURATION);
+
+        return $this->asSuccess(data: ['countries' => $countries]);
+    }
 
     /**
      * @return Response
@@ -33,24 +48,26 @@ class AddressesController extends BaseController
     public function actionGetAddressInfo(): Response
     {
         $this->requireAcceptsJson();
-        $subdivisionRepo = Craft::$app->getAddresses()->getSubdivisionRepository();
-        $addressFormatRepo = Craft::$app->getAddresses()->getAddressFormatRepository();
-        $cache = Craft::$app->getCache();
         $parents = Craft::$app->getRequest()->getRequiredParam('parents');
 
         if (!is_array($parents) || empty($parents)) {
             throw new BadRequestHttpException();
         }
 
-        $cacheKey = [self::FORMAT_CACHE_KEY_PREFIX => $parents];
+        $cacheKey = [__METHOD__ => $parents];
+        $addressInfo = Craft::$app->getCache()->getOrSet($cacheKey, function() use ($parents) {
+            $subdivisionRepo = Craft::$app->getAddresses()->getSubdivisionRepository();
+            $addressFormatRepo = Craft::$app->getAddresses()->getAddressFormatRepository();
 
-        // First item must always be a country
-        $country = $addressFormatRepo->get(Collection::make($parents)->first());
-        $subdivisions = Collection::make($subdivisionRepo->getAll($parents));
-        $addressInfo = $cache->getOrSet($cacheKey, fn() => [
-            'format' => $this->_formatAsArray($country),
-            'subdivisions' => $subdivisions->map(fn($subdivision) => $this->_subdivisionsAsArray($subdivision)),
-        ], self::FORMAT_CACHE_DURATION);
+            // First item must always be a country
+            $country = $addressFormatRepo->get(Collection::make($parents)->first());
+            $subdivisions = Collection::make($subdivisionRepo->getAll($parents));
+
+            return [
+                'format' => $this->_formatAsArray($country),
+                'subdivisions' => $subdivisions->map(fn($subdivision) => $this->_subdivisionsAsArray($subdivision)),
+            ];
+        }, self::ADDRESS_INFO_CACHE_DURATION);
 
         return $this->asSuccess(data: ['addressInfo' => $addressInfo]);
     }
