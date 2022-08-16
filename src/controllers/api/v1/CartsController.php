@@ -395,18 +395,14 @@ class CartsController extends BaseApiController
      */
     private function _updateCartBillingAddress(Order $cart, ?Address $billingAddress): void
     {
-        $address = null;
-
-        if ($billingAddress) {
-            $address = $billingAddress->ownerId === $cart->id
-                ? $billingAddress
-                : Craft::$app->getElements()->duplicateElement($billingAddress, [
-                    'ownerId' => $cart->id,
-                ]);
+        if ($billingAddress && $billingAddress->ownerId !== $cart->id) {
+            $cart->sourceBillingAddressId = $billingAddress?->id;
+            $billingAddress = Craft::$app->getElements()->duplicateElement($billingAddress, [
+                'ownerId' => $cart->id,
+            ]);
         }
 
-        $cart->sourceBillingAddressId = $billingAddress?->id;
-        $cart->setBillingAddress($address);
+        $cart->setBillingAddress($billingAddress);
     }
 
     private function _createCartBillingAddress(Order $cart, \stdClass $billingAddress, array &$errors): ?Address
