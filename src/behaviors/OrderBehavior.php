@@ -37,7 +37,7 @@ class OrderBehavior extends Behavior
     private ?int $orgId = null;
     private ?int $creatorId = null;
     private ?int $purchaserId = null;
-    private ?int $approvalRequestedForOrgId = null;
+    public ?int $approvalRequestedForOrgId = null;
     private ?int $approvalRequestedById = null;
     private ?int $approvalRejectedById = null;
     private ?DateTime $approvalRejectedDate = null;
@@ -124,12 +124,12 @@ class OrderBehavior extends Behavior
             throw new UserException('Only organization owners may reject approval requests.');
         }
 
-        if (!$this->getApprovalRequestedBy()) {
-            throw new UserException('Order has no pending approval request.');
-        }
-
         if ($this->getApprovalRejectedBy()) {
             throw new UserException('Order has already been rejected.');
+        }
+
+        if (!$this->isPendingApproval()) {
+            throw new UserException('Order has no pending approval request.');
         }
 
         $this->setApprovalRejectedBy($user);
@@ -144,7 +144,7 @@ class OrderBehavior extends Behavior
         return Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_REJECT, [
                 'recipient' => $recipient,
-                'sender' => $this->_currentUser,
+                'sender' => $user,
                 'order' => $this->owner,
                 'org' => $org,
             ])
@@ -467,28 +467,29 @@ class OrderBehavior extends Behavior
      */
     private function _updateOrgOrders(): bool
     {
-        if (!$this->orgId) {
-            return (bool) Db::delete(Table::ORGS_ORDERS, [
+        if ($this->orgId) {
+            Db::upsert(Table::ORGS_ORDERS, [
+                'id' => $this->owner->id,
+                'orgId' => $this->orgId,
+                'creatorId' => $this->creatorId,
+                'purchaserId' => $this->purchaserId,
+            ]);
+        } else {
+            Db::delete(Table::ORGS_ORDERS, [
                 'id' => $this->owner->id,
             ]);
         }
 
-        Db::upsert(Table::ORGS_ORDERS, [
-            'id' => $this->owner->id,
-            'orgId' => $this->orgId,
-            'creatorId' => $this->creatorId,
-            'purchaserId' => $this->purchaserId,
-        ]);
-
-        if ($this->approvalRequestedById) {
+        if ($this->approvalRequestedForOrgId) {
             Db::upsert(Table::ORGS_ORDERAPPROVALS, [
                 'orderId' => $this->owner->id,
+                'orgId' => $this->approvalRequestedForOrgId,
                 'requestedById' => $this->approvalRequestedById,
                 'rejectedById' => $this->approvalRejectedById,
                 'dateRejected' => Db::prepareDateForDb($this->approvalRejectedDate),
             ]);
         } else {
-            return (bool) Db::delete(Table::ORGS_ORDERAPPROVALS, [
+            Db::delete(Table::ORGS_ORDERAPPROVALS, [
                 'orderId' => $this->owner->id,
             ]);
         }
@@ -509,13 +510,14 @@ class OrderBehavior extends Behavior
 
         $org = $this->getOrg();
         $requestedBy = $this->getApprovalRequestedBy();
+        $this->approvalRequestedForOrgId = null;
         $this->_updateOrgOrders();
 
         if (!$requestedBy) {
             return false;
         }
 
-        $sent = Craft::$app->getMailer()
+        return Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_ORDER_APPROVAL_APPROVE, [
                 'recipient' => $requestedBy,
                 'sender' => $org->owner,
@@ -524,11 +526,5 @@ class OrderBehavior extends Behavior
             ])
             ->setTo($requestedBy->email)
             ->send();
-
-        if (!$sent) {
-            throw new UserException('Unable to send approval email.');
-        }
-
-        return true;
     }
 }

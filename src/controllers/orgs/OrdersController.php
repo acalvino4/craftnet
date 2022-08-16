@@ -67,7 +67,6 @@ class OrdersController extends SiteController
         $org = static::getOrgById($orgId);
         $order = static::getOrderByNumber($orderNumber);
 
-
         try {
             $requested = $order->rejectApproval($this->_currentUser, $org);
         } catch(UserException $e) {

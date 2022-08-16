@@ -211,6 +211,11 @@ class CartsController extends BaseApiController
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
             $orgRemoved = !$org && $existingOrgFromCart;
             $makePrimary = $payload?->makePrimary ?? false;
+            $originalCustomer = $cart->customer;
+
+            if ($cart->approvalRequestedForOrgId && $cart->approvalRequestedForOrgId != $orgId) {
+                throw new ForbiddenHttpException('This order must be purchased for the requested organization.');
+            }
 
             // set the email/customer before saving the cart, so the cart doesn't create its own customer record
             if ($currentUser !== null) {
@@ -230,7 +235,7 @@ class CartsController extends BaseApiController
                 $this->requireLogin();
 
                 if ($cart->isPendingApproval() && !$org->canApproveOrders($currentUser)) {
-                    throw new ForbiddenHttpException('Member does not have permission to approve orders for thie organization.');
+                    throw new ForbiddenHttpException('Member does not have permission to approve orders for this organization.');
                 }
 
                 if (!$org->canPurchase($currentUser)) {
@@ -242,7 +247,7 @@ class CartsController extends BaseApiController
                 }
 
                 $cart->setOrg($org);
-                $cart->setCreator($cart->customer);
+                $cart->setCreator($originalCustomer);
                 $cart->setCustomer($org->getOwner());
                 $cart->setPurchaser($currentUser);
             } else if ($orgId) {
