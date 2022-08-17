@@ -4,6 +4,7 @@ namespace craftnet\controllers\orgs;
 
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
+use craft\commerce\Plugin as Commerce;
 use craftnet\behaviors\OrderBehavior;
 use craftnet\behaviors\OrderQueryBehavior;
 use yii\base\UserException;
@@ -55,7 +56,13 @@ class OrdersController extends SiteController
             return $this->asFailure($e->getMessage());
         }
 
-        return $requested ? $this->asSuccess('Order approval requested.') : $this->asFailure();
+        if (!$requested) {
+            $this->asFailure();
+        }
+
+        Commerce::getInstance()->getCarts()->forgetCart();
+
+        return $this->asSuccess('Order approval requested.');
     }
 
     /**
