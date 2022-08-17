@@ -213,7 +213,7 @@ class CartsController extends BaseApiController
             $makePrimary = $payload?->makePrimary ?? false;
             $originalCustomer = $cart->customer ?? $currentUser;
 
-            if ($cart->approvalRequestedForOrgId && $cart->approvalRequestedForOrgId != $orgId) {
+            if ($cart->isPendingApproval() && $cart->approvalRequestedForOrgId && $cart->approvalRequestedForOrgId != $orgId) {
                 throw new ForbiddenHttpException('This order must be purchased for the requested organization.');
             }
 
@@ -239,8 +239,15 @@ class CartsController extends BaseApiController
             } else if ($org) {
                 $this->requireLogin();
 
-                if ($cart->isPendingApproval() && !$org->canApproveOrders($currentUser)) {
-                    throw new ForbiddenHttpException('Member does not have permission to approve orders for this organization.');
+                if ($cart->isPendingApproval()) {
+                    if (!$org->canApproveOrders($currentUser)) {
+                        throw new ForbiddenHttpException('Member does not have permission to approve orders for this organization.');
+                    }
+
+                    if ($payload?->items ?? null) {
+                        throw new ForbiddenHttpException('Orders pending approval cannot be changed.');
+                    }
+
                 }
 
                 if (!$org->canPurchase($currentUser)) {
