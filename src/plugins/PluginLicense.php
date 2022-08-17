@@ -51,7 +51,7 @@ class PluginLicense extends License
         return $this->ownerId ? Craft::$app->getElements()->getElementById($this->ownerId) : null;
     }
 
-    public function canManage(User $user): bool
+    public function canEdit(User $user): bool
     {
         if ($this->ownerId === $user->id) {
             return true;
@@ -71,6 +71,16 @@ class PluginLicense extends License
         $owner = $this->getOwner();
 
         return $owner instanceof Org && $owner->hasAdmin($user);
+    }
+
+    public function canView(User $user): bool
+    {
+        return $this->canEdit($user);
+    }
+
+    public function canTransfer(User $user): bool
+    {
+        return $this->canRelease($user);
     }
 
     /**
