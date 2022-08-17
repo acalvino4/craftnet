@@ -7,7 +7,7 @@
     <div class="mt-6 grid grid-cols-3 gap-4">
       <div class="flex">
         <a
-          class="border border-gray-300 dark:border-gray-600 border-dashed block flex-1 rounded-md flex items-center justify-center"
+          class="border border-gray-300 dark:border-gray-600 border-dashed block flex-1 rounded-md flex items-center justify-center p-4"
           href="#"
           @click="add"
         >
