@@ -211,6 +211,8 @@ abstract class BaseController extends Controller
     {
         return $user ? $user->getAttributes([
             'id',
+            'email',
+            'name',
         ]) + [
             'photo' => $user->photo?->getAttributes(['id', 'url']),
         ] : null;
