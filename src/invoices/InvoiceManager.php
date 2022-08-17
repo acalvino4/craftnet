@@ -2,12 +2,15 @@
 
 namespace craftnet\invoices;
 
+use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\db\Query;
 use craft\elements\User;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
+use craftnet\behaviors\OrderQueryBehavior;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use yii\base\Component;
 
 class InvoiceManager extends Component
@@ -18,7 +21,7 @@ class InvoiceManager extends Component
     /**
      * Get invoices.
      *
-     * @param User $customer
+     * @param User|Org $owner
      * @param string|null $searchQuery
      * @param int $limit
      * @param $page
@@ -27,9 +30,9 @@ class InvoiceManager extends Component
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public function getInvoices(User $customer, string $searchQuery = null, int $limit, $page, $orderBy, $ascending): array
+    public function getInvoices(User|Org $owner, string $searchQuery = null, int $limit, $page, $orderBy, $ascending): array
     {
-        $query = $this->_createInvoiceQuery($customer, $searchQuery);
+        $query = $this->_createInvoiceQuery($owner, $searchQuery);
 
         $perPage = $limit;
         $offset = ($page - 1) * $perPage;
@@ -44,19 +47,19 @@ class InvoiceManager extends Component
 
         $results = $query->all();
 
-        return $this->transformInvoices($customer, $results);
+        return $this->transformInvoices($owner, $results);
     }
 
     /**
      * Get total invoices.
      *
-     * @param User $customer
+     * @param User|org $owner
      * @param string|null $searchQuery
      * @return int
      */
-    public function getTotalInvoices(User $customer, string $searchQuery = null): int
+    public function getTotalInvoices(User|org $owner, string $searchQuery = null): int
     {
-        $invoiceQuery = $this->_createInvoiceQuery($customer, $searchQuery);
+        $invoiceQuery = $this->_createInvoiceQuery($owner, $searchQuery);
 
         return $invoiceQuery->count();
     }
@@ -64,38 +67,36 @@ class InvoiceManager extends Component
     /**
      * Get invoice by its number.
      *
-     * @param User $customer
+     * @param User|Org $owner
      * @param $number
      * @return mixed
      * @throws \yii\base\InvalidConfigException
      */
-    public function getInvoiceByNumber(User $customer, $number)
+    public function getInvoiceByNumber(User|Org $owner, $number)
     {
-        $query = $this->_createInvoiceQuery($customer);
+        $query = $this->_createInvoiceQuery($owner);
         $query->andWhere(Db::parseParam('commerce_orders.number', $number));
 
         $result = $query->one();
 
-        return $this->transformInvoice($customer, $result);
+        return $this->transformInvoice($owner, $result);
     }
 
     // Private Methods
     // =========================================================================
 
     /**
-     * @param User $customer
+     * @param User|Org $owner
      * @param $results
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    private function transformInvoices(User $customer, $results)
+    private function transformInvoices(User|Org $owner, $results)
     {
         $orders = [];
 
         foreach ($results as $result) {
-            $order = $this->transformInvoice($customer, $result);
-
-
+            $order = $this->transformInvoice($owner, $result);
             $orders[] = $order;
         }
 
@@ -103,12 +104,12 @@ class InvoiceManager extends Component
     }
 
     /**
-     * @param User $customer
+     * @param User|Org $owner
      * @param $result
      * @return mixed
      * @throws \yii\base\InvalidConfigException
      */
-    private function transformInvoice(User $customer, $result)
+    private function transformInvoice(User|Org $owner, $result)
     {
         $order = $result->getAttributes(['number', 'datePaid', 'shortNumber', 'itemTotal', 'totalPrice', 'billingAddress', 'pdfUrl']);
         $order['pdfUrl'] = UrlHelper::actionUrl("commerce/downloads/pdf?number={$result->number}");
@@ -148,26 +149,32 @@ class InvoiceManager extends Component
         $order['transactions'] = $transactions;
 
         // CMS licenses
-        $order['cmsLicenses'] = Module::getInstance()->getCmsLicenseManager()->transformLicensesForOwner($result->cmsLicenses, $customer);
+        $order['cmsLicenses'] = Module::getInstance()->getCmsLicenseManager()->transformLicensesForOwner($result->cmsLicenses, $owner);
 
         // Plugin licenses
-        $order['pluginLicenses'] = Module::getInstance()->getPluginLicenseManager()->transformLicensesForOwner($result->pluginLicenses, $customer);
+        $order['pluginLicenses'] = Module::getInstance()->getPluginLicenseManager()->transformLicensesForOwner($result->pluginLicenses, $owner);
 
         return $order;
     }
 
     /**
-     * @param User $customer
+     * @param User|Org $owner
      * @param string|null $searchQuery
      * @return Query
      */
-    private function _createInvoiceQuery(User $customer, string $searchQuery = null): Query
+    private function _createInvoiceQuery(User|Org $owner, string $searchQuery = null): Query
     {
+        /** @var OrderQuery|OrderQueryBehavior $query */
         $query = Order::find();
-        $query->customer($customer);
         $query->isCompleted(true);
         $query->limit(null);
         $query->orderBy('dateOrdered desc');
+
+        if ($owner instanceof Org) {
+            $query->orgId($owner->id);
+        } else {
+            $query->customerId($owner->id);
+        }
 
         if ($searchQuery) {
             $query->andWhere([

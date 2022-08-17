@@ -3,10 +3,8 @@
 namespace craftnet\controllers\console;
 
 use Craft;
-use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\Plugin as StripePlugin;
 use craft\helpers\DateTimeHelper;
-use craft\web\Controller;
 use craftnet\Module;
 use Throwable;
 use yii\web\Response;
@@ -14,7 +12,7 @@ use yii\web\Response;
 /**
  * Class InvoicesController
  */
-class InvoicesController extends Controller
+class InvoicesController extends BaseController
 {
     // Public Methods
     // =========================================================================
@@ -27,7 +25,7 @@ class InvoicesController extends Controller
     public function actionGetInvoices(): Response
     {
         $user = Craft::$app->getUser()->getIdentity();
-
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
         $filter = $this->request->getParam('query');
         $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
@@ -38,10 +36,10 @@ class InvoicesController extends Controller
             $invoices = [];
 
             if ($user) {
-                $invoices = Module::getInstance()->getInvoiceManager()->getInvoices($user, $filter, $limit, $page, $orderBy, $ascending);
+                $invoices = Module::getInstance()->getInvoiceManager()->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
             }
 
-            $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($user, $filter);
+            $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($owner, $filter);
 
             $last_page = ceil($total / $limit);
             $next_page_url = '?next';
@@ -62,7 +60,7 @@ class InvoicesController extends Controller
                 'data' => $invoices,
             ]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
