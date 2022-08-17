@@ -17,6 +17,7 @@
     "marc-mabe/enum-cl": "^1.0",
     "mead-steve/mono-snag": "^4.1",
     "moccalotto/eu": "^0.3.0",
+    "nystudio107/craft-retour": "^4.0",
     "nystudio107/craft-twigpack": "^4.0.0-beta.4",
     "omnilight/yii2-scheduling": "^1.1.6",
     "paypal/rest-api-sdk-php": "^1.14",

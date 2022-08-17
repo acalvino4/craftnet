@@ -271,7 +271,7 @@ class Plugin extends Element
     public bool $published = false;
 
     /**
-     * @var int|null The developer’s user ID
+     * @var int|null The developer’s org ID
      */
     public ?int $developerId = null;
 
