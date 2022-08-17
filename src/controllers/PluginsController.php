@@ -809,7 +809,7 @@ JS;
         try {
             Craft::$app->getMailer()->compose()
                 ->setSubject('A plugin is waiting for approval: ' . $plugin->name)
-                ->setTextBody('https://id.craftcms.com/' . App::env('CRAFT_CP_TRIGGER') . '/plugins/' . $plugin->id)
+                ->setTextBody('https://console.craftcms.com/' . App::env('CRAFT_CP_TRIGGER') . '/plugins/' . $plugin->id)
                 ->setTo(explode(',', App::env('PLUGIN_APPROVAL_RECIPIENTS')))
                 ->send();
         } catch (\Exception $e) {

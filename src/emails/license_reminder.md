@@ -32,9 +32,9 @@ To ensure you don’t miss any updates, click on the license key {{ pl ? 'links'
 {% else %}
 If you’d like to enable auto-renew for {{ pl ? 'these licenses' : 'this license' }} to ensure you don’t miss any updates, follow these steps:
 
-1. Create a [Craft ID](https://id.craftcms.com) account (if you don’t already have one).
+1. Create a [Craft Console](https://console.craftcms.com) account (if you don’t already have one).
 2. Save your [billing info] on your account.
-3. Go to the [Claim License](https://id.craftcms.com/licenses/claim) page to add {{ pl ? 'these licenses' : 'this license' }} to your account, using the “Claim licenses by your email address” feature.
+3. Go to the [Claim License](https://console.craftcms.com/licenses/claim) page to add {{ pl ? 'these licenses' : 'this license' }} to your account, using the “Claim licenses by your email address” feature.
 4. From the license {{ pl ? 'screens' : 'screen' }}, toggle {{ pl ? 'their Auto-Renew settings' : 'its Auto-Renew setting' }}.
 {% endif %}
 {% endif %}
@@ -55,4 +55,4 @@ Please take a minute to make sure your [billing info] is up-to-date, so there’
 
 Have a great day!
 
-[billing info]: https://id.craftcms.com/account/billing
+[billing info]: https://console.craftcms.com/account/billing

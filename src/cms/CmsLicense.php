@@ -259,7 +259,7 @@ class CmsLicense extends License
      */
     public function getEditUrl(): string
     {
-        return 'https://id.craftcms.com/licenses/cms/' . $this->id;
+        return 'https://console.craftcms.com/licenses/cms/' . $this->id;
     }
 
     /**

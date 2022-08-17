@@ -30,7 +30,7 @@ The following {{ pl ? 'licenses have' : 'license has' }} been auto-renewed for a
 
 {% if autoRenewFailed %}
 However, there was an issue with your billing info which prevented the payment from going through. Please go to the following URL to fix your billing info for future payments:<br>
-<https://id.craftcms.com/account/billing>
+<https://console.craftcms.com/account/billing>
 {% elseif redirect %}
 However, your bank requires further action. Please go to the following URL to complete the renewal:<br>
 <{{ redirect }}>
@@ -51,8 +51,8 @@ To ensure you don’t miss any updates, click on the license key {{ pl ? 'links'
 {% else %}
 To ensure you don’t miss any updates, follow these steps:
 
-1. Create a [Craft ID](https://id.craftcms.com) account (if you don’t already have one).
-2. Go to the [Claim License](https://id.craftcms.com/licenses/claim) page to add {{ pl ? 'these licenses' : 'this license' }} to your account, using the “Claim licenses by your email address” feature.
+1. Create a [Craft Console](https://console.craftcms.com) account (if you don’t already have one).
+2. Go to the [Claim License](https://console.craftcms.com/licenses/claim) page to add {{ pl ? 'these licenses' : 'this license' }} to your account, using the “Claim licenses by your email address” feature.
 3. From the license {{ pl ? 'screens' : 'screen' }}, click  and click the “Renew your license” button in the “Updates” section.
 {% endif %}
 {% endif %}

@@ -11,4 +11,4 @@ Congratulations, {{ developer.title }}! Looks like someone just purchased {{ pur
 
 ---
 
-You can access this and the rest of your plugin sales from your [Craft ID](https://id.craftcms.com) account.
+You can access this and the rest of your plugin sales from your [Craft Console](https://console.craftcms.com) account.

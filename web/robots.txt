@@ -1,4 +1,4 @@
-# robots.txt for https://id.craftcms.com/
+# robots.txt for https://console.craftcms.com/
 
 # don't allow web crawlers to index cpresources/
 

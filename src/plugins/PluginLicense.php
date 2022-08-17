@@ -256,7 +256,7 @@ class PluginLicense extends License
      */
     public function getEditUrl(): string
     {
-        return 'https://id.craftcms.com/licenses/plugins/' . $this->id;
+        return 'https://console.craftcms.com/licenses/plugins/' . $this->id;
     }
 
     /**
