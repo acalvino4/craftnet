@@ -2,6 +2,7 @@
 
 namespace craftnet\behaviors;
 
+use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\UserQuery;
 use craftnet\db\Table;
@@ -10,7 +11,6 @@ use craftnet\orgs\OrgQuery;
 use Illuminate\Support\Collection;
 use yii\base\Behavior;
 use yii\base\InvalidArgumentException;
-use yii\db\Connection;
 
 /**
  * @property UserQuery $owner
@@ -38,7 +38,6 @@ class UserQueryBehavior extends Behavior
 
     public function orgOwner(?bool $value): UserQuery|static
     {
-        $this->orgMember = $value;
         $this->orgOwner = $value;
         return $this->owner;
     }
@@ -63,33 +62,37 @@ class UserQueryBehavior extends Behavior
     {
         $this->beforePrepareLegacy();
 
-        if ($this->orgMember === null) {
-            return;
-        }
-
-        // TODO: this will break when calling ids()
-        $this->owner->query->distinct();
-
-        $this->owner->subQuery->leftJoin(['orgsMembers' => Table::ORGS_MEMBERS], '[[orgsMembers.userId]] = [[users.id]]');
-        $this->owner->subQuery->andWhere($this->orgMember ? ['not', ['orgsMembers.orgId' => null]] : ['orgsMembers.orgId' => null]);
-
         if ($this->orgOwner !== null) {
-            $this->owner->subQuery->innerJoin(['orgs' => Table::ORGS], '[[orgs.ownerId]] = [[orgsMembers.userId]]');
+            $this->owner->subQuery->leftJoin(['orgs' => Table::ORGS], '[[orgs.ownerId]] = [[users.id]]');
+            if ($this->orgOwner) {
+                $this->owner->subQuery->andWhere(['not', ['orgs.ownerId' => null]]);
+            } else {
+                $this->owner->subQuery->andWhere(['orgs.ownerId' => null]);
+            }
+
+            if ($this->ofOrg !== null) {
+                $this->owner->subQuery->andWhere(['orgs.id' => $this->ofOrg]);
+            }
         }
 
-        if ($this->ofOrg) {
+        if ($this->orgMember !== null) {
+            $whereMembers = Collection::make([
+                'orgId' => $this->ofOrg,
+                'admin' => $this->orgAdmin,
+            ])->whereNotNull()->all();
+
             $this->owner->subQuery->andWhere([
-                ($this->orgOwner ? 'orgs.id' : 'orgsMembers.orgId') => $this->ofOrg,
+                'in',
+                'elements.id',
+                (new Query())->select(['userId'])
+                    ->where($whereMembers)
+                    ->from(Table::ORGS_MEMBERS),
             ]);
-        }
-
-        if ($this->orgAdmin !== null) {
-            $this->owner->subQuery->andWhere(['orgsMembers.admin' => $this->orgAdmin]);
         }
     }
 
     /**
-     * TODO: remove this following org migration.
+     * @deprected Remove following Org conversion
      * @return void
      */
     public function beforePrepareLegacy(): void
