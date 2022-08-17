@@ -45,7 +45,7 @@ class CmsLicensesController extends BaseController
             return $this->asFailure('This license is already owned by the specified owner.');
         }
 
-        if (!$license->canRelease($user)) {
+        if (!$license->canTransfer($user)) {
             throw new ForbiddenHttpException('User does not have permission to transfer this license.');
         }
 
@@ -117,7 +117,7 @@ class CmsLicensesController extends BaseController
         $licenseId = $this->request->getParam('id');
         $license = $this->module->getCmsLicenseManager()->getLicenseById($licenseId);
 
-        if ($license->canManage($user)) {
+        if ($license->canView($user)) {
             return $this->response->sendContentAsFile(chunk_split($license->key, 50), 'license.key');
         }
 
@@ -132,9 +132,10 @@ class CmsLicensesController extends BaseController
     public function actionGetExpiringLicensesTotal(): Response
     {
         $user = Craft::$app->getUser()->getIdentity();
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
-            $total = Module::getInstance()->getCmsLicenseManager()->getExpiringLicensesTotal($user);
+            $total = Module::getInstance()->getCmsLicenseManager()->getExpiringLicensesTotal($owner);
 
             return $this->asSuccess(data: ['total' => $total]);
         } catch (Throwable $e) {
@@ -157,7 +158,7 @@ class CmsLicensesController extends BaseController
         try {
             $license = Module::getInstance()->getCmsLicenseManager()->getLicenseById($id);
 
-            if (!$license->canManage($user)) {
+            if (!$license->canView($user)) {
                 throw new UnauthorizedHttpException('Not Authorized');
             }
 
@@ -265,7 +266,7 @@ class CmsLicensesController extends BaseController
         $org = $owner instanceof Org ? $owner : null;
 
         try {
-            if ($license->canManage($user)) {
+            if ($license->canEdit($user)) {
                 $domain = $this->request->getParam('domain');
                 $notes = $this->request->getParam('notes');
 

@@ -57,7 +57,7 @@ class PluginLicensesController extends BaseController
         try {
             $license = Module::getInstance()->getPluginLicenseManager()->getLicenseById($id);
 
-            if (!$license->canManage($user)) {
+            if (!$license->canView($user)) {
                 throw new UnauthorizedHttpException('Not Authorized');
             }
 
@@ -88,7 +88,7 @@ class PluginLicensesController extends BaseController
             return $this->asFailure('This license is already owned by the specified owner.');
         }
 
-        if (!$license->canRelease($user)) {
+        if (!$license->canTransfer($user)) {
             throw new ForbiddenHttpException('User does not have permission to transfer this license.');
         }
 
@@ -160,9 +160,10 @@ class PluginLicensesController extends BaseController
     public function actionGetExpiringLicensesTotal(): Response
     {
         $user = Craft::$app->getUser()->getIdentity();
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
-            $total = Module::getInstance()->getPluginLicenseManager()->getExpiringLicensesTotal($user);
+            $total = Module::getInstance()->getPluginLicenseManager()->getExpiringLicensesTotal($owner);
 
             return $this->asJson(data: ['total' => $total]);
         } catch (Throwable $e) {
@@ -226,7 +227,7 @@ class PluginLicensesController extends BaseController
         $org = $owner instanceof Org ? $owner : null;
 
         try {
-            if ($license->canManage($user)) {
+            if ($license->canEdit($user)) {
                 $notes = $this->request->getParam('notes');
 
                 if ($notes !== null) {
