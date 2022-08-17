@@ -4,6 +4,9 @@ namespace craftnet\controllers\orgs;
 
 use Craft;
 use craftnet\Module;
+use craftnet\orgs\InvitationRecord;
+use craftnet\orgs\MemberRoleEnum;
+use Illuminate\Support\Collection;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -125,7 +128,12 @@ class InvitationsController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        $invitations = $org->getInvitations();
+        $invitations = Collection::make($org->getInvitations())
+            ->map(fn(InvitationRecord $invitation) => [
+                'user' => $this->transformUser(Craft::$app->getUsers()->getUserById($invitation->userId)),
+                'role' => $invitation->admin ? MemberRoleEnum::Admin() : MemberRoleEnum::Member(),
+                'dateCreated' => $invitation->dateCreated,
+            ]);
 
         return $this->asSuccess(data: ['invitations' => $invitations]);
     }
