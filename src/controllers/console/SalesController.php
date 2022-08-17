@@ -2,7 +2,6 @@
 
 namespace craftnet\controllers\console;
 
-use Craft;
 use craftnet\Module;
 use yii\web\Response;
 
@@ -21,14 +20,13 @@ class SalesController extends BaseController
      */
     public function actionGetSales(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
-
+        $org = $this->getAllowedOrgFromRequest(required: true);
         $filter = $this->request->getParam('query');
         $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
 
-        $data = Module::getInstance()->getSaleManager()->getSalesByPluginOwner($user, $filter, $limit, $page);
-        $total = Module::getInstance()->getSaleManager()->getTotalSalesByPluginOwner($user, $filter);
+        $data = Module::getInstance()->getSaleManager()->getSalesByPluginOwner($org, $filter, $limit, $page);
+        $total = Module::getInstance()->getSaleManager()->getTotalSalesByPluginOwner($org, $filter);
 
         $last_page = ceil($total / $limit);
         $next_page_url = '?next';

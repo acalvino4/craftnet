@@ -2,12 +2,14 @@
 
 namespace craftnet\sales;
 
+use Craft;
+use craft\commerce\db\Table as CommerceTable;
 use craft\db\Query;
+use craft\db\Table as CraftTable;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craftnet\db\Table;
-use craft\db\Table as CraftTable;
-use craft\commerce\db\Table as CommerceTable;
+use craftnet\orgs\Org;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginEdition;
 use yii\base\Component;
@@ -17,13 +19,13 @@ class SaleManager extends Component
     /**
      * Get sales by plugin owner.
      *
-     * @param User $owner
+     * @param Org $owner
      * @param string|null $searchQuery
      * @param $limit
      * @param $page
      * @return array
      */
-    public function getSalesByPluginOwner(User $owner, string $searchQuery = null, $limit, $page): array
+    public function getSalesByPluginOwner(Org $owner, string $searchQuery = null, $limit, $page): array
     {
         $defaultLimit = 30;
         $perPage = $limit ?? $defaultLimit;
@@ -59,10 +61,13 @@ class SaleManager extends Component
             ];
 
             // Customer
+
+            /** @var Org|User $owner */
+            $owner = Craft::$app->getElements()->getElementById($row['ownerId']);
             $row['customer'] = [
                 'id' => $row['ownerId'],
-                'name' => implode(' ', array_filter([$row['ownerFirstName'], $row['ownerLastName']])),
-                'email' => $row['ownerEmail'] ?? $row['orderEmail'],
+                'name' => $owner?->title ?? $owner?->name,
+                'email' => $owner instanceof Org ? $owner->getOwner()->email : $owner->email,
             ];
 
             // Edition
@@ -99,11 +104,11 @@ class SaleManager extends Component
     /**
      * Get total sales by plugin owner.
      *
-     * @param User $owner
+     * @param Org $owner
      * @param string|null $searchQuery
      * @return int|string
      */
-    public function getTotalSalesByPluginOwner(User $owner, string $searchQuery = null)
+    public function getTotalSalesByPluginOwner(Org $owner, string $searchQuery = null)
     {
         $query = $this->_getSalesQuery($owner, $searchQuery);
 
@@ -113,11 +118,11 @@ class SaleManager extends Component
     /**
      * Get sales query.
      *
-     * @param User $owner
+     * @param Org $owner
      * @param string|null $searchQuery
      * @return Query
      */
-    private function _getSalesQuery(User $owner, string $searchQuery = null): Query
+    private function _getSalesQuery(Org $owner, string $searchQuery = null): Query
     {
         $query = (new Query())
             ->select([
@@ -125,10 +130,7 @@ class SaleManager extends Component
                 'plugins.id AS pluginId',
                 'plugins.name AS pluginName',
                 'lineitems.total AS grossAmount',
-                'users.id AS ownerId',
-                'users.firstName AS ownerFirstName',
-                'users.lastName AS ownerLastName',
-                'users.email AS ownerEmail',
+                'licenseOwners.id AS ownerId',
                 'lineitems.dateCreated AS saleTime',
                 'orders.email AS orderEmail',
                 'elements.type AS purchasableType',
@@ -139,7 +141,7 @@ class SaleManager extends Component
             ->innerJoin(['orders' => CommerceTable::ORDERS], '[[orders.id]] = [[lineitems.orderId]]')
             ->innerJoin(['licenses' => Table::PLUGINLICENSES], '[[licenses.id]] = [[licenses_items.licenseId]]')
             ->innerJoin(['plugins' => Table::PLUGINS], '[[plugins.id]] = [[licenses.pluginId]]')
-            ->leftJoin(CraftTable::USERS, '[[users.id]] = [[licenses.ownerId]]')
+            ->leftJoin(['licenseOwners' => CraftTable::ELEMENTS], '[[licenseOwners.id]] = [[licenses.ownerId]]')
             ->leftJoin(CraftTable::ELEMENTS, '[[elements.id]] = [[lineitems.purchasableId]]')
             ->where(['plugins.developerId' => $owner->id])
             ->orderBy(['lineitems.dateCreated' => SORT_DESC]);
