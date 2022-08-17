@@ -55,6 +55,11 @@ class Plugin extends Element
         return true;
     }
 
+    public function canEdit(User $user): bool
+    {
+        return $this->getDeveloper()->hasAdmin($user);
+    }
+
     /**
      * @inheritdoc
      */
