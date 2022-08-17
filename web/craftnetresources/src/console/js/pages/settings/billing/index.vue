@@ -10,11 +10,11 @@
       </pane>
 
       <pane>
-        <billing-address-form></billing-address-form>
+        <billing-addresses />
       </pane>
 
       <pane>
-        <billing-addresses />
+        <billing-address-form></billing-address-form>
       </pane>
 
       <pane>
