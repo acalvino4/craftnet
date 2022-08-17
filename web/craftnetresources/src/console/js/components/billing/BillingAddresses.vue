@@ -1,143 +1,87 @@
 <template>
   <div>
-    <h2>Addresses</h2>
+    <div>
+        <h2>Addresses</h2>
+    </div>
 
-    <form @submit.prevent="getAddressesInfo">
-      <field
-        :vertical="true"
-        label="Country Code "
-      >
-        <textbox
-          v-model="countryCode"
-          autocomplete="off"
-        />
-      </field>
+    <div class="mt-6 grid grid-cols-3 gap-4">
+      <div class="flex">
+        <a
+          class="border border-gray-300 dark:border-gray-600 border-dashed block flex-1 rounded-md flex items-center justify-center"
+          href="#"
+          @click="add"
+        >
+          <div>
+            <icon
+              icon="plus"
+              class="w-4 h-4" />
 
-      <btn class="mt-4" type="submit">Refresh</btn>
-    </form>
-
-    <template v-if="addressInfo">
-      <field
-        :vertical="true"
-        label="Subdivision"
-      >
-        <dropdown
-          v-model="address.subdivision"
-          :options="subdivisionOptions"
-        />
-      </field>
-
-      <field
-        :vertical="true"
-        label="Subdivision Child"
-      >
-        <dropdown
-          v-model="address.subdivisionChild"
-          :options="subdivisionChildrenOptions"
-        />
-      </field>
-
-      <template v-for="(usedField, usedFieldKey) in addressInfo.format.usedFields" :key="usedFieldKey">
-        <div>
-          <field
-            :vertical="true"
-            :label="usedField"
-            :required="!!addressInfo.format.requiredFields.find(f => f === usedField)"
-          >
-            <textbox
-              v-model="address[usedField]"
-            />
-          </field>
-        </div>
+            Add an address
+          </div>
+        </a>
+      </div>
+      <template v-for="(address, addressKey) in addresses" :key="addressKey">
+        <address-card
+          :address="address"
+          @edit="edit(address)"
+          @remove="remove(address.id)" />
       </template>
+    </div>
 
-      <hr>
-
-      <h3>Format</h3>
-
-      <pre>{{addressInfo.format}}</pre>
-    </template>
+    <address-modal
+      :isOpen="showAddressModal"
+      :edit-address="editAddress"
+      @close="showAddressModal = false"
+    />
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex';
-import Textbox from '../../../../common/ui/components/Textbox';
-import Field from '../../../../common/ui/components/Field';
-import Dropdown from '../../../../common/ui/components/Dropdown';
+import AddressCard from './addresses/AddressCard';
+import AddressModal from './addresses/AddressModal';
 
 export default {
+  components: {AddressModal, AddressCard},
   data() {
     return {
-      countryCode: 'BR',
-      address: {}
+      countriesLoading: false,
+      countryCode: null,
+      address: {},
+      showAddressModal: false,
+      editAddress: null,
     }
   },
-
-  components: {Dropdown, Field, Textbox},
 
   computed: {
     ...mapState({
-      addressInfo: state => state.addresses.info,
+      addresses: state => state.addresses.addresses,
     }),
-
-    subdivisionOptions() {
-      if (!this.addressInfo) {
-        return [];
-      }
-
-      const options = []
-
-      for (const subdivisionCode in this.addressInfo.subdivisions) {
-        const subdivision = this.addressInfo.subdivisions[subdivisionCode]
-
-        options.push({
-          value: subdivisionCode,
-          label: subdivision.name,
-        });
-      }
-
-      return options;
-    },
-
-    selectedSubdivision() {
-      if (!this.addressInfo) {
-        return null;
-      }
-
-      return this.addressInfo.subdivisions[this.address.subdivision];
-    },
-
-    subdivisionChildrenOptions() {
-      if (!this.selectedSubdivision) {
-          return [];
-      }
-
-      const options = []
-
-      for (const childCode in this.selectedSubdivision.children) {
-        const child = this.selectedSubdivision.children[childCode]
-
-        options.push({
-          value: childCode,
-          label: child.name,
-        });
-      }
-
-      return options;
-    }
   },
 
   methods: {
-    getAddressesInfo() {
-      this.$store.dispatch('addresses/getInfo', {
-        parents: [this.countryCode]
-      });
+    add() {
+      this.editAddress = {
+        title: 'Address',
+        countryCode: '',
+      }
+      this.showAddressModal = true
+    },
+    edit(address) {
+      this.showAddressModal = true
+      this.editAddress = address
+    },
+    remove(addressId) {
+      if (!confirm("Are you sure you want to remove this address?")) {
+        return null;
+      }
+
+      this.$store.dispatch('addresses/deleteAddress', addressId)
     },
   },
 
   mounted() {
-      this.getAddressesInfo();
+    this.$store.dispatch('addresses/getAddresses');
   }
 }
 </script>

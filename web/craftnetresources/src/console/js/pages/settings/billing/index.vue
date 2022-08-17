@@ -10,24 +10,26 @@
       </pane>
 
       <pane>
-        <billing-address-form></billing-address-form>
+        <billing-addresses />
       </pane>
 
+      <!--
       <pane>
-        <billing-addresses />
+        <billing-address-form></billing-address-form>
       </pane>
 
       <pane>
         <billing-invoice-details></billing-invoice-details>
       </pane>
+      -->
     </div>
   </div>
 </template>
 
 <script>
 import BillingPayment from '../../../components/billing/BillingPayment'
-import BillingInvoiceDetails from '../../../components/billing/BillingInvoiceDetails'
-import BillingAddressForm from '../../../components/billing/BillingAddressForm'
+// import BillingInvoiceDetails from '../../../components/billing/BillingInvoiceDetails'
+// import BillingAddressForm from '../../../components/billing/BillingAddressForm'
 import PageHeader from '@/console/js/components/PageHeader'
 import BillingAddresses from '../../../components/billing/BillingAddresses';
 
@@ -35,8 +37,8 @@ export default {
   components: {
     BillingAddresses,
     BillingPayment,
-    BillingInvoiceDetails,
-    BillingAddressForm,
+    // BillingInvoiceDetails,
+    // BillingAddressForm,
     PageHeader,
   },
 }
