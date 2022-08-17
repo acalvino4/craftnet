@@ -8,6 +8,7 @@ const state = {
   currentOrganizationId: null,
   members: [],
   orders: [],
+  invitations: [],
 }
 
 /**
@@ -116,6 +117,46 @@ const actions = {
         })
     })
   },
+
+  getInvitations({commit}, {organizationId}) {
+    return organizationsApi.getInvitations({organizationId})
+      .then((response) => {
+        commit('updateInvitations', response.data.invitations)
+      })
+  },
+
+  cancelInvitation({dispatch}, {organizationId, userId}) {
+    return organizationsApi.cancelInvitation({organizationId, userId})
+      .then(() => {
+        dispatch('getInvitations', {organizationId})
+      })
+  },
+
+  acceptInvitation({dispatch}, {organizationId}) {
+    return new Promise((resolve, reject) => {
+      organizationsApi.acceptInvitation({organizationId})
+        .then(() => {
+          dispatch('getOrganizations')
+            .then(() => {
+              resolve()
+            })
+            .catch((orgError) => {
+              reject(orgError)
+            })
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
+  },
+
+  declineInvitation(context, {organizationId}) {
+    return organizationsApi.declineInvitation({organizationId})
+  },
+
+  setRole(context, {organizationId, userId, role}) {
+    return organizationsApi.setRole({organizationId, userId, role})
+  }
 }
 
 /**
@@ -135,8 +176,11 @@ const mutations = {
   },
 
   updateOrders(state, orders) {
-    console.log('-------------- orders', orders)
     state.orders = orders
+  },
+
+  updateInvitations(state, invitations) {
+    state.invitations = invitations
   }
 }
 

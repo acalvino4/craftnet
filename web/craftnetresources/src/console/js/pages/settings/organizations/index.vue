@@ -61,6 +61,10 @@
         </pane>
       </template>
 
+      <pane>
+        <invitation-mail />
+      </pane>
+
       <pane class="border border-red-500 mb-3">
         <template v-slot:header>
           <h2 class="mb-0 text-red-600">
@@ -79,11 +83,13 @@ import helpers from '@/console/js/mixins/helpers.js';
 import PageHeader from '@/console/js/components/PageHeader'
 import ConvertAccountToOrganization from '@/console/js/components/ConvertAccountToOrganization';
 import ProfilePhoto from '../../../components/ProfilePhoto';
+import InvitationMail from '../../../components/members/InvitationMail';
 
 export default {
   mixins: [helpers],
 
   components: {
+    InvitationMail,
     ProfilePhoto,
     ConvertAccountToOrganization,
     PageHeader,

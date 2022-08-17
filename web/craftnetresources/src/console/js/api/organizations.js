@@ -4,11 +4,10 @@ import qs from 'qs';
 
 export default {
   addMember({organizationId, email}) {
-
     const data = {
       email,
     }
-    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members', qs.stringify(data), {
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/invitations', qs.stringify(data), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -84,4 +83,26 @@ export default {
       }
     })
   },
+
+  getInvitations({organizationId}) {
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/invitations')
+  },
+
+  cancelInvitation({organizationId, userId}) {
+    return axios.delete(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/invitations/' + userId)
+  },
+
+  acceptInvitation({organizationId}) {
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/invitation')
+  },
+
+  declineInvitation({organizationId}) {
+    return axios.delete(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/invitation')
+  },
+
+  setRole({organizationId, userId, role}) {
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members/' + userId + '/role', {
+      role,
+    })
+  }
 }

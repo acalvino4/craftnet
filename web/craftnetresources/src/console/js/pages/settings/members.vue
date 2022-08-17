@@ -7,7 +7,7 @@
         <btn
           kind="primary"
           @click="showInviteMembersModal = true">
-          Invite member
+          Invite members
         </btn>
       </div>
     </div>
@@ -39,35 +39,42 @@
 
               <div class="ml-4 text-sm">
                 <div class="font-bold">
-                  [member.name] {{ member.id }}
+                  [Full Name] {{ member.id }}
                 </div>
                 <div>
-                  [member.email]
+                  [email@address]
                 </div>
               </div>
             </div>
           </td>
           <td class="border-b px-4 py-3 text-sm">
-            {{ member.orgAdmin ? 'Admin' : 'Member' }}
+            {{member.role.charAt(0).toUpperCase() + member.role.slice(1)}}
           </td>
           <td class="border-b px-4 py-3 text-sm">
-            <member-actions
-              @changeRole="changeMemberRole(member.id)"
-              @removeMember="removeMember(member.id)"
-            />
+            <template v-if="member.role !== 'owner'">
+              <member-actions
+                @changeRole="changeMemberRole(member)"
+                @removeMember="removeMember(member.id)"
+              />
+            </template>
           </td>
         </tr>
         </tbody>
       </table>
     </div>
 
+    <invitations />
+
     <change-member-role-modal
       :showChangeMemberRoleModal="showChangeMemberRoleModal"
-      @close="showChangeMemberRoleModal = false"></change-member-role-modal>
+      :member="changeMemberRoleMember"
+      @close="showChangeMemberRoleModal = false"
+    />
 
     <invite-members-modal
       :showInviteMembersModal="showInviteMembersModal"
-      @close="showInviteMembersModal = false"></invite-members-modal>
+      @close="showInviteMembersModal = false"
+    />
   </div>
 </template>
 
@@ -78,15 +85,17 @@ import MemberActions from '@/console/js/components/MemberActions';
 import ChangeMemberRoleModal from '@/console/js/components/members/ChangeMemberRoleModal';
 import InviteMembersModal from '@/console/js/components/members/InviteMembersModal';
 import ProfilePhoto from '../../components/ProfilePhoto';
+import Invitations from '../../components/members/Invitations';
 
 export default {
-  components: {ProfilePhoto, InviteMembersModal, ChangeMemberRoleModal, MemberActions},
+  components: {Invitations, ProfilePhoto, InviteMembersModal, ChangeMemberRoleModal, MemberActions},
   mixins: [helpers],
 
   data() {
     return {
       showChangeMemberRoleModal: false,
       showInviteMembersModal: false,
+      changeMemberRoleMember: null,
     }
   },
 
@@ -103,10 +112,8 @@ export default {
     ...mapActions({
       getOrganizationMembers: 'organizations/getOrganizationMembers',
     }),
-    changeMemberRole(memberKey) {
-      // TODO: Implement change member role
-      console.log('change member role', memberKey)
-
+    changeMemberRole(member) {
+      this.changeMemberRoleMember = member;
       this.showChangeMemberRoleModal = true
     },
 
@@ -120,6 +127,7 @@ export default {
   mounted() {
     if (!this.currentOrganization) {
       this.$router.push({path: '/settings/profile'})
+      return null
     }
 
     this.getOrganizationMembers({

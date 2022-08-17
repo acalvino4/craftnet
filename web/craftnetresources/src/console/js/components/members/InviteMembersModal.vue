@@ -22,9 +22,9 @@
             <div class="w-36">
               <radio
                 v-model="role"
-                value="owner"
+                value="admin"
                 class="mr-4"
-                label="Owner"></radio>
+                label="Admin"></radio>
             </div>
             <ul class="text-sm py-2">
               <li>Edit profile</li>
@@ -71,7 +71,7 @@ export default {
   props: ['showInviteMembersModal'],
   data() {
     return {
-      role: 'owner',
+      role: 'admin',
       email: '',
     }
   },
@@ -86,6 +86,7 @@ export default {
     ...mapActions({
       addMember: 'organizations/addMember',
       getOrganizationMembers: 'organizations/getOrganizationMembers',
+      getInvitations: 'organizations/getInvitations',
     }),
     inviteMembers() {
       this.addMember({
@@ -94,6 +95,7 @@ export default {
         role: this.role,
       })
         .then(() => {
+          this.getInvitations({organizationId: this.currentOrganization.id})
           this.$emit('close')
         })
     },

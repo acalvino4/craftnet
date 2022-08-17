@@ -2,7 +2,7 @@
   <modal-headless
     :isOpen="showChangeMemberRoleModal"
     @close="$emit('close')">
-    <h2>Change member role</h2>
+    <h2>Change member {{member.id}}’s role</h2>
 
     <div class="mt-4">
       <h3 class="text-base font-bold">Permissions</h3>
@@ -11,9 +11,9 @@
           <div class="w-36">
             <radio
               v-model="role"
-              value="owner"
+              value="admin"
               class="mr-4"
-              label="Owner"></radio>
+              label="Admin"></radio>
           </div>
           <ul class="text-sm py-2">
             <li>Edit profile</li>
@@ -44,20 +44,53 @@
 
     <template v-slot:footer>
       <btn @click="$emit('close')">Cancel</btn>
-      <btn kind="primary">Change</btn>
+      <btn kind="primary" @click="setRole({
+        organizationId: currentOrganization.id,
+        userId: member.id,
+        role,
+      })">Change</btn>
     </template>
   </modal-headless>
 </template>
 
 <script>
 import ModalHeadless from '@/console/js/components/ModalHeadless';
+import {mapActions, mapGetters} from 'vuex';
 
 export default {
   components: {ModalHeadless},
-  props: ['showChangeMemberRoleModal'],
+  props: {
+    showChangeMemberRoleModal: {
+      type: Boolean,
+      default: false,
+    },
+    member: {
+      type: Object,
+      required: true,
+    },
+  },
+
+  computed: {
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+  },
+
+  methods: {
+    ...mapActions({
+      setRole: 'organizations/setRole',
+    }),
+  },
+
+  watch: {
+    member() {
+      this.role = this.member.role;
+    }
+  },
+
   data() {
     return {
-      role: 'owner'
+      role: null,
     }
   }
 }
