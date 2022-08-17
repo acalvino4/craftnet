@@ -3,9 +3,12 @@
 namespace craftnet\controllers\orgs;
 
 use Craft;
+use craft\elements\User;
+use craftnet\behaviors\UserBehavior;
 use craftnet\Module;
 use craftnet\orgs\InvitationRecord;
 use craftnet\orgs\MemberRoleEnum;
+use craftnet\orgs\Org;
 use Illuminate\Support\Collection;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
@@ -120,7 +123,7 @@ class InvitationsController extends SiteController
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
-    public function actionGetInvitations(int $orgId): Response
+    public function actionGetInvitationsForOrg(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
 
@@ -129,12 +132,38 @@ class InvitationsController extends SiteController
         }
 
         $invitations = Collection::make($org->getInvitations())
-            ->map(fn(InvitationRecord $invitation) => [
-                'user' => $this->transformUser(Craft::$app->getUsers()->getUserById($invitation->userId)),
-                'role' => $invitation->admin ? MemberRoleEnum::Admin() : MemberRoleEnum::Member(),
-                'dateCreated' => $invitation->dateCreated,
+            ->map(fn(InvitationRecord $invitation) => static::transformInvitation($invitation));
+
+        return $this->asSuccess(data: ['invitations' => $invitations]);
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     */
+    public function actionGetInvitationsForUser(int $userId): Response
+    {
+        if ($userId !== $this->_currentUser->id) {
+            throw new ForbiddenHttpException();
+        }
+
+        /** @var User|UserBehavior $user */
+        $user = User::find()->id($userId)->one();
+        $invitations = Collection::make($user->getOrgInvitations())
+            ->map(fn(InvitationRecord $invitation) => static::transformInvitation($invitation) + [
+                'org' => static::transformOrg(Org::find()->id($invitation->orgId)->one())
             ]);
 
         return $this->asSuccess(data: ['invitations' => $invitations]);
+    }
+
+    private static function transformInvitation(InvitationRecord $invitation): array
+    {
+        $user = Craft::$app->getUsers()->getUserById($invitation->userId);
+
+        return [
+            'user' => static::transformUser($user),
+            'role' => $invitation->admin ? MemberRoleEnum::Admin() : MemberRoleEnum::Member(),
+            'dateCreated' => $invitation->dateCreated,
+        ];
     }
 }

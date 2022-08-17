@@ -96,9 +96,11 @@ return [
         'GET     orgs/<orgId:\d+>/members/<userId:\d+>/role' => 'craftnet/orgs/members/get-role',
         'POST    orgs/<orgId:\d+>/invitations' => 'craftnet/orgs/invitations/send-invitation',
         'DELETE  orgs/<orgId:\d+>/invitations/<userId:\d+>' => 'craftnet/orgs/invitations/cancel-invitation',
-        'GET     orgs/<orgId:\d+>/invitations' => 'craftnet/orgs/invitations/get-invitations',
+        'GET     orgs/<orgId:\d+>/invitations' => 'craftnet/orgs/invitations/get-invitations-for-org',
         'POST    orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/accept-invitation',
         'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
+
+        'GET     users/<userId:\d+>/org-invitations' => 'craftnet/orgs/invitations/get-invitations-for-user',
 
         'GET     cards' => 'craftnet/console/stripe/get-cards',
         'POST    cards' => 'craftnet/console/stripe/add-card',

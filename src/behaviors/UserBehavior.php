@@ -14,6 +14,7 @@ use craftnet\db\Table;
 use craftnet\developers\EmailVerifier;
 use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
+use craftnet\orgs\InvitationRecord;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use yii\base\Behavior;
@@ -68,6 +69,13 @@ class UserBehavior extends Behavior
             Element::EVENT_BEFORE_SAVE => [$this, 'beforeSave'],
             Element::EVENT_AFTER_SAVE => [$this, 'afterSave'],
         ];
+    }
+
+    public function getOrgInvitations(): array
+    {
+        return InvitationRecord::find()->where([
+            'userId' => $this->owner->id,
+        ])->all();
     }
 
     /**
