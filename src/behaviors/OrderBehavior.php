@@ -166,9 +166,8 @@ class OrderBehavior extends Behavior
         $org = $this->getOrg();
 
         if ($org) {
-            // TODO: 4.2 will allow setPaymentSource
-            // $this->owner->setPaymentSource($this->getOrg()->getPaymentSource());
-            $this->owner->paymentSourceId = $this->getOrg()->paymentSourceId;
+            $this->owner->setCustomer($org->getOwner());
+            $this->owner->setPaymentSource($this->getOrg()->getPaymentSource());
 
             // Only set if we didn't already duplicate from org
             if ($this->owner->sourceBillingAddressId !== $org->getBillingAddress()?->id) {

@@ -211,7 +211,7 @@ class CartsController extends BaseApiController
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
             $orgRemoved = !$org && $existingOrgFromCart;
             $makePrimary = $payload?->makePrimary ?? false;
-            $originalCustomer = $cart->customer;
+            $originalCustomer = $cart->customer ?? $currentUser;
 
             if ($cart->approvalRequestedForOrgId && $cart->approvalRequestedForOrgId != $orgId) {
                 throw new ForbiddenHttpException('This order must be purchased for the requested organization.');
@@ -248,7 +248,6 @@ class CartsController extends BaseApiController
 
                 $cart->setOrg($org);
                 $cart->setCreator($originalCustomer);
-                $cart->setCustomer($org->getOwner());
                 $cart->setPurchaser($currentUser);
             } else if ($orgId) {
                 throw new BadRequestHttpException('Invalid organization');
