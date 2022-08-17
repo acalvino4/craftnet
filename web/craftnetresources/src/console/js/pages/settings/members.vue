@@ -39,10 +39,10 @@
 
               <div class="ml-4 text-sm">
                 <div class="font-bold">
-                  [Full Name] {{ member.id }}
+                  {{ member.name }}
                 </div>
                 <div>
-                  [email@address]
+                  <a :href="'mailto:'+member.email">{{member.email}}</a>
                 </div>
               </div>
             </div>
