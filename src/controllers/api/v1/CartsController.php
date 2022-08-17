@@ -231,6 +231,11 @@ class CartsController extends BaseApiController
 
             if ($orgRemoved) {
                 $cart->setOrg(null);
+                $cart->setCustomer($originalCustomer);
+
+                // Pending fix in 4.2
+                // $cart->setPaymentSource(null);
+                $cart->setBillingAddress(null);
             } else if ($org) {
                 $this->requireLogin();
 
@@ -247,6 +252,9 @@ class CartsController extends BaseApiController
                 }
 
                 $cart->setOrg($org);
+                $cart->setCustomer($org->getOwner());
+                $cart->setPaymentSource($org->getPaymentSource());
+                $cart->setValidBillingAddress($org->getBillingAddress());
                 $cart->setCreator($originalCustomer);
                 $cart->setPurchaser($currentUser);
             } else if ($orgId) {

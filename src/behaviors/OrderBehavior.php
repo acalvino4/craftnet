@@ -51,7 +51,6 @@ class OrderBehavior extends Behavior
         return [
             Order::EVENT_AFTER_COMPLETE_ORDER => [$this, 'afterComplete'],
             Element::EVENT_AFTER_SAVE => [$this, 'afterSave'],
-            Element::EVENT_BEFORE_SAVE => [$this, 'beforeSave'],
         ];
     }
 
@@ -161,25 +160,7 @@ class OrderBehavior extends Behavior
 
     public function setOrg(Org|int|null $org): static
     {
-        $removingOrg = !$org && $this->orgId;
         $this->orgId = $org instanceof Org ? $org->id : $org;
-        $org = $this->getOrg();
-
-        if ($org) {
-            $this->owner->setCustomer($org->getOwner());
-            $this->owner->setPaymentSource($this->getOrg()->getPaymentSource());
-
-            // Only set if we didn't already duplicate from org
-            if ($this->owner->sourceBillingAddressId !== $org->getBillingAddress()?->id) {
-                $this->setBillingAddress($org->getBillingAddress());
-            }
-
-        } else if ($removingOrg) {
-            // TODO: should we clean up any addresses/paymentsources that have been cloned, when removing an address?
-            $this->owner->paymentSourceId = null;
-            $this->owner->billingAddressId = null;
-            $this->owner->sourceBillingAddressId = null;
-        }
 
         return $this;
     }
@@ -187,16 +168,23 @@ class OrderBehavior extends Behavior
     /**
      * TODO: Commerce 4.2 may do this for us
      */
-    private function setBillingAddress(?Address $address): void
+    public function setValidBillingAddress(?Address $address): static
     {
-        if ($address && $address->ownerId !== $this->owner->id) {
-            $this->owner->sourceBillingAddressId = $address->id;
-            $address = Craft::$app->getElements()->duplicateElement($address, [
-                'ownerId' => $this->owner->id,
-            ]);
+        if (!$address) {
+            $this->owner->setBillingAddress(null);
+        }  else {
+            $isCloned = $address->id === $this->owner->sourceBillingAddressId;
+
+            if (!$isCloned && $address->ownerId !== $this->owner->id) {
+                $this->owner->sourceBillingAddressId = $address->id;
+                $newAddress = Craft::$app->getElements()->duplicateElement($address, [
+                    'ownerId' => $this->owner->id,
+                ]);
+                $this->owner->setBillingAddress($newAddress);
+            }
         }
 
-        $this->owner->setBillingAddress($address);
+        return $this;
     }
 
     public function getOrgId(?int $orgId): ?int
@@ -265,14 +253,6 @@ class OrderBehavior extends Behavior
     public function getPluginLicenses(): array
     {
         return Module::getInstance()->getPluginLicenseManager()->getLicensesByOrder($this->owner->id);
-    }
-
-    public function beforeSave(): void
-    {
-        // Set org again before saving to ensure billingAddress, paymentSource, etc are correct
-        if ($this->orgId) {
-            $this->setOrg($this->orgId);
-        }
     }
 
     public function afterSave(): void
