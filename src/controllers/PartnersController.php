@@ -60,7 +60,7 @@ class PartnersController extends Controller
         $partner = $user->getPartner();
         $data = PartnerService::getInstance()->serializePartner($partner);
 
-        return $this->asJson(['partner' => $data]);
+        return $this->asSuccess(data: ['partner' => $data]);
     }
 
     /**

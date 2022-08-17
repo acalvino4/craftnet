@@ -113,7 +113,7 @@ class MembersController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-    /** @var UserQuery|UserQueryBehavior $userQuery */
+        /** @var UserQuery|UserQueryBehavior $userQuery */
         $userQuery = User::find()->id($userId);
         $user = $userQuery->ofOrg($org)->one();
 

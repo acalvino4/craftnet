@@ -2,11 +2,15 @@
 
 namespace craftnet\controllers\orgs;
 
+use Craft;
 use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craftnet\behaviors\OrderBehavior;
 use craftnet\behaviors\OrderQueryBehavior;
+use Illuminate\Support\Collection;
+use ReflectionObject;
+use ReflectionProperty;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -26,8 +30,14 @@ class OrdersController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        /** @var OrderQuery|OrderQueryBehavior $orders */
         $orders = Order::find();
+        $queryProps = Collection::make((new ReflectionObject($orders))->getProperties(ReflectionProperty::IS_PUBLIC))->mapWithKeys(fn($reflectionObj) => [
+            $reflectionObj->name => $this->request->getParam($reflectionObj->name)
+        ])->whereNotNull();
+
+        /** @var OrderQuery|OrderQueryBehavior $orders */
+        $orders = Craft::configure($orders, $queryProps);
+
         $orders = $orders->orgId($org->id)->collect()
             ->map(fn(Order|OrderBehavior $order) => $order->getAttributes([
                 'id',

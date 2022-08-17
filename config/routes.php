@@ -100,6 +100,10 @@ return [
         'POST    orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/accept-invitation',
         'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
 
+        'POST    users/login' => 'users/login',
+        'GET     users/logout' => 'users/logout',
+        'POST    users/start-elevated-session' => 'users/start-elevated-session',
+        'GET     users/elevated-session-timeout' => 'users/get-elevated-session-timeout',
         'GET     users/<userId:\d+>/org-invitations' => 'craftnet/orgs/invitations/get-invitations-for-user',
 
         'GET     cards' => 'craftnet/console/stripe/get-cards',
