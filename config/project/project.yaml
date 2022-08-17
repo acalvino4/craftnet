@@ -1,4 +1,4 @@
-dateModified: 1660142854
+dateModified: 1660698966
 elementSources:
   craft\elements\Asset:
     -
@@ -319,6 +319,10 @@ plugins:
     enabled: true
     licenseKey: null
     schemaVersion: 2.0.1
+  retour:
+    edition: standard
+    enabled: true
+    schemaVersion: 3.0.10
   twigpack:
     enabled: true
     licenseKey: null

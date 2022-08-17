@@ -81,6 +81,7 @@ class OrgsController extends SiteController
         // Native element attributes
         $element->slug = $this->request->getBodyParam('slug', $element->slug);
         $element->title = $this->request->getBodyParam('title', $element->title);
+        $element->enabled = $this->request->getBodyParam('enabled', $element->enabled);
 
         // Org attributes
         $element->paymentSourceId = $this->request->getBodyParam('paymentSourceId', $element->paymentSourceId);

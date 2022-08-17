@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "465381fcbffc1cc2c8ecd68f2761ac03",
+    "content-hash": "21302111480854f708d40e792f1d2f58",
     "packages": [
         {
             "name": "adam-paterson/oauth2-stripe",
@@ -2979,6 +2979,65 @@
             "time": "2022-02-01T14:44:21+00:00"
         },
         {
+            "name": "jean85/pretty-package-versions",
+            "version": "2.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Jean85/pretty-package-versions.git",
+                "reference": "ae547e455a3d8babd07b96966b17d7fd21d9c6af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Jean85/pretty-package-versions/zipball/ae547e455a3d8babd07b96966b17d7fd21d9c6af",
+                "reference": "ae547e455a3d8babd07b96966b17d7fd21d9c6af",
+                "shasum": ""
+            },
+            "require": {
+                "composer-runtime-api": "^2.0.0",
+                "php": "^7.1|^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.17",
+                "jean85/composer-provided-replaced-stub-package": "^1.0",
+                "phpstan/phpstan": "^0.12.66",
+                "phpunit/phpunit": "^7.5|^8.5|^9.4",
+                "vimeo/psalm": "^4.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Jean85\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alessandro Lai",
+                    "email": "alessandro.lai85@gmail.com"
+                }
+            ],
+            "description": "A library to get pretty versions strings of installed dependencies",
+            "keywords": [
+                "composer",
+                "package",
+                "release",
+                "versions"
+            ],
+            "support": {
+                "issues": "https://github.com/Jean85/pretty-package-versions/issues",
+                "source": "https://github.com/Jean85/pretty-package-versions/tree/2.0.5"
+            },
+            "time": "2021-10-08T21:21:46+00:00"
+        },
+        {
             "name": "jeremykendall/php-domain-parser",
             "version": "6.1.1",
             "source": {
@@ -3292,6 +3351,90 @@
                 "source": "https://github.com/lcobucci/jwt/tree/3.2"
             },
             "time": "2018-11-11T12:22:26+00:00"
+        },
+        {
+            "name": "league/csv",
+            "version": "9.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/csv.git",
+                "reference": "9d2e0265c5d90f5dd601bc65ff717e05cec19b47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/csv/zipball/9d2e0265c5d90f5dd601bc65ff717e05cec19b47",
+                "reference": "9d2e0265c5d90f5dd601bc65ff717e05cec19b47",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "ext-dom": "*",
+                "friendsofphp/php-cs-fixer": "^v3.4.0",
+                "phpstan/phpstan": "^1.3.0",
+                "phpstan/phpstan-phpunit": "^1.0.0",
+                "phpstan/phpstan-strict-rules": "^1.1.0",
+                "phpunit/phpunit": "^9.5.11"
+            },
+            "suggest": {
+                "ext-dom": "Required to use the XMLConverter and or the HTMLConverter classes",
+                "ext-iconv": "Needed to ease transcoding CSV using iconv stream filters"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "9.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/functions_include.php"
+                ],
+                "psr-4": {
+                    "League\\Csv\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://github.com/nyamsprod/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "CSV data manipulation made easy in PHP",
+            "homepage": "https://csv.thephpleague.com",
+            "keywords": [
+                "convert",
+                "csv",
+                "export",
+                "filter",
+                "import",
+                "read",
+                "transform",
+                "write"
+            ],
+            "support": {
+                "docs": "https://csv.thephpleague.com",
+                "issues": "https://github.com/thephpleague/csv/issues",
+                "rss": "https://github.com/thephpleague/csv/releases.atom",
+                "source": "https://github.com/thephpleague/csv"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/nyamsprod",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-01-04T00:13:07+00:00"
         },
         {
             "name": "league/event",
@@ -4295,6 +4438,125 @@
                 "source": "https://github.com/jmespath/jmespath.php/tree/2.6.1"
             },
             "time": "2021-06-14T00:11:39+00:00"
+        },
+        {
+            "name": "nystudio107/craft-plugin-vite",
+            "version": "4.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nystudio107/craft-plugin-vite.git",
+                "reference": "e6cdb409cd811bd311d92f55c03aa4eba4061607"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nystudio107/craft-plugin-vite/zipball/e6cdb409cd811bd311d92f55c03aa4eba4061607",
+                "reference": "e6cdb409cd811bd311d92f55c03aa4eba4061607",
+                "shasum": ""
+            },
+            "require": {
+                "craftcms/cms": "^4.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "nystudio107\\pluginvite\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "nystudio107",
+                    "homepage": "https://nystudio107.com"
+                }
+            ],
+            "description": "Plugin Vite is the conduit between Craft CMS plugins and Vite, with manifest.json & HMR support",
+            "keywords": [
+                "craftcms",
+                "plugin",
+                "vite"
+            ],
+            "support": {
+                "docs": "https://github.com/nystudio107/craft-plugin-vite/blob/v1/README.md",
+                "issues": "https://github.com/nystudio107/craft-plugin-vite/issues",
+                "source": "https://github.com/nystudio107/craft-plugin-vite/tree/4.0.3"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/khalwat",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-07-16T20:51:11+00:00"
+        },
+        {
+            "name": "nystudio107/craft-retour",
+            "version": "4.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nystudio107/craft-retour.git",
+                "reference": "596aeda2a6b8fdb85064dc2a1c27e1b2a6870530"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nystudio107/craft-retour/zipball/596aeda2a6b8fdb85064dc2a1c27e1b2a6870530",
+                "reference": "596aeda2a6b8fdb85064dc2a1c27e1b2a6870530",
+                "shasum": ""
+            },
+            "require": {
+                "craftcms/cms": "^4.0.0",
+                "jean85/pretty-package-versions": "^1.5 || ^2.0",
+                "league/csv": "^8.2 || ^9.0",
+                "nystudio107/craft-plugin-vite": "^4.0.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "^3.0",
+                "vlucas/phpdotenv": "^3.0"
+            },
+            "type": "craft-plugin",
+            "extra": {
+                "class": "nystudio107\\retour\\Retour",
+                "handle": "retour",
+                "name": "Retour"
+            },
+            "autoload": {
+                "psr-4": {
+                    "nystudio107\\retour\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "nystudio107",
+                    "homepage": "https://nystudio107.com/"
+                }
+            ],
+            "description": "Retour allows you to intelligently redirect legacy URLs, so that you don't lose SEO value when rebuilding & restructuring a website",
+            "keywords": [
+                "404",
+                "craft-plugin",
+                "craftcms",
+                "redirect",
+                "retour",
+                "statistics"
+            ],
+            "support": {
+                "docs": "https://nystudio107.com/docs/retour/",
+                "issues": "https://nystudio107.com/plugins/retour/support",
+                "source": "https://github.com/nystudio107/craft-retour"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/khalwat",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-06-23T02:34:41+00:00"
         },
         {
             "name": "nystudio107/craft-twigpack",

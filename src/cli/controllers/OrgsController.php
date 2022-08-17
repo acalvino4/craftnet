@@ -10,11 +10,13 @@ use craft\elements\Address;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
 use craft\helpers\StringHelper;
+use craft\helpers\UrlHelper;
 use craftnet\db\Table;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
 use craftnet\plugins\Plugin;
 use Illuminate\Support\Collection;
+use nystudio107\retour\Retour;
 use Throwable;
 use yii\console\Controller;
 use yii\db\Exception;
@@ -127,6 +129,7 @@ class OrgsController extends Controller
                 ]);
 
                 // Previously, users only had one stored payment sources
+                // TODO: revisit with Commerce 4.2
                 $org->paymentSourceId = Commerce::getInstance()
                     ?->getPaymentSources()
                     ?->getAllPaymentSourcesByCustomerId($user->id)[0]?->id ?? null;
@@ -230,6 +233,18 @@ class OrgsController extends Controller
                     ->each(function ($address) {
                         return Craft::$app->getElements()->deleteElementById($address->id, hardDelete: true);
                     });
+                $this->stdout('done' . PHP_EOL);
+
+                $this->stdout("    > Creating Retour redirects ... ");
+                Retour::getInstance()->redirects->saveRedirect([
+                    'redirectMatchType' => 'exactmatch',
+                    'redirectHttpCode' => 301,
+                    'redirectSrcUrl' => UrlHelper::siteUrl(
+                        "developer/$user->id",
+                        siteId: Craft::$app->getSites()->getSiteByHandle('plugins')->id,
+                    ),
+                    'redirectDestUrl' => $org->url,
+                ]);
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("Done creating org #$org->id" . PHP_EOL . PHP_EOL);

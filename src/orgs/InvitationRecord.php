@@ -8,16 +8,13 @@
 namespace craftnet\orgs;
 
 use craft\db\ActiveRecord;
-use craft\validators\DateTimeValidator;
 use craftnet\db\Table;
-use DateTime;
 
 /**
  * @property int $id
  * @property int $orgId
  * @property int $userId
  * @property string $admin
- * @property DateTime $expiryDate
  */
 class InvitationRecord extends ActiveRecord
 {
@@ -37,8 +34,7 @@ class InvitationRecord extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['expiryDate'], DateTimeValidator::class],
-            [['orgId', 'userId', 'expiryDate', 'admin'], 'required'],
+            [['orgId', 'userId', 'admin'], 'required'],
         ];
     }
 }
