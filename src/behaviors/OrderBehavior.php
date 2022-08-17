@@ -187,7 +187,7 @@ class OrderBehavior extends Behavior
     /**
      * TODO: Commerce 4.2 may do this for us
      */
-    public function setBillingAddress(?Address $address): void
+    private function setBillingAddress(?Address $address): void
     {
         if ($address && $address->ownerId !== $this->owner->id) {
             $this->owner->sourceBillingAddressId = $address->id;
