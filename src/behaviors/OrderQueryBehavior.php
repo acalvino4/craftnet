@@ -17,9 +17,10 @@ class OrderQueryBehavior extends Behavior
     public ?int $orgId = null;
     public ?int $creatorId = null;
     public ?int $purchaserId = null;
-    public ?int $approvalRejectedById = null;
-    public ?int $approvalRequestedById = null;
-    public mixed $approvalRejectedDate = null;
+    public ?bool $approvalRequested = null;
+    private ?int $approvalRejectedById = null;
+    private ?int $approvalRequestedById = null;
+    private mixed $approvalRejectedDate = null;
 
     /**
      * @inheritdoc
@@ -38,10 +39,21 @@ class OrderQueryBehavior extends Behavior
         return $this->owner;
     }
 
+    public function approvalRequested(bool $approvalRequested): OrderQuery
+    {
+        $this->approvalRequested = $approvalRequested;
+
+        return $this->owner;
+    }
+
     public function approvalRejectedBy(int|User|null $approvalRejectedBy): OrderQuery
     {
         $approvalRejectedById = $approvalRejectedBy instanceof User ? $approvalRejectedBy->id : $approvalRejectedBy;
         $this->approvalRejectedById = $approvalRejectedById;
+
+        if ($this->approvalRejectedById) {
+            $this->approvalRequested = true;
+        }
 
         return $this->owner;
     }
@@ -51,12 +63,20 @@ class OrderQueryBehavior extends Behavior
         $approvalRequestedById = $approvalRequestedBy instanceof User ? $approvalRequestedBy->id : $approvalRequestedBy;
         $this->approvalRequestedById = $approvalRequestedById;
 
+        if ($this->approvalRequestedById) {
+            $this->approvalRequested = true;
+        }
+
         return $this->owner;
     }
 
     public function approvalRejectedDate(mixed $approvalRejectedDate): OrderQuery
     {
         $this->approvalRejectedDate = $approvalRejectedDate;
+
+        if ($this->approvalRejectedDate) {
+            $this->approvalRequested = true;
+        }
 
         return $this->owner;
     }
@@ -79,8 +99,11 @@ class OrderQueryBehavior extends Behavior
         $this->owner->subQuery->leftJoin(['orgsOrderApprovals' => Table::ORGS_ORDERAPPROVALS], '[[orgsOrderApprovals.orderId]] = [[commerce_orders.id]]');
 
         if ($this->orgId) {
-            $this->owner->subQuery->andWhere(['orgsOrders.orgId' => $this->orgId]);
-            // $this->owner->subQuery->orWhere(['orgsOrderApprovals.orgId' => $this->orgId]);
+            if ($this->approvalRequested) {
+                $this->owner->subQuery->orWhere(['orgsOrderApprovals.orgId' => $this->orgId]);
+            } else {
+                $this->owner->subQuery->andWhere(['orgsOrders.orgId' => $this->orgId]);
+            }
         }
 
         if ($this->creatorId) {
