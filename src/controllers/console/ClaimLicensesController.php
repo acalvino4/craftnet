@@ -44,10 +44,10 @@ class ClaimLicensesController extends Controller
 
             $this->currentUser->getEmailVerifier()->sendVerificationEmail($email);
         } catch (InvalidArgumentException $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
 
-        return $this->asJson(['success' => true]);
+        return $this->asSuccess('Request sent.');
     }
 
     /**
@@ -63,6 +63,7 @@ class ClaimLicensesController extends Controller
     {
         /** @var User|UserBehavior|null $user */
         $user = User::find()->uid($id)->one();
+
         if ($user === null) {
             throw new NotFoundHttpException("Invalid user ID: {$id}");
         }

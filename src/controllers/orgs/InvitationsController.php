@@ -24,7 +24,7 @@ class InvitationsController extends SiteController
         $role = $this->getOrgMemberRoleFromRequest();
         $recipient = Craft::$app->getUsers()->ensureUserByEmail($email);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -41,7 +41,7 @@ class InvitationsController extends SiteController
         $sent = Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_INVITATION, [
                 'recipient' => $recipient,
-                'sender' => $this->_currentUser,
+                'sender' => $this->currentUser,
                 'org' => $org,
             ])
             ->setTo($email)
@@ -53,20 +53,20 @@ class InvitationsController extends SiteController
     public function actionAcceptInvitation(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
-        $invitation = $org->getInvitationForUser($this->_currentUser);
+        $invitation = $org->getInvitationForUser($this->currentUser);
 
         if (!$invitation) {
             throw new NotFoundHttpException('Invitation not found.');
         }
 
-        if ($org->hasMember($this->_currentUser)) {
+        if ($org->hasMember($this->currentUser)) {
             return $this->asFailure('User is already a member of this organization.');
         }
 
         if ($invitation->admin) {
-            $org->addAdmin($this->_currentUser);
+            $org->addAdmin($this->currentUser);
         } else {
-            $org->addMember($this->_currentUser);
+            $org->addMember($this->currentUser);
         }
 
         $invitation->delete();
@@ -82,7 +82,7 @@ class InvitationsController extends SiteController
     public function actionDeclineInvitation(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
-        $invitation = $org->getInvitationForUser($this->_currentUser);
+        $invitation = $org->getInvitationForUser($this->currentUser);
 
         if (!$invitation) {
             throw new NotFoundHttpException('Invitation not found.');
@@ -100,7 +100,7 @@ class InvitationsController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -127,7 +127,7 @@ class InvitationsController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -142,7 +142,7 @@ class InvitationsController extends SiteController
      */
     public function actionGetInvitationsForUser(int $userId): Response
     {
-        if ($userId !== $this->_currentUser->id) {
+        if ($userId !== $this->currentUser->id) {
             throw new ForbiddenHttpException();
         }
 

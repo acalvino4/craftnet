@@ -21,25 +21,23 @@ class InvoicesController extends BaseController
      *
      * @return Response
      */
-    public function actionGetInvoices(): Response
+    public function actionGetInvoicesForUser(int $userId = null): Response
     {
-        $user = $this->getCurrentUser();
-        $owner = $this->getAllowedOrgFromRequest() ?? $user;
+        $owner = $this->getAllowedOrgFromRequest() ?? $this->currentUser;
         $filter = $this->request->getParam('query');
         $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
         $ascending = $this->request->getParam('ascending');
 
-        try {
-            $invoices = [];
+        $this->restrictToUser($userId);
 
-            if ($user) {
-                $invoices = Module::getInstance()->getInvoiceManager()->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
-            }
+        try {
+            $invoices = Module::getInstance()
+                ->getInvoiceManager()
+                ->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
 
             $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($owner, $filter);
-
             $last_page = ceil($total / $limit);
             $next_page_url = '?next';
             $prev_page_url = '?prev';
@@ -71,11 +69,10 @@ class InvoicesController extends BaseController
      */
     public function actionGetInvoiceByNumber(): Response
     {
-        $user = $this->getCurrentUser();
         $number = $this->request->getRequiredParam('number');
 
         try {
-            $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($user, $number);
+            $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($this->currentUser, $number);
 
             return $this->asSuccess(data: ['invoice' => $invoice]);
         } catch (Throwable $e) {
@@ -90,8 +87,7 @@ class InvoicesController extends BaseController
      */
     public function actionGetSubscriptionInvoices(): Response
     {
-        $user = $this->getCurrentUser();
-        $invoices = StripePlugin::getInstance()->getInvoices()->getUserInvoices($user->id);
+        $invoices = StripePlugin::getInstance()->getInvoices()->getUserInvoices($this->currentUser->id);
 
         $data = [
             'invoices' => [],

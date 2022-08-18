@@ -235,12 +235,17 @@ abstract class BaseController extends Controller
      */
     protected function restrictToUser(int|User $user): void
     {
-        $userId = $user instanceof User ? $user->id : $user;
-
-        if ($this->_currentUser->admin || $userId === $this->_currentUser->id) {
+        if ($this->currentUser->admin || $this->isCurrentUser($user)) {
             return;
         }
 
-        throw new ForbiddenHttpException();
+        throw new ForbiddenHttpException('Invalid user.');
+    }
+
+    protected function isCurrentUser(int|User $user): bool
+    {
+        $userId = $user instanceof User ? $user->id : $user;
+
+        return $userId === $this->currentUser->id;
     }
 }

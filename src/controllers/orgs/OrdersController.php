@@ -60,7 +60,7 @@ class OrdersController extends SiteController
         $order = static::getOrderByNumber($orderNumber);
 
         try {
-            $requested = $order->requestApproval($this->_currentUser, $org);
+            $requested = $order->requestApproval($this->currentUser, $org);
         } catch(UserException $e) {
             return $this->asFailure($e->getMessage());
         }
@@ -84,7 +84,7 @@ class OrdersController extends SiteController
         $order = static::getOrderByNumber($orderNumber);
 
         try {
-            $requested = $order->rejectApproval($this->_currentUser, $org);
+            $requested = $order->rejectApproval($this->currentUser, $org);
         } catch(UserException $e) {
             return $this->asFailure($e->getMessage());
         }

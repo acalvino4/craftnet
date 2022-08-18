@@ -109,6 +109,7 @@ return [
         'GET     users/me/elevated-session-timeout' => 'users/get-elevated-session-timeout',
         'GET     users/<userId:\d+|me>/org-invitations' => 'craftnet/orgs/invitations/get-invitations-for-user',
         'GET     users/<userId:\d+|me>/orgs' => 'craftnet/orgs/orgs/get-orgs-for-user',
+        'GET     users/<userId:\d+|me>/invoices' => 'craftnet/console/invoices/get-invoices-for-user',
 
         'GET     cards' => 'craftnet/console/stripe/get-cards',
         'POST    cards' => 'craftnet/console/stripe/add-card',
