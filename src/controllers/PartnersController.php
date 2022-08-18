@@ -56,7 +56,7 @@ class PartnersController extends Controller
         $this->requireAcceptsJson();
 
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $partner = $user->getPartner();
         $data = PartnerService::getInstance()->serializePartner($partner);
 
@@ -80,7 +80,7 @@ class PartnersController extends Controller
         $partnerId = $this->request->getBodyParam('id');
 
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $partner = $user->getPartner();
 
         if ($partner->id !== (int)$partnerId) {
@@ -177,7 +177,7 @@ class PartnersController extends Controller
         $this->requireAcceptsJson();
 
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $partner = $user->getPartner();
 
         $screenshots = PartnerService::getInstance()->handleUploadedScreenshots($partner);

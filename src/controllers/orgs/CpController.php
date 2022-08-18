@@ -30,13 +30,11 @@ class CpController extends Controller
      */
     public function actionCreate(): ?Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
-
         // Create & populate the draft
         $org = Craft::createObject(Org::class);
-        $org->setOwner($this->request->getQueryParam('ownerId', $user->id));
+        $org->setOwner($this->request->getQueryParam('ownerId', $this->currentUser->id));
 
-        if (!$org->canSave($user)) {
+        if (!$org->canSave($this->currentUser)) {
             throw new ForbiddenHttpException('User not authorized to save this organization.');
         }
 
@@ -55,7 +53,7 @@ class CpController extends Controller
 
         // Save it
         $org->setScenario(Element::SCENARIO_ESSENTIALS);
-        $success = Craft::$app->getDrafts()->saveElementAsDraft($org, $user->id, null, null, false);
+        $success = Craft::$app->getDrafts()->saveElementAsDraft($org, $this->currentUser->id, null, null, false);
 
         // Resume time
         DateTimeHelper::resume();

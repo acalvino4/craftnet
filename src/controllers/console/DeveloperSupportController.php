@@ -2,7 +2,6 @@
 
 namespace craftnet\controllers\console;
 
-use Craft;
 use craft\commerce\elements\Subscription;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\base\SubscriptionGateway;
@@ -40,7 +39,7 @@ class DeveloperSupportController extends Controller
     public function beforeAction($action): bool
     {
         $this->requireLogin();
-        $this->_user = Craft::$app->getUser()->getIdentity();
+        $this->_user = $this->getCurrentUser();
 
         return parent::beforeAction($action);
     }
@@ -259,7 +258,7 @@ class DeveloperSupportController extends Controller
      */
     private function _getSubscriptionData()
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $planService = Commerce::getInstance()->getPlans();
         $proPlan = $planService->getPlanByHandle(self::PLAN_PRO);
         $premiumPlan = $planService->getPlanByHandle(self::PLAN_PREMIUM);

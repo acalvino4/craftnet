@@ -159,7 +159,7 @@ abstract class BaseController extends Controller
     protected function getAllowedOrgFromRequest($required = false, string $name = 'orgId'): ?Org
     {
         $this->requireLogin();
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $orgId = $required ? $this->request->getRequiredParam($name) : $this->request->getParam($name);
         $org = $orgId ? Org::find()->id($orgId)->hasMember($user)->one() : null;
 

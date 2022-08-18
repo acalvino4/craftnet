@@ -186,7 +186,7 @@ class PluginsController extends Controller
                 if ($plugin === null) {
                     throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
                 }
-                $currentUser = Craft::$app->getUser()->getIdentity();
+                $currentUser = $this->getCurrentUser();
                 if (!Craft::$app->getUser()->checkPermission('craftnet:managePlugins') && !$plugin->canEdit($currentUser)) {
                     throw new ForbiddenHttpException('User is not permitted to perform this action');
                 }
@@ -243,7 +243,7 @@ JS;
         $isCpRequest = $this->request->getIsCpRequest();
         $canManagePlugins = Craft::$app->getUser()->checkPermission('craftnet:managePlugins');
         $newPlugin = false;
-        $currentUser = Craft::$app->getUser()->getIdentity();
+        $currentUser = $this->getCurrentUser();
 
         if ($pluginId = $this->request->getBodyParam('pluginId')) {
             /** @var Plugin|CustomFieldBehavior|null $plugin */
@@ -769,7 +769,7 @@ JS;
         $pluginId = $this->request->getBodyParam('pluginId');
         /** @var Plugin|null $plugin */
         $plugin = Plugin::find()->id($pluginId)->status(null)->one();
-        $currentUser = Craft::$app->getUser()->getIdentity();
+        $currentUser = $this->getCurrentUser();
 
         if (!$plugin) {
             throw new NotFoundHttpException('Plugin not found');

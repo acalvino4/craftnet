@@ -21,7 +21,7 @@ class OrdersController extends SiteController
     {
         $org = static::getOrgById($orgId);
 
-        if (!$org->canView($this->_currentUser)) {
+        if (!$org->canView($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 

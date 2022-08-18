@@ -2,7 +2,6 @@
 
 namespace craftnet\controllers\console;
 
-use Craft;
 use craft\commerce\stripe\Plugin as StripePlugin;
 use craft\helpers\DateTimeHelper;
 use craftnet\Module;
@@ -24,7 +23,7 @@ class InvoicesController extends BaseController
      */
     public function actionGetInvoices(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
         $filter = $this->request->getParam('query');
         $limit = $this->request->getParam('limit', 10);
@@ -72,7 +71,7 @@ class InvoicesController extends BaseController
      */
     public function actionGetInvoiceByNumber(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $number = $this->request->getRequiredParam('number');
 
         try {
@@ -91,7 +90,7 @@ class InvoicesController extends BaseController
      */
     public function actionGetSubscriptionInvoices(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $invoices = StripePlugin::getInstance()->getInvoices()->getUserInvoices($user->id);
 
         $data = [

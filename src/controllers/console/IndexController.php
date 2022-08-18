@@ -30,7 +30,7 @@ class IndexController extends Controller
     {
         $stripeAccessToken = null;
         /** @var User|UserBehavior|null $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         if ($user) {
             $stripeAccessToken = $user->stripeAccessToken;

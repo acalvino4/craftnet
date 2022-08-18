@@ -55,7 +55,7 @@ class StripeController extends BaseController
     public function actionCallback(): Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $provider = $this->_getStripeProvider();
         $code = $this->request->getParam('code');
 
@@ -84,7 +84,7 @@ class StripeController extends BaseController
     public function actionDisconnect(): Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         $provider = $this->_getStripeProvider();
         $accessToken = new AccessToken(['access_token' => $user->stripeAccessToken]);
@@ -114,7 +114,7 @@ class StripeController extends BaseController
     public function actionAccount(): Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         if ($user->stripeAccessToken) {
             Stripe::setApiKey($user->stripeAccessToken);
@@ -131,7 +131,7 @@ class StripeController extends BaseController
     public function actionGetCards(): ?Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         $paymentSources = Collection::make($user->getPaymentSources())
             ->map(function(PaymentSource|PaymentSourceBehavior $paymentSource) {
@@ -159,7 +159,7 @@ class StripeController extends BaseController
     public function actionAddCard(): Response
     {
         $this->requirePostRequest();
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         /** @var PaymentIntents $gateway */
         $gateway = Commerce::getInstance()?->getGateways()->getGatewayById(App::env('STRIPE_GATEWAY_ID'));
@@ -194,7 +194,7 @@ class StripeController extends BaseController
      */
     public function actionRemoveCard(int $paymentSourceId): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         /** @var PaymentSource|PaymentSourceBehavior $paymentSource */
         $paymentSource = Commerce::getInstance()

@@ -205,7 +205,7 @@ class CartsController extends BaseApiController
             $cart->cancelUrl = App::parseEnv('$URL_CONSOLE') . 'payment';
             $cart->returnUrl = App::parseEnv('$URL_CONSOLE') . 'thank-you';
 
-            $currentUser = Craft::$app->getUser()->getIdentity(false);
+            $currentUser = $this->getCurrentUser(false);
             $existingOrgFromCart = $cart->getOrg();
             $orgId = $this->request->getBodyParam('orgId', $existingOrgFromCart?->id);
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
