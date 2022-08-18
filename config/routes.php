@@ -99,8 +99,12 @@ return [
         'POST    orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/accept-invitation',
         'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
 
+        'POST    users' => 'users/save-user',
+        'POST    users/me' => 'users/save-user',
+        'POST    users/me/send-password-reset-email' => 'users/send-password-reset-email',
         'POST    users/me/login' => 'users/login',
         'GET     users/me/logout' => 'users/logout',
+        'GET     users/me/session-info' => 'users/session-info',
         'POST    users/me/start-elevated-session' => 'users/start-elevated-session',
         'GET     users/me/elevated-session-timeout' => 'users/get-elevated-session-timeout',
         'GET     users/<userId:\d+|me>/org-invitations' => 'craftnet/orgs/invitations/get-invitations-for-user',
