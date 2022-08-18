@@ -22,7 +22,7 @@ class OrgsController extends SiteController
         $org = Org::find()->id($orgId)->one();
 
         if (!$org) {
-            throw new NotFoundHttpException();
+        throw new NotFoundHttpException();
         }
 
         if (!$org->canView($this->_currentUser)) {
@@ -39,6 +39,18 @@ class OrgsController extends SiteController
      */
     public function actionGetOrgs(): Response
     {
+        $this->requireAdmin();
+
+        $orgs = Org::find()->collect()
+            ->map(fn($org) => static::transformOrg($org));
+
+        return $this->asSuccess(data: $orgs->all());
+    }
+
+    public function actionGetOrgsForUser(int $userId): Response
+    {
+        $this->restrictToUser($userId);
+
         $orgs = Org::find()->hasMember($this->_currentUser)->collect()
             ->map(fn($org) => static::transformOrg($org));
 

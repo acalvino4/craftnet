@@ -13,6 +13,7 @@ use Throwable;
 use yii\base\UserException;
 use yii\helpers\Markdown;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -22,6 +23,15 @@ use yii\web\NotFoundHttpException;
  */
 abstract class BaseController extends Controller
 {
+    public function bindActionParams($action, $params)
+    {
+        if (isset($params['userId']) && $params['userId'] === 'me') {
+            $params['userId'] = Craft::$app->getUser()->getId();
+        }
+
+        return parent::bindActionParams($action, $params);
+    }
+
     // Protected Methods
     // =========================================================================
 
@@ -216,5 +226,21 @@ abstract class BaseController extends Controller
         ]) + [
             'photo' => $user->photo?->getAttributes(['id', 'url']),
         ] : null;
+    }
+
+    /**
+     * @param int|User $user
+     * @return void
+     * @throws ForbiddenHttpException
+     */
+    protected function restrictToUser(int|User $user): void
+    {
+        $userId = $user instanceof User ? $user->id : $user;
+
+        if ($this->_currentUser->admin || $userId === $this->_currentUser->id) {
+            return;
+        }
+
+        throw new ForbiddenHttpException();
     }
 }
