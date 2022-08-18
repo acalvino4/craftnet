@@ -157,6 +157,7 @@ return [
     'vigetx.com',
     'vmgdev.com',
     'vrielingdev.nl',
+    'vrs.gd',
     'wave-dev.com',
     'wave-stage.com',
     'weareboq.design',
