@@ -3,9 +3,7 @@
 namespace craftnet\cli\controllers;
 
 use Craft;
-use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\elements\Order;
-use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\gateways\PaymentIntents as StripeGateway;
 use craft\commerce\stripe\models\forms\payment\PaymentIntent as PaymentForm;
@@ -13,7 +11,9 @@ use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craftnet\base\LicenseInterface;
+use craftnet\behaviors\OrderBehavior;
 use craftnet\Module;
+use craftnet\orgs\Org;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\helpers\Console;
@@ -147,12 +147,13 @@ class LicensesController extends Controller
         foreach ($licenses as $ownerKey => $ownerLicenses) {
             try {
                 /** @var string $email */
-                /** @var User|null $user */
-                [$email, $user, $usingOwnerId] = $this->_resolveOwnerKey($ownerKey);
+                /** @var User|Org|null $user */
+                /** @var User|Org|null $owner */
+                [$email, $user, $owner, $usingOwnerId] = $this->_resolveOwnerKey($ownerKey);
 
                 /** @var LicenseInterface[] $renewLicenses */
                 /** @var LicenseInterface[] $expireLicenses */
-                if ($user === null || !$usingOwnerId) {
+                if ($owner === null || !$usingOwnerId) {
                     $renewLicenses = [];
                     $expireLicenses = $ownerLicenses;
                 } else {
@@ -165,7 +166,7 @@ class LicensesController extends Controller
 
                 // If there are any licenses that should be auto-renewed, give that a shot
                 if (!empty($renewLicenses)) {
-                    if (!$this->_autoRenewLicenses($renewLicenses, $user, $redirect)) {
+                    if (!$this->_autoRenewLicenses($renewLicenses, $owner, $redirect)) {
                         $licensesToExpire = array_merge($licensesToExpire, $renewLicenses);
                         if (!$redirect) {
                             $autoRenewFailed = true;
@@ -210,7 +211,7 @@ class LicensesController extends Controller
     }
 
     /**
-     * Returns the email and user account (if one exists) for the given license owner key.
+     * Returns the email, user account (if one exists), and license owner (if one exists) for the given license owner key.
      *
      * @param string $ownerKey
      * @return array
@@ -218,15 +219,16 @@ class LicensesController extends Controller
     private function _resolveOwnerKey(string $ownerKey): array
     {
         if ($usingOwnerId = (bool)preg_match('/^owner-(\d+)$/', $ownerKey, $matches)) {
-            /** @var User $user */
-            $user = User::find()->id((int)$matches[1])->status(null)->one();
+            /** @var User|Org $licenseOwner */
+            $licenseOwner = Craft::$app->getElements()->getElementById($matches[1]);
+            $user = $licenseOwner instanceof Org ? $licenseOwner->getOwner() : $licenseOwner;
             $email = $user->email;
         } else {
             $email = $ownerKey;
-            $user = User::find()->email($email)->status(null)->one();
+            $licenseOwner = $user = User::find()->email($email)->status(null)->one();
         }
 
-        return [$email, $user, $usingOwnerId];
+        return [$email, $user, $licenseOwner, $usingOwnerId];
     }
 
     /**
@@ -263,39 +265,57 @@ class LicensesController extends Controller
      * Attempts to auto-renew some licenses.
      *
      * @param LicenseInterface[] $licenses
-     * @param User $user
+     * @param User|Org $licenseOwner
      * @param string|null $redirect The redirect URL that can be used to complete the renewal
      * @return bool Whether it was successful
      */
-    private function _autoRenewLicenses(array $licenses, User $user, ?string &$redirect): bool
+    private function _autoRenewLicenses(array $licenses, User|Org $licenseOwner, ?string &$redirect): bool
     {
         try {
             // Make sure they have a Commerce customer record
             $commerce = Commerce::getInstance();
 
-            /** @var User|CustomerBehavior $user */
-            if (!$user->primaryBillingAddressId) {
+            if ($licenseOwner instanceof Org) {
+                $billingAddressId = $licenseOwner->billingAddressId;
+                $paymentSourceId = $licenseOwner->paymentSourceId;
+                $customer = $licenseOwner->getOwner();
+            } else {
+                $billingAddressId = $licenseOwner->primaryBillingAddressId;
+                // TODO: primaryPaymentSourceId doesn't exist in commerce yet
+                $paymentSourceId = $licenseOwner->primaryPaymentSourceId;
+                $customer = $licenseOwner;
+            }
+
+            if (!$billingAddressId) {
                 return false;
             }
 
             // Make sure they have a payment source
-            /** @var PaymentSource|null $paymentSource */
-            $paymentSource = ArrayHelper::firstValue($commerce->getPaymentSources()->getAllPaymentSourcesByCustomerId($user->id));
+            $paymentSource = $commerce->getPaymentSources()->getPaymentSourceById($paymentSourceId);
+
             if ($paymentSource === null) {
                 return false;
             }
 
-            $this->stdout('    - Creating order for ' . count($licenses) . " licenses for {$user->email} ... ", Console::FG_YELLOW);
+            $this->stdout('    - Creating order for ' . count($licenses) . " licenses for {$licenseOwner} ... ", Console::FG_YELLOW);
 
+            /** @var Order|OrderBehavior $order */
             $order = new Order([
                 'number' => $commerce->getCarts()->generateCartNumber(),
                 'currency' => 'USD',
                 'paymentCurrency' => 'USD',
                 'gatewayId' => App::env('STRIPE_GATEWAY_ID'),
                 'orderLanguage' => Craft::$app->language,
-                'customerId' => $user->id,
-                'email' => $user->email,
+                'customerId' => $customer->id,
+                'email' => $customer->email,
             ]);
+
+            if ($licenseOwner instanceof Org) {
+                $order->setOrg($licenseOwner);
+                $order->setPaymentSource($licenseOwner->getPaymentSource());
+                $order->setValidBillingAddress($licenseOwner->getBillingAddress());
+                $order->setCreator($customer);
+            }
 
             $order->cancelUrl = App::parseEnv('$URL_CONSOLE') . 'payment';
             $order->returnUrl = App::parseEnv('$URL_CONSOLE') . 'thank-you';
