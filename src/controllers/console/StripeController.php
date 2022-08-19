@@ -4,6 +4,7 @@ namespace craftnet\controllers\console;
 
 use AdamPaterson\OAuth2\Client\Provider\Stripe as StripeOauthProvider;
 use Craft;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\gateways\PaymentIntents;
@@ -141,6 +142,7 @@ class StripeController extends BaseController
                         'id',
                         'token',
                     ]) + [
+                        'isPrimary' => $paymentSource->isPrimary(),
                         'card' => $paymentSource->getCard(),
                         'orgs' => $orgs->isEmpty() ? null : $paymentSource->getOrgs()->collect()
                             ->map(fn($org) => static::transformOrg($org)),
@@ -159,6 +161,8 @@ class StripeController extends BaseController
     public function actionAddCard(): Response
     {
         $this->requirePostRequest();
+
+        /** @var User|CustomerBehavior $user */
         $user = $this->getCurrentUser();
 
         /** @var PaymentIntents $gateway */
@@ -171,11 +175,20 @@ class StripeController extends BaseController
         $paymentForm = $gateway->getPaymentFormModel();
         $paymentForm->setAttributes($this->request->getBodyParams(), false);
         $description = $this->request->getBodyParam('description');
+        $isPrimary = (bool) $this->request->getBodyParam('isPrimary', false);
 
         try {
             $paymentSource = Commerce::getInstance()
                 ->getPaymentSources()
                 ->createPaymentSource($user->id, $gateway, $paymentForm, $description);
+
+            if ($isPrimary) {
+                $user->setPrimaryPaymentSourceId($paymentSource->id);
+
+                if (!Craft::$app->getElements()->saveElement($user)) {
+                    return $this->asFailure('Couldn’t set primary payment source for user.');
+                }
+            }
 
             // TODO: test
             $card = $paymentSource->response;

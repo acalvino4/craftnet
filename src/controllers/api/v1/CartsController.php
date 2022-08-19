@@ -275,7 +275,7 @@ class CartsController extends BaseApiController
 
             if ($makePrimary) {
                 // TODO: Commerce 4.2
-                // $customer->setPrimaryPaymentSourceId();
+                // $cart->makePrimaryPaymentSource = true;
 
                 /** @var Address $userBillingAddress */
                 $userBillingAddress = Craft::$app->getElements()->duplicateElement(
