@@ -3,6 +3,7 @@
 namespace craftnet\cli\controllers;
 
 use Craft;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\gateways\PaymentIntents as StripeGateway;
@@ -271,6 +272,7 @@ class LicensesController extends Controller
      */
     private function _autoRenewLicenses(array $licenses, User|Org $licenseOwner, ?string &$redirect): bool
     {
+
         try {
             // Make sure they have a Commerce customer record
             $commerce = Commerce::getInstance();
@@ -280,8 +282,8 @@ class LicensesController extends Controller
                 $paymentSourceId = $licenseOwner->paymentSourceId;
                 $customer = $licenseOwner->getOwner();
             } else {
+                /** @var User|CustomerBehavior $licenseOwner */
                 $billingAddressId = $licenseOwner->primaryBillingAddressId;
-                // TODO: primaryPaymentSourceId doesn't exist in commerce yet
                 $paymentSourceId = $licenseOwner->primaryPaymentSourceId;
                 $customer = $licenseOwner;
             }
