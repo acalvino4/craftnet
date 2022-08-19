@@ -1194,12 +1194,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/craftcms/commerce.git",
-                "reference": "f135211f7faa025da688ed24caf14765f85aa62a"
+                "reference": "9b95875e3d6f9ecf69bbbec4cd6101b51c220207"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/craftcms/commerce/zipball/f135211f7faa025da688ed24caf14765f85aa62a",
-                "reference": "f135211f7faa025da688ed24caf14765f85aa62a",
+                "url": "https://api.github.com/repos/craftcms/commerce/zipball/9b95875e3d6f9ecf69bbbec4cd6101b51c220207",
+                "reference": "9b95875e3d6f9ecf69bbbec4cd6101b51c220207",
                 "shasum": ""
             },
             "require": {
@@ -1256,7 +1256,7 @@
                 "rss": "https://github.com/craftcms/commerce/releases.atom",
                 "source": "https://github.com/craftcms/commerce"
             },
-            "time": "2022-08-12T10:45:00+00:00"
+            "time": "2022-08-19T12:38:51+00:00"
         },
         {
             "name": "craftcms/commerce-stripe",
