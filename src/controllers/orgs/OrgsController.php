@@ -22,10 +22,10 @@ class OrgsController extends SiteController
         $org = Org::find()->id($orgId)->one();
 
         if (!$org) {
-            throw new NotFoundHttpException();
+        throw new NotFoundHttpException();
         }
 
-        if (!$org->canView($this->_currentUser)) {
+        if (!$org->canView($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -39,7 +39,19 @@ class OrgsController extends SiteController
      */
     public function actionGetOrgs(): Response
     {
-        $orgs = Org::find()->hasMember($this->_currentUser)->collect()
+        $this->requireAdmin();
+
+        $orgs = Org::find()->collect()
+            ->map(fn($org) => static::transformOrg($org));
+
+        return $this->asSuccess(data: $orgs->all());
+    }
+
+    public function actionGetOrgsForUser(int $userId): Response
+    {
+        $this->restrictToUser($userId);
+
+        $orgs = Org::find()->hasMember($this->currentUser)->collect()
             ->map(fn($org) => static::transformOrg($org));
 
         return $this->asSuccess(data: $orgs->all());
@@ -57,8 +69,8 @@ class OrgsController extends SiteController
 
         if ($isNew) {
             $element = new Org();
-            $element->setOwner($this->_currentUser);
-            $element->creatorId = $this->_currentUser->id;
+            $element->setOwner($this->currentUser);
+            $element->creatorId = $this->currentUser->id;
             if ($siteId) {
                 $element->siteId = $siteId;
             }
@@ -74,7 +86,7 @@ class OrgsController extends SiteController
             }
         }
 
-        if (!$element->canSave($this->_currentUser)) {
+        if (!$element->canSave($this->currentUser)) {
             throw new ForbiddenHttpException('User not authorized to save this organization.');
         }
 

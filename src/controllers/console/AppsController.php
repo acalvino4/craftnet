@@ -104,7 +104,7 @@ class AppsController extends BaseController
             return $this->redirect($this->_connectUri);
         }
 
-        $currentUser = Craft::$app->getUser()->getIdentity();
+        $currentUser = $this->getCurrentUser();
         $existingToken = Module::getInstance()->getOauth()->getAuthTokenByUserId($appTypeConfig['class'], $currentUser->id);
 
         // No previous acces token, create a new one.
@@ -157,7 +157,7 @@ class AppsController extends BaseController
         $appTypeHandle = $this->request->getBodyParam('appTypeHandle');
         $appTypeConfig = Module::getInstance()->getOauth()->getAppTypeConfig($appTypeHandle);
 
-        Module::getInstance()->getOauth()->deleteAccessToken(Craft::$app->getUser()->getIdentity()->id, $appTypeConfig['class']);
+        Module::getInstance()->getOauth()->deleteAccessToken($this->getCurrentUser()->id, $appTypeConfig['class']);
 
         return $this->asJson(['success' => true]);
     }

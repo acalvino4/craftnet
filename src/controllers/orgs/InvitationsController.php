@@ -3,7 +3,13 @@
 namespace craftnet\controllers\orgs;
 
 use Craft;
+use craft\elements\User;
+use craftnet\behaviors\UserBehavior;
 use craftnet\Module;
+use craftnet\orgs\InvitationRecord;
+use craftnet\orgs\MemberRoleEnum;
+use craftnet\orgs\Org;
+use Illuminate\Support\Collection;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -18,7 +24,7 @@ class InvitationsController extends SiteController
         $role = $this->getOrgMemberRoleFromRequest();
         $recipient = Craft::$app->getUsers()->ensureUserByEmail($email);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -35,7 +41,7 @@ class InvitationsController extends SiteController
         $sent = Craft::$app->getMailer()
             ->composeFromKey(Module::MESSAGE_KEY_ORG_INVITATION, [
                 'recipient' => $recipient,
-                'sender' => $this->_currentUser,
+                'sender' => $this->currentUser,
                 'org' => $org,
             ])
             ->setTo($email)
@@ -47,20 +53,20 @@ class InvitationsController extends SiteController
     public function actionAcceptInvitation(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
-        $invitation = $org->getInvitationForUser($this->_currentUser);
+        $invitation = $org->getInvitationForUser($this->currentUser);
 
         if (!$invitation) {
             throw new NotFoundHttpException('Invitation not found.');
         }
 
-        if ($org->hasMember($this->_currentUser)) {
+        if ($org->hasMember($this->currentUser)) {
             return $this->asFailure('User is already a member of this organization.');
         }
 
         if ($invitation->admin) {
-            $org->addAdmin($this->_currentUser);
+            $org->addAdmin($this->currentUser);
         } else {
-            $org->addMember($this->_currentUser);
+            $org->addMember($this->currentUser);
         }
 
         $invitation->delete();
@@ -76,7 +82,7 @@ class InvitationsController extends SiteController
     public function actionDeclineInvitation(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
-        $invitation = $org->getInvitationForUser($this->_currentUser);
+        $invitation = $org->getInvitationForUser($this->currentUser);
 
         if (!$invitation) {
             throw new NotFoundHttpException('Invitation not found.');
@@ -94,7 +100,7 @@ class InvitationsController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -117,16 +123,47 @@ class InvitationsController extends SiteController
      * @throws ForbiddenHttpException
      * @throws NotFoundHttpException
      */
-    public function actionGetInvitations(int $orgId): Response
+    public function actionGetInvitationsForOrg(int $orgId): Response
     {
         $org = SiteController::getOrgById($orgId);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
-        $invitations = $org->getInvitations();
+        $invitations = Collection::make($org->getInvitations())
+            ->map(fn(InvitationRecord $invitation) => static::transformInvitation($invitation));
 
         return $this->asSuccess(data: ['invitations' => $invitations]);
+    }
+
+    /**
+     * @throws ForbiddenHttpException
+     */
+    public function actionGetInvitationsForUser(int $userId): Response
+    {
+        if ($userId !== $this->currentUser->id) {
+            throw new ForbiddenHttpException();
+        }
+
+        /** @var User|UserBehavior $user */
+        $user = User::find()->id($userId)->one();
+        $invitations = Collection::make($user->getOrgInvitations())
+            ->map(fn(InvitationRecord $invitation) => static::transformInvitation($invitation) + [
+                'org' => static::transformOrg(Org::find()->id($invitation->orgId)->one())
+            ]);
+
+        return $this->asSuccess(data: ['invitations' => $invitations]);
+    }
+
+    private static function transformInvitation(InvitationRecord $invitation): array
+    {
+        $user = Craft::$app->getUsers()->getUserById($invitation->userId);
+
+        return [
+            'user' => static::transformUser($user),
+            'role' => $invitation->admin ? MemberRoleEnum::Admin() : MemberRoleEnum::Member(),
+            'dateCreated' => $invitation->dateCreated,
+        ];
     }
 }

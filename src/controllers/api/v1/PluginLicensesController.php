@@ -2,7 +2,6 @@
 
 namespace craftnet\controllers\api\v1;
 
-use Craft;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
@@ -39,7 +38,7 @@ class PluginLicensesController extends BaseApiController
      */
     public function actionList($page = null, $perPage = null): Response
     {
-        if (($user = Craft::$app->getUser()->getIdentity(false)) === null) {
+        if (($user = $this->getCurrentUser(false)) === null) {
             throw new UnauthorizedHttpException('Not Authorized');
         }
 
@@ -71,7 +70,7 @@ class PluginLicensesController extends BaseApiController
      */
     public function actionCreate(): Response
     {
-        if (($user = Craft::$app->getUser()->getIdentity(false)) === null) {
+        if (($user = $this->getCurrentUser(false)) === null) {
             throw new UnauthorizedHttpException('Not Authorized');
         }
 
@@ -181,7 +180,7 @@ class PluginLicensesController extends BaseApiController
      */
     public function actionGet(string $key): Response
     {
-        if (($user = Craft::$app->getUser()->getIdentity(false)) === null) {
+        if (($user = $this->getCurrentUser(false)) === null) {
             throw new UnauthorizedHttpException('Not Authorized');
         }
 

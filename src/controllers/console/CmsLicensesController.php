@@ -33,7 +33,7 @@ class CmsLicensesController extends BaseController
      */
     public function actionTransfer(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $licenseId = $this->request->getRequiredParam('id');
         $newOwnerId = $this->request->getRequiredParam('newOwnerId');
         $includePlugins = (bool) $this->request->getParam('includePlugins', false);
@@ -78,7 +78,7 @@ class CmsLicensesController extends BaseController
     {
         $key = $this->request->getBodyParam('key');
         $licenseFile = UploadedFile::getInstanceByName('licenseFile');
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
@@ -113,7 +113,7 @@ class CmsLicensesController extends BaseController
      */
     public function actionDownload(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $licenseId = $this->request->getParam('id');
         $license = $this->module->getCmsLicenseManager()->getLicenseById($licenseId);
 
@@ -131,7 +131,7 @@ class CmsLicensesController extends BaseController
      */
     public function actionGetExpiringLicensesTotal(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
@@ -151,7 +151,7 @@ class CmsLicensesController extends BaseController
      */
     public function actionGetLicenseById(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $id = $this->request->getRequiredParam('id');
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
@@ -184,7 +184,7 @@ class CmsLicensesController extends BaseController
         $ascending = (bool)$this->request->getParam('ascending');
 
         try {
-            $user = Craft::$app->getUser()->getIdentity();
+            $user = $this->getCurrentUser();
             $owner = $this->getAllowedOrgFromRequest() ?? $user;
             $licenses = Module::getInstance()->getCmsLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
             $totalLicenses = Module::getInstance()->getCmsLicenseManager()->getTotalLicensesByOwner($owner, $filter);
@@ -222,7 +222,7 @@ class CmsLicensesController extends BaseController
     public function actionRelease(): Response
     {
         $key = $this->request->getParam('key');
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $manager = $this->module->getCmsLicenseManager();
         $license = $manager->getLicenseByKey($key);
 
@@ -259,7 +259,7 @@ class CmsLicensesController extends BaseController
     public function actionSave(): Response
     {
         $key = $this->request->getParam('key');
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $manager = $this->module->getCmsLicenseManager();
         $license = $manager->getLicenseByKey($key);
         $owner = $license->getOwner();

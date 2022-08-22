@@ -2,7 +2,6 @@
 
 namespace craftnet\controllers\api\v1;
 
-use Craft;
 use craft\behaviors\CustomFieldBehavior;
 use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\Plugin as Commerce;
@@ -33,7 +32,7 @@ class AccountController extends BaseApiController
     public function actionIndex(): Response
     {
         /** @var User|CustomerBehavior|CustomFieldBehavior|null $user */
-        $user = Craft::$app->getUser()->getIdentity(false);
+        $user = $this->getCurrentUser(false);
         if ($user === null) {
             throw new UnauthorizedHttpException('Not Authorized');
         }

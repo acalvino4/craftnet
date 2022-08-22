@@ -2,11 +2,8 @@
 
 namespace craftnet\controllers\console;
 
-use Craft;
-use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\Plugin as StripePlugin;
 use craft\helpers\DateTimeHelper;
-use craft\web\Controller;
 use craftnet\Module;
 use Throwable;
 use yii\web\Response;
@@ -14,7 +11,7 @@ use yii\web\Response;
 /**
  * Class InvoicesController
  */
-class InvoicesController extends Controller
+class InvoicesController extends BaseController
 {
     // Public Methods
     // =========================================================================
@@ -24,25 +21,23 @@ class InvoicesController extends Controller
      *
      * @return Response
      */
-    public function actionGetInvoices(): Response
+    public function actionGetInvoicesForUser(int $userId = null): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
-
+        $owner = $this->getAllowedOrgFromRequest() ?? $this->currentUser;
         $filter = $this->request->getParam('query');
         $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
         $ascending = $this->request->getParam('ascending');
 
+        $this->restrictToUser($userId);
+
         try {
-            $invoices = [];
+            $invoices = Module::getInstance()
+                ->getInvoiceManager()
+                ->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
 
-            if ($user) {
-                $invoices = Module::getInstance()->getInvoiceManager()->getInvoices($user, $filter, $limit, $page, $orderBy, $ascending);
-            }
-
-            $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($user, $filter);
-
+            $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($owner, $filter);
             $last_page = ceil($total / $limit);
             $next_page_url = '?next';
             $prev_page_url = '?prev';
@@ -62,7 +57,7 @@ class InvoicesController extends Controller
                 'data' => $invoices,
             ]);
         } catch (Throwable $e) {
-            return $this->asErrorJson($e->getMessage());
+            return $this->asFailure($e->getMessage());
         }
     }
 
@@ -74,11 +69,10 @@ class InvoicesController extends Controller
      */
     public function actionGetInvoiceByNumber(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
         $number = $this->request->getRequiredParam('number');
 
         try {
-            $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($user, $number);
+            $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($this->currentUser, $number);
 
             return $this->asSuccess(data: ['invoice' => $invoice]);
         } catch (Throwable $e) {
@@ -93,8 +87,7 @@ class InvoicesController extends Controller
      */
     public function actionGetSubscriptionInvoices(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
-        $invoices = StripePlugin::getInstance()->getInvoices()->getUserInvoices($user->id);
+        $invoices = StripePlugin::getInstance()->getInvoices()->getUserInvoices($this->currentUser->id);
 
         $data = [
             'invoices' => [],

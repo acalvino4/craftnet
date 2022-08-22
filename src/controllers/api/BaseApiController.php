@@ -1089,7 +1089,7 @@ EOL;
      */
     protected function getAuthUser()
     {
-        if ($user = Craft::$app->getUser()->getIdentity()) {
+        if ($user = $this->getCurrentUser()) {
             return $user;
         }
 

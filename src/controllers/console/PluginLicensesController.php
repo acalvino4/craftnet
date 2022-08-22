@@ -31,7 +31,7 @@ class PluginLicensesController extends BaseController
     public function actionClaim(): Response
     {
         $key = $this->request->getParam('key');
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
@@ -50,7 +50,7 @@ class PluginLicensesController extends BaseController
      */
     public function actionGetLicenseById(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $id = $this->request->getRequiredParam('id');
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
@@ -77,7 +77,7 @@ class PluginLicensesController extends BaseController
      */
     public function actionTransfer(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $licenseId = $this->request->getRequiredParam('id');
         $newOwnerId = $this->request->getRequiredParam('newOwnerId');
         $licenseManager = Module::getInstance()->getPluginLicenseManager();
@@ -115,7 +115,7 @@ class PluginLicensesController extends BaseController
      */
     public function actionGetLicenses(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         $filter = $this->request->getParam('query');
         $perPage = $this->request->getParam('limit', 10);
@@ -124,7 +124,7 @@ class PluginLicensesController extends BaseController
         $ascending = (bool)$this->request->getParam('ascending');
 
         try {
-            $user = Craft::$app->getUser()->getIdentity();
+            $user = $this->getCurrentUser();
             $owner = $this->getAllowedOrgFromRequest() ?? $user;
             $licenses = Module::getInstance()->getPluginLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
             $totalLicenses = Module::getInstance()->getPluginLicenseManager()->getTotalLicensesByOwner($owner, $filter);
@@ -159,7 +159,7 @@ class PluginLicensesController extends BaseController
      */
     public function actionGetExpiringLicensesTotal(): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $owner = $this->getAllowedOrgFromRequest() ?? $user;
 
         try {
@@ -181,7 +181,7 @@ class PluginLicensesController extends BaseController
     {
         $pluginHandle = $this->request->getParam('handle');
         $key = $this->request->getParam('key');
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $manager = $this->module->getPluginLicenseManager();
         $license = $manager->getLicenseByKey($key, $pluginHandle);
 
@@ -220,7 +220,7 @@ class PluginLicensesController extends BaseController
     {
         $pluginHandle = $this->request->getRequiredBodyParam('pluginHandle');
         $key = $this->request->getRequiredBodyParam('key');
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $manager = $this->module->getPluginLicenseManager();
         $license = $manager->getLicenseByKey($key, $pluginHandle);
         $owner = $license->getOwner();

@@ -2,10 +2,10 @@
 
 namespace craftnet\controllers\orgs;
 
-use craft\commerce\elements\db\OrderQuery;
 use craft\commerce\elements\Order;
+use craft\commerce\Plugin as Commerce;
 use craftnet\behaviors\OrderBehavior;
-use craftnet\behaviors\OrderQueryBehavior;
+use Illuminate\Support\Collection;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -21,12 +21,22 @@ class OrdersController extends SiteController
     {
         $org = static::getOrgById($orgId);
 
-        if (!$org->canView($this->_currentUser)) {
+        if (!$org->canView($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
-        /** @var OrderQuery|OrderQueryBehavior $orders */
         $orders = Order::find();
+
+        $queryProps = Collection::make([
+            'approvalRejectedById',
+            'approvalRequestedById',
+            'approvalRejectedDate',
+            'approvalRequested',
+        ])->mapWithKeys(fn($prop) => [
+            $prop => $this->request->getParam($prop)
+        ])->whereNotNull()
+        ->each(fn($value, $prop) => $orders?->$prop($value));
+
         $orders = $orders->orgId($org->id)->collect()
             ->map(fn(Order|OrderBehavior $order) => $order->getAttributes([
                 'id',
@@ -50,12 +60,18 @@ class OrdersController extends SiteController
         $order = static::getOrderByNumber($orderNumber);
 
         try {
-            $requested = $order->requestApproval($this->_currentUser, $org);
+            $requested = $order->requestApproval($this->currentUser, $org);
         } catch(UserException $e) {
             return $this->asFailure($e->getMessage());
         }
 
-        return $requested ? $this->asSuccess('Order approval requested.') : $this->asFailure();
+        if (!$requested) {
+            $this->asFailure();
+        }
+
+        Commerce::getInstance()->getCarts()->forgetCart();
+
+        return $this->asSuccess('Order approval requested.');
     }
 
     /**
@@ -68,7 +84,7 @@ class OrdersController extends SiteController
         $order = static::getOrderByNumber($orderNumber);
 
         try {
-            $requested = $order->rejectApproval($this->_currentUser, $org);
+            $requested = $order->rejectApproval($this->currentUser, $org);
         } catch(UserException $e) {
             return $this->asFailure($e->getMessage());
         }

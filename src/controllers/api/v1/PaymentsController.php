@@ -180,7 +180,7 @@ class PaymentsController extends CartsController
         $stripe = Stripe::getInstance();
         $paymentSourcesService = $commerce->getPaymentSources();
         $customersService = $stripe->getCustomers();
-        $user = Craft::$app->getUser()->getIdentity(false);
+        $user = $this->getCurrentUser(false);
         $makePrimary = $payload->makePrimary ?? false;
         $address = $cart->getBillingAddress();
         $customerData = [

@@ -36,7 +36,7 @@ class AccountController extends BaseController
     public function actionGetAccount(): Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $photoUrl = $user->getPhoto()?->getUrl([
             'mode' => 'crop',
             'width' => 200,
@@ -114,7 +114,7 @@ class AccountController extends BaseController
                 throw new UploadFailedException($file->error);
             }
 
-            $user = Craft::$app->getUser()->getIdentity();
+            $user = $this->getCurrentUser();
 
             // Move to our own temp location
             $fileLocation = Assets::tempFilePath($file->getExtension());
@@ -159,7 +159,7 @@ class AccountController extends BaseController
         $this->requireAcceptsJson();
         $this->requireLogin();
 
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         if ($user->photoId) {
             Craft::$app->getElements()->deleteElementById($user->photoId, Asset::class);
@@ -188,7 +188,7 @@ class AccountController extends BaseController
         $this->requireLogin();
 
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         if (!$user->isInGroup('developers')) {
             throw new ForbiddenHttpException('User is not permitted to perform this action');
@@ -214,7 +214,7 @@ class AccountController extends BaseController
         $this->requireLogin();
         $this->requirePostRequest();
         /** @var User|CustomerBehavior $customer */
-        $customer = Craft::$app->getUser()->getIdentity(false);
+        $customer = $this->getCurrentUser(false);
 
         $address = new Address();
         $address->title = 'Billing Address';

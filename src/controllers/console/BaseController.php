@@ -13,6 +13,7 @@ use Throwable;
 use yii\base\UserException;
 use yii\helpers\Markdown;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -22,6 +23,15 @@ use yii\web\NotFoundHttpException;
  */
 abstract class BaseController extends Controller
 {
+    public function bindActionParams($action, $params)
+    {
+        if (isset($params['userId']) && $params['userId'] === 'me') {
+            $params['userId'] = Craft::$app->getUser()->getId();
+        }
+
+        return parent::bindActionParams($action, $params);
+    }
+
     // Protected Methods
     // =========================================================================
 
@@ -149,7 +159,7 @@ abstract class BaseController extends Controller
     protected function getAllowedOrgFromRequest($required = false, string $name = 'orgId'): ?Org
     {
         $this->requireLogin();
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $orgId = $required ? $this->request->getRequiredParam($name) : $this->request->getParam($name);
         $org = $orgId ? Org::find()->id($orgId)->hasMember($user)->one() : null;
 
@@ -216,5 +226,26 @@ abstract class BaseController extends Controller
         ]) + [
             'photo' => $user->photo?->getAttributes(['id', 'url']),
         ] : null;
+    }
+
+    /**
+     * @param int|User $user
+     * @return void
+     * @throws ForbiddenHttpException
+     */
+    protected function restrictToUser(int|User $user): void
+    {
+        if ($this->currentUser->admin || $this->isCurrentUser($user)) {
+            return;
+        }
+
+        throw new ForbiddenHttpException('Invalid user.');
+    }
+
+    protected function isCurrentUser(int|User $user): bool
+    {
+        $userId = $user instanceof User ? $user->id : $user;
+
+        return $userId === $this->currentUser->id;
     }
 }

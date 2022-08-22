@@ -74,7 +74,7 @@ class PluginsController extends Controller
             $repo === null ||
             ($route !== null && ($route !== 'tree' || $ref === null))
         ) {
-            return $this->asErrorJson("{$repository} is not a valid GitHub repository URL");
+            return $this->asFailure("{$repository} is not a valid GitHub repository URL");
         }
 
         $client = new Client();
@@ -90,17 +90,17 @@ class PluginsController extends Controller
             $response = $api->contents()->show($owner, $repo, 'composer.json', $ref);
             $config = Json::decode(base64_decode($response['content']));
         } catch (\Throwable $e) {
-            return $this->asErrorJson('There was an error loading composer.json: ' . $e->getMessage());
+            return $this->asFailure('There was an error loading composer.json: ' . $e->getMessage());
         }
 
         // Make sure it's a Craft plugin
         if (!isset($config['type']) || $config['type'] !== 'craft-plugin') {
-            return $this->asErrorJson('The "type" property in composer.json must be set to "craft-plugin".');
+            return $this->asFailure('The "type" property in composer.json must be set to "craft-plugin".');
         }
 
         // Make sure it has a handle
         if (!isset($config['extra']['handle'])) {
-            return $this->asErrorJson('The "extra"."handle" property in composer.json must be set.');
+            return $this->asFailure('The "extra"."handle" property in composer.json must be set.');
         }
 
         // Get the title and handle
@@ -186,8 +186,8 @@ class PluginsController extends Controller
                 if ($plugin === null) {
                     throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
                 }
-
-                if (!Craft::$app->getUser()->checkPermission('craftnet:managePlugins') && Craft::$app->getUser()->getId() !== $plugin->developerId) {
+                $currentUser = $this->getCurrentUser();
+                if (!Craft::$app->getUser()->checkPermission('craftnet:managePlugins') && !$plugin->canEdit($currentUser)) {
                     throw new ForbiddenHttpException('User is not permitted to perform this action');
                 }
             } else {
@@ -243,6 +243,7 @@ JS;
         $isCpRequest = $this->request->getIsCpRequest();
         $canManagePlugins = Craft::$app->getUser()->checkPermission('craftnet:managePlugins');
         $newPlugin = false;
+        $currentUser = $this->getCurrentUser();
 
         if ($pluginId = $this->request->getBodyParam('pluginId')) {
             /** @var Plugin|CustomFieldBehavior|null $plugin */
@@ -251,7 +252,7 @@ JS;
                 throw new NotFoundHttpException('Invalid plugin ID: ' . $pluginId);
             }
 
-            if (!$canManagePlugins && Craft::$app->getUser()->getId() !== $plugin->developerId) {
+            if (!$canManagePlugins && !$plugin->canEdit($currentUser)) {
                 throw new ForbiddenHttpException('User is not permitted to perform this action');
             }
         } else {
@@ -768,12 +769,13 @@ JS;
         $pluginId = $this->request->getBodyParam('pluginId');
         /** @var Plugin|null $plugin */
         $plugin = Plugin::find()->id($pluginId)->status(null)->one();
+        $currentUser = $this->getCurrentUser();
 
         if (!$plugin) {
             throw new NotFoundHttpException('Plugin not found');
         }
 
-        if (!Craft::$app->getUser()->checkPermission('craftnet:managePlugins') && Craft::$app->getUser()->getId() !== $plugin->developerId) {
+        if (!Craft::$app->getUser()->checkPermission('craftnet:managePlugins') && !$plugin->canEdit($currentUser)) {
             throw new ForbiddenHttpException('User is not permitted to perform this action');
         }
 

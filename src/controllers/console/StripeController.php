@@ -4,6 +4,7 @@ namespace craftnet\controllers\console;
 
 use AdamPaterson\OAuth2\Client\Provider\Stripe as StripeOauthProvider;
 use Craft;
+use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\gateways\PaymentIntents;
@@ -55,7 +56,7 @@ class StripeController extends BaseController
     public function actionCallback(): Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $provider = $this->_getStripeProvider();
         $code = $this->request->getParam('code');
 
@@ -84,7 +85,7 @@ class StripeController extends BaseController
     public function actionDisconnect(): Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         $provider = $this->_getStripeProvider();
         $accessToken = new AccessToken(['access_token' => $user->stripeAccessToken]);
@@ -114,7 +115,7 @@ class StripeController extends BaseController
     public function actionAccount(): Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         if ($user->stripeAccessToken) {
             Stripe::setApiKey($user->stripeAccessToken);
@@ -131,7 +132,7 @@ class StripeController extends BaseController
     public function actionGetCards(): ?Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         $paymentSources = Collection::make($user->getPaymentSources())
             ->map(function(PaymentSource|PaymentSourceBehavior $paymentSource) {
@@ -141,6 +142,7 @@ class StripeController extends BaseController
                         'id',
                         'token',
                     ]) + [
+                        'isPrimary' => $paymentSource->isPrimary(),
                         'card' => $paymentSource->getCard(),
                         'orgs' => $orgs->isEmpty() ? null : $paymentSource->getOrgs()->collect()
                             ->map(fn($org) => static::transformOrg($org)),
@@ -159,7 +161,9 @@ class StripeController extends BaseController
     public function actionAddCard(): Response
     {
         $this->requirePostRequest();
-        $user = Craft::$app->getUser()->getIdentity();
+
+        /** @var User|CustomerBehavior $user */
+        $user = $this->getCurrentUser();
 
         /** @var PaymentIntents $gateway */
         $gateway = Commerce::getInstance()?->getGateways()->getGatewayById(App::env('STRIPE_GATEWAY_ID'));
@@ -171,11 +175,20 @@ class StripeController extends BaseController
         $paymentForm = $gateway->getPaymentFormModel();
         $paymentForm->setAttributes($this->request->getBodyParams(), false);
         $description = $this->request->getBodyParam('description');
+        $isPrimary = (bool) $this->request->getBodyParam('isPrimary', false);
 
         try {
             $paymentSource = Commerce::getInstance()
                 ->getPaymentSources()
                 ->createPaymentSource($user->id, $gateway, $paymentForm, $description);
+
+            if ($isPrimary) {
+                $user->setPrimaryPaymentSourceId($paymentSource->id);
+
+                if (!Craft::$app->getElements()->saveElement($user)) {
+                    return $this->asFailure('Couldn’t set primary payment source for user.');
+                }
+            }
 
             // TODO: test
             $card = $paymentSource->response;
@@ -194,7 +207,7 @@ class StripeController extends BaseController
      */
     public function actionRemoveCard(int $paymentSourceId): Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         /** @var PaymentSource|PaymentSourceBehavior $paymentSource */
         $paymentSource = Commerce::getInstance()

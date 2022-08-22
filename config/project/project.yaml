@@ -1,4 +1,4 @@
-dateModified: 1660698966
+dateModified: 1660924224
 elementSources:
   craft\elements\Asset:
     -
@@ -274,7 +274,7 @@ plugins:
     edition: pro
     enabled: true
     licenseKey: AX9Z8XL3CNFWOIA52P4CYXL4
-    schemaVersion: 4.1.0
+    schemaVersion: 4.1.1
     settings:
       activeCartDuration: PT1H
       allowEmptyCartOnCheckout: true

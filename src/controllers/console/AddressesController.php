@@ -81,7 +81,7 @@ class AddressesController extends BaseController
      */
     public function actionSaveAddress(?int $addressId = null): ?Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
         $isPrimaryBilling = (bool) $this->request->getBodyParam('isPrimaryBilling');
         $isPrimaryShipping = (bool) $this->request->getBodyParam('isPrimaryShipping');
 
@@ -114,7 +114,7 @@ class AddressesController extends BaseController
      */
     public function actionRemoveAddress(int $addressId = null): ?Response
     {
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         /** @var Address|AddressBehavior $address */
         $address = Address::find()
@@ -140,7 +140,7 @@ class AddressesController extends BaseController
     public function actionGetAddresses(): ?Response
     {
         /** @var User|UserBehavior $user */
-        $user = Craft::$app->getUser()->getIdentity();
+        $user = $this->getCurrentUser();
 
         $addresses = Collection::make($user->getAddresses())
             ->map(function(Address|AddressBehavior $address) {

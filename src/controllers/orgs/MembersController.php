@@ -26,7 +26,7 @@ class MembersController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -73,7 +73,7 @@ class MembersController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
 
-        if (!$org->canManageMembers($this->_currentUser)) {
+        if (!$org->canManageMembers($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -92,7 +92,7 @@ class MembersController extends SiteController
             throw new BadRequestHttpException('Member is already specified role.');
         }
 
-        if ($role === MemberRoleEnum::Owner() || $this->_currentUser->id === $user->id) {
+        if ($role === MemberRoleEnum::Owner() || $this->currentUser->id === $user->id) {
             $this->requireElevatedSession();
         }
 
@@ -109,11 +109,11 @@ class MembersController extends SiteController
     {
         $org = SiteController::getOrgById($orgId);
 
-        if (!$org->hasMember($this->_currentUser)) {
+        if (!$org->hasMember($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
-    /** @var UserQuery|UserQueryBehavior $userQuery */
+        /** @var UserQuery|UserQueryBehavior $userQuery */
         $userQuery = User::find()->id($userId);
         $user = $userQuery->ofOrg($org)->one();
 

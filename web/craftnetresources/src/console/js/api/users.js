@@ -5,11 +5,11 @@ import FormDataHelper from '../helpers/form-data.js';
 
 export default {
   getRemainingSessionTime(config) {
-    return axios.get(Craft.actionUrl + '/users/session-info', config)
+    return axios.get(Craft.VUE_APP_URL_CONSOLE + '/users/me/session-info', config)
   },
 
   login(formData) {
-    return axios.post(Craft.actionUrl + '/users/login', formData, {
+    return axios.post(VUE_APP_URL_CONSOLE + '/users/me/login', formData, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -17,11 +17,11 @@ export default {
   },
 
   logout() {
-    return axios.get(Craft.actionUrl + '/users/logout')
+    return axios.get(VUE_APP_URL_CONSOLE + '/users/me/logout')
   },
 
   registerUser(formData) {
-    return axios.post(Craft.actionUrl + '/users/save-user', formData, {
+    return axios.post(VUE_APP_URL_CONSOLE + '/users', formData, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -51,7 +51,7 @@ export default {
       }
     }
 
-    return axios.post(Craft.actionUrl + '/users/save-user', formData, {
+    return axios.post(VUE_APP_URL_CONSOLE + '/users/me', formData, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -59,7 +59,7 @@ export default {
   },
 
   sendPasswordResetEmail(formData) {
-    return axios.post(Craft.actionUrl + '/users/send-password-reset-email', formData, {
+    return axios.post(VUE_APP_URL_CONSOLE + '/users/me/send-password-reset-email', formData, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }

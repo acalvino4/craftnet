@@ -26,6 +26,7 @@ export default {
     const data = {
       org: organization,
     }
+    // TODO: this is now POST orgs/<orgId:\d+>
     return axios.post(VUE_APP_URL_CONSOLE + '/orgs/save-org', qs.stringify(data), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
@@ -73,7 +74,7 @@ export default {
   },
 
   getOrganizations() {
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs')
+    return axios.get(VUE_APP_URL_CONSOLE + '/users/me/orgs')
   },
 
   removeMember({organizationId, memberId}) {
