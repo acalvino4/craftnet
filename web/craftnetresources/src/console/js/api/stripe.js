@@ -1,4 +1,4 @@
-/* global Craft */
+/* global Craft, VUE_APP_URL_CONSOLE */
 
 import axios from 'axios'
 import qs from 'qs'
@@ -21,18 +21,18 @@ export default {
       paymentMethodId: source.id
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/stripe/save-card', qs.stringify(data), {
+    return axios.post(VUE_APP_URL_CONSOLE + '/cards', qs.stringify(data), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
     })
   },
 
-  removeCard() {
-    return axios.post(Craft.actionUrl + '/craftnet/console/stripe/remove-card', {}, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+  removeCard(cardId) {
+    return axios.delete(VUE_APP_URL_CONSOLE + '/cards/' + cardId)
   },
+
+  getCards() {
+    return axios.get(VUE_APP_URL_CONSOLE + '/cards')
+  }
 }

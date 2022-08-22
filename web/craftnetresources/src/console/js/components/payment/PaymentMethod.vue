@@ -44,7 +44,7 @@
     </template>
 
     <template v-else>
-      <card-element ref="guestCard"></card-element>
+      <card-element ref="guestCard" />
     </template>
   </div>
 </template>

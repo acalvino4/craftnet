@@ -5,6 +5,7 @@ import stripeApi from '../../api/stripe'
  */
 const state = {
   card: null,
+  cards: null,
   cardToken: null,
   stripeAccount: null,
 }
@@ -44,16 +45,18 @@ const actions = {
     })
   },
 
-  removeCard({commit}) {
+  removeCard({dispatch}, cardId) {
+    console.log('cardId', cardId)
     return new Promise((resolve, reject) => {
-      stripeApi.removeCard()
-        .then((response) => {
-          if (!response.data.error) {
-            commit('removeStripeCard')
-            resolve(response)
-          } else {
-            reject(response)
-          }
+      stripeApi.removeCard(cardId)
+        .then((removeCardResponse) => {
+          dispatch('getCards')
+            .then((getCardsResponse) => {
+              resolve({
+                removeCardResponse,
+                getCardsResponse
+              })
+            })
         })
         .catch((error) => {
           reject(error.response)
@@ -77,6 +80,19 @@ const actions = {
         })
     })
   },
+
+  getCards({commit}) {
+    return new Promise((resolve, reject) => {
+      stripeApi.getCards()
+        .then((response) => {
+          commit('updateCards', {cards: response.data.cards})
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
+  }
 }
 
 /**
@@ -93,6 +109,10 @@ const mutations = {
 
   updateCard(state, {card}) {
     state.card = card
+  },
+
+  updateCards(state, {cards}) {
+    state.cards = cards
   },
 
   updateCardToken(state, {cardToken}) {

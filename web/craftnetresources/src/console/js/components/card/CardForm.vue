@@ -8,11 +8,13 @@
       class="text-red"
       role="alert"></p>
 
-    <btn
-      kind="primary"
-      type="submit">Save
-    </btn>
-    <btn @click="cancel()">Cancel</btn>
+    <div class="space-x-2">
+      <btn
+        kind="primary"
+        type="submit">Save
+      </btn>
+      <btn @click="cancel()">Cancel</btn>
+    </div>
 
     <spinner v-if="loading"></spinner>
   </form>
