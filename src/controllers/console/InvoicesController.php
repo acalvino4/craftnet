@@ -5,7 +5,6 @@ namespace craftnet\controllers\console;
 use craft\commerce\stripe\Plugin as StripePlugin;
 use craft\helpers\DateTimeHelper;
 use craftnet\Module;
-use Throwable;
 use yii\web\Response;
 
 /**
@@ -21,7 +20,7 @@ class InvoicesController extends BaseController
      *
      * @return Response
      */
-    public function actionGetInvoicesForUser(int $userId = null): Response
+    public function actionGetInvoicesForUser(): Response
     {
         $owner = $this->getAllowedOrgFromRequest() ?? $this->currentUser;
         $filter = $this->request->getParam('query');
@@ -30,35 +29,29 @@ class InvoicesController extends BaseController
         $orderBy = $this->request->getParam('orderBy');
         $ascending = $this->request->getParam('ascending');
 
-        $this->restrictToUser($userId);
+        $invoices = Module::getInstance()
+            ->getInvoiceManager()
+            ->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
 
-        try {
-            $invoices = Module::getInstance()
-                ->getInvoiceManager()
-                ->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
+        $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($owner, $filter);
+        $last_page = ceil($total / $limit);
+        $next_page_url = '?next';
+        $prev_page_url = '?prev';
+        $from = ($page - 1) * $limit;
+        $to = ($page * $limit) - 1;
 
-            $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($owner, $filter);
-            $last_page = ceil($total / $limit);
-            $next_page_url = '?next';
-            $prev_page_url = '?prev';
-            $from = ($page - 1) * $limit;
-            $to = ($page * $limit) - 1;
-
-            return $this->asJson([
-                'total' => $total,
-                'count' => $total,
-                'per_page' => $limit,
-                'current_page' => $page,
-                'last_page' => $last_page,
-                'next_page_url' => $next_page_url,
-                'prev_page_url' => $prev_page_url,
-                'from' => $from,
-                'to' => $to,
-                'data' => $invoices,
-            ]);
-        } catch (Throwable $e) {
-            return $this->asFailure($e->getMessage());
-        }
+        return $this->asSuccess(data: [
+            'total' => $total,
+            'count' => $total,
+            'per_page' => $limit,
+            'current_page' => $page,
+            'last_page' => $last_page,
+            'next_page_url' => $next_page_url,
+            'prev_page_url' => $prev_page_url,
+            'from' => $from,
+            'to' => $to,
+            'data' => $invoices,
+        ]);
     }
 
     /**
@@ -67,17 +60,11 @@ class InvoicesController extends BaseController
      * @return Response
      * @throws \yii\web\BadRequestHttpException
      */
-    public function actionGetInvoiceByNumber(): Response
+    public function actionGetInvoiceByNumber(string $number): Response
     {
-        $number = $this->request->getRequiredParam('number');
+        $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($this->currentUser, $number);
 
-        try {
-            $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($this->currentUser, $number);
-
-            return $this->asSuccess(data: ['invoice' => $invoice]);
-        } catch (Throwable $e) {
-            return $this->asFailure($e->getMessage());
-        }
+        return $this->asSuccess(data: ['invoice' => $invoice]);
     }
 
     /**
@@ -110,6 +97,6 @@ class InvoicesController extends BaseController
             ];
         }
 
-        return $this->asSuccess($data);
+        return $this->asSuccess(data: $data);
     }
 }

@@ -140,14 +140,10 @@ class InvitationsController extends SiteController
     /**
      * @throws ForbiddenHttpException
      */
-    public function actionGetInvitationsForUser(int $userId): Response
+    public function actionGetInvitations(): Response
     {
-        if ($userId !== $this->currentUser->id) {
-            throw new ForbiddenHttpException();
-        }
-
         /** @var User|UserBehavior $user */
-        $user = User::find()->id($userId)->one();
+        $user = User::find()->id($this->currentUser->id)->one();
         $invitations = Collection::make($user->getOrgInvitations())
             ->map(fn(InvitationRecord $invitation) => static::transformInvitation($invitation) + [
                 'org' => static::transformOrg(Org::find()->id($invitation->orgId)->one())

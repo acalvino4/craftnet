@@ -5,11 +5,11 @@ import FormDataHelper from '../helpers/form-data.js';
 
 export default {
   getRemainingSessionTime(config) {
-    return axios.get(Craft.VUE_APP_URL_CONSOLE + '/users/me/session-info', config)
+    return axios.get(Craft.VUE_APP_URL_CONSOLE + '/session', config)
   },
 
   login(formData) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/users/me/login', formData, {
+    return axios.post(VUE_APP_URL_CONSOLE + '/session', formData, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -17,7 +17,7 @@ export default {
   },
 
   logout() {
-    return axios.get(VUE_APP_URL_CONSOLE + '/users/me/logout')
+    return axios.delete(VUE_APP_URL_CONSOLE + '/session')
   },
 
   registerUser(formData) {

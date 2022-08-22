@@ -98,18 +98,7 @@ return [
         'GET     orgs/<orgId:\d+>/invitations' => 'craftnet/orgs/invitations/get-invitations-for-org',
         'POST    orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/accept-invitation',
         'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
-
-        'POST    users' => 'users/save-user',
-        'POST    users/me' => 'users/save-user',
-        'POST    users/me/send-password-reset-email' => 'users/send-password-reset-email',
-        'POST    users/me/login' => 'users/login',
-        'GET     users/me/logout' => 'users/logout',
-        'GET     users/me/session-info' => 'users/session-info',
-        'POST    users/me/start-elevated-session' => 'users/start-elevated-session',
-        'GET     users/me/elevated-session-timeout' => 'users/get-elevated-session-timeout',
-        'GET     users/<userId:\d+|me>/org-invitations' => 'craftnet/orgs/invitations/get-invitations-for-user',
-        'GET     users/<userId:\d+|me>/orgs' => 'craftnet/orgs/orgs/get-orgs-for-user',
-        'GET     users/<userId:\d+|me>/invoices' => 'craftnet/console/invoices/get-invoices-for-user',
+        'GET     orgs/invitations' => 'craftnet/orgs/invitations/get-invitations-for-user',
 
         'GET     cards' => 'craftnet/console/stripe/get-cards',
         'POST    cards' => 'craftnet/console/stripe/add-card',
@@ -121,6 +110,20 @@ return [
         'DELETE  addresses/<addressId:\d+>' => 'craftnet/console/addresses/remove-address',
         'POST    addresses/info' => 'craftnet/console/addresses/get-address-info',
         'GET     addresses/countries' => 'craftnet/console/addresses/get-countries',
+
+        'POST    users' => 'users/save-user',
+        'POST    users/me' => 'users/save-user',
+        'POST    users/me/send-password-reset-email' => 'users/send-password-reset-email',
+
+        'GET     invoices' => 'craftnet/console/invoices/get-invoices-for-user',
+        'GET     invoices/subscriptions' => 'craftnet/console/invoices/get-subscription-invoices',
+        'GET     invoices/<number:.*>' => 'craftnet/console/invoices/get-invoice-by-number',
+
+        'GET     session' => 'users/session-info',
+        'POST    session' => 'users/login',
+        'DELETE  session' => 'users/logout',
+        'POST    session/elevated' => 'users/start-elevated-session',
+        'GET     session/elevated' => 'users/get-elevated-session-timeout',
 
         'oauth/login' => 'oauth-server/oauth/login',
         'oauth/authorize' => 'oauth-server/oauth/authorize',

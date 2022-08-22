@@ -32,25 +32,8 @@ class OrgsController extends SiteController
         return $this->asSuccess(data: static::transformOrg($org));
     }
 
-    /**
-     * Get all orgs current user is a member of
-     *
-     * @return Response
-     */
     public function actionGetOrgs(): Response
     {
-        $this->requireAdmin();
-
-        $orgs = Org::find()->collect()
-            ->map(fn($org) => static::transformOrg($org));
-
-        return $this->asSuccess(data: $orgs->all());
-    }
-
-    public function actionGetOrgsForUser(int $userId): Response
-    {
-        $this->restrictToUser($userId);
-
         $orgs = Org::find()->hasMember($this->currentUser)->collect()
             ->map(fn($org) => static::transformOrg($org));
 

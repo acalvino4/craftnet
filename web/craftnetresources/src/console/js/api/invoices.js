@@ -3,11 +3,15 @@
 import axios from 'axios'
 
 export default {
+  getInvoices() {
+    return axios.get(`${VUE_APP_URL_CONSOLE}/invoices`);
+  },
+
   getInvoiceByNumber(number) {
-    return axios.get(Craft.actionUrl + '/craftnet/console/invoices/get-invoice-by-number', {params: {number}})
+    return axios.get(`${VUE_APP_URL_CONSOLE}/invoices/${number}`);
   },
 
   getSubscriptionInvoices() {
-    return axios.get(Craft.actionUrl + '/craftnet/console/invoices/get-subscription-invoices')
+    return axios.get(`${VUE_APP_URL_CONSOLE}/invoices/subscriptions`);
   }
 }
