@@ -6,6 +6,7 @@ use CommerceGuys\Addressing\AddressFormat\AddressFormat;
 use CommerceGuys\Addressing\Country\Country;
 use CommerceGuys\Addressing\Subdivision\Subdivision;
 use Craft;
+use craft\commerce\behaviors\CustomerAddressBehavior;
 use craft\elements\Address;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
@@ -81,22 +82,20 @@ class AddressesController extends BaseController
      */
     public function actionSaveAddress(?int $addressId = null): ?Response
     {
-        $user = $this->getCurrentUser();
-        $isPrimaryBilling = (bool) $this->request->getBodyParam('isPrimaryBilling');
-        $isPrimaryShipping = (bool) $this->request->getBodyParam('isPrimaryShipping');
-
-        /** @var Address $address */
+        /** @var Address|CustomerAddressBehavior $address */
         $address = $addressId ?
             Address::find()
                 ->id($addressId)
-                ->ownerId($user->id)
+                ->ownerId($this->currentUser->id)
                 ->one() :
-            new Address(['ownerId' => $user->id]);
+            new Address(['ownerId' => $this->currentUser->id]);
 
         if (!$address) {
             throw new NotFoundHttpException('Address not found.');
         }
 
+        $isPrimaryBilling = (bool) $this->request->getBodyParam('isPrimaryBilling', $address->isPrimaryBilling);
+        $isPrimaryShipping = (bool) $this->request->getBodyParam('isPrimaryShipping', $address->isPrimaryBilling);
 
         $address->setAttributes($this->request->getBodyParams());
         $address->isPrimaryBilling = $isPrimaryBilling;
