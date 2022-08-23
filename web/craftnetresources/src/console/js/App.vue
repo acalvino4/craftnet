@@ -101,31 +101,45 @@ export default {
                     .then(() => {
                       this.$store.commit('app/updateLoading', false)
 
-                      if (vueApp.$store.state.account.user) {
-                        // Logged in user
-
-                        // Renew the auth manager’s session if needed
-                        if (vueApp.$refs.authManager) {
-                          vueApp.$refs.authManager.renewSession()
-                        }
-
-                        next()
-                      } else {
-                        // Guest user
-                        // Check that the user can access the next route
-                        if (!to.meta.allowAnonymous) {
-                          next({path: '/login'})
-                        } else {
-                          next()
-                        }
-                      }
+                      this._handleRoute(to, from, next)
                     })
                 })
             })
         } else {
-          next()
+          this._handleRoute(to, from, next)
         }
       })
+    },
+
+    _handleRoute(to, from, next) {
+      const vueApp = this
+
+      if (vueApp.$store.state.account.user) {
+        // Logged in user
+
+        // Renew the auth manager’s session if needed
+        if (vueApp.$refs.authManager) {
+          vueApp.$refs.authManager.renewSession()
+        }
+
+        if (to.meta.orgOnly) {
+          if (this.currentOrganization) {
+            next()
+          } else {
+            next({path: '/licenses/cms'})
+          }
+        } else {
+          next()
+        }
+      } else {
+        // Guest user
+        // Check that the user can access the next route
+        if (!to.meta.allowAnonymous) {
+          next({path: '/login'})
+        } else {
+          next()
+        }
+      }
     },
 
     /**

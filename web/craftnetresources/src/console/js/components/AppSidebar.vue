@@ -162,16 +162,18 @@
         </li>
       </template>
 
-      <li>
-        <router-link
-          @click="$emit('closeSidebar')"
-          to="/settings/plugin-store">
-          <icon
-            class="mr-2 text-blue-500 w-5 h-5"
-            icon="plug" />
-          Plugin Store
-        </router-link>
-      </li>
+      <template v-if="currentOrganization">
+        <li>
+          <router-link
+            @click="$emit('closeSidebar')"
+            to="/settings/plugin-store">
+            <icon
+              class="mr-2 text-blue-500 w-5 h-5"
+              icon="plug" />
+            Plugin Store
+          </router-link>
+        </li>
+      </template>
     </ul>
   </div>
 </template>

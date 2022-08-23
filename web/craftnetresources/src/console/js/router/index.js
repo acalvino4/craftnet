@@ -100,6 +100,7 @@ const router = createRouter({
       path: '/settings/plugin-store',
       name: 'SettingsPluginStore',
       component: () => import('../pages/settings/plugin-store.vue'),
+      meta: {orgOnly: true}
     },
     {
       path: '/settings/developer-support',

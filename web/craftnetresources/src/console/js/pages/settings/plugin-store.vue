@@ -232,7 +232,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 import PaypalPayout from '../../components/developer/PaypalPayout'
 import DeveloperPreferences from '../../components/developer/Preferences'
 import ConnectedApps from '../../components/developer/connected-apps/ConnectedApps'
@@ -274,6 +274,11 @@ export default {
       hasApiToken: state => state.account.hasApiToken,
       user: state => state.account.user,
     }),
+
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization',
+    }),
+
     selectedPayoutRegion() {
       return this.payoutRegions.find(region => region.handle === this.selectedPayoutRegionHandle)
     },
@@ -320,6 +325,6 @@ export default {
     if (this.hasApiToken) {
       this.apiToken = '****************************************'
     }
-  }
+  },
 }
 </script>
