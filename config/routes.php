@@ -102,6 +102,7 @@ return [
 
         'GET     cards' => 'craftnet/console/stripe/get-cards',
         'POST    cards' => 'craftnet/console/stripe/add-card',
+        'POST    cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/save-card',
         'DELETE  cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/remove-card',
 
         'GET     addresses' => 'craftnet/console/addresses/get-addresses',

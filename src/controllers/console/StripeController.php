@@ -177,26 +177,54 @@ class StripeController extends BaseController
         $description = $this->request->getBodyParam('description');
         $isPrimary = (bool) $this->request->getBodyParam('isPrimary', false);
 
-        try {
-            $paymentSource = Commerce::getInstance()
-                ->getPaymentSources()
-                ->createPaymentSource($user->id, $gateway, $paymentForm, $description);
+        $paymentSource = Commerce::getInstance()
+            ->getPaymentSources()
+            ->createPaymentSource($user->id, $gateway, $paymentForm, $description);
 
-            if ($isPrimary) {
-                $user->setPrimaryPaymentSourceId($paymentSource->id);
+        if ($isPrimary) {
+            $user->setPrimaryPaymentSourceId($paymentSource->id);
 
-                if (!Craft::$app->getElements()->saveElement($user)) {
-                    return $this->asFailure('Couldn’t set primary payment source for user.');
-                }
+            if (!Craft::$app->getElements()->saveElement($user)) {
+                return $this->asFailure('Couldn’t set primary payment source for user.');
             }
-
-            // TODO: test
-            $card = $paymentSource->response;
-
-            return $this->asSuccess(data: ['card' => $card]);
-        } catch (\Throwable $t) {
-            return $this->asFailure($t->getMessage());
         }
+
+        // TODO: test
+        $card = $paymentSource->response;
+
+        return $this->asSuccess(data: ['card' => $card]);
+    }
+
+    public function actionSaveCard(int $paymentSourceId): ?Response
+    {
+        $paymentSource = Commerce::getInstance()
+            ->getPaymentSources()
+            ->getPaymentSourceByIdAndUserId($paymentSourceId, $this->currentUser->id);
+
+        if (!$paymentSource) {
+            throw new NotFoundHttpException();
+        }
+
+        $description = $this->request->getBodyParam('description', $paymentSource->description);
+        $isPrimary = (bool) $this->request->getBodyParam('isPrimary', $paymentSource->isPrimary());
+
+        $paymentSource->description = $description;
+
+        if ($isPrimary !== $paymentSource->isPrimary()) {
+            $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
+            if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
+                return $this->asFailure('Couldn’t set primary payment source for user.');
+            }
+        }
+
+        $saved = Commerce::getInstance()
+            ->getPaymentSources()
+            ->savePaymentSource($paymentSource);
+
+        // TODO: test
+        $card = $paymentSource->response;
+
+        return $saved ? $this->asSuccess(data: ['card' => $card]) : $this->asFailure();
     }
 
     /**
