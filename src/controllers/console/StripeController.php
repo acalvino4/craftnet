@@ -13,6 +13,7 @@ use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use craftnet\behaviors\PaymentSourceBehavior;
 use craftnet\behaviors\UserBehavior;
+use craftnet\orgs\Org;
 use Illuminate\Support\Collection;
 use League\OAuth2\Client\Token\AccessToken;
 use Stripe\Account;
@@ -142,7 +143,7 @@ class StripeController extends BaseController
                         'id',
                         'token',
                     ]) + [
-                        'isPrimary' => $paymentSource->isPrimary(),
+                        'isPrimary' => $paymentSource->isPrimary,
                         'card' => $paymentSource->getCard(),
                         'orgs' => $orgs->isEmpty() ? null : $paymentSource->getOrgs()->collect()
                             ->map(fn($org) => static::transformOrg($org)),
@@ -177,26 +178,54 @@ class StripeController extends BaseController
         $description = $this->request->getBodyParam('description');
         $isPrimary = (bool) $this->request->getBodyParam('isPrimary', false);
 
-        try {
-            $paymentSource = Commerce::getInstance()
-                ->getPaymentSources()
-                ->createPaymentSource($user->id, $gateway, $paymentForm, $description);
+        $paymentSource = Commerce::getInstance()
+            ->getPaymentSources()
+            ->createPaymentSource($user->id, $gateway, $paymentForm, $description);
 
-            if ($isPrimary) {
-                $user->setPrimaryPaymentSourceId($paymentSource->id);
+        if ($isPrimary) {
+            $user->setPrimaryPaymentSourceId($paymentSource->id);
 
-                if (!Craft::$app->getElements()->saveElement($user)) {
-                    return $this->asFailure('Couldn’t set primary payment source for user.');
-                }
+            if (!Craft::$app->getElements()->saveElement($user)) {
+                return $this->asFailure('Couldn’t set primary payment source for user.');
             }
-
-            // TODO: test
-            $card = $paymentSource->response;
-
-            return $this->asSuccess(data: ['card' => $card]);
-        } catch (\Throwable $t) {
-            return $this->asFailure($t->getMessage());
         }
+
+        // TODO: test
+        $card = $paymentSource->response;
+
+        return $this->asSuccess(data: ['card' => $card]);
+    }
+
+    public function actionSaveCard(int $paymentSourceId): ?Response
+    {
+        $paymentSource = Commerce::getInstance()
+            ->getPaymentSources()
+            ->getPaymentSourceByIdAndUserId($paymentSourceId, $this->currentUser->id);
+
+        if (!$paymentSource) {
+            throw new NotFoundHttpException();
+        }
+
+        $description = $this->request->getBodyParam('description', $paymentSource->description);
+        $isPrimary = (bool) $this->request->getBodyParam('isPrimary', $paymentSource->isPrimary);
+
+        $paymentSource->description = $description;
+
+        if ($isPrimary !== $paymentSource->isPrimary) {
+            $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
+            if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
+                return $this->asFailure('Couldn’t set primary payment source for user.');
+            }
+        }
+
+        $saved = Commerce::getInstance()
+            ->getPaymentSources()
+            ->savePaymentSource($paymentSource);
+
+        // TODO: test
+        $card = $paymentSource->response;
+
+        return $saved ? $this->asSuccess(data: ['card' => $card]) : $this->asFailure();
     }
 
     /**
@@ -218,8 +247,8 @@ class StripeController extends BaseController
             throw new NotFoundHttpException('Credit card not found.');
         }
 
-        if ($paymentSource->getOrgs()->exists()) {
-            $this->requireElevatedSession();
+        if ($paymentSource->getOrgs()->exists() && !Craft::$app->getUser()->getHasElevatedSession()) {
+            return $this->getElevatedSessionResponse();
         }
 
         $success = Commerce::getInstance()
@@ -229,6 +258,38 @@ class StripeController extends BaseController
         return $success ?
             $this->asSuccess('Credit card removed.') :
             $this->asFailure('Could not remove credit card.');
+    }
+
+    public function actionGetPaymentSources(): ?Response
+    {
+        /** @var User|UserBehavior $user */
+        $user = $this->currentUser;
+        $userPaymentSources = Collection::make($user->getPaymentSources())
+            ->sortByDesc('isPrimary');
+
+        // TODO: should we filter out orgs with null billing address?
+        $eligibleOrgs= Org::find()->hasMember($user)->collect();
+
+        $paymentSources = $userPaymentSources
+            ->concat($eligibleOrgs)
+            ->map(function(PaymentSource|Org $paymentSource) {
+                $org = $paymentSource instanceof Org ? $paymentSource : null;
+                $paymentSource = $org ? $paymentSource?->paymentSource : $paymentSource;
+
+                return $paymentSource ? $paymentSource->getAttributes([
+                    'id',
+                    'token',
+                    'description',
+                    'isPrimary',
+                ]) + [
+                    'card' => $paymentSource->getCard(),
+                    'org' => $org ? static::transformOrg($org) : null,
+                    'canPurchase' => $org ? $org->canPurchase($this->currentUser) : true,
+                ] : null;
+            })
+            ->whereNotNull();
+
+        return $this->asSuccess(data: ['paymentSources' => $paymentSources]);
     }
 
     // Private Methods

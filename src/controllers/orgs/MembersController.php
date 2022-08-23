@@ -93,7 +93,9 @@ class MembersController extends SiteController
         }
 
         if ($role === MemberRoleEnum::Owner() || $this->currentUser->id === $user->id) {
-            $this->requireElevatedSession();
+            if (!Craft::$app->getUser()->getHasElevatedSession()) {
+                return $this->getElevatedSessionResponse();
+            }
         }
 
         return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
