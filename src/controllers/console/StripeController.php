@@ -284,6 +284,7 @@ class StripeController extends BaseController
                 ]) + [
                     'card' => $paymentSource->getCard(),
                     'org' => $org ? static::transformOrg($org) : null,
+                    'canPurchase' => $org ? $org->canPurchase($this->currentUser) : true,
                 ] : null;
             })
             ->whereNotNull();
