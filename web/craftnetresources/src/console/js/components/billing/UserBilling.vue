@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <page-header>
       <h1>Billing</h1>
     </page-header>
