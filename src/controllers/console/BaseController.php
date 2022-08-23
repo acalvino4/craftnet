@@ -196,6 +196,8 @@ abstract class BaseController extends Controller
                 'id',
                 'title',
                 'requireOrderApproval',
+                'paymentSourceId',
+                'billingAddressId',
             ]) + [
                 'orgLogo' => $org->orgLogo->one()?->getAttributes(['id', 'url']),
             ];
