@@ -123,10 +123,16 @@ export default {
         }
 
         if (to.meta.orgOnly) {
-          if (this.currentOrganization) {
+          if (vueApp.currentOrganization) {
             next()
           } else {
-            next({path: '/licenses/cms'})
+            next({path: '/'})
+          }
+        } else if(to.meta.userOnly) {
+          if (!vueApp.currentOrganization) {
+            next()
+          } else {
+            next({path: '/'})
           }
         } else {
           next()

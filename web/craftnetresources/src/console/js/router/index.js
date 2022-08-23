@@ -106,6 +106,7 @@ const router = createRouter({
       path: '/settings/developer-support',
       name: 'AccountDeveloperSupport',
       component: () => import('../pages/settings/developer-support'),
+      meta: {userOnly: true}
     },
     {
       path: '/settings/developer-support/old',

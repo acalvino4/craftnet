@@ -36,7 +36,8 @@
 
           <div class="main-content">
             <router-view
-              :key="(currentOrganization ? currentOrganization.id : 'personal') + '-' + $route.path"></router-view>
+              :key="routerViewKey"
+            />
           </div>
         </div>
       </div>
@@ -67,11 +68,16 @@ export default {
     ...mapState({
       expiringCmsLicensesTotal: state => state.cmsLicenses.expiringCmsLicensesTotal,
       expiringPluginLicensesTotal: state => state.pluginLicenses.expiringPluginLicensesTotal,
+      currentOrganizationId: state => state.organizations.currentOrganizationId,
     }),
 
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization'
     }),
+
+    routerViewKey() {
+      return ((this.currentOrganizationId ? 'org-' + this.currentOrganizationId : 'personal') + '-' + this.$route.path)
+    }
   },
 
   methods: {
