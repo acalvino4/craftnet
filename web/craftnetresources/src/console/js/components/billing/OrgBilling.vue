@@ -131,6 +131,8 @@ export default {
         .then(() => {
           this.saving = false;
           this.$store.dispatch('app/displayNotice', 'Billing settings saved.')
+
+          this.$store.dispatch('organizations/getOrganizations')
         })
         .catch(() => {
           this.saving = false;
