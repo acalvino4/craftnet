@@ -6,6 +6,7 @@
 
     <data-table
       :url="apiUrl"
+      :query="apiQuery"
       :columns="vtColumns"
       :options="vtOptions">
       <template v-slot:item="props">
@@ -62,6 +63,7 @@
 import EditionBadge from '../../../components/EditionBadge'
 import PageHeader from '@/console/js/components/PageHeader'
 import DataTable from '@/console/js/components/DataTable';
+import {mapGetters} from 'vuex';
 
 export default {
   components: {
@@ -84,9 +86,23 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+    
     apiUrl() {
       return Craft.actionUrl + '/craftnet/console/sales/get-sales'
     },
+
+    apiQuery() {
+      if (!this.currentOrganization) {
+        return null
+      }
+
+      return {
+        orgId: this.currentOrganization.id,
+      }
+    }
   },
 }
 </script>
