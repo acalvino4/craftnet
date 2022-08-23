@@ -121,15 +121,9 @@ export default {
       const organization = {
         id: this.currentOrganization.id,
         requireOrderApproval: this.requireOrderApproval ? 1 : 0,
+        paymentSourceId: this.paymentSourceId,
+        billingAddressId: this.billingAddressId,
       };
-
-      if (this.paymentSourceId) {
-        organization.paymentSourceId = this.paymentSourceId;
-      }
-
-      if (this.billingAddressId) {
-        organization.billingAddressId = this.billingAddressId;
-      }
 
       this.$store.dispatch('organizations/saveOrganization', organization)
         .then(() => {
