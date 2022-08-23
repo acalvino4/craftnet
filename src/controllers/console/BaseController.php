@@ -15,6 +15,7 @@ use yii\helpers\Markdown;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response as YiiResponse;
 
 /**
  * Class BaseController
@@ -196,6 +197,15 @@ abstract class BaseController extends Controller
         }
 
         return $role;
+    }
+
+    public function getElevatedSessionResponse(?string $message = null): ?YiiResponse
+    {
+        $message = $message ?? Craft::t('app', 'This action may only be performed with an elevated session.');
+
+        return $this->asFailure($message, [
+            'requireElevatedSession' => true
+        ]);
     }
 
     protected static function transformOrg(Org $org): array

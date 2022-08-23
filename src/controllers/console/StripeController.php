@@ -246,8 +246,8 @@ class StripeController extends BaseController
             throw new NotFoundHttpException('Credit card not found.');
         }
 
-        if ($paymentSource->getOrgs()->exists()) {
-            $this->requireElevatedSession();
+        if ($paymentSource->getOrgs()->exists() && !Craft::$app->getUser()->getHasElevatedSession()) {
+            return $this->getElevatedSessionResponse();
         }
 
         $success = Commerce::getInstance()
