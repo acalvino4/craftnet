@@ -112,8 +112,9 @@ return [
         'GET     addresses/countries' => 'craftnet/console/addresses/get-countries',
 
         'POST    users' => 'users/save-user',
-        'POST    users/me' => 'users/save-user',
-        'POST    users/me/send-password-reset-email' => 'users/send-password-reset-email',
+        'POST    users/<userId:\d+|me>' => 'craftnet/console/users/save-user',
+        'POST    users/<userId:\d+|me>/upload-photo' => 'craftnet/console/users/upload-user-photo',
+        'POST    users/<userId:\d+|me>/send-password-reset-email' => 'users/send-password-reset-email',
 
         'GET     invoices' => 'craftnet/console/invoices/get-invoices-for-user',
         'GET     invoices/subscriptions' => 'craftnet/console/invoices/get-subscription-invoices',

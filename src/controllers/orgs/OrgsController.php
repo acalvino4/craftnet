@@ -79,9 +79,9 @@ class OrgsController extends SiteController
         $element->enabled = $this->request->getBodyParam('enabled', $element->enabled);
 
         // Org attributes
-        $element->paymentSourceId = $this->request->getBodyParam('paymentSourceId', $element->paymentSourceId);
-        $element->billingAddressId = $this->request->getBodyParam('billingAddressId', $element->billingAddressId);
-        $element->locationAddressId = $this->request->getBodyParam('locationAddressId', $element->locationAddressId);
+        $element->paymentSourceId = $this->request->getBodyParam('paymentSourceId', $element->paymentSourceId) ?: null;
+        $element->billingAddressId = $this->request->getBodyParam('billingAddressId', $element->billingAddressId) ?: null;
+        $element->locationAddressId = $this->request->getBodyParam('locationAddressId', $element->locationAddressId) ?: null;
 
         $element->setFieldValuesFromRequest('fields');
 

@@ -25,8 +25,16 @@ abstract class BaseController extends Controller
 {
     public function bindActionParams($action, $params)
     {
-        if (isset($params['userId']) && $params['userId'] === 'me') {
-            $params['userId'] = Craft::$app->getUser()->getId();
+        $userId = $params['userId'] ?? null;
+        $userId = $userId === 'me' ? Craft::$app->getUser()->getId() : $userId;
+
+        if ($userId) {
+            $params['userId'] = $userId;
+
+            // Inject userId as a body param for Craft's users controllers
+            $this->request->setBodyParams($this->request->getBodyParams() + [
+                'userId' => $userId,
+            ]);
         }
 
         return parent::bindActionParams($action, $params);
