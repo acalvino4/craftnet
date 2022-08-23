@@ -144,7 +144,9 @@ export default {
   },
 
   mounted() {
-    this.requireOrderApproval = JSON.parse(JSON.stringify(this.currentOrganization.requireOrderApproval));
+    this.requireOrderApproval = this.currentOrganization.requireOrderApproval;
+    this.paymentSourceId = this.currentOrganization.paymentSourceId;
+    this.billingAddressId = this.currentOrganization.billingAddressId;
 
     this.loading = true
 
