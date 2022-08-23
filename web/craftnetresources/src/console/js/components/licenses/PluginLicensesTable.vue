@@ -105,7 +105,6 @@
 </template>
 
 <script>
-import Badge from '../Badge'
 import pluginLicensesApi from '../../api/plugin-licenses'
 import helpers from '../../mixins/helpers.js'
 
@@ -113,10 +112,6 @@ export default {
   mixins: [helpers],
 
   props: ['licenses', 'excludeCmsLicenseColumn', 'excludeNotesColumn', 'autoRenewSwitch'],
-
-  components: {
-    Badge,
-  },
 
   data() {
     return {

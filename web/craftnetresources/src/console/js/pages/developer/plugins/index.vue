@@ -90,7 +90,9 @@
             </td>
             <td class="py-4 px-2">
               <template v-if="plugin.enabled">
-                <badge type="success">Approved</badge>
+                <badge type="success">
+                  Approved
+                </badge>
               </template>
               <template v-else>
                 <badge v-if="plugin.pendingApproval">In Review

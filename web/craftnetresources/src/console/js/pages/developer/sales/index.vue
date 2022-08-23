@@ -89,7 +89,7 @@ export default {
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization'
     }),
-    
+
     apiUrl() {
       return Craft.actionUrl + '/craftnet/console/sales/get-sales'
     },

@@ -17,9 +17,7 @@
 </template>
 
 <script>
-import Badge from '../../../../../common/ui/components/Badge';
 export default {
-  components: {Badge},
   data() {
     return {
       showingFields: [

@@ -76,10 +76,9 @@
 import {mapState} from 'vuex'
 import helpers from '../../mixins/helpers.js'
 import AddCardModal from './AddCardModal';
-import Badge from '../../../../common/ui/components/Badge';
 
 export default {
-  components: {Badge, AddCardModal},
+  components: {AddCardModal},
   mixins: [helpers],
 
   data() {

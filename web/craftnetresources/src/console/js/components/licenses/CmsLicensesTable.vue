@@ -72,16 +72,11 @@
 </template>
 
 <script>
-import Badge from '../Badge'
 import helpers from '../../mixins/helpers.js'
 
 export default {
   mixins: [helpers],
 
   props: ['licenses'],
-
-  components: {
-    Badge
-  },
 }
 </script>
