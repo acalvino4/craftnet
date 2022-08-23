@@ -102,7 +102,7 @@ fields:
       previewMode: full
       restrictFiles: false
       restrictLocation: true
-      restrictedDefaultUploadSubpath: '{owner.id}'
+      restrictedDefaultUploadSubpath: null
       restrictedLocationSource: 'volume:e08a6ce3-ecbb-469e-b0e5-a03d2d9c6052' # Partner Images
       restrictedLocationSubpath: '{owner.id}'
       selectionCondition:
