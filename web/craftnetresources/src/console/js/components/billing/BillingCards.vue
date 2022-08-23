@@ -32,7 +32,15 @@
                   </div>
 
                   <div>
-                    {{ card.card.brand }}
+                    <template v-if="card.isPrimary">
+                      <div class="mb-2">
+                        <badge type="info">Primary</badge>
+                      </div>
+                    </template>
+
+                    <div>
+                      {{ card.card.brand }}
+                    </div>
 
                     <div>
                       **** **** **** {{ card.card.last4 }}
@@ -42,7 +50,10 @@
                       {{ card.card.exp_month }}/{{ card.card.exp_year }}
                     </div>
 
-                    <div class="mt-4">
+                    <div class="mt-4 space-x-4">
+                      <template v-if="!card.isPrimary">
+                        <a href="#" @click.prevent="setPrimary(card.id)">Set as primary</a>
+                      </template>
                       <a href="#" @click.prevent="removeCard(card.id)">Remove</a>
                     </div>
                   </div>
@@ -65,9 +76,10 @@
 import {mapState} from 'vuex'
 import helpers from '../../mixins/helpers.js'
 import AddCardModal from './AddCardModal';
+import Badge from '../../../../common/ui/components/Badge';
 
 export default {
-  components: {AddCardModal},
+  components: {Badge, AddCardModal},
   mixins: [helpers],
 
   data() {
@@ -105,6 +117,10 @@ export default {
           this.$store.dispatch('app/displayError', errorMessage)
         })
     },
+
+    setPrimary(cardId) {
+      console.log(`Set card #${cardId} as primary`)
+    }
   },
 
   mounted() {
