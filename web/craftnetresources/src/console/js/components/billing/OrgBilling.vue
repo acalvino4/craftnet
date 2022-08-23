@@ -120,7 +120,9 @@ export default {
 
       const organization = {
         id: this.currentOrganization.id,
-        requireOrderApproval: this.requireOrderApproval ? 1 : 0,
+        fields: {
+          requireOrderApproval: this.requireOrderApproval ? 1 : 0,
+        },
         paymentSourceId: this.paymentSourceId,
         billingAddressId: this.billingAddressId,
       };
