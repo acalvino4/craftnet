@@ -4,6 +4,8 @@ namespace craftnet\controllers\orgs;
 
 use Craft;
 use craft\base\Element;
+use craft\elements\Asset;
+use craft\elements\MatrixBlock;
 use craft\errors\UnsupportedSiteException;
 use craftnet\orgs\Org;
 use Throwable;
@@ -29,7 +31,46 @@ class OrgsController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        return $this->asSuccess(data: static::transformOrg($org));
+        $projects = $org->partnerProjects
+            ->collect()
+            ->map(fn(MatrixBlock $block) => $block->getAttributes([
+                'projectName',
+                'projectUrl',
+                'role',
+                'withCraftCommerce',
+                'linkType',
+            ]) + [
+                'partnerProjects' => $block->screenshots->collect()
+                    ->map(fn(Asset $asset) => $asset->getAttributes(['id', 'url'])),
+            ]);
+
+        $transformed = static::transformOrg($org) + [
+            'projects' => $projects->all(),
+        ] + $org->getAttributes([
+            'primaryContactName',
+            'partnerRegion',
+            'location',
+            'externalUrl',
+            'payPalEmail',
+            'enablePartnerFeatures',
+            'primaryContactName',
+            'primaryContactEmail',
+            'primaryContactPhone',
+            'partnerFullBio',
+            'partnerShortBio',
+            'partnerHasFullTimeDev',
+            'partnerIsCraftVerified',
+            'partnerIsCommerceVerified',
+            'partnerIsEnterpriseVerified',
+            'partnerIsRegisteredBusiness',
+            'partnerAgencySize',
+            'partnerCapabilities',
+            'partnerExpertise',
+            'partnerVerificationStartDate',
+            'partnerRegion',
+        ]);
+
+        return $this->asSuccess(data: $transformed);
     }
 
     public function actionGetOrgs(): Response
