@@ -104,6 +104,7 @@ return [
         'POST    cards' => 'craftnet/console/stripe/add-card',
         'POST    cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/save-card',
         'DELETE  cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/remove-card',
+        'GET     cards/payment-sources' => 'craftnet/console/stripe/get-payment-sources',
 
         'GET     addresses' => 'craftnet/console/addresses/get-addresses',
         'POST    addresses' => 'craftnet/console/addresses/save-address',

@@ -13,6 +13,7 @@ use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use craftnet\behaviors\PaymentSourceBehavior;
 use craftnet\behaviors\UserBehavior;
+use craftnet\orgs\Org;
 use Illuminate\Support\Collection;
 use League\OAuth2\Client\Token\AccessToken;
 use Stripe\Account;
@@ -257,6 +258,37 @@ class StripeController extends BaseController
         return $success ?
             $this->asSuccess('Credit card removed.') :
             $this->asFailure('Could not remove credit card.');
+    }
+
+    public function actionGetPaymentSources(): ?Response
+    {
+        /** @var User|UserBehavior $user */
+        $user = $this->currentUser;
+        $userPaymentSources = Collection::make($user->getPaymentSources())
+            ->sortByDesc('isPrimary');
+
+        // TODO: should we filter out orgs with null billing address?
+        $eligibleOrgs= Org::find()->hasMember($user)->collect();
+
+        $paymentSources = $userPaymentSources
+            ->concat($eligibleOrgs)
+            ->map(function(PaymentSource|Org $paymentSource) {
+                $org = $paymentSource instanceof Org ? $paymentSource : null;
+                $paymentSource = $org ? $paymentSource?->paymentSource : $paymentSource;
+
+                return $paymentSource ? $paymentSource->getAttributes([
+                    'id',
+                    'token',
+                    'description',
+                    'isPrimary',
+                ]) + [
+                    'card' => $paymentSource->getCard(),
+                    'org' => $org ? static::transformOrg($org) : null,
+                ] : null;
+            })
+            ->whereNotNull();
+
+        return $this->asSuccess(data: ['paymentSources' => $paymentSources]);
     }
 
     // Private Methods
