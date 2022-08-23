@@ -35,15 +35,6 @@
       </field>
 
       <field
-        label-for="location"
-        label="Location">
-        <textbox
-          id="location"
-          v-model="currentOrganizationDraft.location"
-          :errors="errors.location" />
-      </field>
-
-      <field
         label-for="photo"
         label="Photo">
         <div class="flex items-start">
