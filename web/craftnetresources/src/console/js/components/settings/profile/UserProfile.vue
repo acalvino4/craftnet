@@ -26,24 +26,6 @@
       </field>
 
       <field
-        label-for="developerUrl"
-        label="Website URL">
-        <textbox
-          id="developerUrl"
-          v-model="userDraft.developerUrl"
-          :errors="errors.developerUrl" />
-      </field>
-
-      <field
-        label-for="location"
-        label="Location">
-        <textbox
-          id="location"
-          v-model="userDraft.location"
-          :errors="errors.location" />
-      </field>
-
-      <field
         label-for="photo"
         label="Photo">
         <div class="flex items-start">
@@ -211,8 +193,6 @@ export default {
           user: {
             id: this.userDraft.id,
             developerName: this.userDraft.developerName,
-            developerUrl: this.userDraft.developerUrl,
-            location: this.userDraft.location,
             photoUrl: this.userDraft.photoUrl,
           }
         })
