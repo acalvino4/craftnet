@@ -46,10 +46,8 @@
           />
         </div>
         <h2>Billing address</h2>
-        <billing-info-form
-          v-model:billingInfo="billingInfo"
-          :errors="errors"
-          :vertical="true"
+        <address-fields
+          v-model:address="billingAddress"
         />
       </div>
 
@@ -89,36 +87,19 @@ import {
 } from '@headlessui/vue'
 import PaymentMethodOption from './PaymentMethodOption';
 import CardElement from '../card/CardElement';
-import BillingInfoForm from './BillingInfo';
+import AddressFields from '../billing/addresses/AddressFields';
 import {mapState} from 'vuex';
 
 export default {
   components: {
     RadioGroup, RadioGroupOption,
     PaymentMethodOption, CardElement,
-    BillingInfoForm,
+    AddressFields,
   },
 
   data() {
     return {
       selectedCreditCardValue: null,
-      /*creditCards: [
-        {
-          id: 1,
-          brand: 'Visa',
-          last4: '4242',
-          exp_month: '01',
-          exp_year: '28',
-        },
-        {
-          id: 2,
-          brand: 'Visa',
-          last4: '4545',
-          exp_month: '05',
-          exp_year: '25',
-          org: 'Pixel & Tonic',
-        },
-      ],*/
       billingInfo: {
         firstName: '',
         lastName: '',
@@ -130,6 +111,10 @@ export default {
         state: '',
         city: '',
         zipCode: '',
+      },
+
+      billingAddress: {
+
       },
 
       errors: {}
