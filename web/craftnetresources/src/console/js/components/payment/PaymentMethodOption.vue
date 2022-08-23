@@ -44,10 +44,10 @@
             class="w-5 h-5 text-gray-500" />
 
           <div>
-            {{ creditCard.brand }} {{ creditCard.last4 }}
+            {{ creditCard.card.brand }} {{ creditCard.card.last4 }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">
-            {{ creditCard.exp_month }}/{{ creditCard.exp_year }}
+            {{ creditCard.card.exp_month }}/{{ creditCard.card.exp_year }}
           </div>
         </div>
       </template>

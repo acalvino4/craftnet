@@ -1,6 +1,7 @@
 <template>
   <div class="max-w-md">
     <RadioGroup class="space-y-4" v-model="selectedCreditCardValue">
+      <!-- Personal + Org credit cards -->
       <template v-for="creditCard in creditCards">
         <RadioGroupOption
           class="ring-0 group"
@@ -8,8 +9,8 @@
           v-slot="{ active, checked }"
         >
           <payment-method-option
-            :name="creditCard.brand + ' ' + creditCard.last4"
-            :description=" creditCard.exp_month + '/' + creditCard.exp_year"
+            :name="creditCard.card.brand + ' ' + creditCard.card.last4"
+            :description=" creditCard.card.exp_month + '/' + creditCard.card.exp_year"
             :info="creditCard.org"
             :value="creditCard.id"
             :credit-card="creditCard"
@@ -82,49 +83,96 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue'
+<script>
 import {
   RadioGroup, RadioGroupOption,
 } from '@headlessui/vue'
 import PaymentMethodOption from './PaymentMethodOption';
 import CardElement from '../card/CardElement';
 import BillingInfoForm from './BillingInfo';
+import {mapState} from 'vuex';
 
-const selectedCreditCardValue = ref(null)
-const creditCards = ref([
-  {
-    id: 1,
-    brand: 'Visa',
-    last4: '4242',
-    exp_month: '01',
-    exp_year: '28',
+export default {
+  components: {
+    RadioGroup, RadioGroupOption,
+    PaymentMethodOption, CardElement,
+    BillingInfoForm,
   },
-  {
-    id: 2,
-    brand: 'Visa',
-    last4: '4545',
-    exp_month: '05',
-    exp_year: '25',
-    org: 'Pixel & Tonic',
+
+  data() {
+    return {
+      selectedCreditCardValue: null,
+      /*creditCards: [
+        {
+          id: 1,
+          brand: 'Visa',
+          last4: '4242',
+          exp_month: '01',
+          exp_year: '28',
+        },
+        {
+          id: 2,
+          brand: 'Visa',
+          last4: '4545',
+          exp_month: '05',
+          exp_year: '25',
+          org: 'Pixel & Tonic',
+        },
+      ],*/
+      billingInfo: {
+        firstName: '',
+        lastName: '',
+        businessName: '',
+        businessTaxId: '',
+        address1: '',
+        address2: '',
+        country: '',
+        state: '',
+        city: '',
+        zipCode: '',
+      },
+
+      errors: {}
+    }
   },
-])
 
-const selectedCreditCard = computed(() => creditCards.value.find(creditCard => creditCard.id === selectedCreditCardValue.value))
+  computed: {
+    ...mapState({
+      cards: state => state.stripe.cards,
+    }),
 
-const billingInfo = ref({
-  firstName: '',
-    lastName: '',
-    businessName: '',
-    businessTaxId: '',
-    address1: '',
-    address2: '',
-    country: '',
-    state: '',
-    city: '',
-    zipCode: '',
-});
+    creditCards() {
+      const cards = []
 
-const errors = ref({})
+      // Personal card
+      for (const cardKey in this.cards) {
+        const card = this.cards[cardKey];
+
+        if (card.isPrimary) {
+          cards.push(card)
+        }
+      }
+
+      // Org cards
+
+      return cards
+    },
+
+    selectedCreditCard() {
+      return this.creditCards.find(creditCard => creditCard.id === this.selectedCreditCardValue)
+    },
+  },
+
+  mounted() {
+    this.$store.dispatch('stripe/getCards')
+      .then(() => {
+      })
+      .catch(() => {
+        this.$store.dispatch('app/displayNotice', 'Couldn’t get credit cards.')
+      })
+
+  }
+}
 
 </script>
+
