@@ -75,9 +75,6 @@
         </div>
       </field>
     </pane>
-
-    <p class="mt-4 text-sm text-light">Your profile data is being used for
-      your developer page on the Plugin Store.</p>
   </form>
 </template>
 
