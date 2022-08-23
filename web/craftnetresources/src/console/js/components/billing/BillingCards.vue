@@ -79,11 +79,9 @@ export default {
   },
 
   computed: {
-
     ...mapState({
       cards: state => state.stripe.cards,
     }),
-
   },
 
   methods: {

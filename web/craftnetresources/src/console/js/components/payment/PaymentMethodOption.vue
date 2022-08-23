@@ -1,6 +1,6 @@
 <template>
     <div
-      class="rounded-lg rounded p-4 flex items-center cursor-pointer border"
+      class="rounded-lg rounded p-4 flex items-center cursor-pointer border dark:border-gray-700"
       :class='[
             checked ? "outline outline-1 outline-blue-600 border-blue-600" : "border-gray-300 hover:border-gray-400",
             active ? "group-focus-visible:ring group-focus-visible:ring-3 group-focus-visible:ring-offset-1 group-focus-visible:ring-blue-600/30" : ""
@@ -27,7 +27,7 @@
                 </template>
               </strong>
             </div>
-            <div class="mt-1 text-sm text-gray-600 leading-snug">
+            <div class="mt-1 text-sm text-gray-600 dark:text-gray-400 leading-snug">
               <template v-if="creditCard.org">
                 Licenses will be assigned to the {{creditCard.org}} organization.
               </template>
@@ -46,7 +46,7 @@
           <div>
             {{ creditCard.brand }} {{ creditCard.last4 }}
           </div>
-          <div class="text-sm text-gray-600">
+          <div class="text-sm text-gray-600 dark:text-gray-400">
             {{ creditCard.exp_month }}/{{ creditCard.exp_year }}
           </div>
         </div>

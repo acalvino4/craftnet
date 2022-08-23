@@ -1,45 +1,43 @@
 <template>
   <div>
-    <page-header>
-      <h1>Billing</h1>
-    </page-header>
+    <template v-if="currentOrganization">
+      <org-billing />
+    </template>
+    <template v-else>
+      <user-billing />
+    </template>
 
-    <div class="space-y-6">
-      <pane>
-        <billing-cards />
-      </pane>
+    <!--
+    <pane>
+      <billing-address-form></billing-address-form>
+    </pane>
 
-      <pane>
-        <billing-addresses />
-      </pane>
-
-      <!--
-      <pane>
-        <billing-address-form></billing-address-form>
-      </pane>
-
-      <pane>
-        <billing-invoice-details></billing-invoice-details>
-      </pane>
-      -->
-    </div>
+    <pane>
+      <billing-invoice-details></billing-invoice-details>
+    </pane>
+    -->
   </div>
 </template>
 
 <script>
-import BillingCards from '../../../components/billing/BillingCards'
 // import BillingInvoiceDetails from '../../../components/billing/BillingInvoiceDetails'
 // import BillingAddressForm from '../../../components/billing/BillingAddressForm'
-import PageHeader from '@/console/js/components/PageHeader'
-import BillingAddresses from '../../../components/billing/BillingAddresses';
+import {mapGetters} from 'vuex';
+import OrgBilling from '../../../components/billing/OrgBilling';
+import UserBilling from '../../../components/billing/UserBilling';
 
 export default {
   components: {
-    BillingAddresses,
-    BillingCards,
+    UserBilling,
+    OrgBilling,
     // BillingInvoiceDetails,
     // BillingAddressForm,
-    PageHeader,
   },
+
+  computed: {
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+  }
 }
 </script>
