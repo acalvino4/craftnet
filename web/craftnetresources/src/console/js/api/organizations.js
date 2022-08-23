@@ -23,11 +23,15 @@ export default {
   },
 
   saveOrganization(organization) {
-    const data = {
-      org: organization,
+    const data = organization
+
+    let endpointUrl = VUE_APP_URL_CONSOLE + '/orgs'
+
+    if (organization.id) {
+      endpointUrl += '/' + organization.id
     }
-    // TODO: this is now POST orgs/<orgId:\d+>
-    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/save-org', qs.stringify(data), {
+
+    return axios.post(endpointUrl, qs.stringify(data), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
