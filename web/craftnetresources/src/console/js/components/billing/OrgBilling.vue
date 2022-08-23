@@ -120,7 +120,7 @@ export default {
 
       const organization = {
         id: this.currentOrganization.id,
-        requireOrderApproval: this.requireOrderApproval,
+        requireOrderApproval: this.requireOrderApproval ? 1 : 0,
       };
 
       if (this.paymentSourceId) {
