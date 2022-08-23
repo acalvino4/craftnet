@@ -142,7 +142,7 @@ class StripeController extends BaseController
                         'id',
                         'token',
                     ]) + [
-                        'isPrimary' => $paymentSource->isPrimary(),
+                        'isPrimary' => $paymentSource->isPrimary,
                         'card' => $paymentSource->getCard(),
                         'orgs' => $orgs->isEmpty() ? null : $paymentSource->getOrgs()->collect()
                             ->map(fn($org) => static::transformOrg($org)),
@@ -206,11 +206,11 @@ class StripeController extends BaseController
         }
 
         $description = $this->request->getBodyParam('description', $paymentSource->description);
-        $isPrimary = (bool) $this->request->getBodyParam('isPrimary', $paymentSource->isPrimary());
+        $isPrimary = (bool) $this->request->getBodyParam('isPrimary', $paymentSource->isPrimary);
 
         $paymentSource->description = $description;
 
-        if ($isPrimary !== $paymentSource->isPrimary()) {
+        if ($isPrimary !== $paymentSource->isPrimary) {
             $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
             if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
                 return $this->asFailure('Couldn’t set primary payment source for user.');
