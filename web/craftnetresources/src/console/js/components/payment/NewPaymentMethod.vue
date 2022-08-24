@@ -150,6 +150,10 @@ export default {
     }),
 
     selectedPaymentSource() {
+      if (!this.paymentSources) {
+        return null;
+      }
+
       return this.paymentSources.find(paymentSource => {
         if (paymentSource.id === parseInt(this.selectedPaymentSourceValue)) {
           return true
