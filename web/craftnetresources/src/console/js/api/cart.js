@@ -43,7 +43,8 @@ export default {
     return this.axios().post('carts/' + orderNumber, data, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
-      }
+      },
+      withCredentials: true,
     })
   },
 
