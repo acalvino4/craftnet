@@ -166,20 +166,52 @@ export default {
         token: this.selectedPaymentSource.token,
         expectedPrice: this.cart.totalPrice,
         // makePrimary: this.replaceCard,
-        email: this.user.email,
       }
 
       console.log('- checkoutData', checkoutData)
 
-      return this.$store.dispatch('cart/checkout', checkoutData)
+      this.saveBillingInfos()
         .then(() => {
-          // this.$store.dispatch('cart/resetCart')
-          this.$store.dispatch('app/displayError', 'Payment success.')
+          this.$store.dispatch('cart/checkout', checkoutData)
+            .then(() => {
+              // this.$store.dispatch('cart/resetCart')
+              this.$store.dispatch('app/displayError', 'Payment success.')
+            })
+            .catch(() => {
+              this.$store.dispatch('app/displayError', 'There was an error processing your payment.')
+            })
         })
         .catch(() => {
-          this.$store.dispatch('app/displayError', 'There was an error processing your payment.')
+          this.$store.dispatch('app/displayError', 'Couldn’t save billing information.')
         })
-    }
+    },
+
+    saveBillingInfos() {
+      let cartData = {
+        billingAddress: {
+          firstName: 'John',
+          lastName: 'Smith',
+          countryCode: 'FR',
+
+          // firstName: this.billingInfo.firstName,
+          // lastName: this.billingInfo.lastName,
+          // businessName: this.billingInfo.businessName,
+          // businessTaxId: this.billingInfo.businessTaxId,
+          // address1: this.billingInfo.address1,
+          // address2: this.billingInfo.address2,
+          // country: this.billingInfo.country,
+          // state: this.billingInfo.state,
+          // city: this.billingInfo.city,
+          // zipCode: this.billingInfo.zipCode,
+        },
+      }
+
+      if (this.user) {
+        cartData.email = this.user.email
+      }
+
+      return this.$store.dispatch('cart/saveCart', cartData)
+    },
   },
 
   mounted() {
