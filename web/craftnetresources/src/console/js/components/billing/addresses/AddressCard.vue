@@ -1,7 +1,9 @@
 <template>
   <div class="border border-gray-200 dark:border-gray-700 rounded-md p-6 flex flex-col">
     <div class="flex-1">
-      <div class="space-x-2">
+      <div class="font-mono">{{address.id}}</div>
+
+      <div class="mt-2 space-x-2">
         <badge type="info">{{address.title}}</badge>
 
         <template v-if="address.isPrimary">
