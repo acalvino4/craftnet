@@ -10,6 +10,9 @@
       <div class="border border-red-500 rounded-md p-4 flex justify-between">
         <div>
           <h4 class="font-bold">Invitation #{{invitation.id}}</h4>
+          <div class="font-mono">
+            orgId: {{currentOrganization.id}}
+          </div>
           <pre>{{invitation}}</pre>
         </div>
         <div class="space-x-4">
