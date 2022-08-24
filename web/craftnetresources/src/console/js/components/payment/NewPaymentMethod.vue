@@ -94,6 +94,11 @@
         <btn kind="primary" large @click="pay">Submit for approval $XX</btn>
       </template>
     </div>
+
+    <div>
+      <h3>Debug Cart</h3>
+      <pre>{{cart}}</pre>
+    </div>
   </div>
 </template>
 
@@ -188,26 +193,28 @@ export default {
 
     saveBillingInfos() {
       let cartData = {
-        billingAddress: {
-          firstName: 'John',
-          lastName: 'Smith',
-          countryCode: 'FR',
-
-          // firstName: this.billingInfo.firstName,
-          // lastName: this.billingInfo.lastName,
-          // businessName: this.billingInfo.businessName,
-          // businessTaxId: this.billingInfo.businessTaxId,
-          // address1: this.billingInfo.address1,
-          // address2: this.billingInfo.address2,
-          // country: this.billingInfo.country,
-          // state: this.billingInfo.state,
-          // city: this.billingInfo.city,
-          // zipCode: this.billingInfo.zipCode,
-        },
+        // billingAddressId: 903716,
+        orgId: 903717,
+        // billingAddress: {
+        //   firstName: 'John',
+        //   lastName: 'Smith',
+        //   countryCode: 'FR',
+        //
+        //   // firstName: this.billingInfo.firstName,
+        //   // lastName: this.billingInfo.lastName,
+        //   // businessName: this.billingInfo.businessName,
+        //   // businessTaxId: this.billingInfo.businessTaxId,
+        //   // address1: this.billingInfo.address1,
+        //   // address2: this.billingInfo.address2,
+        //   // country: this.billingInfo.country,
+        //   // state: this.billingInfo.state,
+        //   // city: this.billingInfo.city,
+        //   // zipCode: this.billingInfo.zipCode,
+        // },
       }
 
       if (this.user) {
-        cartData.email = this.user.email
+        // cartData.email = this.user.email
       }
 
       return this.$store.dispatch('cart/saveCart', cartData)
