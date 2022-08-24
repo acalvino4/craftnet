@@ -88,10 +88,10 @@
 
     <div class="mt-6 space-x-2">
       <template v-if="!selectedPaymentSource || selectedPaymentSource.canPurchase">
-        <btn kind="primary" large>Pay $XX</btn>
+        <btn kind="primary" large @click="pay">Pay $XX</btn>
       </template>
       <template v-else>
-        <btn kind="primary" large>Submit for approval $XX</btn>
+        <btn kind="primary" large @click="pay">Submit for approval $XX</btn>
       </template>
     </div>
   </div>
@@ -139,7 +139,9 @@ export default {
 
   computed: {
     ...mapState({
+      cart: state => state.cart.cart,
       paymentSources: state => state.stripe.paymentSources,
+      user: state => state.account.user,
     }),
 
     selectedPaymentSource() {
@@ -151,6 +153,33 @@ export default {
         return !!(paymentSource.org && ('org-' + paymentSource.id) === this.selectedPaymentSourceValue);
       })
     },
+  },
+
+  methods: {
+    pay() {
+      console.log('pay', this.selectedPaymentSource)
+      console.log('- selected payment source', this.selectedPaymentSource)
+      console.log('- email', this.user.email)
+
+      let checkoutData = {
+        orderNumber: this.cart.number,
+        token: this.selectedPaymentSource.token,
+        expectedPrice: this.cart.totalPrice,
+        // makePrimary: this.replaceCard,
+        email: this.user.email,
+      }
+
+      console.log('- checkoutData', checkoutData)
+
+      return this.$store.dispatch('cart/checkout', checkoutData)
+        .then(() => {
+          // this.$store.dispatch('cart/resetCart')
+          this.$store.dispatch('app/displayError', 'Payment success.')
+        })
+        .catch(() => {
+          this.$store.dispatch('app/displayError', 'There was an error processing your payment.')
+        })
+    }
   },
 
   mounted() {
