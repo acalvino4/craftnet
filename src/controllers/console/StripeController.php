@@ -288,7 +288,8 @@ class StripeController extends BaseController
                     'canPurchase' => $org ? $org->canPurchase($this->currentUser) : true,
                 ] : null;
             })
-            ->whereNotNull();
+            ->whereNotNull()
+            ->values();
 
         return $this->asSuccess(data: ['paymentSources' => $paymentSources]);
     }

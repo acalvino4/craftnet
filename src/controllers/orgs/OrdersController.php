@@ -42,7 +42,7 @@ class OrdersController extends SiteController
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
         $ascending = (bool)$this->request->getParam('ascending');
-        $offset = $page * $limit;
+        $offset = ($page - 1) * $limit;
 
         $orders
             ->search($this->request->getParam('query'))
