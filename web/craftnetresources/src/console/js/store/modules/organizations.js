@@ -84,6 +84,10 @@ const actions = {
       })
   },
 
+  requestOrderApproval(context, {organizationId, orderNumber}) {
+    return organizationsApi.requestOrderApproval({organizationId, orderNumber})
+  },
+
   getOrganizationMembers({commit}, {organizationId}) {
     return organizationsApi.getOrganizationMembers({organizationId})
             .then((response) => {

@@ -91,11 +91,11 @@
         <btn kind="primary" large @click="pay">Pay $XX</btn>
       </template>
       <template v-else>
-        <btn kind="primary" large @click="pay">Submit for approval $XX</btn>
+        <btn kind="primary" large @click="requestApproval">Submit for approval $XX</btn>
       </template>
     </div>
 
-    <div>
+    <div class="mt-6">
       <h3>Debug Cart</h3>
       <pre>{{cart}}</pre>
     </div>
@@ -223,14 +223,29 @@ export default {
 
       return this.$store.dispatch('cart/saveCart', cartData)
     },
+
+    requestApproval() {
+      console.log('this.cart', this.cart.number)
+      this.$store.dispatch('organizations/requestOrderApproval', {
+        organizationId: this.selectedPaymentSource.org.id,
+        orderNumber: this.cart.number,
+      })
+        .then(() => {
+          this.$store.dispatch('app/displayNotice', 'Approval requested.')
+        })
+        .catch(() => {
+          this.$store.dispatch('app/displayError', 'Couldn’t request approval.')
+        })
+    }
   },
 
   mounted() {
     this.$store.dispatch('stripe/getPaymentSources')
       .catch(() => {
-        this.$store.dispatch('app/displayNotice', 'Couldn’t get payment sources.')
+        this.$store.dispatch('app/displayError', 'Couldn’t get payment sources.')
       })
 
+    this.$store.dispatch('cart/getCart')
   }
 }
 
