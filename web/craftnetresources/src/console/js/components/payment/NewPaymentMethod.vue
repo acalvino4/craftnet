@@ -59,6 +59,22 @@
         @input="$emit('update:replaceCard', !replaceCard)" />
     </template>
 
+
+    <template v-if="selectedPaymentSource">
+      <div class="mt-6 border p-4 rounded-md">
+        <h2>Billing Address</h2>
+
+        <template v-if="selectedPaymentSource.org">
+          [show billing address]
+          #{{selectedPaymentSource.org.billingAddressId}}
+        </template>
+        <template v-else>
+          <div>[show billing address]</div>
+          <div>[edit button]</div>
+        </template>
+      </div>
+    </template>
+
     <field
       :vertical="true"
       label-for="note"
