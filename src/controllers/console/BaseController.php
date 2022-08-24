@@ -24,7 +24,7 @@ use yii\web\Response as YiiResponse;
  */
 abstract class BaseController extends Controller
 {
-    public function bindActionParams($action, $params)
+    public function bindActionParams($action, $params): array
     {
         $userId = $params['userId'] ?? null;
         $userId = $userId === 'me' ? Craft::$app->getUser()->getId() : $userId;
@@ -208,6 +208,27 @@ abstract class BaseController extends Controller
         ]);
     }
 
+    protected function formatPagination(iterable $data, int $total, int $page, int $perPage): array
+    {
+        $lastPage = ceil($total / $perPage);
+        $nextPageUrl = '?next';
+        $prevPageUrl = '?prev';
+        $from = ($page - 1) * $perPage;
+        $to = ($page * $perPage) - 1;
+
+        return [
+            'total' => $total,
+            'per_page' => $perPage,
+            'current_page' => $page,
+            'last_page' => $lastPage,
+            'next_page_url' => $nextPageUrl,
+            'prev_page_url' => $prevPageUrl,
+            'from' => $from,
+            'to' => $to,
+            'data' => $data,
+        ];
+    }
+
     protected static function transformOrg(Org $org): array
     {
         return $org->getAttributes([
@@ -216,6 +237,8 @@ abstract class BaseController extends Controller
                 'requireOrderApproval',
                 'paymentSourceId',
                 'billingAddressId',
+                'slug',
+                'uri',
             ]) + [
                 'orgLogo' => $org->orgLogo->one()?->getAttributes(['id', 'url']),
             ];

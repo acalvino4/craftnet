@@ -26,8 +26,9 @@ class OrdersController extends SiteController
         }
 
         $orders = Order::find();
+        $orders->orgId($org->id);
 
-        $queryProps = Collection::make([
+        Collection::make([
             'approvalRejectedById',
             'approvalRequestedById',
             'approvalRejectedDate',
@@ -37,7 +38,19 @@ class OrdersController extends SiteController
         ])->whereNotNull()
         ->each(fn($value, $prop) => $orders?->$prop($value));
 
-        $orders = $orders->orgId($org->id)->collect()
+        $limit = $this->request->getParam('limit', 10);
+        $page = (int)$this->request->getParam('page', 1);
+        $orderBy = $this->request->getParam('orderBy');
+        $ascending = (bool)$this->request->getParam('ascending');
+        $offset = $page * $limit;
+
+        $orders
+            ->search($this->request->getParam('query'))
+            ->orderBy($orderBy ? [$orderBy => $ascending ? SORT_ASC : SORT_DESC] : null);
+
+        $total = $orders->count();
+
+        $orders = $orders->limit($limit)->offset($offset)->collect()
             ->map(fn(Order|OrderBehavior $order) => $order->getAttributes([
                 'id',
                 'number',
@@ -47,7 +60,7 @@ class OrdersController extends SiteController
                 'approvalRejectedBy' => static::transformUser($order->getApprovalRejectedBy()),
             ]);
 
-        return $this->asSuccess(data: $orders->all());
+        return $this->asSuccess(data: $this->formatPagination($orders, $total, $page, $limit));
     }
 
     /**

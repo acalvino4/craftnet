@@ -115,41 +115,16 @@ class PluginLicensesController extends BaseController
      */
     public function actionGetLicenses(): Response
     {
-        $user = $this->getCurrentUser();
-
         $filter = $this->request->getParam('query');
         $perPage = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
         $ascending = (bool)$this->request->getParam('ascending');
+        $owner = $this->getAllowedOrgFromRequest() ?? $this->currentUser;
+        $licenses = Module::getInstance()->getPluginLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
+        $totalLicenses = Module::getInstance()->getPluginLicenseManager()->getTotalLicensesByOwner($owner, $filter);
 
-        try {
-            $user = $this->getCurrentUser();
-            $owner = $this->getAllowedOrgFromRequest() ?? $user;
-            $licenses = Module::getInstance()->getPluginLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
-            $totalLicenses = Module::getInstance()->getPluginLicenseManager()->getTotalLicensesByOwner($owner, $filter);
-
-            $lastPage = ceil($totalLicenses / $perPage);
-            $nextPageUrl = '?next';
-            $prevPageUrl = '?prev';
-            $from = ($page - 1) * $perPage;
-            $to = ($page * $perPage) - 1;
-
-            return $this->asSuccess(data: [
-                'total' => $totalLicenses,
-                'count' => $totalLicenses,
-                'per_page' => $perPage,
-                'current_page' => $page,
-                'last_page' => $lastPage,
-                'next_page_url' => $nextPageUrl,
-                'prev_page_url' => $prevPageUrl,
-                'from' => $from,
-                'to' => $to,
-                'data' => $licenses,
-            ]);
-        } catch (Throwable $e) {
-            return $this->asFailure($e->getMessage());
-        }
+        return $this->asSuccess(data: $this->formatPagination($licenses, $totalLicenses, $page, $perPage));
     }
 
     /**
