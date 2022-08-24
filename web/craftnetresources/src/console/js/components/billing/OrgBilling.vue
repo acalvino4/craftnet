@@ -40,11 +40,6 @@
         />
       </field>
     </pane>
-
-    <pane class="mt-6">
-      <h2><code>organization</code></h2>
-      <pre class="mt-4">{{currentOrganization}}</pre>
-    </pane>
   </form>
 </template>
 

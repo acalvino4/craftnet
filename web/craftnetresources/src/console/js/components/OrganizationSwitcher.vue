@@ -175,9 +175,7 @@ export default {
         .then(() => {
           if (!organization && this.$route.path === '/settings/members') {
             this.$router.push('/settings/profile')
-          }
-
-          if (organization && this.$route.path === '/settings/organizations') {
+          } else if (organization && this.$route.path === '/settings/organizations') {
             this.$router.push('/settings/profile')
           }
         })

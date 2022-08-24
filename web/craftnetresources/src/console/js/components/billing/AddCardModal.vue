@@ -54,6 +54,9 @@ export default {
 
   data() {
     return {
+      stripe: null,
+      elements: null,
+      card: null,
       cardFormloading: false,
     }
   },
@@ -66,7 +69,7 @@ export default {
      * @param source
      */
     saveCardForm(card, source) {
-      this.$store.dispatch('stripe/saveCard', source)
+      this.$store.dispatch('stripe/addCard', source)
         .then(() => {
           card.clear()
           this.cardFormloading = false

@@ -23,6 +23,7 @@
       <template v-for="(address, addressKey) in addresses" :key="addressKey">
         <address-card
           :address="address"
+          @setPrimary="setPrimary(address)"
           @edit="edit(address)"
           @remove="remove(address.id)" />
       </template>
@@ -77,6 +78,9 @@ export default {
       }
 
       this.$store.dispatch('addresses/deleteAddress', addressId)
+    },
+    setPrimary(address) {
+      console.log('set address as primary', address)
     },
   },
 

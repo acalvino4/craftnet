@@ -8,6 +8,7 @@ const state = {
   cards: null,
   cardToken: null,
   stripeAccount: null,
+  paymentSources: [],
 }
 
 /**
@@ -64,9 +65,9 @@ const actions = {
     })
   },
 
-  saveCard({commit}, source) {
+  addCard({commit}, source) {
     return new Promise((resolve, reject) => {
-      stripeApi.saveCard(source)
+      stripeApi.addCard(source)
         .then((response) => {
           if (!response.data.error) {
             commit('updateStripeCard', {card: response.data.card.card})
@@ -74,6 +75,18 @@ const actions = {
           } else {
             reject(response)
           }
+        })
+        .catch((error) => {
+          reject(error.response)
+        })
+    })
+  },
+
+  saveCard(context, {paymentSourceId, card}) {
+    return new Promise((resolve, reject) => {
+      stripeApi.saveCard({paymentSourceId, card})
+        .then((response) => {
+          resolve(response)
         })
         .catch((error) => {
           reject(error.response)
@@ -92,7 +105,20 @@ const actions = {
           reject(error)
         })
     })
-  }
+  },
+
+  getPaymentSources({commit}) {
+    return new Promise((resolve, reject) => {
+      stripeApi.getPaymentSources()
+        .then((response) => {
+          commit('updatePaymentSources', {paymentSources: response.data.paymentSources})
+          resolve(response)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
+  },
 }
 
 /**
@@ -125,6 +151,10 @@ const mutations = {
 
   updateStripeCard(state, {card}) {
     state.card = card
+  },
+
+  updatePaymentSources(state, {paymentSources}) {
+    state.paymentSources = paymentSources
   },
 }
 

@@ -1,19 +1,19 @@
 <template>
   <div class="max-w-md">
-    <RadioGroup class="space-y-4" v-model="selectedCreditCardValue">
+    <RadioGroup class="space-y-4" v-model="selectedPaymentSourceValue">
       <!-- Personal + Org credit cards -->
-      <template v-for="creditCard in creditCards">
+      <template v-for="paymentSource in paymentSources">
         <RadioGroupOption
           class="ring-0 group"
-          :value="creditCard.id"
+          :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
           v-slot="{ active, checked }"
         >
           <payment-method-option
-            :name="creditCard.card.brand + ' ' + creditCard.card.last4"
-            :description=" creditCard.card.exp_month + '/' + creditCard.card.exp_year"
-            :info="creditCard.org"
-            :value="creditCard.id"
-            :credit-card="creditCard"
+            :name="paymentSource.card.brand + ' ' + paymentSource.card.last4 + ' '"
+            :description=" paymentSource.card.exp_month + '/' + paymentSource.card.exp_year"
+            :info="paymentSource.org"
+            :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
+            :credit-card="paymentSource"
             :active="active"
             :checked="checked"
           />
@@ -35,7 +35,7 @@
       </RadioGroupOption>
     </RadioGroup>
 
-    <template v-if="!selectedCreditCardValue">
+    <template v-if="!selectedPaymentSourceValue">
       <div class="mt-6">
         <h2>Credit Card</h2>
         Enter your new credit card information:
@@ -71,7 +71,7 @@
     </field>
 
     <div class="mt-6 space-x-2">
-      <template v-if="!selectedCreditCard || (selectedCreditCard && !selectedCreditCard.org)">
+      <template v-if="!selectedPaymentSource || selectedPaymentSource.canPurchase">
         <btn kind="primary" large>Pay $XX</btn>
       </template>
       <template v-else>
@@ -99,7 +99,7 @@ export default {
 
   data() {
     return {
-      selectedCreditCardValue: null,
+      selectedPaymentSourceValue: null,
       billingInfo: {
         firstName: '',
         lastName: '',
@@ -123,37 +123,24 @@ export default {
 
   computed: {
     ...mapState({
-      cards: state => state.stripe.cards,
+      paymentSources: state => state.stripe.paymentSources,
     }),
 
-    creditCards() {
-      const cards = []
-
-      // Personal card
-      for (const cardKey in this.cards) {
-        const card = this.cards[cardKey];
-
-        if (card.isPrimary) {
-          cards.push(card)
+    selectedPaymentSource() {
+      return this.paymentSources.find(paymentSource => {
+        if (paymentSource.id === parseInt(this.selectedPaymentSourceValue)) {
+          return true
         }
-      }
 
-      // Org cards
-
-      return cards
-    },
-
-    selectedCreditCard() {
-      return this.creditCards.find(creditCard => creditCard.id === this.selectedCreditCardValue)
+        return !!(paymentSource.org && ('org-' + paymentSource.id) === this.selectedPaymentSourceValue);
+      })
     },
   },
 
   mounted() {
-    this.$store.dispatch('stripe/getCards')
-      .then(() => {
-      })
+    this.$store.dispatch('stripe/getPaymentSources')
       .catch(() => {
-        this.$store.dispatch('app/displayNotice', 'Couldn’t get credit cards.')
+        this.$store.dispatch('app/displayNotice', 'Couldn’t get payment sources.')
       })
 
   }
