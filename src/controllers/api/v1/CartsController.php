@@ -269,7 +269,15 @@ class CartsController extends BaseApiController
             }
 
             // billing address
-            if (isset($payload->billingAddress)) {
+            if (isset($payload->billingAddressId)) {
+                $address = Address::find()->id($payload->billingAddressId)->one();
+
+                if (!$address) {
+                    throw new BadRequestHttpException('Address not found.');
+                }
+
+                $cart->setValidBillingAddress($address);
+            } else if (isset($payload->billingAddress)) {
                 $this->_updateCartBillingAddress($cart, $payload->billingAddress, $errors);
             }
 
