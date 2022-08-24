@@ -9,15 +9,21 @@
         <tr>
           <th>Number</th>
           <th>Date Ordered</th>
+          <th>Order Placed By</th>
+          <th>Debug</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="order in orders">
+        <tr v-for="order in orders.data">
           <td>{{ order.number }}</td>
           <td>
             <template v-if="order.dateOrdered && order.dateOrdered.date">
               {{ order.dateOrdered.date }}
             </template>
+          </td>
+          <td>—</td>
+          <td>
+            <pre>{{order}}</pre>
           </td>
         </tr>
         </tbody>

@@ -8,6 +8,7 @@ const state = {
   currentOrganizationId: null,
   members: [],
   orders: [],
+  pendingOrders: [],
   invitations: [],
 }
 
@@ -73,6 +74,13 @@ const actions = {
     return organizationsApi.getOrders(organizationId)
       .then((response) => {
         commit('updateOrders', response.data)
+      })
+  },
+
+  getPendingOrders({commit}, {organizationId}) {
+    return organizationsApi.getPendingOrders(organizationId)
+      .then((response) => {
+        commit('updatePendingOrders', response.data)
       })
   },
 
@@ -177,6 +185,10 @@ const mutations = {
 
   updateOrders(state, orders) {
     state.orders = orders
+  },
+
+  updatePendingOrders(state, pendingOrders) {
+    state.pendingOrders = pendingOrders
   },
 
   updateInvitations(state, invitations) {

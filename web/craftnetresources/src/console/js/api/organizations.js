@@ -69,6 +69,14 @@ export default {
     })
   },
 
+  getPendingOrders(organizationId) {
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?approvalRequested=1', {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
+  },
+
   getOrganizationMembers({organizationId}) {
     return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members', {
       headers: {

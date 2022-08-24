@@ -156,7 +156,7 @@ export default {
         ...this.requestData
       })
 
-      return axios.post(this.url, queryString, {
+      return axios.get(this.url + '?' + queryString, {
           headers: {
             'X-CSRF-Token': Craft.csrfTokenValue,
           }

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-/* global Craft */
+/* global VUE_APP_URL_CONSOLE */
 
 import DataTable from '@/console/js/components/DataTable';
 
@@ -46,7 +46,7 @@ export default {
 
   computed: {
     apiUrl() {
-      return Craft.actionUrl + '/craftnet/console/invoices/get-invoices'
+      return VUE_APP_URL_CONSOLE + '/invoices'
     },
   },
 }
