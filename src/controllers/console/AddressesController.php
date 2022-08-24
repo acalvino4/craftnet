@@ -51,7 +51,7 @@ class AddressesController extends BaseController
         $this->requireAcceptsJson();
         $parents = Craft::$app->getRequest()->getRequiredParam('parents');
 
-        if (!is_array($parents) || empty($parents)) {
+        if (!is_array($parents) || empty($parents) || $parents[0]) {
             throw new BadRequestHttpException();
         }
 
