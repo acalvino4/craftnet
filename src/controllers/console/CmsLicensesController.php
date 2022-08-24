@@ -182,34 +182,15 @@ class CmsLicensesController extends BaseController
         $page = (int)$this->request->getParam('page', 1);
         $orderBy = $this->request->getParam('orderBy');
         $ascending = (bool)$this->request->getParam('ascending');
+        $user = $this->getCurrentUser();
+        $owner = $this->getAllowedOrgFromRequest() ?? $user;
+        $licenses = Module::getInstance()->getCmsLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
+        $totalLicenses = Module::getInstance()->getCmsLicenseManager()->getTotalLicensesByOwner($owner, $filter);
 
-        try {
-            $user = $this->getCurrentUser();
-            $owner = $this->getAllowedOrgFromRequest() ?? $user;
-            $licenses = Module::getInstance()->getCmsLicenseManager()->getLicensesByOwner($owner, $filter, $perPage, $page, $orderBy, $ascending);
-            $totalLicenses = Module::getInstance()->getCmsLicenseManager()->getTotalLicensesByOwner($owner, $filter);
+        return $this->asSuccess(data:
+            $this->formatPagination($licenses, $totalLicenses, $page, $perPage)
+        );
 
-            $lastPage = ceil($totalLicenses / $perPage);
-            $nextPageUrl = '?next';
-            $prevPageUrl = '?prev';
-            $from = ($page - 1) * $perPage;
-            $to = ($page * $perPage) - 1;
-
-            return $this->asSuccess(data: [
-                'total' => $totalLicenses,
-                'per_page' => $perPage,
-                'count' => $totalLicenses,
-                'current_page' => $page,
-                'last_page' => $lastPage,
-                'next_page_url' => $nextPageUrl,
-                'prev_page_url' => $prevPageUrl,
-                'from' => $from,
-                'to' => $to,
-                'data' => $licenses,
-            ]);
-        } catch (Throwable $e) {
-            return $this->asFailure($e->getMessage());
-        }
     }
 
     /**

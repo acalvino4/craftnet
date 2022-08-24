@@ -34,24 +34,7 @@ class InvoicesController extends BaseController
             ->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
 
         $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($owner, $filter);
-        $last_page = ceil($total / $limit);
-        $next_page_url = '?next';
-        $prev_page_url = '?prev';
-        $from = ($page - 1) * $limit;
-        $to = ($page * $limit) - 1;
-
-        return $this->asSuccess(data: [
-            'total' => $total,
-            'count' => $total,
-            'per_page' => $limit,
-            'current_page' => $page,
-            'last_page' => $last_page,
-            'next_page_url' => $next_page_url,
-            'prev_page_url' => $prev_page_url,
-            'from' => $from,
-            'to' => $to,
-            'data' => $invoices,
-        ]);
+        return $this->asSuccess(data: $this->formatPagination($invoices, $total, $page, $limit));
     }
 
     /**
