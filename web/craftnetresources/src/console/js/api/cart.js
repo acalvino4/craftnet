@@ -1,4 +1,4 @@
-/* global VUE_APP_CRAFT_API_ENDPOINT */
+/* global Craft, VUE_APP_CRAFT_API_ENDPOINT */
 
 import axios from 'axios'
 
@@ -40,7 +40,11 @@ export default {
    * Update cart.
    */
   updateCart(orderNumber, data) {
-    return this.axios().post('carts/' + orderNumber, data)
+    return this.axios().post('carts/' + orderNumber, data, {
+      headers: {
+        'X-CSRF-Token': Craft.csrfTokenValue,
+      }
+    })
   },
 
   /**
