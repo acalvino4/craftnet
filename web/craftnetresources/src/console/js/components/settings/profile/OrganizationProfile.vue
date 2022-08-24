@@ -3,7 +3,7 @@
     v-if="currentOrganizationDraft"
     @submit.prevent="save()">
     <div class="flex items-center justify-between">
-      <h1 class="m-0">Profile</h1>
+      <h1 class="m-0">Profile #{{currentOrganization.id}}</h1>
       <div>
         <btn
           kind="primary"
