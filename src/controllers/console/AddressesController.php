@@ -146,6 +146,8 @@ class AddressesController extends BaseController
                 $orgs = $address->getOrgs()->collect();
 
                 return $address->getAttributes() + [
+                        'isPrimaryBilling' => $address->isPrimaryBilling,
+                        'isPrimaryShipping' => $address->isPrimaryShipping,
                         'orgs' => $orgs->isEmpty() ? null : $address->getOrgs()->collect()
                             ->map(fn($org) => static::transformOrg($org)),
                     ];

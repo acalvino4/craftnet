@@ -142,6 +142,7 @@ class StripeController extends BaseController
                 return $paymentSource->getAttributes([
                         'id',
                         'token',
+                        'description',
                     ]) + [
                         'isPrimary' => $paymentSource->isPrimary,
                         'card' => $paymentSource->getCard(),
