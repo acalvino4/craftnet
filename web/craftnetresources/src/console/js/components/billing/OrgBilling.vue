@@ -78,11 +78,12 @@ export default {
         },
       ]
 
-      for (const addressKey in this.addresses) {
-        const address = this.addresses[addressKey]
-        options.push({
-          label: '#' + address.id,
-          value: address.id,
+      if (this.addresses) {
+        this.addresses.forEach(address => {
+          options.push({
+            label: '#' + address.id,
+            value: address.id,
+          })
         })
       }
 
