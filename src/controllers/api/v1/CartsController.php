@@ -487,17 +487,17 @@ class CartsController extends BaseApiController
         $addressConfig = [
             'title' => $billingAddress->title ?? 'Billing Address',
             'ownerId' => $cart->id,
-            'fullName' => trim("$billingAddress->firstName $billingAddress->lastName") ?: null,
-            'countryCode' => $country?->getCountryCode(),
-            'administrativeArea' => $state?->getCode(),
-            'locality' => $billingAddress->city ?? null,
-            'postalCode' => $billingAddress->zipCode ?? null,
-            'addressLine1' => $billingAddress->address1 ?? null,
-            'addressLine2' => $billingAddress->address2 ?? null,
-            'organization' => $billingAddress->businessName ?? null,
-            'organizationTaxId' => $billingAddress->businessTaxId ?? null,
-            'addressPhone' => $billingAddress->phone ?? null,
-            'addressAttention' => $billingAddress->attention ?? null,
+            'fullName' => $billingAddress?->fullName ?? trim("$billingAddress->firstName $billingAddress->lastName") ?: null,
+            'countryCode' => $billingAddress?->countryCode ?? $country?->getCountryCode(),
+            'administrativeArea' => $billingAddress?->administrativeArea ?? $state?->getCode(),
+            'locality' => $billingAddress?->locality ?? $billingAddress->city ?? null,
+            'postalCode' => $billingAddress?->postalCode ?? $billingAddress->zipCode ?? null,
+            'addressLine1' => $billingAddress?->addressLine1 ?? $billingAddress->address1 ?? null,
+            'addressLine2' => $billingAddress?->addressLine2 ?? $billingAddress->address2 ?? null,
+            'organization' => $billingAddress?->organization ?? $billingAddress->businessName ?? null,
+            'organizationTaxId' => $billingAddress?->organizationTaxId ?? $billingAddress->businessTaxId ?? null,
+            'addressPhone' => $billingAddress?->addressPhone ?? $billingAddress->phone ?? null,
+            'addressAttention' => $billingAddress?->addressAttention ?? $billingAddress->attention ?? null,
         ];
 
         Craft::configure($address, $addressConfig);
