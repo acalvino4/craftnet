@@ -34,5 +34,9 @@ export default {
 
   getCards() {
     return axios.get(VUE_APP_URL_CONSOLE + '/cards')
+  },
+
+  getPaymentSources() {
+    return axios.get(VUE_APP_URL_CONSOLE + '/cards/payment-sources')
   }
 }

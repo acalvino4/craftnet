@@ -20,7 +20,7 @@
             <div>
               <strong>
                 <template v-if="creditCard.org">
-                  {{ creditCard.org }}
+                  {{ creditCard.org.title }}
                 </template>
                 <template v-else>
                   Personal
@@ -29,7 +29,7 @@
             </div>
             <div class="mt-1 text-sm text-gray-600 dark:text-gray-400 leading-snug">
               <template v-if="creditCard.org">
-                Licenses will be assigned to the {{creditCard.org}} organization.
+                Licenses will be assigned to the {{creditCard.org.title}} organization.
               </template>
               <template v-else>
                 Licenses will be assigned to your user.
