@@ -34,7 +34,7 @@
                   <div>
                     <template v-if="card.isPrimary">
                       <div class="mb-2">
-                        <badge type="info">Primary</badge>
+                        <badge>Primary</badge>
                       </div>
                     </template>
 
@@ -118,7 +118,16 @@ export default {
     },
 
     setPrimary(cardId) {
-      console.log(`Set card #${cardId} as primary`)
+      this.$store.dispatch('stripe/saveCard', {
+        paymentSourceId: cardId,
+        card: {
+          isPrimary: true,
+        }
+      })
+        .then(() => {
+          this.$store.dispatch('app/displayNotice', 'Card set as primary.')
+          this.$store.dispatch('stripe/getCards')
+        })
     }
   },
 
