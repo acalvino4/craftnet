@@ -36,6 +36,7 @@ import {mapGetters, mapState} from 'vuex'
 import helpers from './mixins/helpers.js'
 import AuthManager from './components/AuthManager'
 import AppLayout from './components/layouts/AppLayout'
+import CheckoutLayout from './components/layouts/CheckoutLayout'
 import SiteLayout from './components/layouts/SiteLayout'
 
 export default {
@@ -44,6 +45,7 @@ export default {
   components: {
     AuthManager,
     AppLayout,
+    CheckoutLayout,
     SiteLayout,
   },
 
@@ -67,6 +69,9 @@ export default {
       switch (this.$route.meta.layout) {
         case 'site':
           return 'site-layout'
+
+        case 'checkout':
+          return 'checkout-layout'
 
         default:
           return 'app-layout'
