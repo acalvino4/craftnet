@@ -44,6 +44,8 @@
         </tr>
         </tbody>
       </table>
+
+      <div class="mt-4 text-gray-500 text-sm">{{pendingOrders.total}} rows</div>
     </template>
   </div>
 </template>

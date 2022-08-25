@@ -29,6 +29,8 @@
         </tbody>
       </table>
     </template>
+
+    <div class="mt-4 text-gray-500 text-sm">{{orders.total}} rows</div>
   </div>
 </template>
 
