@@ -46,7 +46,7 @@
 
       <template v-else>
         <div
-          class="relative z-20 bg-white dark:bg-gray-900 flex-1  p-4 md:p-8">
+          class="relative z-20 bg-white dark:bg-gray-900 flex-1 p-4 md:p-8">
           <div class="w-full max-w-screen-lg m-auto">
             <router-view :key="$route.path"></router-view>
           </div>
