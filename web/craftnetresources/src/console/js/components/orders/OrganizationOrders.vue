@@ -10,7 +10,6 @@
           <th>Number</th>
           <th>Date Ordered</th>
           <th>Order Placed By</th>
-          <th>Debug</th>
         </tr>
         </thead>
         <tbody>
@@ -22,9 +21,6 @@
             </template>
           </td>
           <td>—</td>
-          <td>
-            <pre>{{order}}</pre>
-          </td>
         </tr>
         </tbody>
       </table>
