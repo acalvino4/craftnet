@@ -37,9 +37,20 @@
               —
             </template>
           </td>
-          <td class="space-x-2">
-            <btn kind="primary" @click="approveRequest(pendingOrder)">Approve</btn>
-            <btn kind="danger" @click="rejectRequest(pendingOrder)">Reject</btn>
+          <td>
+            <template v-if="userIsOwner">
+
+            <div class="space-x-2">
+              <btn :disabled="!userIsOwner" kind="primary" @click="approveRequest(pendingOrder)">Approve</btn>
+              <btn :disabled="!userIsOwner" kind="danger" @click="rejectRequest(pendingOrder)">Reject</btn>
+            </div>
+            </template>
+
+            <template v-else>
+              <div class="mt-2">
+                <em>Pending owner approval</em>
+              </div>
+            </template>
           </td>
         </tr>
         </tbody>
@@ -57,17 +68,30 @@ export default {
   computed: {
     ...mapState({
       pendingOrders: state => state.organizations.pendingOrders,
+      user: state => state.account.user,
+      members: state => state.organizations.members,
+      cart: state => state.cart.cart,
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
     }),
+
+    userIsOwner() {
+      if (!this.members) {
+        return false
+      }
+
+      return !!this.members.find(member => {
+        return (member.id === this.user.id && member.role === 'owner')
+      })
+    }
   },
 
   methods: {
     approveRequest(pendingOrder) {
       console.log('approveRequest', pendingOrder);
       this.$store.dispatch('cart/saveCart', {
-        orgId: 903717,
+        orgId: this.currentOrganization.id,
       })
         .then(() => {
           this.$store.dispatch('app/displayNotice', 'Cart saved.')
@@ -108,6 +132,12 @@ export default {
     this.$store.dispatch('organizations/getPendingOrders', {
         organizationId: this.currentOrganization.id
       })
+
+    this.$store.dispatch('organizations/getOrganizationMembers', {
+      organizationId: this.currentOrganization.id
+    })
+
+    this.$store.dispatch('cart/getCart')
   }
 }
 </script>
