@@ -62,7 +62,11 @@ export default {
   },
 
   getOrders(organizationId) {
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders', {
+    const query = qs.stringify({
+      approvalRequested: 0,
+    })
+
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?' + query, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
