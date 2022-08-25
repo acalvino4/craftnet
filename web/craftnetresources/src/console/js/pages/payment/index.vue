@@ -107,11 +107,6 @@
           <btn kind="primary" large @click="requestApproval">Submit for approval $XX</btn>
         </template>
       </div>
-
-      <div class="mt-6">
-        <h3>Debug Cart</h3>
-        <pre>{{cart}}</pre>
-      </div>
     </div>
   </div>
 </template>
