@@ -14,7 +14,7 @@
 
     <div class="max-w-md">
       <RadioGroup class="space-y-4" v-model="selectedPaymentSourceValue">
-        <!-- Personal + Org credit cards -->
+        <!-- Payment sources -->
         <template v-for="paymentSource in paymentSources">
           <RadioGroupOption
             class="ring-0 group"
