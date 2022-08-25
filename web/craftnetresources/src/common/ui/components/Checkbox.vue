@@ -46,7 +46,7 @@ export default {
     invalid: Boolean,
     label: String,
     name: String,
-    value: String,
+    value: [String, Boolean],
   },
 
   methods: {
