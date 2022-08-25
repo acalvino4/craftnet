@@ -81,6 +81,10 @@ export default {
     return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders/' + orderNumber + '/request-approval')
   },
 
+  rejectRequest({organizationId, orderNumber}) {
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders/' + orderNumber + '/reject-request')
+  },
+
   getOrganizationMembers({organizationId}) {
     return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members', {
       headers: {

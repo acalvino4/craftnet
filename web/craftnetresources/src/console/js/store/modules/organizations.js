@@ -88,6 +88,10 @@ const actions = {
     return organizationsApi.requestOrderApproval({organizationId, orderNumber})
   },
 
+  rejectRequest(context, {organizationId, orderNumber}) {
+    return organizationsApi.rejectRequest({organizationId, orderNumber})
+  },
+
   getOrganizationMembers({commit}, {organizationId}) {
     return organizationsApi.getOrganizationMembers({organizationId})
             .then((response) => {
