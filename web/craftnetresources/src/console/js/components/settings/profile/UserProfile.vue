@@ -16,13 +16,13 @@
 
     <pane class="mt-6">
       <field
-        label-for="developerName"
+        label-for="fullName"
         label="Name"
         :first="true">
         <textbox
-          id="developerName"
-          v-model="userDraft.developerName"
-          :errors="errors.developerName" />
+          id="fullName"
+          v-model="userDraft.fullName"
+          :errors="errors.fullName" />
       </field>
 
       <field
@@ -189,7 +189,7 @@ export default {
       this.$store.dispatch('account/saveUser', {
           user: {
             id: this.userDraft.id,
-            developerName: this.userDraft.developerName,
+            fullName: this.userDraft.fullName,
             photoUrl: this.userDraft.photoUrl,
           }
         })
