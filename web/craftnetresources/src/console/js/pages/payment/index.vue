@@ -3,7 +3,7 @@
     <page-header>
       <div class="flex-1 flex">
         <div class="flex-1">
-          <h1>How would you like to pay?</h1>
+          <h1 class="text-3xl">How would you like to pay?</h1>
         </div>
 
         <div class="space-x-4">
@@ -13,7 +13,8 @@
     </page-header>
 
     <div class="max-w-md">
-      <RadioGroup class="space-y-4" v-model="selectedPaymentSourceValue">
+      <h2>Credit Card</h2>
+      <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentSourceValue">
         <!-- Payment sources -->
         <template v-for="paymentSource in paymentSources">
           <RadioGroupOption
@@ -50,7 +51,7 @@
 
       <template v-if="!selectedPaymentSourceValue">
         <div class="mt-6">
-          <h2>Credit Card</h2>
+          <h3>Add a new credit card</h3>
           Enter your new credit card information:
           <div class="mt-2">
             <card-element
@@ -58,35 +59,27 @@
               ref="newCard"
             />
           </div>
-          <h2>Billing address</h2>
-          <address-fields
-            v-model:address="billingAddress"
+        </div>
+      </template>
+
+      <div class="mt-8">
+        <h2>Billing Address</h2>
+
+        <div class="mt-4">
+          <dropdown
+            :options="addressOptions"
+            v-model="billingAddressId"
           />
         </div>
+      </div>
 
-        <checkbox
-          class="mt-6"
-          id="replaceCard"
-          label="Save as your primary billing information"
-          :value="replaceCard"
-          @input="$emit('update:replaceCard', !replaceCard)" />
-      </template>
-
-
-      <template v-if="selectedPaymentSource">
-        <div class="mt-6 border p-4 rounded-md">
-          <h2>Billing Address</h2>
-
-          <template v-if="selectedPaymentSource.org">
-            [show billing address]
-            #{{selectedPaymentSource.org.billingAddressId}}
-          </template>
-          <template v-else>
-            <div>[show billing address]</div>
-            <div>[edit button]</div>
-          </template>
-        </div>
-      </template>
+      <h2 class="mt-8">More</h2>
+      <checkbox
+        class="mt-6"
+        id="replaceCard"
+        label="Save as your primary billing information"
+        v-model="replaceCard"
+      />
 
       <field
         :vertical="true"
@@ -107,6 +100,19 @@
           <btn kind="primary" large @click="requestApproval">Submit for approval $XX</btn>
         </template>
       </div>
+
+      <div class="mt-16 border rounded-md p-4">
+        <div>
+          <h3>Cart Data</h3>
+          <pre>{{cartData}}</pre>
+        </div>
+        <hr>
+        <div>
+          <h3>Pay Data</h3>
+          <pre>{{payData}}</pre>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -148,15 +154,22 @@ export default {
       errors: {},
       replaceCard: false,
       cardToken: null,
+      billingAddressId: null,
     }
   },
 
+  watch: {
+    selectedPaymentSource() {
+      this.billingAddressId = this.selectedPaymentSource && this.selectedPaymentSource.org ? this.selectedPaymentSource.org.billingAddressId : null;
+    }
+  },
 
   computed: {
     ...mapState({
       cart: state => state.cart.cart,
       paymentSources: state => state.stripe.paymentSources,
       user: state => state.account.user,
+      addresses: state => state.addresses.addresses,
     }),
 
     selectedPaymentSource() {
@@ -172,29 +185,67 @@ export default {
         return !!(paymentSource.org && ('org-' + paymentSource.id) === this.selectedPaymentSourceValue);
       })
     },
+
+    cartData() {
+      let cartData = {}
+
+      if (this.billingAddressId) {
+        cartData.billingAddressId = parseInt(this.billingAddressId)
+      }
+
+      if (this.selectedPaymentSource) {
+        if (this.selectedPaymentSource.org) {
+          cartData.orgId = this.selectedPaymentSource.org.id
+        } else {
+          cartData.paymentSourceId = this.selectedPaymentSource.id;
+        }
+      }
+
+      if (this.user) {
+        cartData.email = this.user.email
+      }
+
+      return cartData;
+    },
+
+    payData() {
+      return {
+        orderNumber: this.cart.number,
+        token: this.selectedPaymentSource ? this.selectedPaymentSource.token : null,
+        expectedPrice: this.cart.totalPrice,
+        // makePrimary: this.replaceCard,
+      }
+    },
+
+    addressOptions() {
+      const options = [
+        {
+          label: 'Select an address',
+          value: '',
+        },
+      ]
+
+      if (this.addresses) {
+        this.addresses.forEach(address => {
+          options.push({
+            label: '#' + address.id,
+            value: address.id,
+          })
+        })
+      }
+
+      return options
+    },
   },
 
   methods: {
     pay() {
-      console.log('pay', this.selectedPaymentSource)
-      console.log('- selected payment source', this.selectedPaymentSource)
-      console.log('- email', this.user.email)
-
-      let checkoutData = {
-        orderNumber: this.cart.number,
-        token: this.selectedPaymentSource.token,
-        expectedPrice: this.cart.totalPrice,
-        // makePrimary: this.replaceCard,
-      }
-
-      console.log('- checkoutData', checkoutData)
-
       this.saveBillingInfos()
         .then(() => {
-          this.$store.dispatch('cart/checkout', checkoutData)
+          this.$store.dispatch('cart/checkout', this.payData)
             .then(() => {
-              // this.$store.dispatch('cart/resetCart')
-              this.$store.dispatch('app/displayError', 'Payment success.')
+              this.$store.dispatch('cart/resetCart')
+              this.$store.dispatch('app/displayNotice', 'Payment success.')
             })
             .catch(() => {
               this.$store.dispatch('app/displayError', 'There was an error processing your payment.')
@@ -206,32 +257,7 @@ export default {
     },
 
     saveBillingInfos() {
-      let cartData = {
-        // billingAddressId: 903716,
-        orgId: 903717,
-        // billingAddress: {
-        //   firstName: 'John',
-        //   lastName: 'Smith',
-        //   countryCode: 'FR',
-        //
-        //   // firstName: this.billingInfo.firstName,
-        //   // lastName: this.billingInfo.lastName,
-        //   // businessName: this.billingInfo.businessName,
-        //   // businessTaxId: this.billingInfo.businessTaxId,
-        //   // address1: this.billingInfo.address1,
-        //   // address2: this.billingInfo.address2,
-        //   // country: this.billingInfo.country,
-        //   // state: this.billingInfo.state,
-        //   // city: this.billingInfo.city,
-        //   // zipCode: this.billingInfo.zipCode,
-        // },
-      }
-
-      if (this.user) {
-        // cartData.email = this.user.email
-      }
-
-      return this.$store.dispatch('cart/saveCart', cartData)
+      return this.$store.dispatch('cart/saveCart', this.cartData)
     },
 
     requestApproval() {
@@ -256,6 +282,8 @@ export default {
       })
 
     this.$store.dispatch('cart/getCart')
+
+    this.$store.dispatch('addresses/getAddresses')
   }
 }
 </script>
