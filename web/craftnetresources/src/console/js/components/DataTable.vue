@@ -156,7 +156,7 @@ export default {
         ...this.requestData
       })
 
-      return axios.get(this.url + '?' + queryString, {
+      return axios.get(this.url + (this.url.includes('?') ? '&' : '?') + queryString, {
           headers: {
             'X-CSRF-Token': Craft.csrfTokenValue,
           }
