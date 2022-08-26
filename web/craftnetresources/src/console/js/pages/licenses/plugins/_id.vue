@@ -25,7 +25,16 @@
                 exact>← Plugins
               </router-link>
             </p>
-            <h1><code>{{ license.key.substr(0, 4) }}</code></h1>
+            <h1>
+              <code>
+                <template v-if="license.key">
+                  {{ license.key.substr(0, 4) }}
+                </template>
+                <template v-else-if="license.shortKey">
+                  {{ license.shortKey }}
+                </template>
+              </code>
+            </h1>
           </div>
         </page-header>
 

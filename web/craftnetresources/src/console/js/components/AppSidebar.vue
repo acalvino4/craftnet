@@ -9,7 +9,8 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/licenses/cms">
+          :to="getPrefixedTo('/licenses/cms')"
+        >
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="key" />
@@ -19,7 +20,8 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/licenses/plugins">
+          :to="getPrefixedTo('/licenses/plugins')"
+        >
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="key" />
@@ -29,7 +31,8 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/licenses/claim">
+          :to="getPrefixedTo('/licenses/claim')"
+        >
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="key" />
@@ -44,7 +47,7 @@
           <li>
             <router-link
               @click="$emit('closeSidebar')"
-              to="/developer/sales">
+              :to="getPrefixedTo('/developer/sales')">
               <icon
                 class="mr-2 text-blue-500 w-5 h-5"
                 icon="chart-square-bar" />
@@ -54,7 +57,7 @@
           <li>
             <router-link
               @click="$emit('closeSidebar')"
-              to="/developer/plugins">
+              :to="getPrefixedTo('/developer/plugins')">
               <icon
                 class="mr-2 text-blue-500 w-5 h-5"
                 icon="plug" />
@@ -73,6 +76,17 @@
       </template>
     </h5>
     <ul>
+      <li>
+        <router-link
+          @click="$emit('closeSidebar')"
+          :to="getPrefixedTo('/settings/profile')"
+        >
+          <icon
+            class="mr-2 text-blue-500 w-5 h-5"
+            icon="identification" />
+          Profile
+        </router-link>
+      </li>
       <template v-if="!currentOrganization && user">
         <li>
           <router-link
@@ -85,16 +99,6 @@
           </router-link>
         </li>
       </template>
-      <li>
-        <router-link
-          @click="$emit('closeSidebar')"
-          :to="(currentOrganization ? '/organizations/' + currentOrganization.slug : '') + '/settings/profile'">
-          <icon
-            class="mr-2 text-blue-500 w-5 h-5"
-            icon="identification" />
-          Profile
-        </router-link>
-      </li>
       <li v-if="currentOrganization">
         <router-link
           @click="$emit('closeSidebar')"
@@ -108,7 +112,7 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          :to="(currentOrganization ? '/organizations/' + currentOrganization.slug : '') + '/settings/orders'"
+          :to="getPrefixedTo('/settings/orders')"
         >
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
@@ -119,7 +123,7 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          :to="(currentOrganization ? '/organizations/' + currentOrganization.slug : '') + '/settings/billing'"
+          :to="getPrefixedTo('/settings/billing')"
         >
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
@@ -155,7 +159,7 @@
         <li>
           <router-link
             @click="$emit('closeSidebar')"
-            to="/settings/partner/network">
+            :to="getPrefixedTo('/settings/partner/network')">
             <icon
               class="mr-2 text-blue-500 w-5 h-5"
               icon="check-circle" />
@@ -184,8 +188,10 @@
 <script>
 import {mapState, mapGetters} from 'vuex'
 import OrganizationSwitcher from '@/console/js/components/OrganizationSwitcher';
+import helpers from '../mixins/helpers';
 
 export default {
+  mixins: [helpers],
   components: {OrganizationSwitcher},
   props: ['showingSidebar'],
 
@@ -218,7 +224,6 @@ export default {
         this.showingOrganizationHud = false
       }
     },
-
   }
 }
 </script>

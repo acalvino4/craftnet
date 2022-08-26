@@ -51,7 +51,7 @@
               <div class="flex items-start">
                 <div class="flex-shrink-0 mt-0.5">
                   <router-link
-                    :to="'/developer/plugins/' + plugin.id">
+                    :to="getPrefixedTo('/developer/plugins/' + plugin.id)">
                     <img
                       v-if="plugin.iconUrl"
                       :src="plugin.iconUrl"
@@ -70,7 +70,7 @@
                 <div class="ml-4">
                   <router-link
                     class="text-base font-medium"
-                    :to="'/developer/plugins/' + plugin.id">
+                    :to="getPrefixedTo('/developer/plugins/' + plugin.id)">
                     {{ plugin.name }}
                   </router-link>
                   <small
@@ -133,8 +133,10 @@
 import {mapGetters, mapState} from 'vuex'
 import Empty from '../../../components/Empty'
 import PageHeader from '@/console/js/components/PageHeader'
+import helpers from '../../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
   components: {
     Empty,
     PageHeader,

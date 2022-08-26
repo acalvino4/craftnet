@@ -13,6 +13,7 @@
 import {mapState, mapGetters} from 'vuex'
 import OrganizationProfile from './_org';
 import UserProfile from './_user';
+import {checkRoute} from '../../../helpers/check-route';
 
 export default {
   components: {
@@ -32,20 +33,13 @@ export default {
   mounted() {
     this.userDraft = JSON.parse(JSON.stringify(this.user))
 
-    if (this.currentOrganization && this.$route.params.orgSlug !== this.currentOrganization.slug) {
-      // Redirect to the right org profile if the org slug is different than the current org slug.
-      this.$router.push({
-        name: 'OrgProfile',
-        params: {
-          orgSlug: this.currentOrganization.slug,
-        },
-      })
-    } else if (!this.currentOrganization && this.$route.params.orgSlug) {
-      // Redirect to the user profile if the org slug is provided but there is no current org.
-      this.$router.push({
-        name: 'UserProfile',
-      })
-    }
+    checkRoute( {
+      currentOrganization: this.currentOrganization,
+      $router: this.$router,
+      $route: this.$route,
+      orgRouteName: 'OrgProfile',
+      userRouteName: 'UserProfile'
+    })
   }
 }
 </script>

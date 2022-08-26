@@ -6,7 +6,7 @@
       :options="vtOptions">
       <template v-slot:number="props">
         <router-link
-          :to="'/settings/orders/' + props.row.number">
+          :to="getPrefixedTo('/settings/orders/' + props.row.number)">
           {{ props.row.shortNumber }}
         </router-link>
       </template>
@@ -30,8 +30,10 @@
 /* global VUE_APP_URL_CONSOLE */
 
 import DataTable from '@/console/js/components/DataTable';
+import helpers from '../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
   components: {DataTable},
   data() {
     return {

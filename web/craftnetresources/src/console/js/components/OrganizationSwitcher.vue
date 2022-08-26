@@ -41,7 +41,7 @@
               v-slot="{active}">
               <organization-switcher-menu-item
                 :active="active"
-                :checked="!currentOrganization"
+                :checked="!currentOrgSlug"
                 @click="selectOrganization(null)"
               >
                 <div class="flex items-center">
@@ -67,7 +67,7 @@
               <MenuItem v-slot="{active}">
                 <organization-switcher-menu-item
                   :active="active"
-                  :checked="currentOrganization && currentOrganization.id === organization.id"
+                  :checked="currentOrgSlug === organization.slug"
                   @click="selectOrganization(organization)"
                 >
                   <div class="flex items-center min-w-0">
@@ -127,6 +127,7 @@ export default {
 
   computed: {
     ...mapState({
+      currentOrgSlug: state => state.organizations.currentOrgSlug,
       organizations: state => state.organizations.organizations,
       user: state => state.account.user,
     }),
@@ -171,20 +172,34 @@ export default {
      * Select an organization.
      */
     selectOrganization(organization) {
-      this.$store.dispatch('organizations/saveCurrentOrganization', organization)
-        .then(() => {
-          if (!organization && this.$route.path === '/settings/members') {
-            this.$router.push('/settings/profile')
-          } else if (organization && this.$route.path === '/settings/organizations') {
-            this.$router.push('/settings/profile')
-          }
-        })
+      // this.$store.dispatch('organizations/saveCurrentOrganization', organization)
+      //   .then(() => {
+      //     if (!organization && this.$route.path === '/settings/members') {
+      //       this.$router.push('/settings/profile')
+      //     } else if (organization && this.$route.path === '/settings/organizations') {
+      //       this.$router.push('/settings/profile')
+      //     }
+      //   })
+
+      if (organization) {
+        this.$router.push({path:'/organizations/'+organization.slug})
+      } else {
+        this.$router.push({path: '/'})
+      }
     },
 
     newOrganization() {
       this.$store.commit('organizations/updateCurrentOrganization', null)
       this.$router.push({path: '/settings/organizations/new'})
     }
-  }
+  },
+
+  watch: {
+    $route() {
+      const currentOrgSlug = (this.$route.params && this.$route.params.orgSlug ? this.$route.params.orgSlug : null);
+      this.$store.commit('organizations/updateCurrentOrgSlug', currentOrgSlug)
+    }
+  },
+
 }
 </script>

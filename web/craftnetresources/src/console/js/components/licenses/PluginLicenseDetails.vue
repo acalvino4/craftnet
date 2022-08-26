@@ -83,9 +83,10 @@
               <dd>{{ license.email }}</dd>
 
               <dt>Created</dt>
-              <dd>{{
-                  $filters.parseDate(license.dateCreated.date).toFormat('yyyy-MM-dd')
-                }}
+              <dd>
+                <template v-if="license.dateCreated">
+                  {{ $filters.parseDate(license.dateCreated.date).toFormat('yyyy-MM-dd') }}
+                </template>
               </dd>
 
               <dt>Notes</dt>

@@ -25,6 +25,7 @@
 import {mapGetters} from 'vuex';
 import OrgBilling from '../../../components/billing/OrgBilling';
 import UserBilling from '../../../components/billing/UserBilling';
+import {checkRoute} from '../../../helpers/check-route';
 
 export default {
   components: {
@@ -41,20 +42,13 @@ export default {
   },
 
   mounted() {
-    if (this.currentOrganization && this.$route.params.orgSlug !== this.currentOrganization.slug) {
-      // Redirect to the right org profile if the org slug is different than the current org slug.
-      this.$router.push({
-        name: 'OrgBilling',
-        params: {
-          orgSlug: this.currentOrganization.slug,
-        },
-      })
-    } else if (!this.currentOrganization && this.$route.params.orgSlug) {
-      // Redirect to the user profile if the org slug is provided but there is no current org.
-      this.$router.push({
-        name: 'UserBilling',
-      })
-    }
+    checkRoute( {
+      currentOrganization: this.currentOrganization,
+      $router: this.$router,
+      $route: this.$route,
+      orgRouteName: 'OrgBilling',
+      userRouteName: 'UserBilling'
+    })
   }
 }
 </script>

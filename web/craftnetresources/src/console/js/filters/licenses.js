@@ -69,7 +69,11 @@ export function formatPluginLicense(value, format) {
       return formattedValue;
     }
     default: {
-      return `${value.substr(0, 4)}-****-****-****-****-****`
+      if (value) {
+        return `${value.substr(0, 4)}-****-****-****-****-****`
+      }
+
+      return '****'
     }
   }
 }

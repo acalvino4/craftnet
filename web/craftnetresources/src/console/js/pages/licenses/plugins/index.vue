@@ -13,7 +13,7 @@
         <code>
           <router-link
             v-if="props.row.key"
-            :to="'/licenses/plugins/'+props.row.id">
+            :to="getPrefixedTo('/licenses/plugins/'+props.row.id)">
             {{ props.row.key.substr(0, 4) }}
           </router-link>
 

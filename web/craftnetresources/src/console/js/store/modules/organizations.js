@@ -6,6 +6,7 @@ import organizationsApi from '@/console/js/api/organizations';
 const state = {
   organizations: [],
   currentOrganizationId: null,
+  currentOrgSlug: null,
   members: [],
   orders: [],
   pendingOrders: [],
@@ -17,11 +18,11 @@ const state = {
  */
 const getters = {
   currentOrganization(state) {
-    if (!state.currentOrganizationId) {
+    if (!state.currentOrgSlug) {
       return null
     }
 
-    return state.organizations.find(o => o.id === state.currentOrganizationId)
+    return state.organizations.find(o => o.slug === state.currentOrgSlug)
   }
 }
 
@@ -181,6 +182,10 @@ const actions = {
 const mutations = {
   updateCurrentOrganizationId(state, organizationId) {
     state.currentOrganizationId = organizationId
+  },
+
+  updateCurrentOrgSlug(state, orgSlug) {
+    state.currentOrgSlug = orgSlug
   },
 
   updateOrganizations(state, organizations) {

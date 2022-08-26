@@ -117,13 +117,13 @@
           </table>
         </pane>
 
-        <pane v-if="invoice.cmsLicenses.length">
+        <pane v-if="invoice.cmsLicenses && invoice.cmsLicenses.length">
           <h3 class="mb-2">CMS Licenses</h3>
           <cms-licenses-table
             :licenses="invoice.cmsLicenses"></cms-licenses-table>
         </pane>
 
-        <pane v-if="invoice.pluginLicenses.length">
+        <pane v-if="invoice.pluginLicenses && invoice.pluginLicenses.length">
           <h3 class="mb-2">Plugin Licenses</h3>
           <plugin-licenses-table
             :licenses="invoice.pluginLicenses"></plugin-licenses-table>
@@ -165,7 +165,7 @@ export default {
 
     invoicesApi.getInvoiceByNumber(invoiceNumber)
       .then((response) => {
-        this.invoice = response.data
+        this.invoice = response.data.invoice
         this.loading = false
       })
 

@@ -3,8 +3,14 @@
 import get from 'lodash/get'
 import update from 'lodash/update'
 import {parseDate} from "../filters/date.js";
+import {mapGetters} from 'vuex';
 
 export default {
+  computed: {
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+  },
   methods: {
     /**
      * Clones an object without references or bindings.
@@ -182,5 +188,9 @@ export default {
     licenseKeyAlreadyInCart(licenseKey, cartItems) {
       return !!cartItems.find((item) => item.lineItem.options.licenseKey === licenseKey)
     },
+
+    getPrefixedTo(to) {
+      return (this.currentOrganization ? '/organizations/' + this.currentOrganization.slug : '') + to
+    }
   }
 }

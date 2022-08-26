@@ -24,8 +24,10 @@ const router = createRouter({
       redirect: '/developer/sales',
     },
     {
-      path: '/settings',
-      redirect: '/settings/profile',
+      path: '/organizations/:orgSlug',
+      redirect: to => {
+        return '/organizations/' + to.params.orgSlug + '/licenses/cms'
+      },
     },
 
 
@@ -66,11 +68,13 @@ const router = createRouter({
       name: 'UserProfile',
       component: () => import('../pages/settings/profile'),
     },
+
     {
       path: '/organizations/:orgSlug/settings/profile',
       name: 'OrgProfile',
       component: () => import('../pages/settings/profile'),
     },
+
     {
       path: '/organizations/:orgSlug/settings/members',
       name: 'SettingsMembers',
@@ -108,7 +112,12 @@ const router = createRouter({
     },
     {
       path: '/settings/orders/:number',
-      name: 'AccountBillingInvoiceNumber',
+      name: 'UserOrderDetails',
+      component: () => import('../pages/settings/orders/_number.vue'),
+    },
+    {
+      path: '/organizations/:orgSlug/settings/orders/:number',
+      name: 'OrgOrderDetails',
       component: () => import('../pages/settings/orders/_number.vue'),
     },
     {
@@ -129,16 +138,16 @@ const router = createRouter({
       component: () => import('../pages/settings/developer-support/old.vue'),
     },
     {
-      path: '/settings/partner',
+      path: '/organizations/:orgSlug/settings/partner',
       redirect: '/settings/partner/overview',
     },
     {
-      path: '/settings/partner/overview',
+      path: '/organizations/:orgSlug/settings/partner/overview',
       name: 'PartnerOverview',
       component: () => import('../pages/settings/partner/overview.vue'),
     },
     {
-      path: '/settings/partner/network',
+      path: '/organizations/:orgSlug/settings/partner/network',
       name: 'PartnerNetwork',
       component: () => import('../pages/settings/partner/network.vue'),
     },
@@ -167,22 +176,22 @@ const router = createRouter({
       meta: {sidebar: false, allowAnonymous: true}
     },
     {
-      path: '/developer/plugins',
+      path: '/organizations/:orgSlug/developer/plugins',
       name: 'Plugins',
       component: () => import('../pages/developer/plugins'),
       meta: {stripeAccountAlert: true}
     },
     {
-      path: '/developer/add-plugin',
+      path: '/organizations/:orgSlug/developer/add-plugin',
       component: () => import('../pages/developer/plugins/_id.vue'),
     },
     {
-      path: '/developer/plugins/:id',
+      path: '/organizations/:orgSlug/developer/plugins/:id',
       name: 'DeveloperPluginsId',
       component: () => import('../pages/developer/plugins/_id.vue'),
     },
     {
-      path: '/developer/sales',
+      path: '/organizations/:orgSlug/developer/sales',
       name: 'DeveloperSalesIndex',
       component: () => import('../pages/developer/sales'),
       meta: {stripeAccountAlert: true}
@@ -193,7 +202,16 @@ const router = createRouter({
       meta: {cmsLicensesRenewAlert: true}
     },
     {
+      path: '/organizations/:orgSlug/licenses/cms',
+      component: () => import('../pages/licenses/cms'),
+      meta: {cmsLicensesRenewAlert: true}
+    },
+    {
       path: '/licenses/cms/:id',
+      component: () => import('../pages/licenses/cms/_id.vue'),
+    },
+    {
+      path: '/organizations/:orgSlug/licenses/cms/:id',
       component: () => import('../pages/licenses/cms/_id.vue'),
     },
     {
@@ -202,11 +220,24 @@ const router = createRouter({
       meta: {pluginLicensesRenewAlert: true}
     },
     {
+      path: '/organizations/:orgSlug/licenses/plugins',
+      component: () => import('../pages/licenses/plugins'),
+      meta: {pluginLicensesRenewAlert: true}
+    },
+    {
       path: '/licenses/plugins/:id',
       component: () => import('../pages/licenses/plugins/_id.vue'),
     },
     {
+      path: '/organizations/:orgSlug/licenses/plugins/:id',
+      component: () => import('../pages/licenses/plugins/_id.vue'),
+    },
+    {
       path: '/licenses/claim',
+      component: () => import('../pages/licenses/claim.vue'),
+    },
+    {
+      path: '/organizations/:orgSlug/licenses/claim',
       component: () => import('../pages/licenses/claim.vue'),
     },
     {

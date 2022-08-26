@@ -10,7 +10,7 @@
             <p>
               <router-link
                 class="nav-link"
-                to="/licenses/cms"
+                :to="getPrefixedTo('/licenses/cms')"
                 exact>← Craft CMS
               </router-link>
             </p>
@@ -116,8 +116,11 @@ import PluginLicensesTable from '../../../components/licenses/PluginLicensesTabl
 import LicenseHistory from '../../../components/licenses/LicenseHistory'
 import PageHeader from '@/console/js/components/PageHeader';
 import TransferLicenseModal from '@/console/js/components/licenses/TransferLicenseModal';
+import helpers from '../../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
+
   components: {
     TransferLicenseModal,
     PageHeader,

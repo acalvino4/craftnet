@@ -6,6 +6,7 @@
 import {mapGetters} from 'vuex';
 import PersonalIndex from './_personal';
 import OrganizationIndex from './_organization';
+import {checkRoute} from '../../../helpers/check-route';
 
 export default {
   computed: {
@@ -23,20 +24,13 @@ export default {
   },
 
   mounted() {
-    if (this.currentOrganization && this.$route.params.orgSlug !== this.currentOrganization.slug) {
-      // Redirect to the right org profile if the org slug is different than the current org slug.
-      this.$router.push({
-        name: 'OrgOrders',
-        params: {
-          orgSlug: this.currentOrganization.slug,
-        },
-      })
-    } else if (!this.currentOrganization && this.$route.params.orgSlug) {
-      // Redirect to the user profile if the org slug is provided but there is no current org.
-      this.$router.push({
-        name: 'UserOrders',
-      })
-    }
+    // checkRoute( {
+    //   currentOrganization: this.currentOrganization,
+    //   $router: this.$router,
+    //   $route: this.$route,
+    //   orgRouteName: 'OrgOrders',
+    //   userRouteName: 'UserOrders'
+    // })
   }
 }
 </script>

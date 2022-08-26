@@ -4,7 +4,6 @@
     <div class="mt-6 space-y-6">
       <pane>
         <h2>Orders</h2>
-
         <invoices-table class="mt-4"></invoices-table>
       </pane>
 

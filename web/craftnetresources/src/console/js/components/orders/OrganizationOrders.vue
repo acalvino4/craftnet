@@ -14,7 +14,13 @@
         </thead>
         <tbody>
         <tr v-for="order in orders.data">
-          <td>{{ order.number }}</td>
+          <td>
+            <router-link
+              :to="getPrefixedTo('/settings/orders/' + order.number)"
+            >
+              {{ order.number }}
+            </router-link>
+          </td>
           <td>
             <template v-if="order.dateOrdered && order.dateOrdered.date">
               {{ order.dateOrdered.date }}
@@ -33,8 +39,10 @@
 <script>
 import {mapGetters, mapState} from 'vuex';
 import Spinner from '../../../../common/ui/components/Spinner';
+import helpers from '../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
   components: {Spinner},
   data() {
     return {

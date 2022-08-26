@@ -5,7 +5,7 @@
         <p>
           <router-link
             class="nav-link"
-            to="/developer/plugins"
+            :to="getPrefixedTo('/developer/plugins')"
             exact>
             ←
             Plugins
@@ -440,8 +440,10 @@ import slug from 'limax'
 import draggable from 'vuedraggable'
 import qs from 'qs'
 import PageHeader from '@/console/js/components/PageHeader';
+import helpers from '../../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
   components: {
     PageHeader,
     ConnectedApps,

@@ -76,7 +76,7 @@ export default {
     }),
 
     routerViewKey() {
-      return ((this.currentOrganizationId ? 'org-' + this.currentOrganizationId : 'personal') + '-' + this.$route.path)
+      return (this.$route.fullPath)
     }
   },
 
@@ -94,7 +94,7 @@ export default {
     closeSidebar() {
       this.showingSidebar = false
     },
-  }
+  },
 }
 </script>
 
