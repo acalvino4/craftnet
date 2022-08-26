@@ -123,6 +123,8 @@ class PaymentsController extends CartsController
 
         // only process a payment if there's a price
         if ($totalPrice) {
+            // TODO: support pre-selected card
+
             // get the gateway
             /** @var StripeGateway $gateway */
             $gateway = $commerce->getGateways()->getGatewayById(App::env('STRIPE_GATEWAY_ID'));
@@ -257,6 +259,7 @@ class PaymentsController extends CartsController
         $stripeCustomer->save();
 
         // save it for Commerce
+        // TODO: save as a payment method
         $paymentSource = new PaymentSource([
             'customerId' => $user->id,
             'gatewayId' => $gateway->id,
