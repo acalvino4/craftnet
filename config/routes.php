@@ -100,11 +100,11 @@ return [
         'DELETE  orgs/<orgId:\d+>/invitation' => 'craftnet/orgs/invitations/decline-invitation',
         'GET     orgs/invitations' => 'craftnet/orgs/invitations/get-invitations-for-user',
 
-        'GET     cards' => 'craftnet/console/stripe/get-cards',
-        'POST    cards' => 'craftnet/console/stripe/add-card',
-        'POST    cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/save-card',
-        'DELETE  cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/remove-card',
-        'GET     cards/payment-sources' => 'craftnet/console/stripe/get-payment-sources',
+        'GET     payment-methods' => 'craftnet/console/payment-methods/get-payment-methods',
+        'GET     payment-methods/checkout' => 'craftnet/console/payment-methods/get-payment-methods-for-checkout',
+        'POST    payment-methods' => 'craftnet/console/payment-methods/save-payment-method',
+        'POST    payment-methods/<paymentMethodId:\d+>' => 'craftnet/console/payment-methods/save-payment-method',
+        'DELETE  payment-methods/<paymentMethodId:\d+>' => 'craftnet/console/payment-methods/delete-payment-method',
 
         'GET     addresses' => 'craftnet/console/addresses/get-addresses',
         'POST    addresses' => 'craftnet/console/addresses/save-address',

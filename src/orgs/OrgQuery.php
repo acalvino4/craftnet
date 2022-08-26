@@ -15,8 +15,7 @@ class OrgQuery extends ElementQuery
     public ?string $apiToken = null;
     public ?int $balance = null;
     public ?int $ownerId = null;
-    public ?int $paymentSourceId = null;
-    public ?int $billingAddressId = null;
+    public ?int $paymentMethodId = null;
     public ?int $locationAddressId = null;
     public ?int $orderId = null;
     private ?int $hasMemberId = null;
@@ -35,15 +34,9 @@ class OrgQuery extends ElementQuery
         return $this;
     }
 
-    public function paymentSourceId(?int $paymentSourceId): OrgQuery
+    public function paymentMethodId(?int $paymentMethodId): OrgQuery
     {
-        $this->paymentSourceId = $paymentSourceId;
-        return $this;
-    }
-
-    public function billingAddressId(?int $billingAddressId): OrgQuery
-    {
-        $this->billingAddressId = $billingAddressId;
+        $this->paymentMethodId = $paymentMethodId;
         return $this;
     }
 
@@ -87,8 +80,7 @@ class OrgQuery extends ElementQuery
             'balance',
             'ownerId',
             'creatorId',
-            'paymentSourceId',
-            'billingAddressId',
+            'paymentMethodId',
             'locationAddressId',
         ]);
 

@@ -235,8 +235,7 @@ abstract class BaseController extends Controller
                 'id',
                 'title',
                 'requireOrderApproval',
-                'paymentSourceId',
-                'billingAddressId',
+                'paymentMethodId',
                 'slug',
                 'uri',
             ]) + [

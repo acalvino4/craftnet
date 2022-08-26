@@ -41,6 +41,7 @@ abstract class Table
     public const PAYOUTS = '{{%craftnet_payouts}}';
     public const PAYOUT_ERRORS = '{{%craftnet_payout_errors}}';
     public const PAYOUT_ITEMS = '{{%craftnet_payout_items}}';
+    public const PAYMENTMETHODS = '{{%craftnet_paymentmethods}}';
     public const PLUGINCATEGORIES = '{{%craftnet_plugincategories}}';
     public const PLUGINEDITIONS = '{{%craftnet_plugineditions}}';
     public const PLUGINHISTORY = '{{%craftnet_pluginhistory}}';

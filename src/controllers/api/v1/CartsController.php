@@ -22,6 +22,7 @@ use craftnet\errors\LicenseNotFoundException;
 use craftnet\errors\ValidationException;
 use craftnet\helpers\KeyHelper;
 use craftnet\orgs\Org;
+use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginRenewal;
 use Ddeboer\Vatin\Validator;
@@ -212,6 +213,8 @@ class CartsController extends BaseApiController
             $orgRemoved = !$org && $existingOrgFromCart;
             $makePrimary = $payload?->makePrimary ?? false;
             $originalCustomer = $cart->customer ?? $currentUser;
+            $paymentMethodId = $this->request->getBodyParam('paymentMethodId');
+            $paymentMethod = $paymentMethodId ? PaymentMethodRecord::findOne(['id' => $paymentMethodId]) : null;
 
             if ($cart->isPendingApproval() && $cart->approvalRequestedForOrgId && $cart->approvalRequestedForOrgId != $orgId) {
                 throw new ForbiddenHttpException('This order must be purchased for the requested organization.');
@@ -260,17 +263,22 @@ class CartsController extends BaseApiController
 
                 $cart->setOrg($org);
                 $cart->setCustomer($org->getOwner());
-                $cart->setPaymentSource($org->getPaymentSource());
-                $cart->setValidBillingAddress($org->getBillingAddress());
                 $cart->setCreator($originalCustomer);
                 $cart->setPurchaser($currentUser);
+                $paymentMethod = $org->paymentMethod ?? $paymentMethod;
+
             } else if ($orgId) {
                 throw new BadRequestHttpException('Invalid organization');
             }
 
+            if ($paymentMethod) {
+                $cart->setPaymentSource($paymentMethod->paymentSource);
+            }
+
             // billing address
-            if (isset($payload->billingAddressId)) {
-                $address = Address::find()->id($payload->billingAddressId)->one();
+            $billingAddressId = $payload?->billingAddressId ?? $paymentMethod?->billingAddressId;
+            if ($billingAddressId) {
+                $address = Address::find()->id($billingAddressId)->one();
 
                 if (!$address) {
                     throw new BadRequestHttpException('Address not found.');

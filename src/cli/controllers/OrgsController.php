@@ -5,7 +5,6 @@ namespace craftnet\cli\controllers;
 use Craft;
 use craft\commerce\behaviors\CustomerBehavior;
 use craft\commerce\elements\Order;
-use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
 use craft\elements\User;
 use craft\errors\ElementNotFoundException;
@@ -14,6 +13,7 @@ use craft\helpers\UrlHelper;
 use craftnet\db\Table;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
+use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
 use Illuminate\Support\Collection;
 use nystudio107\retour\Retour;
@@ -34,11 +34,40 @@ class OrgsController extends Controller
 
         switch ($actionID) {
             case 'convert':
+            case 'create-payment-methods':
                 $options[] = 'userId';
                 break;
         }
 
         return $options;
+    }
+
+    public function actionCreatePaymentMethods(): void
+    {
+        $this->stdout("Creating payment methods for users ... " . PHP_EOL);
+
+        User::find()->id($this->userId)->collect()
+            ->each(function(User|CustomerBehavior $user) {
+                $this->stdout("    > Creating payment method for $user ... ");
+
+                if (!$user->primaryPaymentSourceId) {
+                    $this->stdout("No payment source, skipping." . PHP_EOL);
+                    return;
+                }
+
+                $paymentMethod = new PaymentMethodRecord();
+                $paymentMethod->paymentSourceId = $user->primaryPaymentSourceId;
+                $paymentMethod->billingAddressId = $user->primaryBillingAddressId;
+                $paymentMethod->ownerId = $user->id;
+
+                if (!$paymentMethod->save(false)) {
+                    throw new Exception("Couldn't save payment method: " . implode(', ', $paymentMethod->getFirstErrors()));
+                }
+
+                $this->stdout('done' . PHP_EOL);
+            });
+
+        $this->stdout('Done creating payment methods' . PHP_EOL);
     }
 
     /**
@@ -51,6 +80,8 @@ class OrgsController extends Controller
      */
     public function actionConvert(): void
     {
+        $this->run('create-payment-methods');
+
         $partnerOwnerIds = Partner::find()->collect()->pluck('ownerId');
         $developerIds = Plugin::find()->collect()->pluck('developerId');
 
@@ -82,7 +113,10 @@ class OrgsController extends Controller
                 $org->apiToken = $user->apiToken;
                 $org->balance = $user->balance ?? 0;
                 $org->setOwner($user->id);
-
+                $org->paymentMethodId = PaymentMethodRecord::findOne([
+                    'ownerId' => $user->id,
+                    'paymentSourceId' => $user->primaryPaymentSourceId,
+                ])?->id;
                 $projectsAsMatrix = Collection::make($partner?->getProjects())
                     ->flatMap(function($project, $index) {
                         $key = 'new' . ($index + 1);
@@ -127,14 +161,6 @@ class OrgsController extends Controller
                     'partnerRegion' => $partner?->region ? StringHelper::toCamelCase($partner?->region) : null,
                     'partnerProjects' => $projectsAsMatrix,
                 ]);
-
-                // Previously, users only had one stored payment sources
-                // TODO: revisit with Commerce 4.2
-                $org->paymentSourceId = Commerce::getInstance()
-                    ?->getPaymentSources()
-                    ?->getAllPaymentSourcesByCustomerId($user->id)[0]?->id ?? null;
-
-                $org->billingAddressId = $user->primaryBillingAddressId;
 
                 $this->stdout("    > Saving org ... ");
                 if (!Craft::$app->getElements()->saveElement($org)) {
@@ -222,13 +248,13 @@ class OrgsController extends Controller
                 $this->stdout('done' . PHP_EOL);
 
                 $this->stdout("    > Deleting redundant addresses ... ");
-                $query = Address::find()
+                $usedAddressIds = array_filter([$org?->paymentMethod?->billingAddressId, $org->locationAddressId]);
+                $idParam = $usedAddressIds ? array_merge([
+                    'not',
+                ], $usedAddressIds) : null;
+                Address::find()
                     ->ownerId($user->id)
-                    ->id([
-                        'not',
-                        $org->billingAddressId,
-                        $org->locationAddressId,
-                    ])
+                    ->id($idParam)
                     ->collect()
                     ->each(function ($address) {
                         return Craft::$app->getElements()->deleteElementById($address->id, hardDelete: true);
