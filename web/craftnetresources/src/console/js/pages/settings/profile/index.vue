@@ -11,8 +11,8 @@
 
 <script>
 import {mapState, mapGetters} from 'vuex'
-import OrganizationProfile from '../../components/settings/profile/OrganizationProfile';
-import UserProfile from '../../components/settings/profile/UserProfile';
+import OrganizationProfile from './_org';
+import UserProfile from './_user';
 
 export default {
   components: {
