@@ -12,6 +12,8 @@ use craft\commerce\Plugin;
 use craft\db\ActiveRecord;
 use craft\elements\Address;
 use craftnet\db\Table;
+use craftnet\orgs\Org;
+use craftnet\orgs\OrgQuery;
 
 /**
  * @property int $id
@@ -53,5 +55,10 @@ class PaymentMethodRecord extends ActiveRecord
     public function getBillingAddress(): ?Address
     {
         return Address::find()->id($this->billingAddressId)->one();
+    }
+
+    public function getOrgs(): OrgQuery
+    {
+        return Org::find()->paymentMethodId($this->id);
     }
 }

@@ -90,6 +90,10 @@ class PaymentMethodsController extends BaseController
             throw new NotFoundHttpException();
         }
 
+        if ($paymentMethod->getOrgs()->exists() && !Craft::$app->getUser()->getHasElevatedSession()) {
+            return $this->getElevatedSessionResponse();
+        }
+
         // Payment method will be deleted by cascade
         $deleted = Commerce::getInstance()
             ->getPaymentSources()
@@ -97,40 +101,56 @@ class PaymentMethodsController extends BaseController
 
         return $deleted ? $this->asSuccess('Payment method deleted.') : $this->asFailure();
     }
-
     public function actionGetPaymentMethods(): Response
+    {
+        $paymentMethods = Collection::make($this->currentUser->getPaymentMethods())
+            ->map(fn(PaymentMethodRecord $paymentMethod) => $this->_transformPaymentMethod($paymentMethod) + [
+                'orgs' => $paymentMethod->getOrgs()->hasOwner($this->currentUser)
+                    ->collect()
+                    ->map(fn(Org $org) => static::transformOrg($org)),
+            ]);
+
+        return $this->asSuccess(data: ['paymentMethods' => $paymentMethods]);
+    }
+
+    public function actionGetPaymentMethodsForCheckout(): Response
     {
         $orgs = Org::find()->hasMember($this->currentUser)->collect();
         $paymentMethods = Collection::make($this->currentUser->getPaymentMethods())
-            ->sortByDesc(fn(PaymentMethodRecord $paymentMethod) => $paymentMethod->paymentSource->isPrimary ? 1 : 0)
             ->concat($orgs)
             ->map(function(PaymentMethodRecord|Org $orgOrPaymentMethod) {
                 $org = $orgOrPaymentMethod instanceof Org ? $orgOrPaymentMethod : null;
 
                 /** @var PaymentMethodRecord|null $paymentMethod */
                 $paymentMethod = $org ? $org->getPaymentMethod() : $orgOrPaymentMethod;
-                $paymentSource = $paymentMethod?->getPaymentSource();
-                $billingAddress = $paymentMethod?->getBillingAddress();
 
                 if (!$paymentMethod) {
                     return null;
                 }
 
-                return $paymentMethod->getAttributes([
-                    'id',
-                ]) + [
-                    'card' => $paymentSource?->getCard(),
+                return $this->_transformPaymentMethod($paymentMethod) + [
                     'org' => $org ? static::transformOrg($org) + [
                         'canPurchase' => $org->canPurchase($this->currentUser),
                     ] : null,
-                    'isPrimary' => (bool) $paymentSource?->isPrimary,
-                    'paymentSourceId' => $paymentSource?->id,
-                    'billingAddressId' => $billingAddress?->id,
                 ];
             })
             ->whereNotNull()
             ->values();
 
         return $this->asSuccess(data: ['paymentMethods' => $paymentMethods]);
+    }
+
+    private function _transformPaymentMethod(PaymentMethodRecord $paymentMethod): array
+    {
+        $paymentSource = $paymentMethod?->getPaymentSource();
+
+        return $paymentMethod->getAttributes([
+            'id',
+            'paymentSourceId',
+            'billingAddressId',
+        ]) + [
+            'card' => $paymentSource?->getCard(),
+            'isPrimary' => (bool) $paymentSource?->isPrimary,
+        ];
     }
 }

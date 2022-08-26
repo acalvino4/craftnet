@@ -19,6 +19,7 @@ use craftnet\partners\Partner;
 use craftnet\paymentmethods\PaymentMethod;
 use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
+use Illuminate\Support\Collection;
 use yii\base\Behavior;
 use yii\base\Exception;
 
@@ -119,11 +120,14 @@ class UserBehavior extends Behavior
             ->getAllPaymentSourcesByCustomerId($this->owner->id);
     }
 
-    public function getPaymentMethods(): array
+    public function getPaymentMethods(): Collection
     {
-        return PaymentMethodRecord::find()
+        $paymentMethods = PaymentMethodRecord::find()
             ->where(['ownerId' => $this->owner->id])
             ->all();
+
+        return Collection::make($paymentMethods)
+            ->sortByDesc(fn(PaymentMethodRecord $paymentMethod) => $paymentMethod->paymentSource->isPrimary ? 1 : 0);
     }
 
     /**
