@@ -134,7 +134,6 @@ class PaymentsController extends CartsController
             try {
                 $this->_populatePaymentForm($cart, $payload, $gateway, $paymentForm);
 
-                // TODO: why does calling this lose our paymentSourceId on the order?
                 $commerce->getPayments()->processPayment($cart, $paymentForm, $redirect, $transaction);
             } catch (ApiErrorException $e) {
                 throw new BadRequestHttpException($e->getMessage(), 0, $e);

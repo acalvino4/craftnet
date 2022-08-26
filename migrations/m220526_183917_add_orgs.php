@@ -25,9 +25,8 @@ class m220526_183917_add_orgs extends Migration
             'stripeAccessToken' => $this->text()->null(),
             'stripeAccount' => $this->string()->null(),
             'apiToken' => $this->char(60)->null(),
-            'billingAddressId' => $this->integer(),
             'locationAddressId' => $this->integer(),
-            'paymentSourceId' => $this->integer(),
+            'paymentMethodId' => $this->integer(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
@@ -75,11 +74,20 @@ class m220526_183917_add_orgs extends Migration
             'uid' => $this->uid(),
         ]);
 
+        $this->createTable(Table::PAYMENTMETHODS, [
+            'id' => $this->primaryKey(),
+            'ownerId' => $this->integer()->notNull(),
+            'paymentSourceId' => $this->integer()->notNull(),
+            'billingAddressId' => $this->integer(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
+
         $this->addForeignKey(null, Table::ORGS, ['id'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS, ['ownerId'], CraftTable::USERS, ['id']);
         $this->addForeignKey(null, Table::ORGS, ['creatorId'], CraftTable::USERS, ['id']);
-        $this->addForeignKey(null, Table::ORGS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'SET NULL');
-        $this->addForeignKey(null, Table::ORGS, ['billingAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
+        $this->addForeignKey(null, Table::ORGS, ['paymentMethodId'], Table::PAYMENTMETHODS, ['id'], 'SET NULL');
 
         // TODO: Ideally this would be a custom field, but currently only user elements can have addresses
         $this->addForeignKey(null, Table::ORGS, ['locationAddressId'], CraftTable::ADDRESSES, ['id'], 'SET NULL');
@@ -102,6 +110,13 @@ class m220526_183917_add_orgs extends Migration
         $this->addForeignKey(null, Table::ORGS_ORDERAPPROVALS, ['rejectedById'], CraftTable::USERS, ['id'], 'CASCADE');
 
         $this->createIndex(null, Table::ORGS_ORDERAPPROVALS, ['orderId', 'orgId', 'requestedById'], true);
+
+        $this->addForeignKey(null, Table::PAYMENTMETHODS, ['paymentSourceId'], CommerceTable::PAYMENTSOURCES, ['id'], 'CASCADE');
+
+        // Should this be SET NULL on delete?
+        $this->addForeignKey(null, Table::PAYMENTMETHODS, ['billingAddressId'], CraftTable::ADDRESSES, ['id']);
+        $this->addForeignKey(null, Table::PAYMENTMETHODS, ['ownerId'], CraftTable::USERS, ['id'], 'CASCADE');
+        $this->createIndex(null, Table::PAYMENTMETHODS, ['paymentSourceId'], true);
 
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['orgId'], Table::ORGS, ['id'], 'CASCADE');
         $this->addForeignKey(null, Table::ORGS_INVITATIONS, ['userId'], CraftTable::USERS, ['id'], 'CASCADE');

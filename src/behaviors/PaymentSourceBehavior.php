@@ -4,8 +4,6 @@ namespace craftnet\behaviors;
 
 use craft\commerce\models\PaymentSource;
 use craft\helpers\Json;
-use craftnet\orgs\Org;
-use craftnet\orgs\OrgQuery;
 use yii\base\Behavior;
 
 /**
@@ -24,10 +22,5 @@ class PaymentSourceBehavior extends Behavior
             'source', 'payment_method' => $response['card'],
             default => null,
         };
-    }
-
-    public function getOrgs(): OrgQuery
-    {
-        return Org::find()->paymentSourceId($this->owner->id);
     }
 }

@@ -102,9 +102,14 @@ return [
 
         'GET     cards' => 'craftnet/console/stripe/get-cards',
         'POST    cards' => 'craftnet/console/stripe/add-card',
-        'POST    cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/save-card',
-        'DELETE  cards/<paymentSourceId:\d+>' => 'craftnet/console/stripe/remove-card',
+        'POST    cards/<paymentMethodId:\d+>' => 'craftnet/console/stripe/save-card',
+        'DELETE  cards/<paymentMethodId:\d+>' => 'craftnet/console/stripe/remove-card',
         'GET     cards/payment-sources' => 'craftnet/console/stripe/get-payment-sources',
+
+        'GET     payment-methods' => 'craftnet/console/payment-methods/get-payment-methods',
+        'POST    payment-methods' => 'craftnet/console/payment-methods/save-payment-method',
+        'POST    payment-methods/<paymentMethodId:\d+>' => 'craftnet/console/payment-methods/save-payment-method',
+        'DELETE  payment-methods/<paymentMethodId:\d+>' => 'craftnet/console/payment-methods/delete-payment-method',
 
         'GET     addresses' => 'craftnet/console/addresses/get-addresses',
         'POST    addresses' => 'craftnet/console/addresses/save-address',

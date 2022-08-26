@@ -4,8 +4,6 @@ namespace craftnet\orgs;
 
 use Craft;
 use craft\base\Element;
-use craft\commerce\models\PaymentSource;
-use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
 use craft\elements\db\UserQuery;
 use craft\elements\User;
@@ -18,6 +16,7 @@ use craft\models\FieldLayout;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
 use craftnet\developers\FundsManager;
+use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
 use Throwable;
 use yii\base\InvalidConfigException;
@@ -25,9 +24,8 @@ use yii\base\UserException;
 use yii\db\Exception;
 
 /**
- *
+ * @property-read PaymentMethodRecord $paymentMethod
  * @property-read array $invitations
- * @property-read null|PaymentSource $paymentSource
  * @property-read null|string $invitationUrl
  */
 class Org extends Element
@@ -38,9 +36,8 @@ class Org extends Element
     public ?string $stripeAccount = null;
     public ?string $apiToken = null;
     public float $balance = 0;
-    public ?int $paymentSourceId = null;
-    public ?int $billingAddressId = null;
     public ?int $locationAddressId = null;
+    public ?int $paymentMethodId = null;
 
     /**
      * @var Plugin[]|null
@@ -445,8 +442,8 @@ class Org extends Element
             throw new UserException('User must be a member of the organization before becoming the owner.');
         }
 
-        $this->paymentSourceId = null;
-        $this->billingAddressId = null;
+        $this->paymentMethodId = null;
+
         $saved = $this->setOwner($owner)->save();
 
         // TODO: email notifications
@@ -485,21 +482,16 @@ class Org extends Element
         }
 
         if (
-            $this->paymentSourceId &&
-            !Commerce::getInstance()
-                ->getPaymentSources()
-                ->getPaymentSourceByIdAndUserId($this->paymentSourceId, $owner->id)
+            $this->paymentMethodId &&
+            !PaymentMethodRecord::find()->where([
+                'ownerId' => $this->ownerId,
+                'id' => $this->paymentMethodId,
+            ])->exists()
         ) {
-            throw new InvalidConfigException('Invalid payment source.');
+            throw new InvalidConfigException('Invalid payment method.');
         }
 
-        if (
-            $this->billingAddressId &&
-            !Address::find()->id($this->billingAddressId)->ownerId($owner->id)->exists()
-        ) {
-            throw new InvalidConfigException('Invalid billing address.');
-        }
-
+        // TODO: Review…seems like this wouldn't ever be able to save an addrress?
         if (
             $this->locationAddressId &&
             !Address::find()->id($this->locationAddressId)->ownerId($this->id)->exists()
@@ -522,9 +514,8 @@ class Org extends Element
             'id',
             'stripeAccessToken',
             'stripeAccount',
-            'billingAddressId',
             'locationAddressId',
-            'paymentSourceId',
+            'paymentMethodId',
             'apiToken',
             'balance',
             'ownerId',
@@ -623,17 +614,10 @@ class Org extends Element
         return Craft::$app->getElements()->saveElement($this, ...$args);
     }
 
-    public function getPaymentSource(): ?PaymentSource
+    public function getPaymentMethod(): ?PaymentMethodRecord
     {
-        return $this->paymentSourceId
-            ? Commerce::getInstance()->getPaymentSources()->getPaymentSourceById($this->paymentSourceId)
-            : null;
-    }
-
-    public function getBillingAddress(): ?Address
-    {
-        return $this->billingAddressId
-            ? Address::find()->id($this->billingAddressId)->one()
+        return $this->paymentMethodId
+            ? PaymentMethodRecord::findOne(['id' => $this->paymentMethodId])
             : null;
     }
 
