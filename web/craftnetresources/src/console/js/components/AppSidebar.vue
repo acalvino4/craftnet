@@ -88,7 +88,7 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/settings/profile">
+          :to="(currentOrganization ? '/organizations/' + currentOrganization.slug : '') + '/settings/profile'">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="identification" />

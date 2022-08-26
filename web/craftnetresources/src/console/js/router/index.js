@@ -63,7 +63,12 @@ const router = createRouter({
     },
     {
       path: '/settings/profile',
-      name: 'AccountProfile',
+      name: 'UserProfile',
+      component: () => import('../pages/settings/profile'),
+    },
+    {
+      path: '/organizations/:orgSlug/settings/profile',
+      name: 'OrgProfile',
       component: () => import('../pages/settings/profile'),
     },
     {
