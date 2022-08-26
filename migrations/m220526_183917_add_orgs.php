@@ -123,6 +123,7 @@ class m220526_183917_add_orgs extends Migration
         $this->createIndex(null, Table::ORGS_INVITATIONS, ['orgId', 'userId'], true);
 
         $this->dropForeignKey('craftcom_plugins_developerId_fk', Table::PLUGINS);
+        // TODO: change this to be keyed to Table::ORGS, ['id'] after migration
         $this->addForeignKey('craftcom_plugins_developerId_fk', Table::PLUGINS, ['developerId'], CraftTable::ELEMENTS, ['id'], 'CASCADE');
 
         $this->dropForeignKey('craftnet_pluginlicenses_ownerId_fk', Table::PLUGINLICENSES);
