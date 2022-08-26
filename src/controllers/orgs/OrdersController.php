@@ -33,6 +33,7 @@ class OrdersController extends SiteController
             'approvalRequestedById',
             'approvalRejectedDate',
             'approvalRequested',
+            'approvalPending',
         ])->mapWithKeys(fn($prop) => [
             $prop => $this->request->getParam($prop)
         ])->whereNotNull()
@@ -40,8 +41,8 @@ class OrdersController extends SiteController
 
         $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
-        $orderBy = $this->request->getParam('orderBy');
-        $ascending = (bool)$this->request->getParam('ascending');
+        $orderBy = $this->request->getParam('orderBy', 'dateOrdered');
+        $ascending = (bool)$this->request->getParam('ascending', false);
         $offset = ($page - 1) * $limit;
 
         $orders

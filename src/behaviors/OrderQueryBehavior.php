@@ -18,6 +18,7 @@ class OrderQueryBehavior extends Behavior
     public ?int $creatorId = null;
     public ?int $purchaserId = null;
     public ?bool $approvalRequested = null;
+    private ?bool $approvalPending = null;
     private ?int $approvalRejectedById = null;
     private ?int $approvalRequestedById = null;
     private mixed $approvalRejectedDate = null;
@@ -35,6 +36,17 @@ class OrderQueryBehavior extends Behavior
     public function orgId(?int $orgId): OrderQuery
     {
         $this->orgId = $orgId;
+
+        return $this->owner;
+    }
+
+    public function approvalPending(bool $approvalPending): OrderQuery
+    {
+        $this->approvalPending = $approvalPending;
+
+        if ($this->approvalPending) {
+            $this->approvalRequested = true;
+        }
 
         return $this->owner;
     }
@@ -112,6 +124,10 @@ class OrderQueryBehavior extends Behavior
 
         if ($this->purchaserId) {
             $this->owner->subQuery->andWhere(['orgsOrders.purchaserId' => $this->purchaserId]);
+        }
+
+        if ($this->approvalPending) {
+            $this->owner->subQuery->andWhere(['orgsOrderApprovals.rejectedById' => null]);
         }
 
         if ($this->approvalRequestedById) {
