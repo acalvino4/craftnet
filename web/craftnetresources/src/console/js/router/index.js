@@ -72,7 +72,7 @@ const router = createRouter({
       component: () => import('../pages/settings/profile'),
     },
     {
-      path: '/settings/members',
+      path: '/organizations/:orgSlug/settings/members',
       name: 'SettingsMembers',
       component: () => import('../pages/settings/members.vue'),
     },

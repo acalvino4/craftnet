@@ -98,7 +98,7 @@
       <li v-if="currentOrganization">
         <router-link
           @click="$emit('closeSidebar')"
-          to="/settings/members">
+          :to="'/organizations/' + currentOrganization.slug + '/settings/members'">
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="user-group" />
