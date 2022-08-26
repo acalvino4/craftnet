@@ -7,6 +7,13 @@ namespace craft\elements;
  */
 class User {}
 
+namespace craft\commerce\models;
+
+/**
+ * @mixin \craftnet\behaviors\PaymentSourceBehavior
+ */
+class PaymentSource {}
+
 namespace craft\commerce\behaviors;
 
 class CustomerBehavior {}
