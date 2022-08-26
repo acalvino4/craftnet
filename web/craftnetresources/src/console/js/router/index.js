@@ -88,12 +88,22 @@ const router = createRouter({
     },
     {
       path: '/settings/orders',
-      name: 'Orders',
+      name: 'UserOrders',
+      component: () => import('../pages/settings/orders/index.vue'),
+    },
+    {
+      path: '/organizations/:orgSlug/settings/orders',
+      name: 'OrgOrders',
       component: () => import('../pages/settings/orders/index.vue'),
     },
     {
       path: '/settings/billing',
-      name: 'Billing',
+      name: 'UserBilling',
+      component: () => import('../pages/settings/billing'),
+    },
+    {
+      path: '/organizations/:orgSlug/settings/billing',
+      name: 'OrgBilling',
       component: () => import('../pages/settings/billing'),
     },
     {
@@ -102,7 +112,7 @@ const router = createRouter({
       component: () => import('../pages/settings/orders/_number.vue'),
     },
     {
-      path: '/settings/plugin-store',
+      path: '/organizations/:orgSlug/settings/plugin-store',
       name: 'SettingsPluginStore',
       component: () => import('../pages/settings/plugin-store.vue'),
       meta: {orgOnly: true}

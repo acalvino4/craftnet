@@ -108,7 +108,8 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/settings/orders">
+          :to="(currentOrganization ? '/organizations/' + currentOrganization.slug : '') + '/settings/orders'"
+        >
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="box" />
@@ -118,7 +119,8 @@
       <li>
         <router-link
           @click="$emit('closeSidebar')"
-          to="/settings/billing">
+          :to="(currentOrganization ? '/organizations/' + currentOrganization.slug : '') + '/settings/billing'"
+        >
           <icon
             class="mr-2 text-blue-500 w-5 h-5"
             icon="credit-card" />
@@ -166,7 +168,8 @@
         <li>
           <router-link
             @click="$emit('closeSidebar')"
-            to="/settings/plugin-store">
+            :to="'/organizations/' + currentOrganization.slug + '/settings/plugin-store'"
+          >
             <icon
               class="mr-2 text-blue-500 w-5 h-5"
               icon="plug" />
