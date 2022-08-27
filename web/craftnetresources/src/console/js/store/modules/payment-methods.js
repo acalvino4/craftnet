@@ -36,9 +36,9 @@ const actions = {
     })
   },
 
-  saveCard(context, {paymentSourceId, card}) {
+  savePaymentMethod(context, {paymentMethodId, card}) {
     return new Promise((resolve, reject) => {
-      paymentMethodsApi.saveCard({paymentSourceId, card})
+      paymentMethodsApi.savePaymentMethod({paymentMethodId, card})
         .then((response) => {
           resolve(response)
         })

@@ -16,8 +16,8 @@ export default {
     })
   },
 
-  saveCard({paymentSourceId, card}) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/cards/' + paymentSourceId, qs.stringify(card), {
+  savePaymentMethod({paymentMethodId, card}) {
+    return axios.post(VUE_APP_URL_CONSOLE + '/payment-methods/' + paymentMethodId, qs.stringify(card), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
