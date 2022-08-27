@@ -16,13 +16,24 @@
 
     <pane class="mt-6">
       <field
-        label-for="fullName"
-        label="Name"
-        :first="true">
+        label-for="firstName"
+        label="First Name"
+        :first="true"
+      >
         <textbox
-          id="fullName"
-          v-model="userDraft.fullName"
-          :errors="errors.fullName" />
+          id="firstName"
+          v-model="userDraft.firstName"
+          :errors="errors.firstName" />
+      </field>
+
+      <field
+        label-for="lastName"
+        label="Last Name"
+      >
+        <textbox
+          id="lastName"
+          v-model="userDraft.lastName"
+          :errors="errors.lastName" />
       </field>
 
       <field
@@ -187,11 +198,10 @@ export default {
       this.loading.page = true
 
       this.$store.dispatch('account/saveUser', {
-          user: {
-            id: this.userDraft.id,
-            fullName: this.userDraft.fullName,
-            photoUrl: this.userDraft.photoUrl,
-          }
+          id: this.userDraft.id,
+          firstName: this.userDraft.firstName,
+          lastName: this.userDraft.lastName,
+          photoUrl: this.userDraft.photoUrl,
         })
         .then(() => {
           this.$store.dispatch('app/displayNotice', 'Settings saved.')
