@@ -119,9 +119,9 @@ export default {
 
     setPrimary(cardId) {
       this.$store.dispatch('paymentMethods/savePaymentMethod', {
-        paymentSourceId: cardId,
+        paymentMethodId: cardId,
         card: {
-          isPrimary: true,
+          makePrimary: true,
         }
       })
         .then(() => {
