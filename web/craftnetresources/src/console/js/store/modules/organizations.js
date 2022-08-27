@@ -5,7 +5,6 @@ import organizationsApi from '@/console/js/api/organizations';
  */
 const state = {
   organizations: [],
-  currentOrganizationId: null,
   currentOrgSlug: null,
   members: [],
   orders: [],
@@ -47,28 +46,6 @@ const actions = {
           reject(response)
         })
     })
-  },
-
-  saveCurrentOrganization({commit}, organization) {
-    return new Promise((resolve, reject) => {
-      const organizationId = organization ? organization.id : null
-
-      organizationsApi.saveCurrentOrganizationId(organizationId)
-        .then((response) => {
-          commit('updateCurrentOrganizationId', organizationId)
-          resolve(response)
-        })
-        .catch((response) => {
-          reject(response)
-        })
-    })
-  },
-
-  getCurrentOrganizationId({commit}) {
-    return organizationsApi.getCurrentOrganizationId()
-      .then((response) => {
-        commit('updateCurrentOrganizationId', response.organizationId)
-      })
   },
 
   getOrders({commit}, {organizationId}) {
@@ -180,10 +157,6 @@ const actions = {
  * Mutations
  */
 const mutations = {
-  updateCurrentOrganizationId(state, organizationId) {
-    state.currentOrganizationId = organizationId
-  },
-
   updateCurrentOrgSlug(state, orgSlug) {
     state.currentOrgSlug = orgSlug
   },
