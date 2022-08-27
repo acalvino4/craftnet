@@ -91,7 +91,7 @@ export default {
 
   computed: {
     ...mapState({
-      paymentMethods: state => state.stripe.paymentMethods,
+      paymentMethods: state => state.paymentMethods.paymentMethods,
     }),
   },
 
