@@ -119,7 +119,7 @@ export default {
 
   computed: {
     ...mapState({
-      card: state => state.stripe.card,
+      card: state => state.paymentMethods.card,
       plans: state => state.developerSupport.plans,
     }),
 

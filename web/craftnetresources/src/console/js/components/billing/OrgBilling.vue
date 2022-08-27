@@ -63,7 +63,7 @@ export default {
   computed: {
     ...mapState({
       addresses: state => state.addresses.addresses,
-      cards: state => state.stripe.cards,
+      paymentMethods: state => state.paymentMethods.paymentMethods,
     }),
 
     ...mapGetters({
@@ -98,11 +98,11 @@ export default {
         },
       ]
 
-      for (const cardKey in this.cards) {
-        const card = this.cards[cardKey]
+      for (const paymentMethodKey in this.paymentMethods) {
+        const paymentMethod = this.paymentMethods[paymentMethodKey]
         options.push({
-          label: `**** **** **** ${card.card.last4} - ${card.card.brand} - ${card.card.exp_month}/${card.card.exp_year}`,
-          value: card.id,
+          label: `**** **** **** ${paymentMethod.card.last4} - ${paymentMethod.card.brand} - ${paymentMethod.card.exp_month}/${paymentMethod.card.exp_year}`,
+          value: paymentMethod.id,
         })
       }
 
@@ -144,14 +144,14 @@ export default {
 
     this.loading = true
 
-    this.$store.dispatch('stripe/getCards')
+    this.$store.dispatch('paymentMethods/getPaymentMethods')
       .then(() => {
         this.loading = false
       })
-      .catch(() => {
-        this.loading = false
-        this.$store.dispatch('app/displayNotice', 'Couldn’t get credit cards.')
-      })
+      // .catch(() => {
+      //   this.loading = false
+      //   this.$store.dispatch('app/displayNotice', 'Couldn’t get payment methods.')
+      // })
 
     this.$store.dispatch('addresses/getAddresses');
   }

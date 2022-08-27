@@ -112,8 +112,8 @@ const actions = {
           commit('updateBillingAddress', {billingAddress: response.data.billingAddress})
           commit('updateHasApiToken', {hasApiToken: response.data.user.hasApiToken})
           commit('updateCurrentUser', {user: response.data.user})
-          commit('stripe/updateCard', {card: response.data.card}, {root: true})
-          commit('stripe/updateCardToken', {cardToken: response.data.cardToken}, {root: true})
+          commit('paymentMethods/updateCard', {card: response.data.card}, {root: true})
+          commit('paymentMethods/updateCardToken', {cardToken: response.data.cardToken}, {root: true})
           commit('updateCurrentUserLoaded', true)
 
           dispatch('organizations/getOrganizations', null, {root: true})

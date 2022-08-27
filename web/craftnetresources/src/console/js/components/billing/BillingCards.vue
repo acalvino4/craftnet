@@ -105,7 +105,7 @@ export default {
       }
 
       this.removeCardLoading = true
-      this.$store.dispatch('stripe/removeCard', cardId)
+      this.$store.dispatch('paymentMethods/removeCard', cardId)
         .then(() => {
           this.removeCardLoading = false
           this.$store.dispatch('app/displayNotice', 'Card removed.')
@@ -118,7 +118,7 @@ export default {
     },
 
     setPrimary(cardId) {
-      this.$store.dispatch('stripe/saveCard', {
+      this.$store.dispatch('paymentMethods/saveCard', {
         paymentSourceId: cardId,
         card: {
           isPrimary: true,
@@ -126,7 +126,7 @@ export default {
       })
         .then(() => {
           this.$store.dispatch('app/displayNotice', 'Card set as primary.')
-          this.$store.dispatch('stripe/getPaymentMethods')
+          this.$store.dispatch('paymentMethods/getPaymentMethods')
         })
     }
   },
@@ -134,7 +134,7 @@ export default {
   mounted() {
     this.loading = true
 
-    this.$store.dispatch('stripe/getPaymentMethods')
+    this.$store.dispatch('paymentMethods/getPaymentMethods')
       .then(() => {
         this.loading = false
       })
