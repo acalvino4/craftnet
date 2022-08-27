@@ -276,7 +276,7 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('stripe/getPaymentSources')
+    this.$store.dispatch('paymentMethods/getPaymentSources')
       .catch(() => {
         this.$store.dispatch('app/displayError', 'Couldn’t get payment sources.')
       })

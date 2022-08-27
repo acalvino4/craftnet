@@ -21,7 +21,7 @@
               Add a credit card
             </div>
           </a>
-          <template v-for="(card, cardKey) in cards" :key="cardKey">
+          <template v-for="(paymentMethod, paymentMethodKey) in paymentMethods" :key="paymentMethodKey">
             <div class="border border-gray-200 dark:border-gray-700 rounded-md p-4">
               <div>
                 <div class="flex">
@@ -32,29 +32,29 @@
                   </div>
 
                   <div>
-                    <template v-if="card.isPrimary">
+                    <template v-if="paymentMethod.isPrimary">
                       <div class="mb-2">
                         <badge>Primary</badge>
                       </div>
                     </template>
 
                     <div>
-                      {{ card.card.brand }}
+                      {{ paymentMethod.card.brand }}
                     </div>
 
                     <div>
-                      **** **** **** {{ card.card.last4 }}
+                      **** **** **** {{ paymentMethod.card.last4 }}
                     </div>
 
                     <div class="text-sm text-gray-600">
-                      {{ card.card.exp_month }}/{{ card.card.exp_year }}
+                      {{ paymentMethod.card.exp_month }}/{{ paymentMethod.card.exp_year }}
                     </div>
 
                     <div class="mt-4 space-x-4">
-                      <template v-if="!card.isPrimary">
-                        <a href="#" @click.prevent="setPrimary(card.id)">Set as primary</a>
+                      <template v-if="!paymentMethod.isPrimary">
+                        <a href="#" @click.prevent="setPrimary(paymentMethod.id)">Set as primary</a>
                       </template>
-                      <a href="#" @click.prevent="removeCard(card.id)">Remove</a>
+                      <a href="#" @click.prevent="removeCard(paymentMethod.id)">Remove</a>
                     </div>
                   </div>
                 </div>
@@ -91,7 +91,7 @@ export default {
 
   computed: {
     ...mapState({
-      cards: state => state.stripe.cards,
+      paymentMethods: state => state.stripe.paymentMethods,
     }),
   },
 
@@ -105,7 +105,7 @@ export default {
       }
 
       this.removeCardLoading = true
-      this.$store.dispatch('stripe/removeCard', cardId)
+      this.$store.dispatch('paymentMethods/removeCard', cardId)
         .then(() => {
           this.removeCardLoading = false
           this.$store.dispatch('app/displayNotice', 'Card removed.')
@@ -118,7 +118,7 @@ export default {
     },
 
     setPrimary(cardId) {
-      this.$store.dispatch('stripe/saveCard', {
+      this.$store.dispatch('paymentMethods/saveCard', {
         paymentSourceId: cardId,
         card: {
           isPrimary: true,
@@ -126,7 +126,7 @@ export default {
       })
         .then(() => {
           this.$store.dispatch('app/displayNotice', 'Card set as primary.')
-          this.$store.dispatch('stripe/getCards')
+          this.$store.dispatch('paymentMethods/getPaymentMethods')
         })
     }
   },
@@ -134,7 +134,7 @@ export default {
   mounted() {
     this.loading = true
 
-    this.$store.dispatch('stripe/getCards')
+    this.$store.dispatch('paymentMethods/getPaymentMethods')
       .then(() => {
         this.loading = false
       })

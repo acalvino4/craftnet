@@ -69,7 +69,7 @@ export default {
      * @param source
      */
     saveCardForm(card, source) {
-      this.$store.dispatch('stripe/addCard', source)
+      this.$store.dispatch('paymentMethods/addCard', source)
         .then(() => {
           card.clear()
           this.cardFormloading = false
@@ -79,7 +79,7 @@ export default {
         })
         .catch((response) => {
           this.cardFormloading = false
-          const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
+          const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
           this.$store.dispatch('app/displayError', errorMessage)
         })
     },

@@ -113,8 +113,8 @@ export default {
   computed: {
     ...mapState({
       cart: state => state.cart.cart,
-      card: state => state.stripe.card,
-      existingCardToken: state => state.stripe.cardToken,
+      card: state => state.paymentMethods.card,
+      existingCardToken: state => state.paymentMethods.cardToken,
       accountBillingAddress: state => state.account.billingAddress,
       user: state => state.account.user,
     }),
