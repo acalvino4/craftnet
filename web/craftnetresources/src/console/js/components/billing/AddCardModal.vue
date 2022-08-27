@@ -79,7 +79,7 @@ export default {
         })
         .catch((response) => {
           this.cardFormloading = false
-          const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
+          const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
           this.$store.dispatch('app/displayError', errorMessage)
         })
     },

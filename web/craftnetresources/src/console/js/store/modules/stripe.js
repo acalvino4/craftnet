@@ -5,7 +5,7 @@ import stripeApi from '../../api/stripe'
  */
 const state = {
   card: null,
-  cards: null,
+  paymentMethods: null,
   cardToken: null,
   stripeAccount: null,
   paymentSources: [],
@@ -51,11 +51,11 @@ const actions = {
     return new Promise((resolve, reject) => {
       stripeApi.removeCard(cardId)
         .then((removeCardResponse) => {
-          dispatch('getCards')
-            .then((getCardsResponse) => {
+          dispatch('getPaymentMethods')
+            .then((getPaymentMethodsResponse) => {
               resolve({
                 removeCardResponse,
-                getCardsResponse
+                getPaymentMethodsResponse
               })
             })
         })
@@ -94,11 +94,11 @@ const actions = {
     })
   },
 
-  getCards({commit}) {
+  getPaymentMethods({commit}) {
     return new Promise((resolve, reject) => {
-      stripeApi.getCards()
+      stripeApi.getPaymentMethods()
         .then((response) => {
-          commit('updateCards', {cards: response.data.cards})
+          commit('updatePaymentMethods', {paymentMethods: response.data.paymentMethods})
           resolve(response)
         })
         .catch((error) => {
@@ -137,8 +137,8 @@ const mutations = {
     state.card = card
   },
 
-  updateCards(state, {cards}) {
-    state.cards = cards
+  updatePaymentMethods(state, {paymentMethods}) {
+    state.paymentMethods = paymentMethods
   },
 
   updateCardToken(state, {cardToken}) {

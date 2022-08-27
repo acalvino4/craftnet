@@ -21,7 +21,7 @@ export default {
       paymentMethodId: source.id
     }
 
-    return axios.post(VUE_APP_URL_CONSOLE + '/cards', qs.stringify(data), {
+    return axios.post(VUE_APP_URL_CONSOLE + '/payment-methods', qs.stringify(data), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -40,8 +40,8 @@ export default {
     return axios.delete(VUE_APP_URL_CONSOLE + '/cards/' + cardId)
   },
 
-  getCards() {
-    return axios.get(VUE_APP_URL_CONSOLE + '/cards')
+  getPaymentMethods() {
+    return axios.get(VUE_APP_URL_CONSOLE + '/payment-methods')
   },
 
   getPaymentSources() {
