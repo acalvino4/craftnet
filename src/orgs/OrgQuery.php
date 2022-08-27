@@ -15,7 +15,7 @@ class OrgQuery extends ElementQuery
     public ?string $apiToken = null;
     public ?int $balance = null;
     public ?int $ownerId = null;
-    public ?int $paymentMethodId = null;
+    public int|array|null $paymentMethodId = null;
     public ?int $locationAddressId = null;
     public ?int $orderId = null;
     private ?int $hasMemberId = null;
@@ -34,7 +34,7 @@ class OrgQuery extends ElementQuery
         return $this;
     }
 
-    public function paymentMethodId(?int $paymentMethodId): OrgQuery
+    public function paymentMethodId(int|array|null $paymentMethodId): OrgQuery
     {
         $this->paymentMethodId = $paymentMethodId;
         return $this;
