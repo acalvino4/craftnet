@@ -30,7 +30,7 @@ class PaymentMethodsController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        $billingAddressId = (int) $this->request->getBodyParam('billingAddressId', $paymentMethod->billingAddressId);
+        $billingAddressId = $this->request->getBodyParam('billingAddressId', $paymentMethod->billingAddressId);
 
         if ($isNew) {
             $gateway = Commerce::getInstance()
