@@ -24,7 +24,7 @@
             <payment-method-option
               :name="paymentSource.card.brand + ' ' + paymentSource.card.last4 + ' '"
               :description=" paymentSource.card.exp_month + '/' + paymentSource.card.exp_year"
-              :info="paymentSource.org"
+              :info="(paymentSource.org ? paymentSource.org.name : null)"
               :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
               :credit-card="paymentSource"
               :active="active"
@@ -94,7 +94,7 @@
       </field>
 
       <div class="mt-6 space-x-2">
-        <template v-if="!selectedPaymentSource || selectedPaymentSource.canPurchase">
+        <template v-if="!selectedPaymentSource || !selectedPaymentSource.org || selectedPaymentSource.org.canPurchase">
           <btn kind="primary" large @click="pay">Pay $XX</btn>
         </template>
         <template v-else>
@@ -123,7 +123,6 @@ import {
 } from '@headlessui/vue'
 import PaymentMethodOption from '../../components/payment/PaymentMethodOption';
 import CardElement from '../../components/card/CardElement';
-import AddressFields from '../../components/billing/addresses/AddressFields';
 import PageHeader from '../../components/PageHeader';
 import {mapState} from 'vuex';
 
@@ -132,7 +131,6 @@ export default {
     RadioGroup, RadioGroupOption,
     PaymentMethodOption,
     CardElement,
-    AddressFields,
     PageHeader
   },
 
