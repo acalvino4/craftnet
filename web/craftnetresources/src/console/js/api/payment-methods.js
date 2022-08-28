@@ -25,7 +25,7 @@ export default {
   },
 
   removeCard(cardId) {
-    return axios.delete(VUE_APP_URL_CONSOLE + '/cards/' + cardId)
+    return axios.delete(VUE_APP_URL_CONSOLE + '/payment-methods/' + cardId)
   },
 
   getPaymentMethods() {
