@@ -19,19 +19,14 @@ const getters = {}
  * Actions
  */
 const actions = {
-  addCard({commit}, source) {
+  addCard(context, source) {
     return new Promise((resolve, reject) => {
       paymentMethodsApi.addCard(source)
         .then((response) => {
-          if (!response.data.error) {
-            commit('updateStripeCard', {card: response.data.card.card})
-            resolve(response)
-          } else {
-            reject(response)
-          }
+          resolve(response)
         })
         .catch((error) => {
-          reject(error.response)
+          reject(error)
         })
     })
   },
