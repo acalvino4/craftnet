@@ -61,16 +61,18 @@
         </div>
       </template>
 
-      <div class="mt-8">
-        <h2>Billing Address</h2>
+      <template v-if="!selectedPaymentSource || !selectedPaymentSource.org">
+        <div class="mt-8">
+          <h2>Billing Address</h2>
 
-        <div class="mt-4">
-          <dropdown
-            :options="addressOptions"
-            v-model="billingAddressId"
-          />
+          <div class="mt-4">
+            <dropdown
+              :options="addressOptions"
+              v-model="billingAddressId"
+            />
+          </div>
         </div>
-      </div>
+      </template>
 
       <h2 class="mt-8">More</h2>
       <checkbox
