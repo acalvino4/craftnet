@@ -52,7 +52,7 @@
 
                     <div class="mt-4 space-x-4">
                       <template v-if="!paymentMethod.isPrimary">
-                        <a href="#" @click.prevent="setPrimary(paymentMethod.id)">Set as primary</a>
+                        <a href="#" @click.prevent="makePrimary(paymentMethod.id)">Make primary</a>
                       </template>
                       <a href="#" @click.prevent="removeCard(paymentMethod.id)">Remove</a>
                     </div>
@@ -99,13 +99,13 @@ export default {
     /**
      * Removes a credit card.
      */
-    removeCard(cardId) {
+    removeCard(paymentMethodId) {
       if (!confirm("Are you sure you want to remove this credit card?")) {
         return null;
       }
 
       this.removeCardLoading = true
-      this.$store.dispatch('paymentMethods/removeCard', cardId)
+      this.$store.dispatch('paymentMethods/removeCard', paymentMethodId)
         .then(() => {
           this.removeCardLoading = false
           this.$store.dispatch('app/displayNotice', 'Card removed.')
@@ -117,9 +117,12 @@ export default {
         })
     },
 
-    setPrimary(cardId) {
+    /**
+     * Makes a credit card primary.
+     */
+    makePrimary(paymentMethodId) {
       this.$store.dispatch('paymentMethods/savePaymentMethod', {
-        paymentMethodId: cardId,
+        paymentMethodId,
         card: {
           makePrimary: true,
         }
