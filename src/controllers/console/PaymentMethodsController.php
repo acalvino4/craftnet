@@ -3,6 +3,7 @@
 namespace craftnet\controllers\console;
 
 use Craft;
+use craft\commerce\Plugin;
 use craft\commerce\Plugin as Commerce;
 use craft\helpers\App;
 use craftnet\orgs\Org;
@@ -31,6 +32,8 @@ class PaymentMethodsController extends BaseController
         }
 
         $billingAddressId = $this->request->getBodyParam('billingAddressId', $paymentMethod->billingAddressId);
+
+        Plugin::getInstance()->getCustomers()->ensureCustomer($this->currentUser);
 
         if ($isNew) {
             $gateway = Commerce::getInstance()
@@ -97,7 +100,7 @@ class PaymentMethodsController extends BaseController
         // Payment method will be deleted by cascade
         $deleted = Commerce::getInstance()
             ->getPaymentSources()
-            ->deletePaymentSourceById($paymentMethod->paymentMethodId);
+            ->deletePaymentSourceById($paymentMethod->paymentSource->id);
 
         return $deleted ? $this->asSuccess('Payment method deleted.') : $this->asFailure();
     }
