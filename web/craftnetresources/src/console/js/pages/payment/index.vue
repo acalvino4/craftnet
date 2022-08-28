@@ -14,19 +14,19 @@
 
     <div class="max-w-md">
       <h2>Credit Card</h2>
-      <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentSourceValue">
-        <template v-for="paymentSource in paymentMethodsCheckout">
+      <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentMethodValue">
+        <template v-for="paymentMethod in paymentMethodsCheckout">
           <RadioGroupOption
             class="ring-0 group"
-            :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
+            :value="(paymentMethod.org ? 'org-' : '') + paymentMethod.id"
             v-slot="{ active, checked }"
           >
             <payment-method-option
-              :name="paymentSource.card.brand + ' ' + paymentSource.card.last4 + ' '"
-              :description=" paymentSource.card.exp_month + '/' + paymentSource.card.exp_year"
-              :info="(paymentSource.org ? paymentSource.org.name : null)"
-              :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
-              :credit-card="paymentSource"
+              :name="paymentMethod.card.brand + ' ' + paymentMethod.card.last4 + ' '"
+              :description=" paymentMethod.card.exp_month + '/' + paymentMethod.card.exp_year"
+              :info="(paymentMethod.org ? paymentMethod.org.name : null)"
+              :value="(paymentMethod.org ? 'org-' : '') + paymentMethod.id"
+              :credit-card="paymentMethod"
               :active="active"
               :checked="checked"
             />
@@ -48,7 +48,7 @@
         </RadioGroupOption>
       </RadioGroup>
 
-      <template v-if="!selectedPaymentSourceValue">
+      <template v-if="!selectedPaymentMethodValue">
         <div class="mt-6">
           <h3>Add a new credit card</h3>
           Enter your new credit card information:
@@ -61,7 +61,7 @@
         </div>
       </template>
 
-      <template v-if="!selectedPaymentSource || !selectedPaymentSource.org">
+      <template v-if="!selectedPaymentMethod || !selectedPaymentMethod.org">
         <div class="mt-8">
           <h2>Billing Address</h2>
 
@@ -119,7 +119,7 @@
       </field>
 
       <div class="mt-6 space-x-2">
-        <template v-if="!selectedPaymentSource || !selectedPaymentSource.org || selectedPaymentSource.org.canPurchase">
+        <template v-if="!selectedPaymentMethod || !selectedPaymentMethod.org || selectedPaymentMethod.org.canPurchase">
           <btn kind="primary" large @click="pay">Pay $XX</btn>
         </template>
         <template v-else>
@@ -161,7 +161,7 @@ export default {
 
   data() {
     return {
-      selectedPaymentSourceValue: null,
+      selectedPaymentMethodValue: null,
       billingInfo: {
         firstName: '',
         lastName: '',
@@ -183,8 +183,8 @@ export default {
   },
 
   watch: {
-    selectedPaymentSource() {
-      this.billingAddressId = this.selectedPaymentSource && this.selectedPaymentSource.org ? this.selectedPaymentSource.org.billingAddressId : null;
+    selectedPaymentMethod() {
+      this.billingAddressId = this.selectedPaymentMethod && this.selectedPaymentMethod.org ? this.selectedPaymentMethod.org.billingAddressId : null;
     }
   },
 
@@ -196,17 +196,17 @@ export default {
       addresses: state => state.addresses.addresses,
     }),
 
-    selectedPaymentSource() {
+    selectedPaymentMethod() {
       if (!this.paymentMethodsCheckout.length) {
         return null;
       }
 
-      return this.paymentMethodsCheckout.find(paymentSource => {
-        if (paymentSource.id === parseInt(this.selectedPaymentSourceValue)) {
+      return this.paymentMethodsCheckout.find(paymentMethod => {
+        if (paymentMethod.id === parseInt(this.selectedPaymentMethodValue)) {
           return true
         }
 
-        return !!(paymentSource.org && ('org-' + paymentSource.id) === this.selectedPaymentSourceValue);
+        return !!(paymentMethod.org && ('org-' + paymentMethod.id) === this.selectedPaymentMethodValue);
       })
     },
 
@@ -217,11 +217,11 @@ export default {
         cartData.billingAddressId = parseInt(this.billingAddressId)
       }
 
-      if (this.selectedPaymentSource) {
-        if (this.selectedPaymentSource.org) {
-          cartData.orgId = this.selectedPaymentSource.org.id
+      if (this.selectedPaymentMethod) {
+        if (this.selectedPaymentMethod.org) {
+          cartData.orgId = this.selectedPaymentMethod.org.id
         } else {
-          cartData.paymentSourceId = this.selectedPaymentSource.id;
+          cartData.paymentSourceId = this.selectedPaymentMethod.id;
         }
       }
 
@@ -235,7 +235,7 @@ export default {
     payData() {
       return {
         orderNumber: (this.cart ? this.cart.number : null),
-        token: this.selectedPaymentSource ? this.selectedPaymentSource.token : null,
+        token: this.selectedPaymentMethod ? this.selectedPaymentMethod.token : null,
         expectedPrice: (this.cart ? this.cart.totalPrice : null),
         // makePrimary: this.replaceCard,
       }
@@ -304,7 +304,7 @@ export default {
     requestApproval() {
       console.log('this.cart', this.cart.number)
       this.$store.dispatch('organizations/requestOrderApproval', {
-          organizationId: this.selectedPaymentSource.org.id,
+          organizationId: this.selectedPaymentMethod.org.id,
           orderNumber: this.cart.number,
         })
         .then(() => {

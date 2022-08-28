@@ -98,7 +98,7 @@ export default {
 
           this.$store.dispatch('cart/checkout', {
             orderNumber: this.cart.number,
-            // token: this.selectedPaymentSource.token,
+            // token: this.selectedPaymentMethod.token,
             // expectedPrice: this.cart.totalPrice,
             // // makePrimary: this.replaceCard,
           })
