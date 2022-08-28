@@ -152,6 +152,8 @@ class PaymentMethodsController extends BaseController
             'paymentSourceId',
             'billingAddressId',
         ]) + [
+            'token' => $paymentSource?->token,
+            'description' => $paymentSource?->description,
             'card' => $paymentSource?->getCard(),
             'isPrimary' => (bool) $paymentSource?->isPrimary,
         ];
