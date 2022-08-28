@@ -262,7 +262,7 @@ const router = createRouter({
       path: '/thank-you',
       name: 'ThankYou',
       component: () => import('../pages/thank-you.vue'),
-      meta: {sidebar: false, allowAnonymous: true}
+      meta: {layout: 'checkout'}
     },
 
     // Not found

@@ -16,7 +16,6 @@
       <h2>Credit Card</h2>
       <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentSourceValue">
         <template v-for="paymentSource in paymentMethodsCheckout">
-          <pre>{{paymentSource}}</pre>
           <RadioGroupOption
             class="ring-0 group"
             :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
@@ -235,9 +234,9 @@ export default {
 
     payData() {
       return {
-        orderNumber: this.cart.number,
+        orderNumber: (this.cart ? this.cart.number : null),
         token: this.selectedPaymentSource ? this.selectedPaymentSource.token : null,
-        expectedPrice: this.cart.totalPrice,
+        expectedPrice: (this.cart ? this.cart.totalPrice : null),
         // makePrimary: this.replaceCard,
       }
     },
@@ -287,6 +286,7 @@ export default {
             .then(() => {
               this.$store.dispatch('cart/resetCart')
               this.$store.dispatch('app/displayNotice', 'Payment success.')
+              this.$router.push({path: '/thank-you'})
             })
             .catch(() => {
               this.$store.dispatch('app/displayError', 'There was an error processing your payment.')
