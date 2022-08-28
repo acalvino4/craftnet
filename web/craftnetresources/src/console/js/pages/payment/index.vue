@@ -16,6 +16,7 @@
       <h2>Credit Card</h2>
       <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentSourceValue">
         <template v-for="paymentSource in paymentMethodsCheckout">
+          <pre>{{paymentSource}}</pre>
           <RadioGroupOption
             class="ring-0 group"
             :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
@@ -291,8 +292,8 @@ export default {
               this.$store.dispatch('app/displayError', 'There was an error processing your payment.')
             })
         })
-        .catch(() => {
-          this.$store.dispatch('app/displayError', 'Couldn’t save billing information.')
+        .catch((error) => {
+          this.$store.dispatch('app/displayError', error.response.data && error.response.data.message ? error.response.data.message : 'Couldn’t save billing information.')
         })
     },
 
