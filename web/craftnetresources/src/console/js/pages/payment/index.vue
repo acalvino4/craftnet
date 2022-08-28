@@ -15,8 +15,7 @@
     <div class="max-w-md">
       <h2>Credit Card</h2>
       <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentSourceValue">
-        <!-- Payment sources -->
-        <template v-for="paymentSource in paymentSources">
+        <template v-for="paymentSource in paymentMethodsCheckout">
           <RadioGroupOption
             class="ring-0 group"
             :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
@@ -167,17 +166,17 @@ export default {
   computed: {
     ...mapState({
       cart: state => state.cart.cart,
-      paymentSources: state => state.paymentMethods.paymentSources,
+      paymentMethodsCheckout: state => state.paymentMethods.paymentMethodsCheckout,
       user: state => state.account.user,
       addresses: state => state.addresses.addresses,
     }),
 
     selectedPaymentSource() {
-      if (!this.paymentSources) {
+      if (!this.paymentMethodsCheckout.length) {
         return null;
       }
 
-      return this.paymentSources.find(paymentSource => {
+      return this.paymentMethodsCheckout.find(paymentSource => {
         if (paymentSource.id === parseInt(this.selectedPaymentSourceValue)) {
           return true
         }
@@ -276,9 +275,9 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('paymentMethods/getPaymentSources')
+    this.$store.dispatch('paymentMethods/getPaymentMethodsCheckout')
       .catch(() => {
-        this.$store.dispatch('app/displayError', 'Couldn’t get payment sources.')
+        this.$store.dispatch('app/displayError', 'Couldn’t get payment methods.')
       })
 
     this.$store.dispatch('cart/getCart')

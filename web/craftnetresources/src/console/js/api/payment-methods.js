@@ -32,7 +32,7 @@ export default {
     return axios.get(VUE_APP_URL_CONSOLE + '/payment-methods')
   },
 
-  getPaymentSources() {
-    return axios.get(VUE_APP_URL_CONSOLE + '/cards/payment-sources')
+  getPaymentMethodsCheckout() {
+    return axios.get(VUE_APP_URL_CONSOLE + '/payment-methods/checkout')
   }
 }
