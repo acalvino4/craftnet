@@ -18,7 +18,7 @@
       >
         <dropdown
           :options="cardOptions"
-          v-model="paymentSourceId"
+          v-model="paymentMethodId"
         />
       </field>
       <field
@@ -54,7 +54,7 @@ export default {
     return {
       loading: false,
       saving: false,
-      paymentSourceId: null,
+      paymentMethodId: null,
       billingAddressId: null,
       requireOrderApproval: false,
     }
@@ -119,7 +119,7 @@ export default {
         fields: {
           requireOrderApproval: this.requireOrderApproval ? 1 : 0,
         },
-        paymentSourceId: this.paymentSourceId,
+        paymentMethodId: this.paymentMethodId,
         billingAddressId: this.billingAddressId,
       };
 
@@ -139,7 +139,7 @@ export default {
 
   mounted() {
     this.requireOrderApproval = this.currentOrganization.requireOrderApproval;
-    this.paymentSourceId = this.currentOrganization.paymentSourceId;
+    this.paymentMethodId = this.currentOrganization.paymentMethodId;
     this.billingAddressId = this.currentOrganization.billingAddressId;
 
     this.loading = true
