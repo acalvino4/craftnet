@@ -6,8 +6,8 @@ import paymentMethodsApi from '../../api/payment-methods'
 const state = {
   card: null,
   cardToken: null,
-  paymentMethods: null,
-  paymentSources: [],
+  paymentMethods: [],
+  paymentMethodsCheckout: [],
 }
 
 /**
@@ -19,19 +19,14 @@ const getters = {}
  * Actions
  */
 const actions = {
-  addCard({commit}, source) {
+  addCard(context, source) {
     return new Promise((resolve, reject) => {
       paymentMethodsApi.addCard(source)
         .then((response) => {
-          if (!response.data.error) {
-            commit('updateStripeCard', {card: response.data.card.card})
-            resolve(response)
-          } else {
-            reject(response)
-          }
+          resolve(response)
         })
         .catch((error) => {
-          reject(error.response)
+          reject(error)
         })
     })
   },
@@ -80,11 +75,11 @@ const actions = {
     })
   },
 
-  getPaymentSources({commit}) {
+  getPaymentMethodsCheckout({commit}) {
     return new Promise((resolve, reject) => {
-      paymentMethodsApi.getPaymentSources()
+      paymentMethodsApi.getPaymentMethodsCheckout()
         .then((response) => {
-          commit('updatePaymentSources', {paymentSources: response.data.paymentSources})
+          commit('updatePaymentMethodsCheckout', {paymentMethodsCheckout: response.data.paymentMethods})
           resolve(response)
         })
         .catch((error) => {
@@ -106,8 +101,8 @@ const mutations = {
     state.paymentMethods = paymentMethods
   },
 
-  updatePaymentSources(state, {paymentSources}) {
-    state.paymentSources = paymentSources
+  updatePaymentMethodsCheckout(state, {paymentMethodsCheckout}) {
+    state.paymentMethodsCheckout = paymentMethodsCheckout
   },
 
   updateCard(state, {card}) {

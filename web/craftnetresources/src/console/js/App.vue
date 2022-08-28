@@ -101,13 +101,8 @@ export default {
               // Load the cart
               this.$store.dispatch('cart/getCart')
                 .then(() => {
-                  // Load the current organization
-                  this.$store.dispatch('organizations/getCurrentOrganizationId')
-                    .then(() => {
-                      this.$store.commit('app/updateLoading', false)
-
-                      this._handleRoute(to, from, next)
-                    })
+                  this.$store.commit('app/updateLoading', false)
+                  this._handleRoute(to, from, next)
                 })
             })
         } else {

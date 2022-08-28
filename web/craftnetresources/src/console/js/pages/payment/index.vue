@@ -15,8 +15,7 @@
     <div class="max-w-md">
       <h2>Credit Card</h2>
       <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentSourceValue">
-        <!-- Payment sources -->
-        <template v-for="paymentSource in paymentSources">
+        <template v-for="paymentSource in paymentMethodsCheckout">
           <RadioGroupOption
             class="ring-0 group"
             :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
@@ -25,7 +24,7 @@
             <payment-method-option
               :name="paymentSource.card.brand + ' ' + paymentSource.card.last4 + ' '"
               :description=" paymentSource.card.exp_month + '/' + paymentSource.card.exp_year"
-              :info="paymentSource.org"
+              :info="(paymentSource.org ? paymentSource.org.name : null)"
               :value="(paymentSource.org ? 'org-' : '') + paymentSource.id"
               :credit-card="paymentSource"
               :active="active"
@@ -62,16 +61,43 @@
         </div>
       </template>
 
-      <div class="mt-8">
-        <h2>Billing Address</h2>
+      <template v-if="!selectedPaymentSource || !selectedPaymentSource.org">
+        <div class="mt-8">
+          <h2>Billing Address</h2>
 
-        <div class="mt-4">
-          <dropdown
-            :options="addressOptions"
-            v-model="billingAddressId"
-          />
+          <div class="mt-4 space-y-4">
+            <template v-for="address in addresses">
+              <div class="flex border-b py-4">
+                <div class="mt-1 mr-2">
+                  <input
+                    :id="'address-' + address.id"
+                    type="radio"
+                    :value="address.id"
+                    v-model="billingAddressId"
+                  />
+                </div>
+                <label class="flex flex-1" :for="'address-' + address.id">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-2">
+                      <div v-if="address.countryCode">{{address.countryCode}}</div>
+                      <div v-if="address.addressLine1">{{address.addressLine1}}</div>
+                      <div v-if="address.locality">{{address.locality}}</div>
+                      <div v-if="address.postalCode">{{address.postalCode}}</div>
+                    </div>
+                    <div class="text-sm font-mono text-gray-500">#{{address.id}}</div>
+                  </div>
+                  <div>
+                    <a href="#">Edit</a>
+                  </div>
+                </label>
+              </div>
+            </template>
+            <div>
+              <a href="#">+ Add a new billing address</a>
+            </div>
+          </div>
         </div>
-      </div>
+      </template>
 
       <h2 class="mt-8">More</h2>
       <checkbox
@@ -93,7 +119,7 @@
       </field>
 
       <div class="mt-6 space-x-2">
-        <template v-if="!selectedPaymentSource || selectedPaymentSource.canPurchase">
+        <template v-if="!selectedPaymentSource || !selectedPaymentSource.org || selectedPaymentSource.org.canPurchase">
           <btn kind="primary" large @click="pay">Pay $XX</btn>
         </template>
         <template v-else>
@@ -122,7 +148,6 @@ import {
 } from '@headlessui/vue'
 import PaymentMethodOption from '../../components/payment/PaymentMethodOption';
 import CardElement from '../../components/card/CardElement';
-import AddressFields from '../../components/billing/addresses/AddressFields';
 import PageHeader from '../../components/PageHeader';
 import {mapState} from 'vuex';
 
@@ -131,7 +156,6 @@ export default {
     RadioGroup, RadioGroupOption,
     PaymentMethodOption,
     CardElement,
-    AddressFields,
     PageHeader
   },
 
@@ -167,17 +191,17 @@ export default {
   computed: {
     ...mapState({
       cart: state => state.cart.cart,
-      paymentSources: state => state.paymentMethods.paymentSources,
+      paymentMethodsCheckout: state => state.paymentMethods.paymentMethodsCheckout,
       user: state => state.account.user,
       addresses: state => state.addresses.addresses,
     }),
 
     selectedPaymentSource() {
-      if (!this.paymentSources) {
+      if (!this.paymentMethodsCheckout.length) {
         return null;
       }
 
-      return this.paymentSources.find(paymentSource => {
+      return this.paymentMethodsCheckout.find(paymentSource => {
         if (paymentSource.id === parseInt(this.selectedPaymentSourceValue)) {
           return true
         }
@@ -236,7 +260,23 @@ export default {
 
       return options
     },
+
+    addressRadioOptions() {
+      const options = []
+
+      if (this.addresses) {
+        this.addresses.forEach(address => {
+          options.push({
+            label: '#' + address.id,
+            value: address.id,
+          })
+        })
+      }
+
+      return options
+    },
   },
+
 
   methods: {
     pay() {
@@ -276,9 +316,9 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('paymentMethods/getPaymentSources')
+    this.$store.dispatch('paymentMethods/getPaymentMethodsCheckout')
       .catch(() => {
-        this.$store.dispatch('app/displayError', 'Couldn’t get payment sources.')
+        this.$store.dispatch('app/displayError', 'Couldn’t get payment methods.')
       })
 
     this.$store.dispatch('cart/getCart')

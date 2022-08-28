@@ -68,7 +68,6 @@ export default {
     ...mapState({
       expiringCmsLicensesTotal: state => state.cmsLicenses.expiringCmsLicensesTotal,
       expiringPluginLicensesTotal: state => state.pluginLicenses.expiringPluginLicensesTotal,
-      currentOrganizationId: state => state.organizations.currentOrganizationId,
     }),
 
     ...mapGetters({

@@ -74,7 +74,7 @@ export default {
           card.clear()
           this.cardFormloading = false
           this.$store.dispatch('app/displayNotice', 'Card saved.')
-          this.$store.dispatch('stripe/getCards')
+          this.$store.dispatch('paymentMethods/getPaymentMethods')
           this.$emit('close')
         })
         .catch((response) => {

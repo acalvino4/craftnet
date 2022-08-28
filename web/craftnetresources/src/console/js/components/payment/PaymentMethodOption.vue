@@ -41,13 +41,19 @@
         <div class="text-right">
           <icon
             icon="credit-card"
-            class="w-5 h-5 text-gray-500" />
+            class="w-5 h-5 text-gray-500"
+          />
 
           <div>
             {{ creditCard.card.brand }} {{ creditCard.card.last4 }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">
             {{ creditCard.card.exp_month }}/{{ creditCard.card.exp_year }}
+
+
+            <div class="text-xs font-mono">
+              billingAddressId: {{creditCard.billingAddressId}}
+            </div>
           </div>
         </div>
       </template>

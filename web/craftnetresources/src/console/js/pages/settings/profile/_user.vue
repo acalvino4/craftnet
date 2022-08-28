@@ -204,7 +204,7 @@ export default {
           photoUrl: this.userDraft.photoUrl,
         })
         .then(() => {
-          this.$store.dispatch('app/displayNotice', 'Settings saved.')
+          this.$store.dispatch('app/displayNotice', 'Profile saved.')
           this.errors = {}
           this.loading.page = false
         })
