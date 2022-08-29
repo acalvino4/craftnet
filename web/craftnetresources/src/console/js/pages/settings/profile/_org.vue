@@ -55,6 +55,21 @@
       </template>
 
       <remove-organization />
+
+
+      <hr>
+
+      <div class="lg:flex lg:justify-between lg:items-center">
+        <div class="lg:mr-6">
+          <h4 class="font-bold">Transfer ownership</h4>
+          <p>Transfer organization to another user.</p>
+        </div>
+        <div class="mt-6 lg:mt-0">
+          <btn
+            kind="danger">Transfer
+          </btn>
+        </div>
+      </div>
     </pane>
   </div>
 </template>
