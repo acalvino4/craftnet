@@ -1,14 +1,10 @@
 /* global Craft */
 
-import axios from 'axios'
+import axios from './axios'
 
 export default {
   getPartner() {
-    return axios.post(Craft.actionUrl + '/craftnet/partners/fetch-partner', null, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/partners/fetch-partner')
   },
 
   patchPartner(data, files, partnerId) {
@@ -36,11 +32,7 @@ export default {
       formData.append('logo', files[0])
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData)
   },
 
   patchPartnerContact(data, files, partnerId) {
@@ -54,11 +46,7 @@ export default {
       formData.append(prop, data[prop])
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData)
   },
 
   patchPartnerLocations(locations, partnerId) {
@@ -77,11 +65,7 @@ export default {
       }
     })
 
-    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData)
   },
 
   patchPartnerProjects(projects, partnerId) {
@@ -109,11 +93,7 @@ export default {
       }
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/partners/patch-partner', formData)
   },
 
   uploadScreenshots(formData, config) {

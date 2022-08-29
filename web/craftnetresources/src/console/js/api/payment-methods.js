@@ -1,6 +1,6 @@
 /* global Craft, VUE_APP_URL_CONSOLE */
 
-import axios from 'axios'
+import axios from './axios'
 import qs from 'qs'
 
 export default {
@@ -8,11 +8,7 @@ export default {
     const id = data.id
     const isNew = !id
 
-    return axios.post(VUE_APP_URL_CONSOLE + '/payment-methods' + (!isNew ? '/' + id : ''), qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(VUE_APP_URL_CONSOLE + '/payment-methods' + (!isNew ? '/' + id : ''), qs.stringify(data))
   },
 
   removePaymentMethod(paymentMethodId) {
