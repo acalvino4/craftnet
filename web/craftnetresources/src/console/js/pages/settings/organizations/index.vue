@@ -64,15 +64,6 @@
       <pane>
         <invitation-mail />
       </pane>
-
-      <pane class="border border-red-500 mb-3">
-        <template v-slot:header>
-          <h2 class="mb-0 text-red-600">
-            Danger Zone</h2>
-        </template>
-
-        <convert-account-to-organization></convert-account-to-organization>
-      </pane>
     </div>
   </div>
 </template>
@@ -81,7 +72,6 @@
 import {mapActions, mapState} from 'vuex';
 import helpers from '@/console/js/mixins/helpers.js';
 import PageHeader from '@/console/js/components/PageHeader'
-import ConvertAccountToOrganization from '@/console/js/components/ConvertAccountToOrganization';
 import ProfilePhoto from '../../../components/ProfilePhoto';
 import InvitationMail from '../../../components/members/InvitationMail';
 
@@ -91,7 +81,6 @@ export default {
   components: {
     InvitationMail,
     ProfilePhoto,
-    ConvertAccountToOrganization,
     PageHeader,
   },
 
