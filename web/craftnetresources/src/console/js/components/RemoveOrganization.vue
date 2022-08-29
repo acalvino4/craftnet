@@ -1,15 +1,14 @@
 <template>
   <div class="lg:flex lg:justify-between lg:items-center">
     <div class="lg:mr-6">
-      <h3 class="font-bold">Remove this organization</h3>
+      <h4 class="font-bold">Remove this organization</h4>
       <p>Once you remove an organization, there’s no going back. Please be certain.</p>
     </div>
 
     <div class="mt-6 lg:mt-0">
       <btn
         kind="danger"
-        @click="openModal">Remove the
-        <strong>{{ currentOrganization.slug }}</strong> organization
+        @click="openModal">Remove this organization
       </btn>
 
       <TransitionRoot
