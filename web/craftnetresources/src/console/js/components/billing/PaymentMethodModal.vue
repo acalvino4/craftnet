@@ -30,17 +30,17 @@
       <template v-else>
         <div class="mt-2 border p-4 rounded-md">
           <div>{{ paymentMethod.card.brand }}</div>
+          <div>**** **** **** {{ paymentMethod.card.last4 }}</div>
           <div>{{ paymentMethod.card.exp_month }}/{{ paymentMethod.card.exp_year }}</div>
-          <div>{{ paymentMethod.card.last4 }}</div>
         </div>
       </template>
 
       <h3 class="mt-4">Billing</h3>
-      <template v-if="paymentMethod">
-        <div>
-          Billing Address ID: #{{paymentMethod.billingAddressId}}
-        </div>
-      </template>
+      <div>
+        <billing-address-options
+          v-model:billingAddressId="billingAddressId"
+        />
+      </div>
     </div>
 
     <template v-slot:footer>
@@ -72,9 +72,11 @@
 <script>
 import ModalHeadless from '../ModalHeadless';
 import CardElement from '../card/CardElement';
+import BillingAddressOptions from './BillingAddressOptions';
 
 export default {
   components: {
+    BillingAddressOptions,
     ModalHeadless,
     CardElement,
   },
@@ -90,12 +92,30 @@ export default {
     },
   },
 
+  watch: {
+    paymentMethod(paymentMethod) {
+      this.billingAddressId = paymentMethod ? paymentMethod.billingAddressId : null
+    }
+  },
+
   data() {
     return {
       stripe: null,
       elements: null,
       card: null,
       cardFormloading: false,
+      billingAddressId: null,
+    }
+  },
+
+  computed: {
+    localPaymentMethod: {
+      get() {
+        return this.paymentMethod
+      },
+      set(value) {
+        this.$emit('update:paymentMethod', value)
+      }
     }
   },
 
@@ -106,26 +126,48 @@ export default {
     save() {
       this.cardFormloading = true
 
-      this.$refs.cardElement.save()
-        .then(result => {
-          this.$store.dispatch('paymentMethods/addPaymentMethod', result.paymentMethod)
-            .then(() => {
-              this.$refs.cardElement.card.clear()
-              this.cardFormloading = false
-              this.$store.dispatch('app/displayNotice', 'Card saved.')
-              this.$store.dispatch('paymentMethods/getPaymentMethods')
-              this.$emit('close')
+      if (!this.paymentMethod) {
+        this._saveCard()
+          .then((result) => {
+            this._savePaymentMethod({
+              id: (this.paymentMethod ? this.paymentMethod.id : null),
+              paymentMethodId: result.paymentMethod.id,
+              billingAddressId: this.billingAddressId,
             })
-            .catch((response) => {
-              this.cardFormloading = false
-              const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
-              this.$store.dispatch('app/displayError', errorMessage)
-            })
+          })
+      } else {
+        this._savePaymentMethod({
+          id: (this.paymentMethod ? this.paymentMethod.id : null),
+          billingAddressId: this.billingAddressId,
         })
-        .catch(() => {
+      }
+    },
+
+    _saveCard() {
+      return this.$refs.cardElement.save()
+        // .catch(() => {
+        //   this.cardFormloading = false
+        //   this.$store.dispatch('app/displayError', 'Couldn’t save credit card.')
+        // })
+    },
+
+    _savePaymentMethod(payload) {
+      return this.$store.dispatch('paymentMethods/savePaymentMethod', payload)
+        .then(() => {
+          if (this.$refs.cardElement) {
+            this.$refs.cardElement.card.clear()
+          }
+
           this.cardFormloading = false
-          this.$store.dispatch('app/displayError', 'Couldn’t save credit card.')
+          this.$store.dispatch('app/displayNotice', 'Card saved.')
+          this.$store.dispatch('paymentMethods/getPaymentMethods')
+          this.$emit('close')
         })
+        // .catch((response) => {
+        //   this.cardFormloading = false
+        //   const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
+        //   this.$store.dispatch('app/displayError', errorMessage)
+        // })
     },
 
     /**

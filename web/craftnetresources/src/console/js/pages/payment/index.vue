@@ -65,37 +65,10 @@
         <div class="mt-8">
           <h2>Billing Address</h2>
 
-          <div class="mt-4 space-y-4">
-            <template v-for="address in addresses">
-              <div class="flex border-b py-4">
-                <div class="mt-1 mr-2">
-                  <input
-                    :id="'address-' + address.id"
-                    type="radio"
-                    :value="address.id"
-                    v-model="billingAddressId"
-                  />
-                </div>
-                <label class="flex flex-1" :for="'address-' + address.id">
-                  <div class="flex-1">
-                    <div class="flex items-center space-x-2">
-                      <div v-if="address.countryCode">{{address.countryCode}}</div>
-                      <div v-if="address.addressLine1">{{address.addressLine1}}</div>
-                      <div v-if="address.locality">{{address.locality}}</div>
-                      <div v-if="address.postalCode">{{address.postalCode}}</div>
-                    </div>
-                    <div class="text-sm font-mono text-gray-500">#{{address.id}}</div>
-                  </div>
-                  <div>
-                    <a href="#">Edit</a>
-                  </div>
-                </label>
-              </div>
-            </template>
-            <div>
-              <a href="#">+ Add a new billing address</a>
-            </div>
-          </div>
+          <billing-address-options
+            class="mt-4"
+            v-model:billingAddressId="billingAddressId"
+          />
         </div>
       </template>
 
@@ -150,9 +123,11 @@ import PaymentMethodOption from '../../components/payment/PaymentMethodOption';
 import CardElement from '../../components/card/CardElement';
 import PageHeader from '../../components/PageHeader';
 import {mapState} from 'vuex';
+import BillingAddressOptions from '../../components/billing/BillingAddressOptions';
 
 export default {
   components: {
+    BillingAddressOptions,
     RadioGroup, RadioGroupOption,
     PaymentMethodOption,
     CardElement,
@@ -193,7 +168,6 @@ export default {
       cart: state => state.cart.cart,
       paymentMethodsCheckout: state => state.paymentMethods.paymentMethodsCheckout,
       user: state => state.account.user,
-      addresses: state => state.addresses.addresses,
     }),
 
     selectedPaymentMethod() {
@@ -239,41 +213,6 @@ export default {
         expectedPrice: (this.cart ? this.cart.totalPrice : null),
         // makePrimary: this.replaceCard,
       }
-    },
-
-    addressOptions() {
-      const options = [
-        {
-          label: 'Select an address',
-          value: '',
-        },
-      ]
-
-      if (this.addresses) {
-        this.addresses.forEach(address => {
-          options.push({
-            label: '#' + address.id,
-            value: address.id,
-          })
-        })
-      }
-
-      return options
-    },
-
-    addressRadioOptions() {
-      const options = []
-
-      if (this.addresses) {
-        this.addresses.forEach(address => {
-          options.push({
-            label: '#' + address.id,
-            value: address.id,
-          })
-        })
-      }
-
-      return options
     },
   },
 
@@ -323,8 +262,6 @@ export default {
       })
 
     this.$store.dispatch('cart/getCart')
-
-    this.$store.dispatch('addresses/getAddresses')
   }
 }
 </script>

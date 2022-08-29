@@ -66,7 +66,7 @@
 
       <payment-method-modal
         :is-open="showPaymentMethodModal"
-        :payment-method="editPaymentMethod"
+        v-model:paymentMethod="editPaymentMethod"
         @close="closePaymentMethodModal"
       />
     </template>
@@ -114,7 +114,6 @@ export default {
     },
 
     edit(paymentMethod) {
-      console.log('edit', paymentMethod)
       this.showPaymentMethodModal = true
       this.editPaymentMethod = paymentMethod
     },
