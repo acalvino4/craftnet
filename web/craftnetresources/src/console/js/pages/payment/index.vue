@@ -159,7 +159,7 @@ export default {
 
   watch: {
     selectedPaymentMethod() {
-      this.billingAddressId = this.selectedPaymentMethod && this.selectedPaymentMethod.org ? this.selectedPaymentMethod.org.billingAddressId : null;
+      this.billingAddressId = this.selectedPaymentMethod && this.selectedPaymentMethod.billingAddressId ? this.selectedPaymentMethod.billingAddressId : null;
     }
   },
 
