@@ -11,7 +11,7 @@
           <a
             href="#"
             class="border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 flex items-center justify-center"
-            @click.prevent="showAddCardModal = true"
+            @click.prevent="showPaymentMethodModal = true"
           >
             <div>
               <icon
@@ -54,7 +54,13 @@
                       <template v-if="!paymentMethod.isPrimary">
                         <a href="#" @click.prevent="makePrimary(paymentMethod.id)">Make primary</a>
                       </template>
-                      <a href="#" @click.prevent="removeCard(paymentMethod.id)">Remove</a>
+                      <a href="#" @click.prevent="removePaymentMethod(paymentMethod.id)">Remove</a>
+                    </div>
+
+
+                    <div class="mt-4">
+                      <div class="text-xs font-mono text-gray-500">id: #{{paymentMethod.id}}</div>
+                      <div class="text-xs font-mono text-gray-500">billingAddressId: #{{paymentMethod.billingAddressId}}</div>
                     </div>
                   </div>
                 </div>
@@ -64,9 +70,9 @@
         </div>
       </div>
 
-      <add-card-modal
-        :is-open="showAddCardModal"
-        @close="showAddCardModal = false"
+      <payment-method-modal
+        :is-open="showPaymentMethodModal"
+        @close="showPaymentMethodModal = false"
       />
     </template>
   </div>
@@ -75,17 +81,17 @@
 <script>
 import {mapState} from 'vuex'
 import helpers from '../../mixins/helpers.js'
-import AddCardModal from './AddCardModal';
+import PaymentMethodModal from './PaymentMethodModal';
 
 export default {
-  components: {AddCardModal},
+  components: {PaymentMethodModal},
   mixins: [helpers],
 
   data() {
     return {
       loading: false,
-      removeCardLoading: false,
-      showAddCardModal: false,
+      removePaymentLoading: false,
+      showPaymentMethodModal: false,
     }
   },
 
@@ -97,21 +103,21 @@ export default {
 
   methods: {
     /**
-     * Removes a credit card.
+     * Removes a payment method.
      */
-    removeCard(paymentMethodId) {
+    removePaymentMethod(paymentMethodId) {
       if (!confirm("Are you sure you want to remove this credit card?")) {
         return null;
       }
 
-      this.removeCardLoading = true
-      this.$store.dispatch('paymentMethods/removeCard', paymentMethodId)
+      this.removePaymentLoading = true
+      this.$store.dispatch('paymentMethods/removePaymentMethod', paymentMethodId)
         .then(() => {
-          this.removeCardLoading = false
+          this.removePaymentLoading = false
           this.$store.dispatch('app/displayNotice', 'Card removed.')
         })
         .catch((response) => {
-          this.removeCardLoading = false
+          this.removePaymentLoading = false
           const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t remove credit card.'
           this.$store.dispatch('app/displayError', errorMessage)
         })

@@ -4,7 +4,7 @@ import axios from 'axios'
 import qs from 'qs'
 
 export default {
-  addCard(source) {
+  addPaymentMethod(source) {
     const data = {
       paymentMethodId: source.id
     }
@@ -16,16 +16,17 @@ export default {
     })
   },
 
-  savePaymentMethod({paymentMethodId, card}) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/payment-methods/' + paymentMethodId, qs.stringify(card), {
+  savePaymentMethod(data) {
+    const paymentMethodId = data.paymentMethodId
+    return axios.post(VUE_APP_URL_CONSOLE + '/payment-methods/' + paymentMethodId, qs.stringify(data), {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
     })
   },
 
-  removeCard(cardId) {
-    return axios.delete(VUE_APP_URL_CONSOLE + '/payment-methods/' + cardId)
+  removePaymentMethod(paymentMethodId) {
+    return axios.delete(VUE_APP_URL_CONSOLE + '/payment-methods/' + paymentMethodId)
   },
 
   getPaymentMethods() {

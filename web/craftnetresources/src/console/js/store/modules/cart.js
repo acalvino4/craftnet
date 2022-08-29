@@ -230,12 +230,8 @@ const actions = {
 
       api.updateCart(cart.number, data)
         .then((response) => {
-          if (!response.data.errors) {
-            commit('updateCart', {response: response.data})
-            resolve(response)
-          } else {
-            reject(response)
-          }
+          commit('updateCart', {response: response.data})
+          resolve(response)
         })
         .catch((response) => {
           reject(response)

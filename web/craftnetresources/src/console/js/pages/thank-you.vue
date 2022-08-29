@@ -10,7 +10,7 @@
     <p>
       <router-link
         class="nav-link"
-        to="/">Continue to Craft ID
+        to="/">Continue to Craft Console
       </router-link>
     </p>
   </div>
