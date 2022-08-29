@@ -5,7 +5,7 @@
         <p>
           <router-link
             class="nav-link"
-            to="/settings/orders"
+            :to="getPrefixedTo('/settings/orders')"
             exact>←
             Orders
           </router-link>
@@ -141,8 +141,11 @@ import invoicesApi from '../../../api/invoices'
 import BillingAddress from '../../../components/billing/BillingAddress'
 import CmsLicensesTable from '../../../components/licenses/CmsLicensesTable'
 import PluginLicensesTable from '../../../components/licenses/PluginLicensesTable'
+import helpers from '../../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
+
   components: {
     BillingAddress,
     CmsLicensesTable,
