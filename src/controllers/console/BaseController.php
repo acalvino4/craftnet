@@ -3,6 +3,7 @@
 namespace craftnet\controllers\console;
 
 use Craft;
+use craft\commerce\elements\Order;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\web\Controller;
@@ -290,4 +291,10 @@ abstract class BaseController extends Controller
 
         return $userId === $this->currentUser->id;
     }
+
+    protected static function transformOrder(Order $order): array
+    {
+        return $order->getAttributes();
+    }
+
 }

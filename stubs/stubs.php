@@ -1,4 +1,5 @@
 <?php
+
 namespace craft\elements;
 
 /**
@@ -7,6 +8,26 @@ namespace craft\elements;
  */
 class User {}
 
+// ---------------------------
+
+namespace craft\commerce\elements;
+
+/**
+ * @mixin \craftnet\behaviors\OrderBehavior
+ */
+class Order {}
+
+// ---------------------------
+
+namespace craft\commerce\elements\db;
+
+/**
+ * @mixin \craftnet\behaviors\OrderQueryBehavior
+ */
+class OrderQuery {}
+
+// ---------------------------
+
 namespace craft\commerce\models;
 
 /**
@@ -14,9 +35,13 @@ namespace craft\commerce\models;
  */
 class PaymentSource {}
 
+// ---------------------------
+
 namespace craft\commerce\behaviors;
 
 class CustomerBehavior {}
+
+// ---------------------------
 
 namespace craftnet\behaviors;
 

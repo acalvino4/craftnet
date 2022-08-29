@@ -86,6 +86,7 @@ return [
         'GET     orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/get-org',
         'POST    orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/save-org',
         'GET     orgs/<orgId:\d+>/orders' => 'craftnet/orgs/orders/get-orders',
+        'GET     orgs/<orgId:\d+>/orders/<orderNumber:.*>' => 'craftnet/orgs/orders/get-order',
         'POST    orgs/<orgId:\d+>/orders/<orderNumber:.*>/request-approval' => 'craftnet/orgs/orders/request-approval',
         'POST    orgs/<orgId:\d+>/orders/<orderNumber:.*>/reject-request' => 'craftnet/orgs/orders/reject-request',
         'GET     orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/get-members',
