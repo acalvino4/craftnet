@@ -35,7 +35,7 @@
         </div>
       </template>
 
-      <h3 class="mt-4">Billing</h3>
+      <h3 class="mt-4">Billing Address</h3>
       <div>
         <billing-address-options
           v-model:billingAddressId="billingAddressId"
