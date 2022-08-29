@@ -5,7 +5,7 @@
       class="card-element form-control mb-3"></div>
     <p
       id="card-errors"
-      class="text-red"
+      class="text-red-600"
       role="alert"></p>
   </div>
 </template>
@@ -14,11 +14,25 @@
 /* global Stripe */
 
 export default {
+  props: {
+    card: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+
   data() {
     return {
       stripe: null,
       elements: null,
-      card: null,
+      localCard: null,
+      mode: 'paymentMethod',
+    }
+  },
+
+  watch: {
+    localCard(card) {
+      this.$emit('update:card', card)
     }
   },
 
@@ -26,24 +40,39 @@ export default {
     /**
      * Save the credit card.
      */
-    save(cb, cbError) {
-      this.stripe.createSource(this.card)
-        .then(function(result) {
-          if (result.error) {
-            let errorElement = document.getElementById('card-errors');
-            errorElement.textContent = result.error.message;
-            cbError(result.error)
-          } else {
-            cb(result.source)
-          }
-        });
+    save() {
+      return new Promise((resolve, reject) => {
+        if (this.mode === 'source') {
+          this.stripe.createSource(this.localCard)
+            .then(function(result) {
+              if (result.error) {
+                let errorElement = document.getElementById('card-errors');
+                errorElement.textContent = result.error.message;
+                reject(result.error)
+              } else {
+                resolve(result)
+              }
+            });
+        } else {
+          this.stripe.createPaymentMethod('card', this.localCard)
+            .then(function(result) {
+              if (result.error) {
+                let errorElement = document.getElementById('card-errors');
+                errorElement.textContent = result.error.message;
+                reject(result.error)
+              } else {
+                resolve(result)
+              }
+            })
+        }
+      })
     },
   },
 
   mounted() {
     this.stripe = Stripe(window.stripePublicKey);
     this.elements = this.stripe.elements({locale: 'en'});
-    this.card = this.elements.create('card', {
+    this.localCard = this.elements.create('card', {
       hidePostalCode: true,
       style: {
         base: {
@@ -56,7 +85,7 @@ export default {
 
     // Vue likes to stay in control of $el but Stripe needs a real element
     const el = document.createElement('div')
-    this.card.mount(el)
+    this.localCard.mount(el)
 
     // this.$children cannot be used because it expects a VNode :(
     this.$refs.cardElement.appendChild(el)
