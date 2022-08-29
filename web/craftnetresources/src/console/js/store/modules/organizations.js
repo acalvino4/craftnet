@@ -83,10 +83,16 @@ const actions = {
   },
 
   getOrganizationMembers({commit}, {organizationId}) {
-    return organizationsApi.getOrganizationMembers({organizationId})
-            .then((response) => {
-              commit('updateMembers', response.data)
-            })
+    return new Promise((resolve, reject) => {
+      return organizationsApi.getOrganizationMembers({organizationId})
+        .then((response) => {
+          commit('updateMembers', response.data)
+          resolve(response)
+        })
+        .catch((response) => {
+          reject(response)
+        })
+    })
   },
 
   getOrganizations({commit}) {
