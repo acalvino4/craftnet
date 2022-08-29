@@ -13,6 +13,23 @@ use yii\web\Response;
 
 class OrdersController extends SiteController
 {
+    public function actionGetOrder(int $orgId, string $orderNumber): ?Response
+    {
+        $org = static::getOrgById($orgId);
+
+        if (!$org->canView($this->currentUser)) {
+            throw new ForbiddenHttpException();
+        }
+
+        $order = Order::find()->orgId($org->id)->number($orderNumber)->one();
+
+        if (!$order) {
+            throw new ForbiddenHttpException();
+        }
+
+        return $this->asSuccess(data: ['order' => self::transformOrder($order)]);
+    }
+
     /**
      * @throws NotFoundHttpException
      * @throws ForbiddenHttpException
