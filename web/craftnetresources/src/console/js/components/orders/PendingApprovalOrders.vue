@@ -38,11 +38,11 @@
             </template>
           </td>
           <td>
-            <template v-if="userIsOwner">
+            <template v-if="userIsOwner(user.id)">
 
             <div class="space-x-2">
-              <btn :disabled="!userIsOwner" kind="primary" @click="approveRequest(pendingOrder)">Approve</btn>
-              <btn :disabled="!userIsOwner" kind="danger" @click="rejectRequest(pendingOrder)">Reject</btn>
+              <btn :disabled="!userIsOwner(user.id)" kind="primary" @click="approveRequest(pendingOrder)">Approve</btn>
+              <btn :disabled="!userIsOwner(user.id)" kind="danger" @click="rejectRequest(pendingOrder)">Reject</btn>
             </div>
             </template>
 
@@ -74,17 +74,8 @@ export default {
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
+      userIsOwner: 'organizations/userIsOwner',
     }),
-
-    userIsOwner() {
-      if (!this.members) {
-        return false
-      }
-
-      return !!this.members.find(member => {
-        return (member.id === this.user.id && member.role === 'owner')
-      })
-    }
   },
 
   methods: {

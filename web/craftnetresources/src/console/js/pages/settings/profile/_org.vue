@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex'
+import {mapGetters, mapState} from 'vuex'
 
 export default {
   data() {
@@ -65,8 +65,13 @@ export default {
   },
 
   computed: {
+    ...mapState({
+      user: state => state.account.user,
+    }),
+
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
+      userIsOwner: 'organizations/userIsOwner',
     }),
   },
 
@@ -86,6 +91,10 @@ export default {
   },
 
   mounted() {
+    if (!this.userIsOwner(this.user.id)) {
+      this.$router.push('/')
+    }
+
     this.currentOrganizationDraft = JSON.parse(JSON.stringify(this.currentOrganization))
   }
 }

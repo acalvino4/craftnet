@@ -55,10 +55,12 @@ export default {
     ...mapState({
       addresses: state => state.addresses.addresses,
       paymentMethods: state => state.paymentMethods.paymentMethods,
+      user: state => state.account.user,
     }),
 
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
+      userIsOwner: 'organizations/userIsOwner',
     }),
 
     addressOptions() {
@@ -128,6 +130,10 @@ export default {
   },
 
   mounted() {
+    if (!this.userIsOwner(this.user.id)) {
+      this.$router.push('/')
+    }
+
     this.requireOrderApproval = this.currentOrganization.requireOrderApproval;
     this.paymentMethodId = this.currentOrganization.paymentMethodId;
 
