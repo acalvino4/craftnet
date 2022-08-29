@@ -56,6 +56,12 @@
                       </template>
                       <a href="#" @click.prevent="removeCard(paymentMethod.id)">Remove</a>
                     </div>
+
+
+                    <div class="mt-4">
+                      <div class="text-xs font-mono text-gray-500">id: #{{paymentMethod.id}}</div>
+                      <div class="text-xs font-mono text-gray-500">billingAddressId: #{{paymentMethod.billingAddressId}}</div>
+                    </div>
                   </div>
                 </div>
               </div>
