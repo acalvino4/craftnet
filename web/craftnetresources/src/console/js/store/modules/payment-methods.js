@@ -19,9 +19,9 @@ const getters = {}
  * Actions
  */
 const actions = {
-  addCard(context, source) {
+  addPaymentMethod(context, source) {
     return new Promise((resolve, reject) => {
-      paymentMethodsApi.addCard(source)
+      paymentMethodsApi.addPaymentMethod(source)
         .then((response) => {
           resolve(response)
         })
@@ -43,15 +43,14 @@ const actions = {
     })
   },
 
-  removeCard({dispatch}, cardId) {
-    console.log('cardId', cardId)
+  removePaymentMethod({dispatch}, paymentMethodId) {
     return new Promise((resolve, reject) => {
-      paymentMethodsApi.removeCard(cardId)
-        .then((removeCardResponse) => {
+      paymentMethodsApi.removePaymentMethod(paymentMethodId)
+        .then((removePaymentMethodResponse) => {
           dispatch('getPaymentMethods')
             .then((getPaymentMethodsResponse) => {
               resolve({
-                removeCardResponse,
+                removePaymentMethodResponse,
                 getPaymentMethodsResponse
               })
             })

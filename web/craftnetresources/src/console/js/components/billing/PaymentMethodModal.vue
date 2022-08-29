@@ -69,7 +69,7 @@ export default {
      * @param source
      */
     saveCardForm(card, source) {
-      this.$store.dispatch('paymentMethods/addCard', source)
+      this.$store.dispatch('paymentMethods/addPaymentMethod', source)
         .then(() => {
           card.clear()
           this.cardFormloading = false

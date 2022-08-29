@@ -4,7 +4,7 @@ import axios from 'axios'
 import qs from 'qs'
 
 export default {
-  addCard(source) {
+  addPaymentMethod(source) {
     const data = {
       paymentMethodId: source.id
     }
@@ -25,8 +25,8 @@ export default {
     })
   },
 
-  removeCard(cardId) {
-    return axios.delete(VUE_APP_URL_CONSOLE + '/payment-methods/' + cardId)
+  removePaymentMethod(paymentMethodId) {
+    return axios.delete(VUE_APP_URL_CONSOLE + '/payment-methods/' + paymentMethodId)
   },
 
   getPaymentMethods() {
