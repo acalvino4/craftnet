@@ -3,13 +3,15 @@
     <div class="flex items-center justify-between">
       <h1 class="m-0">Members</h1>
 
-      <div>
-        <btn
-          kind="primary"
-          @click="showInviteMembersModal = true">
-          Invite members
-        </btn>
-      </div>
+      <template v-if="userIsOwner(user.id)">
+        <div>
+          <btn
+            kind="primary"
+            @click="showInviteMembersModal = true">
+            Invite members
+          </btn>
+        </div>
+      </template>
     </div>
 
     <div class="mt-6 pb-24">
@@ -63,7 +65,9 @@
       </table>
     </div>
 
-    <invitations />
+    <template v-if="userIsOwner(user.id)">
+      <invitations />
+    </template>
 
     <change-member-role-modal
       :showChangeMemberRoleModal="showChangeMemberRoleModal"
@@ -102,9 +106,11 @@ export default {
   computed: {
     ...mapState({
       members: state => state.organizations.members,
+      user: state => state.account.user,
     }),
     ...mapGetters({
-      currentOrganization: 'organizations/currentOrganization'
+      currentOrganization: 'organizations/currentOrganization',
+      userIsOwner: 'organizations/userIsOwner'
     }),
   },
 
