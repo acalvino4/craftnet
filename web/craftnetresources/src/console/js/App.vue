@@ -84,7 +84,6 @@ export default {
     initRouterBeforeEach() {
       // Make things happen before each route change
       this.$router.beforeEach((to, from, next) => {
-        console.log('before each', to, from, next)
         if (!this.$refs) {
           return
         }
@@ -98,7 +97,6 @@ export default {
         this.$store.commit('app/updateLoading', true)
         this.loadAccount()
           .then(() => {
-            console.log('then load account')
             this.loadCurrentOrg(to)
               .then(() => {
                 this.$store.commit('app/updateLoading', false)
