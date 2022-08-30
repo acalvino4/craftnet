@@ -325,10 +325,6 @@ export default {
     if (this.hasApiToken) {
       this.apiToken = '****************************************'
     }
-
-    if (!this.currentOrganization) {
-      this.$router.push({path: '/settings'})
-    }
   },
 }
 </script>
