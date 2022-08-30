@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     ...mapState({
-      orders: state => state.organizations.orders,
+      orders: state => state.orders.orders,
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
@@ -59,7 +59,7 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('organizations/getOrders', {
+    this.$store.dispatch('orders/getOrders', {
         organizationId: this.currentOrganization.id
       })
       .then(() => {

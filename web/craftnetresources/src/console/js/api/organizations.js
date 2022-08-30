@@ -1,4 +1,5 @@
-/* global VUE_APP_URL_CONSOLE, Craft */
+/* global VUE_APP_URL_CONSOLE */
+
 import axios from './axios';
 import qs from 'qs';
 
