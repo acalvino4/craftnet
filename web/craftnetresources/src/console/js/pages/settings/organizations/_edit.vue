@@ -77,6 +77,11 @@ export default {
   methods: {
     save() {
       this.$store.dispatch('organizations/saveOrganization', this.organization)
+        .then((response) => {
+          this.$store.dispatch('app/displayNotice', "Organization saved.")
+          const orgSlug = this.organization.slug ? this.organization.slug : response.data.model.slug
+          this.$router.push('/organizations/' + orgSlug)
+        })
     }
   }
 }

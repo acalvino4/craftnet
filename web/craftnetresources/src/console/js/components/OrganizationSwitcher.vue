@@ -189,7 +189,6 @@ export default {
     },
 
     newOrganization() {
-      this.$store.commit('organizations/updateCurrentOrganization', null)
       this.$router.push({path: '/settings/organizations/new'})
     }
   },
