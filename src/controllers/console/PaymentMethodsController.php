@@ -3,6 +3,7 @@
 namespace craftnet\controllers\console;
 
 use Craft;
+use craft\base\Element;
 use craft\commerce\Plugin;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
@@ -20,7 +21,7 @@ class PaymentMethodsController extends BaseController
     {
         $isNew = !$paymentMethodId;
         $description = $this->request->getBodyParam('description');
-        $billingAddressParams = $this->request->getBodyParam('billingAddress', []);
+        $billingAddressParam = $this->request->getBodyParam('billingAddress', []);
         $makePrimary = (bool) $this->request->getBodyParam('makePrimary', false);
         $paymentMethod = $isNew
             ? new PaymentMethodRecord()
@@ -34,6 +35,16 @@ class PaymentMethodsController extends BaseController
         }
 
         Plugin::getInstance()->getCustomers()->ensureCustomer($this->currentUser);
+
+        $billingAddress = $paymentMethod->billingAddress ?? new Address();
+        $billingAddress->title = "Billing address for payment method";
+        $billingAddress->ownerId = $this->currentUser->id;
+        $billingAddress->setScenario(Element::SCENARIO_LIVE);
+        $billingAddress->setAttributes($billingAddressParam);
+
+        if (!Craft::$app->getElements()->saveElement($billingAddress)) {
+            return $this->asModelFailure($billingAddress);
+        }
 
         if ($isNew) {
             $gateway = Commerce::getInstance()
@@ -67,24 +78,12 @@ class PaymentMethodsController extends BaseController
             throw new BadRequestHttpException();
         }
 
-        $billingAddress = $isNew
-            ? Craft::createObject(Address::class)
-            : $paymentMethod->billingAddress;
-
-        if ($billingAddressParams) {
-            $billingAddress->setAttributes($billingAddressParams);
-
-            if (!Craft::$app->getElements()->saveElement($billingAddress)) {
-                throw new BadRequestHttpException();
-            }
-        }
-
         if ($makePrimary) {
             $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
             $this->currentUser->setPrimaryBillingAddressId($billingAddress->id);
 
             if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
-                throw new BadRequestHttpException();
+                return $this->asModelFailure($this->currentUser);
             }
         }
 
