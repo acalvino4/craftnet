@@ -105,10 +105,6 @@ class PaymentMethodsController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        if ($paymentMethod->getOrgs()->exists() && !Craft::$app->getUser()->getHasElevatedSession()) {
-            return $this->getElevatedSessionResponse();
-        }
-
         // Payment method will be deleted by cascade
         $deleted = Commerce::getInstance()
             ->getPaymentSources()

@@ -125,10 +125,6 @@ class OrgsController extends SiteController
 
         $element->setFieldValuesFromRequest('fields');
 
-        if (!$element->enabled && !Craft::$app->getUser()->getHasElevatedSession()) {
-            return $this->getElevatedSessionResponse();
-        }
-
         if ($element->enabled && $element->getEnabledForSite()) {
             $element->setScenario(Element::SCENARIO_LIVE);
         }

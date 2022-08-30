@@ -92,12 +92,6 @@ class MembersController extends SiteController
             throw new BadRequestHttpException('Member is already specified role.');
         }
 
-        if ($role === MemberRoleEnum::Owner() || $this->currentUser->id === $user->id) {
-            if (!Craft::$app->getUser()->getHasElevatedSession()) {
-                return $this->getElevatedSessionResponse();
-            }
-        }
-
         return $org->setMemberRole($user, $role) ? $this->asSuccess() : $this->asFailure();
     }
 
