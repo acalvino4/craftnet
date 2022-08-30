@@ -48,38 +48,31 @@
         your developer page on the Plugin Store.</p>
     </form>
 
-    <pane class="mt-6 border border-red-500 mb-3">
-      <template v-slot:header>
-        <h2 class="mb-0 text-red-600">
-          Danger Zone</h2>
-      </template>
+    <template v-if="currentMember.role === 'owner'">
+      <pane class="mt-6 border border-red-500 mb-3">
+        <template v-slot:header>
+          <h2 class="mb-0 text-red-600">
+            Danger Zone</h2>
+        </template>
 
-      <remove-organization />
+        <remove-organization />
 
 
-      <hr>
+        <hr>
 
-      <div class="lg:flex lg:justify-between lg:items-center">
-        <div class="lg:mr-6">
-          <h4 class="font-bold">Transfer ownership</h4>
-          <p>Transfer organization to another user.</p>
-        </div>
-        <div class="mt-6 lg:mt-0">
-          <btn
-            kind="danger">Transfer
-          </btn>
-        </div>
-      </div>
-    </pane>
+        <transfer-ownership />
+      </pane>
+    </template>
   </div>
 </template>
 
 <script>
 import {mapGetters, mapState} from 'vuex'
 import RemoveOrganization from '../../../components/organizations/RemoveOrganization';
+import TransferOwnership from '../../../components/organizations/TransferOwnership';
 
 export default {
-  components: {RemoveOrganization},
+  components: {TransferOwnership, RemoveOrganization},
   data() {
     return {
       loading: {

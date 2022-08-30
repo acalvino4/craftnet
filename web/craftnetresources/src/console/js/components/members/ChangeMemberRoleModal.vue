@@ -2,10 +2,11 @@
   <modal-headless
     :isOpen="showChangeMemberRoleModal"
     @close="$emit('close')">
-    <h2>Change member {{member.id}}’s role</h2>
+    <h2>Change member role</h2>
+    <p class="mt-1 text-gray-500">Change {{member.name}}’s role.</p>
 
     <div class="mt-4">
-      <h3 class="text-base font-bold">Permissions</h3>
+      <h3 class="text-base font-bold">Role</h3>
       <div class="mt-2 space-y-2">
         <div class="border-t py-2 flex items-start">
           <div class="w-36">
@@ -43,12 +44,11 @@
     </div>
 
     <template v-slot:footer>
+      <template v-if="loading">
+        <spinner />
+      </template>
       <btn @click="$emit('close')">Cancel</btn>
-      <btn kind="primary" @click="setRole({
-        organizationId: currentOrganization.id,
-        userId: member.id,
-        role,
-      })">Change</btn>
+      <btn :disabled="loading || member.role === role" kind="primary" @click="changeRole">Change</btn>
     </template>
   </modal-headless>
 </template>
@@ -80,6 +80,30 @@ export default {
     ...mapActions({
       setRole: 'organizations/setRole',
     }),
+    changeRole() {
+      if (this.member.role === this.role) {
+        return;
+      }
+
+      this.loading = true
+
+      this.setRole({
+        organizationId: this.currentOrganization.id,
+        userId: this.member.id,
+        role: this.role,
+      })
+        .then(() => {
+          this.$store.dispatch('organizations/getOrganizationMembers', {
+              organizationId: this.currentOrganization.id,
+            })
+            .then(() => {
+              this.$store.dispatch('app/displayNotice', 'Member role changed.')
+
+              this.loading = false
+              this.$emit('close')
+            })
+        })
+    }
   },
 
   watch: {
@@ -90,8 +114,9 @@ export default {
 
   data() {
     return {
+      loading: false,
       role: null,
     }
-  }
+  },
 }
 </script>
