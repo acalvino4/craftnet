@@ -31,6 +31,7 @@ use yii\db\Exception;
 
 /**
  * @property Order $owner
+ * @property Org $org
  */
 class OrderBehavior extends Behavior
 {
@@ -322,6 +323,11 @@ class OrderBehavior extends Behavior
     public function hasCustomer(User $user): bool
     {
         return $user->id === $this->owner->customerId;
+    }
+
+    public function canViewOrder(User $user): bool
+    {
+        return $this->hasCustomer($user) || ($this->org?->canViewOrders($user) ?? false);
     }
 
     /**

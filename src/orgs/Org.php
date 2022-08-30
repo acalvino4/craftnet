@@ -579,6 +579,11 @@ class Org extends Element
         return $user->admin || $this->hasOwner($user);
     }
 
+    public function canViewOrders(User $user): bool
+    {
+        return $this->hasMember($user);
+    }
+
     public function canView(User $user): bool
     {
         return $user->admin || $this->hasOwner($user) || $this->hasMember($user);
