@@ -3,6 +3,7 @@
 namespace craftnet\controllers\console;
 
 use Craft;
+use craft\base\Element;
 use craft\commerce\Plugin;
 use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
@@ -20,7 +21,7 @@ class PaymentMethodsController extends BaseController
     {
         $isNew = !$paymentMethodId;
         $description = $this->request->getBodyParam('description');
-        $billingAddressParams = $this->request->getBodyParam('billingAddress', []);
+        $billingAddressParam = $this->request->getBodyParam('billingAddress', []);
         $makePrimary = (bool) $this->request->getBodyParam('makePrimary', false);
         $paymentMethod = $isNew
             ? new PaymentMethodRecord()
@@ -63,20 +64,41 @@ class PaymentMethodsController extends BaseController
             }
         }
 
-        if (!$paymentSource) {
+        if (!$paymentSource->id) {
             throw new BadRequestHttpException();
         }
 
-        $billingAddress = $isNew
-            ? Craft::createObject(Address::class)
-            : $paymentMethod->billingAddress;
+        $billingAddress = $paymentMethod->billingAddress ?? Craft::createObject(Address::class);
 
-        if ($billingAddressParams) {
-            $billingAddress->setAttributes($billingAddressParams);
+        if ($billingAddressParam) {
+            $billingAddress->title = "Billing address for $paymentSource->description";
+            $billingAddress->ownerId = $this->currentUser->id;
+            $billingAddress->setScenario(Element::SCENARIO_LIVE);
+            $billingAddress->setAttributes($billingAddressParam);
 
             if (!Craft::$app->getElements()->saveElement($billingAddress)) {
-                throw new BadRequestHttpException();
+
+                // Clean up orphaned payment source
+                if ($isNew) {
+                    Commerce::getInstance()
+                        ->getPaymentSources()
+                        ->deletePaymentSourceById($paymentSource->id);
+                }
+
+                return $this->asModelFailure($billingAddress);
             }
+        }
+
+        if (!$billingAddress->id) {
+            throw new BadRequestHttpException();
+        }
+
+        $paymentMethod->paymentSourceId = $paymentSource->id;
+        $paymentMethod->billingAddressId = $billingAddress->id;
+        $paymentMethod->ownerId = $this->currentUser->id;
+
+        if (!$paymentMethod->save()) {
+            $this->asFailure();
         }
 
         if ($makePrimary) {
@@ -84,17 +106,11 @@ class PaymentMethodsController extends BaseController
             $this->currentUser->setPrimaryBillingAddressId($billingAddress->id);
 
             if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
-                throw new BadRequestHttpException();
+                return $this->asModelFailure($this->currentUser);
             }
         }
 
-        $paymentMethod->paymentSourceId = $paymentSource->id;
-        $paymentMethod->billingAddressId = $billingAddress->id;
-        $paymentMethod->ownerId = $this->currentUser->id;
-
-        return $paymentMethod->save()
-            ? $this->asSuccess('Payment method saved.')
-            : $this->asFailure();
+        return $this->asSuccess('Payment method saved.');
     }
 
     public function actionDeletePaymentMethod(int $paymentMethodId): Response
@@ -105,12 +121,7 @@ class PaymentMethodsController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        // Payment method will be deleted by cascade
-        $deleted = Commerce::getInstance()
-            ->getPaymentSources()
-            ->deletePaymentSourceById($paymentMethod->paymentSource->id);
-
-        return $deleted ? $this->asSuccess('Payment method deleted.') : $this->asFailure();
+        return $paymentMethod->delete() ? $this->asSuccess('Payment method deleted.') : $this->asFailure();
     }
     public function actionGetPaymentMethods(): Response
     {

@@ -102,10 +102,8 @@ export default {
      */
     makePrimary(paymentMethodId) {
       this.$store.dispatch('paymentMethods/savePaymentMethod', {
-        paymentMethodId,
-        card: {
-          makePrimary: true,
-        }
+        id: paymentMethodId,
+        makePrimary: true,
       })
         .then(() => {
           this.$store.dispatch('app/displayNotice', 'Card set as primary.')
