@@ -99,7 +99,6 @@ export default {
 
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner',
       currentMember: 'organizations/currentMember',
     }),
   },
