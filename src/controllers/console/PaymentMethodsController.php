@@ -5,6 +5,7 @@ namespace craftnet\controllers\console;
 use Craft;
 use craft\commerce\Plugin;
 use craft\commerce\Plugin as Commerce;
+use craft\elements\Address;
 use craft\helpers\App;
 use craftnet\orgs\Org;
 use craftnet\paymentmethods\PaymentMethodRecord;
@@ -19,6 +20,7 @@ class PaymentMethodsController extends BaseController
     {
         $isNew = !$paymentMethodId;
         $description = $this->request->getBodyParam('description');
+        $billingAddressParams = $this->request->getBodyParam('billingAddress', []);
         $makePrimary = (bool) $this->request->getBodyParam('makePrimary', false);
         $paymentMethod = $isNew
             ? new PaymentMethodRecord()
@@ -30,8 +32,6 @@ class PaymentMethodsController extends BaseController
         if (!$paymentMethod) {
             throw new NotFoundHttpException();
         }
-
-        $billingAddressId = $this->request->getBodyParam('billingAddressId', $paymentMethod->billingAddressId);
 
         Plugin::getInstance()->getCustomers()->ensureCustomer($this->currentUser);
 
@@ -67,9 +67,21 @@ class PaymentMethodsController extends BaseController
             throw new BadRequestHttpException();
         }
 
+        $billingAddress = $isNew
+            ? Craft::createObject(Address::class)
+            : $paymentMethod->billingAddress;
+
+        if ($billingAddressParams) {
+            $billingAddress->setAttributes($billingAddressParams);
+
+            if (!Craft::$app->getElements()->saveElement($billingAddress)) {
+                throw new BadRequestHttpException();
+            }
+        }
+
         if ($makePrimary) {
             $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
-            $this->currentUser->setPrimaryBillingAddressId($billingAddressId);
+            $this->currentUser->setPrimaryBillingAddressId($billingAddress->id);
 
             if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
                 throw new BadRequestHttpException();
@@ -77,7 +89,7 @@ class PaymentMethodsController extends BaseController
         }
 
         $paymentMethod->paymentSourceId = $paymentSource->id;
-        $paymentMethod->billingAddressId = $billingAddressId;
+        $paymentMethod->billingAddressId = $billingAddress->id;
         $paymentMethod->ownerId = $this->currentUser->id;
 
         return $paymentMethod->save()

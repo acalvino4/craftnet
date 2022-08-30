@@ -121,9 +121,7 @@ return [
         'POST    orders/<orderNumber:.*>/request-approval' => 'craftnet/console/orders/request-approval',
         'POST    orders/<orderNumber:.*>/reject-request' => 'craftnet/console/orders/reject-request',
 
-        'GET     invoices' => 'craftnet/console/invoices/get-invoices-for-user',
         'GET     invoices/subscriptions' => 'craftnet/console/invoices/get-subscription-invoices',
-        'GET     invoices/<number:.*>' => 'craftnet/console/invoices/get-invoice-by-number',
 
         'GET     session' => 'users/session-info',
         'POST    session' => 'users/login',
