@@ -137,11 +137,13 @@
 </template>
 
 <script>
+// import ordersApi from '../../../api/orders'
 import invoicesApi from '../../../api/invoices'
 import BillingAddress from '../../../components/billing/BillingAddress'
 import CmsLicensesTable from '../../../components/licenses/CmsLicensesTable'
 import PluginLicensesTable from '../../../components/licenses/PluginLicensesTable'
 import helpers from '../../../mixins/helpers';
+import {mapGetters} from 'vuex';
 
 export default {
   mixins: [helpers],
@@ -160,13 +162,31 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+  },
+
   mounted() {
-    const invoiceNumber = this.$route.params.number
+    const orderNumber = this.$route.params.number
+    const orgId = this.currentOrganization ? this.currentOrganization.id : null
 
     this.loading = true
     this.error = false
 
-    invoicesApi.getInvoiceByNumber(invoiceNumber)
+    // ordersApi.getOrder(orderNumber, orgId)
+    //   .then((response) => {
+    //     this.invoice = response.data.invoice
+    //     this.loading = false
+    //   })
+    //
+    //   .catch(() => {
+    //     this.loading = false
+    //     this.error = true
+    //   })
+
+    invoicesApi.getInvoiceByNumber(orderNumber)
       .then((response) => {
         this.invoice = response.data.invoice
         this.loading = false

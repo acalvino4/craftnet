@@ -4,6 +4,16 @@ import axios from './axios';
 import qs from 'qs';
 
 export default {
+  getOrder(orderNumber, orgId) {
+    const query = {}
+
+    if (orgId) {
+      query.orgId = orgId
+    }
+
+    return axios.get(VUE_APP_URL_CONSOLE + '/orders/' + orderNumber + '?' + qs.stringify(query));
+  },
+
   getOrders(organizationId) {
     const query = qs.stringify({
       orgId: organizationId,
