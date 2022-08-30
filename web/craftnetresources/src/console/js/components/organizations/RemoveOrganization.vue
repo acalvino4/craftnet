@@ -76,7 +76,7 @@
                       kind="danger"
                       :disabled="currentOrganization.slug !== slug"
                       type="button"
-                      @click="closeModal"
+                      @click="removeOrg"
                     >
                       Remove the
                       <strong>{{ currentOrganization.slug }}</strong>
@@ -99,8 +99,10 @@
 </template>
 
 <script>
-import {mapGetters, mapState} from 'vuex';
+import {mapGetters, mapState, useStore} from 'vuex';
 import {ref} from 'vue'
+import {useRouter} from 'vue-router';
+
 import {
   TransitionRoot,
   TransitionChild,
@@ -119,8 +121,11 @@ export default {
   },
 
   setup() {
+    const store = useStore()
     const isOpen = ref(false)
     const slug = ref(null)
+    const currentOrganization = store.getters['organizations/currentOrganization']
+    const router = useRouter()
 
     return {
       isOpen,
@@ -130,6 +135,20 @@ export default {
       },
       openModal() {
         isOpen.value = true
+      },
+      removeOrg() {
+          store.dispatch('organizations/saveOrganization', {
+            ...currentOrganization,
+            enabled: 0,
+          })
+            .then(() => {
+              isOpen.value = false
+              store.dispatch('app/displayNotice', "Organization removed.")
+              router.push('/')
+            })
+            .catch(() => {
+              store.dispatch('app/displayError', "Organization could not be removed.")
+            })
       },
     }
   },
