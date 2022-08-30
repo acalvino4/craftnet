@@ -25,7 +25,6 @@
 import {mapGetters} from 'vuex';
 import OrgBilling from './_org';
 import UserBilling from './_user';
-import {checkRoute} from '../../../helpers/check-route';
 
 export default {
   components: {
@@ -40,15 +39,5 @@ export default {
       currentOrganization: 'organizations/currentOrganization'
     }),
   },
-
-  mounted() {
-    checkRoute( {
-      currentOrganization: this.currentOrganization,
-      $router: this.$router,
-      $route: this.$route,
-      orgRouteName: 'OrgBilling',
-      userRouteName: 'UserBilling'
-    })
-  }
 }
 </script>

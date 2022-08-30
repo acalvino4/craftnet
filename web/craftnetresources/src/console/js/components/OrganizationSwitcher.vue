@@ -193,19 +193,5 @@ export default {
       this.$router.push({path: '/settings/organizations/new'})
     }
   },
-
-  watch: {
-    $route() {
-      const currentOrgSlug = (this.$route.params && this.$route.params.orgSlug ? this.$route.params.orgSlug : null);
-      this.$store.commit('organizations/updateCurrentOrgSlug', currentOrgSlug)
-
-      if (this.currentOrganization) {
-        this.$store.dispatch('organizations/getOrganizationMembers', {
-          organizationId: this.currentOrganization.id
-        })
-      }
-    }
-  },
-
 }
 </script>

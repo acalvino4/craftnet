@@ -55,6 +55,7 @@ export default {
       organizations: state => state.organizations.organizations,
       loading: state => state.app.loading,
       user: state => state.account.user,
+      currentOrgSlug: state => state.organizations.currentOrgSlug,
     }),
 
     ...mapGetters({
@@ -81,55 +82,96 @@ export default {
 
   methods: {
     initRouterBeforeEach() {
-      const vueApp = this;
-
       // Make things happen before each route change
       this.$router.beforeEach((to, from, next) => {
-        if (!vueApp.$refs) {
+        console.log('before each', to, from, next)
+        if (!this.$refs) {
           return
         }
 
         // Renew the auth manager’s session
-        if (vueApp.$refs.authManager) {
-          vueApp.$refs.authManager.renewSession()
+        if (this.$refs.authManager) {
+          this.$refs.authManager.renewSession()
         }
 
         // Load the user
-        if (!vueApp.$store.state.account.user) {
-          vueApp.$store.dispatch('account/loadAccount')
+        this.$store.commit('app/updateLoading', true)
+        this.loadAccount()
+          .then(() => {
+            console.log('then load account')
+            this.loadCurrentOrg(to)
+              .then(() => {
+                this.$store.commit('app/updateLoading', false)
+                this.handleRoute(to, from, next)
+              })
+          })
+      })
+    },
+
+    loadAccount() {
+      return new Promise((resolve, reject) => {
+        // Load the user
+        if (!this.$store.state.account.user) {
+          this.$store.dispatch('account/loadAccount')
             .then(() => {
-              // Load the cart
               this.$store.dispatch('cart/getCart')
                 .then(() => {
-                  this.$store.commit('app/updateLoading', false)
-                  this._handleRoute(to, from, next)
+                  resolve()
+                })
+                .catch(() => {
+                  reject()
                 })
             })
+            .catch(() => {
+              reject()
+            })
         } else {
-          this._handleRoute(to, from, next)
+          resolve()
         }
       })
     },
 
-    _handleRoute(to, from, next) {
-      const vueApp = this
+    loadCurrentOrg(to) {
+      return new Promise((resolve, reject) => {
+        const currentOrgSlug = (to.params && to.params.orgSlug ? to.params.orgSlug : null);
 
-      if (vueApp.$store.state.account.user) {
+        if (this.currentOrgSlug !== currentOrgSlug) {
+          this.$store.commit('organizations/updateCurrentOrgSlug', currentOrgSlug)
+
+          if (this.currentOrganization) {
+            this.getOrgMembers()
+              .then(() => {
+                resolve()
+              })
+              .catch(() => {
+                reject()
+              })
+          } else {
+            resolve()
+          }
+        } else {
+          resolve()
+        }
+      })
+    },
+
+    handleRoute(to, from, next) {
+      if (this.$store.state.account.user) {
         // Logged in user
 
         // Renew the auth manager’s session if needed
-        if (vueApp.$refs.authManager) {
-          vueApp.$refs.authManager.renewSession()
+        if (this.$refs.authManager) {
+          this.$refs.authManager.renewSession()
         }
 
         if (to.meta.orgOnly) {
-          if (vueApp.currentOrganization) {
+          if (this.currentOrganization) {
             next()
           } else {
             next({path: '/'})
           }
         } else if(to.meta.userOnly) {
-          if (!vueApp.currentOrganization) {
+          if (!this.currentOrganization) {
             next()
           } else {
             next({path: '/'})
@@ -158,6 +200,12 @@ export default {
 
         this.$store.dispatch('app/displayNotice', 'App connected.')
     },
+
+    getOrgMembers() {
+      return this.$store.dispatch('organizations/getOrganizationMembers', {
+        organizationId: this.currentOrganization.id
+      })
+    }
   },
 
   mounted() {

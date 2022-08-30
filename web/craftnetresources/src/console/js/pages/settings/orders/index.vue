@@ -6,7 +6,6 @@
 import {mapGetters} from 'vuex';
 import UserIndex from './_user';
 import OrgIndex from './_org';
-import {checkRoute} from '../../../helpers/check-route';
 
 export default {
   computed: {
@@ -22,15 +21,5 @@ export default {
       return UserIndex
     }
   },
-
-  mounted() {
-    // checkRoute( {
-    //   currentOrganization: this.currentOrganization,
-    //   $router: this.$router,
-    //   $route: this.$route,
-    //   orgRouteName: 'OrgOrders',
-    //   userRouteName: 'UserOrders'
-    // })
-  }
 }
 </script>
