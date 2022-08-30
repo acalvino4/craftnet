@@ -116,6 +116,8 @@ class OrderQueryBehavior extends Behavior
             } else {
                 $this->owner->subQuery->andWhere(['orgsOrders.orgId' => $this->orgId]);
             }
+        } else {
+            $this->owner->subQuery->andWhere(['orgsOrders.orgId' => null]);
         }
 
         if ($this->creatorId) {
@@ -124,6 +126,10 @@ class OrderQueryBehavior extends Behavior
 
         if ($this->purchaserId) {
             $this->owner->subQuery->andWhere(['orgsOrders.purchaserId' => $this->purchaserId]);
+        }
+
+        if ($this->approvalRequested) {
+            $this->owner->subQuery->andWhere(['not', ['orgsOrderApprovals.requestedById' => null]]);
         }
 
         if ($this->approvalPending) {

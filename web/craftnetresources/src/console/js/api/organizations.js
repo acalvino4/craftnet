@@ -44,10 +44,10 @@ export default {
 
   getOrders(organizationId) {
     const query = qs.stringify({
-      approvalRequested: 0,
+      orgId: organizationId,
     })
 
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?' + query, {
+    return axios.get(VUE_APP_URL_CONSOLE + '/orders?' + query, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -55,7 +55,12 @@ export default {
   },
 
   getPendingOrders(organizationId) {
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?approvalRequested=1', {
+    const query = qs.stringify({
+      orgId: organizationId,
+      approvalPending: 1,
+    })
+
+    return axios.get(VUE_APP_URL_CONSOLE + '/orders?' + query, {
       headers: {
         'X-CSRF-Token': Craft.csrfTokenValue,
       }
@@ -63,11 +68,15 @@ export default {
   },
 
   requestOrderApproval({organizationId, orderNumber}) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders/' + orderNumber + '/request-approval')
+    return axios.post(VUE_APP_URL_CONSOLE + '/orders/' + orderNumber + '/request-approval', {
+      orgId: organizationId
+    })
   },
 
   rejectRequest({organizationId, orderNumber}) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders/' + orderNumber + '/reject-request')
+    return axios.post(VUE_APP_URL_CONSOLE + '/orders/' + orderNumber + '/reject-request', {
+      orgId: organizationId
+    })
   },
 
   getOrganizationMembers({organizationId}) {

@@ -1,10 +1,11 @@
 <?php
 
-namespace craftnet\controllers\orgs;
+namespace craftnet\controllers\console;
 
 use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craftnet\behaviors\OrderBehavior;
+use craftnet\controllers\orgs\SiteController;
 use Illuminate\Support\Collection;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
@@ -30,31 +31,27 @@ class OrdersController extends SiteController
         return $this->asSuccess(data: ['order' => self::transformOrder($order)]);
     }
 
-    /**
-     * @throws NotFoundHttpException
-     * @throws ForbiddenHttpException
-     */
-    public function actionGetOrders(int $orgId): ?Response
+    public function actionGetOrders(?int $orgId = null): ?Response
     {
-        $org = static::getOrgById($orgId);
+        $org = $this->getAllowedOrgFromRequest();
 
-        if (!$org->canView($this->currentUser)) {
+        if ($org && !$org->canView($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
-
+        $approvalPending = $this->request->getParam('approvalPending', false);
         $orders = Order::find();
-        $orders->orgId($org->id);
 
-        Collection::make([
-            'approvalRejectedById',
-            'approvalRequestedById',
-            'approvalRejectedDate',
-            'approvalRequested',
-            'approvalPending',
-        ])->mapWithKeys(fn($prop) => [
-            $prop => $this->request->getParam($prop)
-        ])->whereNotNull()
-        ->each(fn($value, $prop) => $orders?->$prop($value));
+        if ($org) {
+            $orders->orgId($org->id);
+        } else {
+            $orders->customer($this->currentUser);
+        }
+
+        if ($approvalPending) {
+            $orders->approvalPending(true);
+        } else {
+            $orders->isCompleted(true);
+        }
 
         $limit = $this->request->getParam('limit', 10);
         $page = (int)$this->request->getParam('page', 1);
@@ -69,14 +66,7 @@ class OrdersController extends SiteController
         $total = $orders->count();
 
         $orders = $orders->limit($limit)->offset($offset)->collect()
-            ->map(fn(Order|OrderBehavior $order) => $order->getAttributes([
-                'id',
-                'number',
-                'dateOrdered',
-            ]) + [
-                'approvalRequestedBy' => static::transformUser($order->getApprovalRequestedBy()),
-                'approvalRejectedBy' => static::transformUser($order->getApprovalRejectedBy()),
-            ]);
+            ->map(fn(Order|OrderBehavior $order) => self::transformOrder($order));
 
         return $this->asSuccess(data: $this->formatPagination($orders, $total, $page, $limit));
     }
@@ -85,9 +75,9 @@ class OrdersController extends SiteController
      * @throws NotFoundHttpException
      * @throws ForbiddenHttpException
      */
-    public function actionRequestApproval(int $orgId, string $orderNumber): ?Response
+    public function actionRequestApproval(string $orderNumber): ?Response
     {
-        $org = static::getOrgById($orgId);
+        $org = $this->getAllowedOrgFromRequest();
         $order = static::getOrderByNumber($orderNumber);
 
         try {
@@ -109,9 +99,9 @@ class OrdersController extends SiteController
      * @throws NotFoundHttpException
      * @throws ForbiddenHttpException
      */
-    public function actionRejectRequest(int $orgId, string $orderNumber): ?Response
+    public function actionRejectRequest(string $orderNumber): ?Response
     {
-        $org = static::getOrgById($orgId);
+        $org = $this->getAllowedOrgFromRequest();
         $order = static::getOrderByNumber($orderNumber);
 
         try {

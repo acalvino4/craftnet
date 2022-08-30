@@ -85,10 +85,6 @@ return [
         'POST    orgs' => 'craftnet/orgs/orgs/save-org',
         'GET     orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/get-org',
         'POST    orgs/<orgId:\d+>' => 'craftnet/orgs/orgs/save-org',
-        'GET     orgs/<orgId:\d+>/orders' => 'craftnet/orgs/orders/get-orders',
-        'GET     orgs/<orgId:\d+>/orders/<orderNumber:.*>' => 'craftnet/orgs/orders/get-order',
-        'POST    orgs/<orgId:\d+>/orders/<orderNumber:.*>/request-approval' => 'craftnet/orgs/orders/request-approval',
-        'POST    orgs/<orgId:\d+>/orders/<orderNumber:.*>/reject-request' => 'craftnet/orgs/orders/reject-request',
         'GET     orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/get-members',
         'POST    orgs/<orgId:\d+>/members' => 'craftnet/orgs/members/add-member',
         'DELETE  orgs/<orgId:\d+>/members/<userId:\d+|me>' => 'craftnet/orgs/members/remove-member',
@@ -118,6 +114,11 @@ return [
         'POST    users/<userId:\d+|me>' => 'craftnet/console/users/save-user',
         'POST    users/<userId:\d+|me>/upload-photo' => 'craftnet/console/users/upload-user-photo',
         'POST    users/<userId:\d+|me>/send-password-reset-email' => 'users/send-password-reset-email',
+
+        'GET     orders' => 'craftnet/console/orders/get-orders',
+        'GET     orders/<orderNumber:.*>' => 'craftnet/console/orders/get-order',
+        'POST    orders/<orderNumber:.*>/request-approval' => 'craftnet/console/orders/request-approval',
+        'POST    orders/<orderNumber:.*>/reject-request' => 'craftnet/console/orders/reject-request',
 
         'GET     invoices' => 'craftnet/console/invoices/get-invoices-for-user',
         'GET     invoices/subscriptions' => 'craftnet/console/invoices/get-subscription-invoices',

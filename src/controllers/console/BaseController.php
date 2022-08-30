@@ -294,7 +294,24 @@ abstract class BaseController extends Controller
 
     protected static function transformOrder(Order $order): array
     {
-        return $order->getAttributes();
-    }
+        $transformed = $order->getAttributes([
+            'id',
+            'number',
+            'dateOrdered',
+            'pdfUrl',
+            'totalPrice',
+        ]);
 
+        if ($order->org) {
+            $transformed += [
+                'purchasedBy' => static::transformUser($order->getPurchaser()),
+                'createdBy' => static::transformUser($order->getCreator()),
+                'approvalRequestedBy' => static::transformUser($order->getApprovalRequestedBy()),
+                'approvalRejectedBy' => static::transformUser($order->getApprovalRejectedBy()),
+                'approvalRejectedOn' => static::transformUser($order->getApprovalRejectedDate()),
+            ];
+        }
+
+        return $transformed;
+    }
 }
