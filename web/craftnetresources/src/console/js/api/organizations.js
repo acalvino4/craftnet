@@ -39,11 +39,16 @@ export default {
       orgId: organizationId,
     })
 
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?' + query)
+    return axios.get(VUE_APP_URL_CONSOLE + '/orders?' + query)
   },
 
   getPendingOrders(organizationId) {
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?approvalRequested=1')
+    const query = qs.stringify({
+      orgId: organizationId,
+      approvalPending: 1,
+    })
+
+    return axios.get(VUE_APP_URL_CONSOLE + '/orders?' + query)
   },
 
   requestOrderApproval({organizationId, orderNumber}) {
