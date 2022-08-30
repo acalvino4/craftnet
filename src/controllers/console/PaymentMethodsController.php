@@ -121,12 +121,7 @@ class PaymentMethodsController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        // Payment method will be deleted by cascade
-        $deleted = Commerce::getInstance()
-            ->getPaymentSources()
-            ->deletePaymentSourceById($paymentMethod->paymentSource->id);
-
-        return $deleted ? $this->asSuccess('Payment method deleted.') : $this->asFailure();
+        return $paymentMethod->delete() ? $this->asSuccess('Payment method deleted.') : $this->asFailure();
     }
     public function actionGetPaymentMethods(): Response
     {

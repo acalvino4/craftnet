@@ -7,6 +7,7 @@
 
 namespace craftnet\paymentmethods;
 
+use Craft;
 use craft\commerce\models\PaymentSource;
 use craft\commerce\Plugin;
 use craft\db\ActiveRecord;
@@ -60,5 +61,18 @@ class PaymentMethodRecord extends ActiveRecord
     public function getOrgs(): OrgQuery
     {
         return Org::find()->paymentMethodId($this->id);
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+
+        Plugin::getInstance()
+            ->getPaymentSources()
+            ->deletePaymentSourceById($this->paymentSource->id);
+
+        if ($this->billingAddressId) {
+            Craft::$app->getElements()->deleteElementById($this->billingAddressId);
+        }
     }
 }
