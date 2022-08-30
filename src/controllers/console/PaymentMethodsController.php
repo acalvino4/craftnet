@@ -36,16 +36,6 @@ class PaymentMethodsController extends BaseController
 
         Plugin::getInstance()->getCustomers()->ensureCustomer($this->currentUser);
 
-        $billingAddress = $paymentMethod->billingAddress ?? new Address();
-        $billingAddress->title = "Billing address for payment method";
-        $billingAddress->ownerId = $this->currentUser->id;
-        $billingAddress->setScenario(Element::SCENARIO_LIVE);
-        $billingAddress->setAttributes($billingAddressParam);
-
-        if (!Craft::$app->getElements()->saveElement($billingAddress)) {
-            return $this->asModelFailure($billingAddress);
-        }
-
         if ($isNew) {
             $gateway = Commerce::getInstance()
                 ->getGateways()
@@ -74,8 +64,41 @@ class PaymentMethodsController extends BaseController
             }
         }
 
-        if (!$paymentSource) {
+        if (!$paymentSource->id) {
             throw new BadRequestHttpException();
+        }
+
+        $billingAddress = $paymentMethod->billingAddress ?? Craft::createObject(Address::class);
+
+        if ($billingAddressParam) {
+            $billingAddress->title = "Billing address for $paymentSource->description";
+            $billingAddress->ownerId = $this->currentUser->id;
+            $billingAddress->setScenario(Element::SCENARIO_LIVE);
+            $billingAddress->setAttributes($billingAddressParam);
+
+            if (!Craft::$app->getElements()->saveElement($billingAddress)) {
+
+                // Clean up orphaned payment source
+                if ($isNew) {
+                    Commerce::getInstance()
+                        ->getPaymentSources()
+                        ->deletePaymentSourceById($paymentSource->id);
+                }
+
+                return $this->asModelFailure($billingAddress);
+            }
+        }
+
+        if (!$billingAddress->id) {
+            throw new BadRequestHttpException();
+        }
+
+        $paymentMethod->paymentSourceId = $paymentSource->id;
+        $paymentMethod->billingAddressId = $billingAddress->id;
+        $paymentMethod->ownerId = $this->currentUser->id;
+
+        if (!$paymentMethod->save()) {
+            $this->asFailure();
         }
 
         if ($makePrimary) {
@@ -87,13 +110,7 @@ class PaymentMethodsController extends BaseController
             }
         }
 
-        $paymentMethod->paymentSourceId = $paymentSource->id;
-        $paymentMethod->billingAddressId = $billingAddress->id;
-        $paymentMethod->ownerId = $this->currentUser->id;
-
-        return $paymentMethod->save()
-            ? $this->asSuccess('Payment method saved.')
-            : $this->asFailure();
+        return $this->asSuccess('Payment method saved.');
     }
 
     public function actionDeletePaymentMethod(int $paymentMethodId): Response
