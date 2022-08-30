@@ -23,8 +23,8 @@
 // import BillingInvoiceDetails from '../../../components/billing/BillingInvoiceDetails'
 // import BillingAddressForm from '../../../components/billing/BillingAddressForm'
 import {mapGetters} from 'vuex';
-import OrgBilling from '../../../components/billing/OrgBilling';
-import UserBilling from '../../../components/billing/UserBilling';
+import OrgBilling from './_org';
+import UserBilling from './_user';
 import {checkRoute} from '../../../helpers/check-route';
 
 export default {
