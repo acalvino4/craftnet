@@ -7,7 +7,7 @@
       <template v-slot:number="props">
         <router-link
           :to="getPrefixedTo('/settings/orders/' + props.row.number)">
-          {{ props.row.number.substr(0,7) }}
+          {{ props.row.shortNumber }}
         </router-link>
       </template>
       <template v-slot:price="props">

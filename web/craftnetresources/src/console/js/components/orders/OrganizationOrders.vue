@@ -18,7 +18,7 @@
             <router-link
               :to="getPrefixedTo('/settings/orders/' + order.number)"
             >
-              {{ order.number }}
+              {{ order.shortNumber }}
             </router-link>
           </td>
           <td>

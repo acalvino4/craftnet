@@ -13,7 +13,13 @@
         </thead>
         <tbody>
         <tr v-for="pendingOrder in pendingOrders.data">
-          <td>{{ pendingOrder.number }}</td>
+          <td>
+            <router-link
+              :to="getPrefixedTo('/settings/orders/' + pendingOrder.number)"
+            >
+              {{ pendingOrder.shortNumber }}
+            </router-link>
+          </td>
           <td>
             <template v-if="pendingOrder.dateOrdered && pendingOrder.dateOrdered.date">
               {{ pendingOrder.dateOrdered.date }}
@@ -63,8 +69,10 @@
 
 <script>
 import {mapGetters, mapState} from 'vuex';
+import helpers from '../../mixins/helpers';
 
 export default {
+  mixins: [helpers],
   computed: {
     ...mapState({
       pendingOrders: state => state.orders.pendingOrders,

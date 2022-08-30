@@ -137,8 +137,7 @@
 </template>
 
 <script>
-// import ordersApi from '../../../api/orders'
-import invoicesApi from '../../../api/invoices'
+import ordersApi from '../../../api/orders'
 import BillingAddress from '../../../components/billing/BillingAddress'
 import CmsLicensesTable from '../../../components/licenses/CmsLicensesTable'
 import PluginLicensesTable from '../../../components/licenses/PluginLicensesTable'
@@ -175,20 +174,9 @@ export default {
     this.loading = true
     this.error = false
 
-    // ordersApi.getOrder(orderNumber, orgId)
-    //   .then((response) => {
-    //     this.invoice = response.data.invoice
-    //     this.loading = false
-    //   })
-    //
-    //   .catch(() => {
-    //     this.loading = false
-    //     this.error = true
-    //   })
-
-    invoicesApi.getInvoiceByNumber(orderNumber)
+    ordersApi.getOrder(orderNumber, orgId)
       .then((response) => {
-        this.invoice = response.data.invoice
+        this.invoice = response.data.order
         this.loading = false
       })
 
