@@ -1,11 +1,11 @@
-/* global Craft, VUE_APP_URL_CONSOLE */
+/* global VUE_APP_URL_CONSOLE */
 
 import axios from './axios'
 import FormDataHelper from '../helpers/form-data.js';
 
 export default {
   getRemainingSessionTime(config) {
-    return axios.get(Craft.VUE_APP_URL_CONSOLE + '/session', config)
+    return axios.get(VUE_APP_URL_CONSOLE + '/session', config)
   },
 
   login(formData) {
