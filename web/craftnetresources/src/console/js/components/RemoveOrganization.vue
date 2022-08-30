@@ -1,16 +1,14 @@
 <template>
   <div class="lg:flex lg:justify-between lg:items-center">
     <div class="lg:mr-6">
-      <h3 class="font-bold">Convert your account to an organization</h3>
-      <p>You cannot convert this account to an organization until you
-        leave all organizations that you’re a member of.</p>
+      <h4 class="font-bold">Remove this organization</h4>
+      <p>Once you remove an organization, there’s no going back. Please be certain.</p>
     </div>
 
     <div class="mt-6 lg:mt-0">
       <btn
         kind="danger"
-        @click="openModal">Convert
-        <strong>{{ user.username }}</strong> to an organization
+        @click="openModal">Remove this organization
       </btn>
 
       <TransitionRoot
@@ -56,42 +54,33 @@
                     as="h3"
                     class="text-lg font-medium leading-6"
                   >
-                    Convert your account to an organization
+                    Remove this organization
                   </DialogTitle>
                   <div class="mt-2">
                     <p class="text-sm text-light">
-                      You cannot convert this account into
-                      an organization until you leave all
-                      organizations that you’re a member of.
+                      Once you remove an organization, there’s no going back. Please be certain.
                     </p>
                   </div>
-
                   <field
                     :vertical="true"
-                    label-for="new-username"
-                    label="Organization’s username">
-                    <textbox id="new-username"></textbox>
-                  </field>
-                  <field
-                    :vertical="true"
-                    label-for="old-username"
-                    :label="`Type “${user.username}” to confirm`">
+                    label-for="slug"
+                    :label="`Type “${currentOrganization.slug}” to confirm`">
                     <textbox
-                      id="old-username"
-                      v-model="oldUsername"></textbox>
+                      id="slug"
+                      v-model="slug"></textbox>
                   </field>
 
                   <div
                     class="mt-4 space-x-reverse space-x-2 flex flex-row-reverse justify-start">
                     <btn
                       kind="danger"
-                      :disabled="user.username !== oldUsername"
+                      :disabled="currentOrganization.slug !== slug"
                       type="button"
                       @click="closeModal"
                     >
-                      Convert
-                      <strong>{{ user.username }}</strong>
-                      to an organization
+                      Remove the
+                      <strong>{{ currentOrganization.slug }}</strong>
+                      organization
                     </btn>
 
                     <btn
@@ -110,7 +99,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
+import {mapGetters, mapState} from 'vuex';
 import {ref} from 'vue'
 import {
   TransitionRoot,
@@ -131,11 +120,11 @@ export default {
 
   setup() {
     const isOpen = ref(false)
-    const oldUsername = ref(null)
+    const slug = ref(null)
 
     return {
       isOpen,
-      oldUsername,
+      slug,
       closeModal() {
         isOpen.value = false
       },
@@ -148,6 +137,11 @@ export default {
     ...mapState({
       user: state => state.account.user,
     }),
+
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization',
+    }),
+
   },
 }
 </script>

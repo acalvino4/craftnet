@@ -1,6 +1,6 @@
 /* global Craft */
 
-import axios from 'axios'
+import axios from './axios'
 import qs from 'qs'
 
 export default {
@@ -13,10 +13,6 @@ export default {
       appTypeHandle: appHandle
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/apps/disconnect', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/apps/disconnect', qs.stringify(data))
   },
 }

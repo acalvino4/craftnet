@@ -1,6 +1,6 @@
 /* global VUE_APP_CRAFT_API_ENDPOINT */
 
-import axios from 'axios'
+import axios from './axios'
 
 export default {
   getCoreData() {

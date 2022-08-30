@@ -22,6 +22,18 @@ const getters = {
     }
 
     return state.organizations.find(o => o.slug === state.currentOrgSlug)
+  },
+
+  userIsOwner(state) {
+    return (userId) => {
+      if (!state.members) {
+        return false
+      }
+
+      return !!state.members.find(member => {
+        return (member.id === userId && member.role === 'owner')
+      })
+    }
   }
 }
 
@@ -71,10 +83,16 @@ const actions = {
   },
 
   getOrganizationMembers({commit}, {organizationId}) {
-    return organizationsApi.getOrganizationMembers({organizationId})
-            .then((response) => {
-              commit('updateMembers', response.data)
-            })
+    return new Promise((resolve, reject) => {
+      return organizationsApi.getOrganizationMembers({organizationId})
+        .then((response) => {
+          commit('updateMembers', response.data)
+          resolve(response)
+        })
+        .catch((response) => {
+          reject(response)
+        })
+    })
   },
 
   getOrganizations({commit}) {

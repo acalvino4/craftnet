@@ -49,11 +49,6 @@
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">
             {{ creditCard.card.exp_month }}/{{ creditCard.card.exp_year }}
-
-
-            <div class="text-xs font-mono">
-              billingAddressId: {{creditCard.billingAddressId}}
-            </div>
           </div>
         </div>
       </template>

@@ -1,16 +1,12 @@
 /* global Craft */
 
-import axios from 'axios'
+import axios from './axios'
 import FormDataHelper from '../helpers/form-data.js';
 import qs from 'qs'
 
 export default {
   loadDetails(repositoryUrl) {
-    return axios.post(Craft.actionUrl + '/craftnet/plugins/load-details&repository=' + encodeURIComponent(repositoryUrl), {}, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/plugins/load-details&repository=' + encodeURIComponent(repositoryUrl))
   },
 
   save({plugin}) {
@@ -55,11 +51,7 @@ export default {
       }
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/plugins/save', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/plugins/save', formData)
   },
 
   submit(pluginId) {
@@ -67,11 +59,7 @@ export default {
       pluginId: pluginId,
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/plugins/submit', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/plugins/submit', qs.stringify(data))
   },
 
   getPlugins(params) {

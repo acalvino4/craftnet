@@ -1,6 +1,6 @@
 /* global Craft */
 
-import axios from 'axios'
+import axios from './axios'
 import qs from 'qs'
 
 export default {
@@ -9,11 +9,7 @@ export default {
       subscription
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/cancel-subscription', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/cancel-subscription', qs.stringify(data))
   },
 
   getSubscriptionInfo() {
@@ -25,11 +21,7 @@ export default {
       subscription
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/reactivate-subscription', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/reactivate-subscription', qs.stringify(data))
   },
 
   subscribe(plan) {
@@ -37,11 +29,7 @@ export default {
       plan
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/subscribe', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/subscribe', qs.stringify(data))
   },
 
   switchPlan(plan) {
@@ -49,10 +37,6 @@ export default {
       plan
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/switch-plan', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/developer-support/switch-plan', qs.stringify(data))
   }
 }

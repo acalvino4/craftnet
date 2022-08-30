@@ -51,16 +51,10 @@
                     </div>
 
                     <div class="mt-4 space-x-4">
+                      <a href="#" @click.prevent="edit(paymentMethod)">Edit</a>
                       <template v-if="!paymentMethod.isPrimary">
                         <a href="#" @click.prevent="makePrimary(paymentMethod.id)">Make primary</a>
                       </template>
-                      <a href="#" @click.prevent="removePaymentMethod(paymentMethod.id)">Remove</a>
-                    </div>
-
-
-                    <div class="mt-4">
-                      <div class="text-xs font-mono text-gray-500">id: #{{paymentMethod.id}}</div>
-                      <div class="text-xs font-mono text-gray-500">billingAddressId: #{{paymentMethod.billingAddressId}}</div>
                     </div>
                   </div>
                 </div>
@@ -72,7 +66,8 @@
 
       <payment-method-modal
         :is-open="showPaymentMethodModal"
-        @close="showPaymentMethodModal = false"
+        v-model:paymentMethod="editPaymentMethod"
+        @close="closePaymentMethodModal"
       />
     </template>
   </div>
@@ -90,8 +85,8 @@ export default {
   data() {
     return {
       loading: false,
-      removePaymentLoading: false,
       showPaymentMethodModal: false,
+      editPaymentMethod: null,
     }
   },
 
@@ -102,27 +97,6 @@ export default {
   },
 
   methods: {
-    /**
-     * Removes a payment method.
-     */
-    removePaymentMethod(paymentMethodId) {
-      if (!confirm("Are you sure you want to remove this credit card?")) {
-        return null;
-      }
-
-      this.removePaymentLoading = true
-      this.$store.dispatch('paymentMethods/removePaymentMethod', paymentMethodId)
-        .then(() => {
-          this.removePaymentLoading = false
-          this.$store.dispatch('app/displayNotice', 'Card removed.')
-        })
-        .catch((response) => {
-          this.removePaymentLoading = false
-          const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t remove credit card.'
-          this.$store.dispatch('app/displayError', errorMessage)
-        })
-    },
-
     /**
      * Makes a credit card primary.
      */
@@ -137,7 +111,17 @@ export default {
           this.$store.dispatch('app/displayNotice', 'Card set as primary.')
           this.$store.dispatch('paymentMethods/getPaymentMethods')
         })
-    }
+    },
+
+    edit(paymentMethod) {
+      this.showPaymentMethodModal = true
+      this.editPaymentMethod = paymentMethod
+    },
+
+    closePaymentMethodModal() {
+      this.showPaymentMethodModal = false
+      this.editPaymentMethod = null
+    },
   },
 
   mounted() {

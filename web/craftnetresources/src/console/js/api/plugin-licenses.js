@@ -1,6 +1,6 @@
 /* global Craft */
 
-import axios from 'axios'
+import axios from './axios'
 import qs from 'qs'
 
 export default {
@@ -9,11 +9,7 @@ export default {
       key: licenseKey
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/plugin-licenses/claim', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/plugin-licenses/claim', qs.stringify(data))
   },
 
   getPluginLicense(id) {
@@ -30,11 +26,7 @@ export default {
       key: licenseKey
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/plugin-licenses/release', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/plugin-licenses/release', qs.stringify(data))
   },
 
   savePluginLicense(license) {
@@ -48,10 +40,6 @@ export default {
       data[attribute] = license[attribute]
     }
 
-    return axios.post(Craft.actionUrl + '/craftnet/console/plugin-licenses/save', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/plugin-licenses/save', qs.stringify(data))
   },
 }

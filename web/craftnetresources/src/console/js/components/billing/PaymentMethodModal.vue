@@ -4,45 +4,81 @@
     @close="$emit('close')"
   >
     <div>
-      <h2>Add Card</h2>
+      <h2>
+        <template v-if="!paymentMethod">
+          Add Card
+        </template>
+        <template v-else>
+          Edit payment method #{{paymentMethod.id}}
+        </template>
+      </h2>
 
-      <form class="mt-2" @submit.prevent="save()">
-        <div
-          ref="cardElement"
-          class="card-element form-control mb-3"></div>
-        <p
-          id="card-errors"
-          class="text-red"
-          role="alert"></p>
+      <template v-if="!paymentMethod">
+        <form class="mt-2" @submit.prevent="save()">
+          <card-element
+            ref="cardElement"
+            v-model:card="card"
+          />
 
-        <div>
-          <img
-            src="~@/console/images/powered_by_stripe.svg"
-            width="90" />
+          <div>
+            <img
+              src="~@/console/images/powered_by_stripe.svg"
+              width="90" />
+          </div>
+        </form>
+      </template>
+      <template v-else>
+        <div class="mt-2 border p-4 rounded-md">
+          <div>{{ paymentMethod.card.brand }}</div>
+          <div>**** **** **** {{ paymentMethod.card.last4 }}</div>
+          <div>{{ paymentMethod.card.exp_month }}/{{ paymentMethod.card.exp_year }}</div>
         </div>
+      </template>
 
-        <spinner
-          v-if="cardFormloading"
-          class="mt-4"
+      <h3 class="mt-4">Billing Address</h3>
+      <div>
+        <billing-address-options
+          v-model:billingAddressId="billingAddressId"
         />
-      </form>
+      </div>
     </div>
 
     <template v-slot:footer>
-      <btn @click="cancel">Cancel</btn>
-      <btn kind="primary" @click="save">Save</btn>
+      <div class="flex-1 flex items-center justify-end">
+        <template v-if="paymentMethod">
+          <div
+            class="flex-1"
+            :class="{
+            'opacity-50': cardFormloading,
+          }"
+          >
+            <a href="#" class="text-red-600" @click.prevent="removePaymentMethod(paymentMethod.id)">Remove card</a>
+          </div>
+        </template>
+
+        <div class="flex items-center space-x-2">
+          <spinner
+            v-if="cardFormloading"
+          />
+
+          <btn :disabled="cardFormloading" @click="cancel">Cancel</btn>
+          <btn :disabled="cardFormloading" kind="primary" @click="save">Save</btn>
+        </div>
+      </div>
     </template>
   </modal-headless>
 </template>
 
 <script>
-/* global Stripe */
-
 import ModalHeadless from '../ModalHeadless';
+import CardElement from '../card/CardElement';
+import BillingAddressOptions from './BillingAddressOptions';
 
 export default {
   components: {
+    BillingAddressOptions,
     ModalHeadless,
+    CardElement,
   },
 
   props: {
@@ -50,6 +86,16 @@ export default {
       type: Boolean,
       default: false,
     },
+    paymentMethod: {
+      type: Object,
+      default: null,
+    },
+  },
+
+  watch: {
+    paymentMethod(paymentMethod) {
+      this.billingAddressId = paymentMethod ? paymentMethod.billingAddressId : null
+    }
   },
 
   data() {
@@ -58,63 +104,76 @@ export default {
       elements: null,
       card: null,
       cardFormloading: false,
+      billingAddressId: null,
+    }
+  },
+
+  computed: {
+    localPaymentMethod: {
+      get() {
+        return this.paymentMethod
+      },
+      set(value) {
+        this.$emit('update:paymentMethod', value)
+      }
     }
   },
 
   methods: {
-    /**
-     * Saves a credit card.
-     *
-     * @param card
-     * @param source
-     */
-    saveCardForm(card, source) {
-      this.$store.dispatch('paymentMethods/addPaymentMethod', source)
-        .then(() => {
-          card.clear()
-          this.cardFormloading = false
-          this.$store.dispatch('app/displayNotice', 'Card saved.')
-          this.$store.dispatch('paymentMethods/getPaymentMethods')
-          this.$emit('close')
-        })
-        .catch((response) => {
-          this.cardFormloading = false
-          const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
-          this.$store.dispatch('app/displayError', errorMessage)
-        })
-    },
-
     /**
      * Save the credit card.
      */
     save() {
       this.cardFormloading = true
 
-      let vm = this;
-      this.stripe.createPaymentMethod('card', this.card).then(function(result) {
-        if (result.error) {
-          let errorElement = document.getElementById('card-errors');
-          errorElement.textContent = result.error.message;
+      if (!this.paymentMethod) {
+        this._saveCard()
+          .then((result) => {
+            this._savePaymentMethod({
+              id: (this.paymentMethod ? this.paymentMethod.id : null),
+              paymentMethodId: result.paymentMethod.id,
+              billingAddressId: this.billingAddressId,
+            })
+          })
+      } else {
+        this._savePaymentMethod({
+          id: (this.paymentMethod ? this.paymentMethod.id : null),
+          billingAddressId: this.billingAddressId,
+        })
+      }
+    },
 
-          vm.cardFormloading = false
-          const errorMessage = result && result.error ? result.error : 'Couldn’t save credit card.'
-          vm.$store.dispatch('app/displayError', errorMessage)
-        } else {
-          // vm.$emit('save', vm.card, result.paymentMethod);
-          vm.saveCardForm(vm.card, result.paymentMethod)
-        }
-      });
+    _saveCard() {
+      return this.$refs.cardElement.save()
+        // .catch(() => {
+        //   this.cardFormloading = false
+        //   this.$store.dispatch('app/displayError', 'Couldn’t save credit card.')
+        // })
+    },
+
+    _savePaymentMethod(payload) {
+      return this.$store.dispatch('paymentMethods/savePaymentMethod', payload)
+        .then(() => {
+          if (this.$refs.cardElement) {
+            this.$refs.cardElement.card.clear()
+          }
+
+          this.cardFormloading = false
+          this.$store.dispatch('app/displayNotice', 'Card saved.')
+          this.$store.dispatch('paymentMethods/getPaymentMethods')
+          this.$emit('close')
+        })
+        // .catch((response) => {
+        //   this.cardFormloading = false
+        //   const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
+        //   this.$store.dispatch('app/displayError', errorMessage)
+        // })
     },
 
     /**
      * Cancel.
      */
     cancel() {
-      this.card.clear();
-
-      let errorElement = document.getElementById('card-errors');
-      errorElement.textContent = '';
-
       this.$emit('close')
     },
 
@@ -124,35 +183,29 @@ export default {
     error() {
       this.cardFormloading = false
     },
-  },
 
-  watch: {
-    isOpen(isOpen) {
-      if (isOpen) {
-        console.log('-----------', isOpen, this.$refs.cardElement)
-
-        // wait for the card element to be mounted
-        this.$nextTick(() => {
-          console.log('---- next tick ----', this.$refs.cardElement)
-
-          this.stripe = Stripe(window.stripePublicKey);
-          this.elements = this.stripe.elements({locale: 'en'});
-          this.card = this.elements.create('card', {hidePostalCode: true});
-
-          // Vue likes to stay in control of $el but Stripe needs a real element
-          const el = document.createElement('div')
-          this.card.mount(el)
-
-          // this.$children cannot be used because it expects a VNode :(
-          this.$refs.cardElement.appendChild(el)
-        })
+    /**
+     * Removes a payment method.
+     */
+    removePaymentMethod(paymentMethodId) {
+      if (!confirm("Are you sure you want to remove this credit card?")) {
+        return null;
       }
-    }
-  },
 
-  mounted() {
-    console.log('mounted', this.$refs.cardElement)
-  }
+      this.cardFormloading = true
+      this.$store.dispatch('paymentMethods/removePaymentMethod', paymentMethodId)
+        .then(() => {
+          this.cardFormloading = false
+          this.$store.dispatch('app/displayNotice', 'Card removed.')
+          this.$emit('close')
+        })
+        .catch((response) => {
+          this.cardFormloading = false
+          const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t remove credit card.'
+          this.$store.dispatch('app/displayError', errorMessage)
+        })
+    },
+  },
 }
 </script>
 

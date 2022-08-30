@@ -1,6 +1,6 @@
 /* global VUE_APP_URL_CONSOLE */
 
-import axios from 'axios'
+import axios from './axios'
 
 export default {
   deleteAddress(addressId) {
@@ -29,5 +29,6 @@ export default {
   },
   saveAddress(address) {
     return axios.post(VUE_APP_URL_CONSOLE + '/addresses' + (address.id ? '/' + address.id : ''), address)
+
   },
 }

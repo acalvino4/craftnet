@@ -76,17 +76,19 @@
       </template>
     </h5>
     <ul>
-      <li>
-        <router-link
-          @click="$emit('closeSidebar')"
-          :to="getPrefixedTo('/settings/profile')"
-        >
-          <icon
-            class="mr-2 text-blue-500 w-5 h-5"
-            icon="identification" />
-          Profile
-        </router-link>
-      </li>
+      <template v-if="!currentOrganization || userIsOwner(user.id)">
+        <li>
+          <router-link
+            @click="$emit('closeSidebar')"
+            :to="getPrefixedTo('/settings/profile')"
+          >
+            <icon
+              class="mr-2 text-blue-500 w-5 h-5"
+              icon="identification" />
+            Profile
+          </router-link>
+        </li>
+      </template>
       <template v-if="!currentOrganization && user">
         <li>
           <router-link
@@ -120,17 +122,21 @@
           Orders
         </router-link>
       </li>
-      <li>
-        <router-link
-          @click="$emit('closeSidebar')"
-          :to="getPrefixedTo('/settings/billing')"
-        >
-          <icon
-            class="mr-2 text-blue-500 w-5 h-5"
-            icon="credit-card" />
-          Billing
-        </router-link>
-      </li>
+
+      <template v-if="!currentOrganization || userIsOwner(user.id)">
+        <li>
+          <router-link
+            @click="$emit('closeSidebar')"
+            :to="getPrefixedTo('/settings/billing')"
+          >
+            <icon
+              class="mr-2 text-blue-500 w-5 h-5"
+              icon="credit-card" />
+            Billing
+          </router-link>
+        </li>
+      </template>
+
       <li v-if="!currentOrganization">
         <router-link
           @click="$emit('closeSidebar')"
@@ -207,7 +213,8 @@ export default {
     }),
 
     ...mapGetters({
-      currentOrganization: 'organizations/currentOrganization'
+      currentOrganization: 'organizations/currentOrganization',
+      userIsOwner: 'organizations/userIsOwner'
     }),
 
     ...mapGetters({

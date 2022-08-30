@@ -19,18 +19,6 @@ const getters = {}
  * Actions
  */
 const actions = {
-  addPaymentMethod(context, source) {
-    return new Promise((resolve, reject) => {
-      paymentMethodsApi.addPaymentMethod(source)
-        .then((response) => {
-          resolve(response)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
-  },
-
   savePaymentMethod(context, data) {
     return new Promise((resolve, reject) => {
       paymentMethodsApi.savePaymentMethod(data)

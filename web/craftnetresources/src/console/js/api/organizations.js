@@ -1,5 +1,5 @@
 /* global VUE_APP_URL_CONSOLE, Craft */
-import axios from 'axios';
+import axios from './axios';
 import qs from 'qs';
 
 export default {
@@ -7,11 +7,7 @@ export default {
     const data = {
       email,
     }
-    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/invitations', qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/invitations', qs.stringify(data))
   },
 
   leave() {
@@ -31,11 +27,7 @@ export default {
       endpointUrl += '/' + organization.id
     }
 
-    return axios.post(endpointUrl, qs.stringify(data), {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(endpointUrl, qs.stringify(data))
   },
 
   convertAccountToOrganization() {
@@ -47,24 +39,11 @@ export default {
       orgId: organizationId,
     })
 
-    return axios.get(VUE_APP_URL_CONSOLE + '/orders?' + query, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?' + query)
   },
 
   getPendingOrders(organizationId) {
-    const query = qs.stringify({
-      orgId: organizationId,
-      approvalPending: 1,
-    })
-
-    return axios.get(VUE_APP_URL_CONSOLE + '/orders?' + query, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/orders?approvalRequested=1')
   },
 
   requestOrderApproval({organizationId, orderNumber}) {
@@ -80,11 +59,7 @@ export default {
   },
 
   getOrganizationMembers({organizationId}) {
-    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members', {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.get(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members')
   },
 
   getOrganizations() {
@@ -92,11 +67,7 @@ export default {
   },
 
   removeMember({organizationId, memberId}) {
-    return axios.delete(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members/' + memberId, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.delete(VUE_APP_URL_CONSOLE + '/orgs/' + organizationId + '/members/' + memberId)
   },
 
   getInvitations({organizationId}) {

@@ -1,7 +1,6 @@
 /* global Craft */
 
-import axios from 'axios'
-import qs from 'qs'
+import axios from './axios'
 
 export default {
   getAccount() {
@@ -9,10 +8,6 @@ export default {
   },
 
   disconnect() {
-    return axios.post(Craft.actionUrl + '/craftnet/console/stripe/disconnect', {}, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(Craft.actionUrl + '/craftnet/console/stripe/disconnect')
   },
 }

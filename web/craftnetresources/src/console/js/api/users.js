@@ -1,6 +1,6 @@
-/* global Craft */
+/* global Craft, VUE_APP_URL_CONSOLE */
 
-import axios from 'axios'
+import axios from './axios'
 import FormDataHelper from '../helpers/form-data.js';
 
 export default {
@@ -9,11 +9,7 @@ export default {
   },
 
   login(formData) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/session', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(VUE_APP_URL_CONSOLE + '/session', formData)
   },
 
   logout() {
@@ -21,11 +17,7 @@ export default {
   },
 
   registerUser(formData) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/users', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(VUE_APP_URL_CONSOLE + '/users', formData)
   },
 
   saveUser(user) {
@@ -51,18 +43,10 @@ export default {
       }
     }
 
-    return axios.post(VUE_APP_URL_CONSOLE + '/users/me', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(VUE_APP_URL_CONSOLE + '/users/me', formData)
   },
 
   sendPasswordResetEmail(formData) {
-    return axios.post(VUE_APP_URL_CONSOLE + '/users/me/send-password-reset-email', formData, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      }
-    })
+    return axios.post(VUE_APP_URL_CONSOLE + '/users/me/send-password-reset-email', formData)
   },
 }

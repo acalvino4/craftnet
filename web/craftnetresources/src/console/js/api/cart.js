@@ -1,25 +1,14 @@
-/* global Craft, VUE_APP_CRAFT_API_ENDPOINT */
+/* global VUE_APP_CRAFT_API_ENDPOINT */
 
-import axios from 'axios'
+import axios from './axios'
+axios.defaults.baseURL = VUE_APP_CRAFT_API_ENDPOINT + '/'
 
 export default {
-  /**
-   * Axios instance.
-   */
-  _axios: null,
-
   /**
    * Returns the axios instance for calls to the Craft API.
    */
   axios() {
-    if (!this._axios) {
-      this._axios = axios.create({
-        baseURL: VUE_APP_CRAFT_API_ENDPOINT + '/',
-        // params: {XDEBUG_SESSION_START: 16433}
-      })
-    }
-
-    return this._axios
+    return axios
   },
 
   /**
@@ -41,9 +30,6 @@ export default {
    */
   updateCart(orderNumber, data) {
     return this.axios().post('carts/' + orderNumber, data, {
-      headers: {
-        'X-CSRF-Token': Craft.csrfTokenValue,
-      },
       withCredentials: true,
     })
   },
