@@ -183,8 +183,26 @@ export default {
       if (!this.transferMemberId) {
         return
       }
-      
-      console.log('transfer org to member', this.currentOrganization.id, this.transferMemberId)
+
+      this.$store.dispatch('organizations/setRole', {
+        organizationId: this.currentOrganization.id,
+        userId: this.transferMemberId,
+        role: 'owner',
+      })
+        .then(() => {
+          this.$store.dispatch('organizations/getOrganizationMembers', {
+              organizationId: this.currentOrganization.id,
+            })
+            .then(() => {
+              this.$store.dispatch('app/displayNotice', 'Ownership transferred.')
+              this.closeModal()
+            })
+        })
+        .catch((error) => {
+          this.$store.dispatch('app/displayError', 'Couldn’t transfer ownership.')
+          this.closeModal()
+          throw error
+        })
     }
   }
 }

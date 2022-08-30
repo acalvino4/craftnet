@@ -48,19 +48,21 @@
         your developer page on the Plugin Store.</p>
     </form>
 
-    <pane class="mt-6 border border-red-500 mb-3">
-      <template v-slot:header>
-        <h2 class="mb-0 text-red-600">
-          Danger Zone</h2>
-      </template>
+    <template v-if="currentMember.role === 'owner'">
+      <pane class="mt-6 border border-red-500 mb-3">
+        <template v-slot:header>
+          <h2 class="mb-0 text-red-600">
+            Danger Zone</h2>
+        </template>
 
-      <remove-organization />
+        <remove-organization />
 
 
-      <hr>
+        <hr>
 
-      <transfer-ownership />
-    </pane>
+        <transfer-ownership />
+      </pane>
+    </template>
   </div>
 </template>
 
