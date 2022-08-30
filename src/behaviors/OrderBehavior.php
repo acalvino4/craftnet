@@ -327,7 +327,18 @@ class OrderBehavior extends Behavior
 
     public function canViewOrder(User $user): bool
     {
-        return $this->hasCustomer($user) || ($this->org?->canViewOrders($user) ?? false);
+        if ($this->hasCustomer($user)) {
+            return true;
+        }
+
+        if ($this->approvalRequestedForOrgId) {
+            return Org::find()
+                ->id($this->approvalRequestedForOrgId)
+                ->one()
+                ->canViewOrders($user);
+        }
+
+        return false;
     }
 
     /**
