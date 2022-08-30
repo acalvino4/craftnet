@@ -6,6 +6,7 @@ use craft\commerce\elements\Order;
 use craft\commerce\Plugin as Commerce;
 use craftnet\behaviors\OrderBehavior;
 use craftnet\controllers\orgs\SiteController;
+use craftnet\orgs\Org;
 use Illuminate\Support\Collection;
 use yii\base\UserException;
 use yii\web\ForbiddenHttpException;
@@ -14,17 +15,13 @@ use yii\web\Response;
 
 class OrdersController extends SiteController
 {
-    public function actionGetOrder(int $orgId, string $orderNumber): ?Response
+    public function actionGetOrder(string $orderNumber): ?Response
     {
-        $org = static::getOrgById($orgId);
+        $order = Order::find()
+            ->number($orderNumber)
+            ->one();
 
-        if (!$org->canView($this->currentUser)) {
-            throw new ForbiddenHttpException();
-        }
-
-        $order = Order::find()->orgId($org->id)->number($orderNumber)->one();
-
-        if (!$order) {
+        if (!$order || !$order->canViewOrder($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
 
@@ -33,18 +30,19 @@ class OrdersController extends SiteController
 
     public function actionGetOrders(?int $orgId = null): ?Response
     {
-        $org = $this->getAllowedOrgFromRequest();
+        $org = $orgId ? Org::find()->id($orgId)->one() : null;
 
-        if ($org && !$org->canView($this->currentUser)) {
+        if ($org && !$org->canViewOrders($this->currentUser)) {
             throw new ForbiddenHttpException();
         }
+
         $approvalPending = $this->request->getParam('approvalPending', false);
         $orders = Order::find();
 
         if ($org) {
             $orders->orgId($org->id);
         } else {
-            $orders->customer($this->currentUser);
+            $orders->customer($this->currentUser)->withOrgOrders(false);
         }
 
         if ($approvalPending) {
@@ -78,7 +76,14 @@ class OrdersController extends SiteController
     public function actionRequestApproval(string $orderNumber): ?Response
     {
         $org = $this->getAllowedOrgFromRequest();
-        $order = static::getOrderByNumber($orderNumber);
+
+        $order = Order::find()
+            ->number($orderNumber)
+            ->one();
+
+        if (!$order) {
+            throw new ForbiddenHttpException();
+        }
 
         try {
             $requested = $order->requestApproval($this->currentUser, $org);
@@ -102,7 +107,13 @@ class OrdersController extends SiteController
     public function actionRejectRequest(string $orderNumber): ?Response
     {
         $org = $this->getAllowedOrgFromRequest();
-        $order = static::getOrderByNumber($orderNumber);
+        $order = Order::find()
+            ->number($orderNumber)
+            ->one();
+
+        if (!$order) {
+            throw new ForbiddenHttpException();
+        }
 
         try {
             $requested = $order->rejectApproval($this->currentUser, $org);
@@ -111,16 +122,5 @@ class OrdersController extends SiteController
         }
 
         return $requested ? $this->asSuccess('Order approval rejected.') : $this->asFailure();
-    }
-
-    private static function getOrderByNumber(string $orderNumber): Order|OrderBehavior
-    {
-        $order = Order::find()->number($orderNumber)->one();
-
-        if (!$order) {
-            throw new NotFoundHttpException('Order not found');
-        }
-
-        return $order;
     }
 }

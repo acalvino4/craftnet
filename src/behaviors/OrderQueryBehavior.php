@@ -14,6 +14,7 @@ use yii\base\Behavior;
  */
 class OrderQueryBehavior extends Behavior
 {
+    public bool $withOrgOrders = true;
     public ?int $orgId = null;
     public ?int $creatorId = null;
     public ?int $purchaserId = null;
@@ -33,9 +34,23 @@ class OrderQueryBehavior extends Behavior
         ];
     }
 
+    /**
+     * @param bool $withOrgOrders
+     * @return OrderQueryBehavior
+     */
+    public function withOrgOrders(bool $withOrgOrders): OrderQueryBehavior
+    {
+        $this->withOrgOrders = $withOrgOrders;
+        return $this;
+    }
+
     public function orgId(?int $orgId): OrderQuery
     {
         $this->orgId = $orgId;
+
+        if ($this->orgId) {
+            $this->withOrgOrders = true;
+        }
 
         return $this->owner;
     }
@@ -45,6 +60,7 @@ class OrderQueryBehavior extends Behavior
         $this->approvalPending = $approvalPending;
 
         if ($this->approvalPending) {
+            $this->withOrgOrders = true;
             $this->approvalRequested = true;
         }
 
@@ -54,6 +70,10 @@ class OrderQueryBehavior extends Behavior
     public function approvalRequested(bool $approvalRequested): OrderQuery
     {
         $this->approvalRequested = $approvalRequested;
+
+        if ($this->approvalRequested) {
+            $this->withOrgOrders = true;
+        }
 
         return $this->owner;
     }
@@ -65,6 +85,7 @@ class OrderQueryBehavior extends Behavior
 
         if ($this->approvalRejectedById) {
             $this->approvalRequested = true;
+            $this->withOrgOrders = true;
         }
 
         return $this->owner;
@@ -77,6 +98,7 @@ class OrderQueryBehavior extends Behavior
 
         if ($this->approvalRequestedById) {
             $this->approvalRequested = true;
+            $this->withOrgOrders = true;
         }
 
         return $this->owner;
@@ -88,6 +110,7 @@ class OrderQueryBehavior extends Behavior
 
         if ($this->approvalRejectedDate) {
             $this->approvalRequested = true;
+            $this->withOrgOrders = true;
         }
 
         return $this->owner;
@@ -116,7 +139,9 @@ class OrderQueryBehavior extends Behavior
             } else {
                 $this->owner->subQuery->andWhere(['orgsOrders.orgId' => $this->orgId]);
             }
-        } else {
+        }
+
+        if (!$this->withOrgOrders) {
             $this->owner->subQuery->andWhere(['orgsOrders.orgId' => null]);
         }
 
