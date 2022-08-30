@@ -4,8 +4,8 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import PersonalIndex from './_personal';
-import OrganizationIndex from './_organization';
+import UserIndex from './_user';
+import OrgIndex from './_org';
 import {checkRoute} from '../../../helpers/check-route';
 
 export default {
@@ -16,10 +16,10 @@ export default {
 
     computedComponent() {
       if (this.currentOrganization) {
-        return OrganizationIndex
+        return OrgIndex
       }
 
-      return PersonalIndex
+      return UserIndex
     }
   },
 
