@@ -28,6 +28,11 @@ const getters = {
         return (member.id === userId && member.role === 'owner')
       })
     }
+  },
+
+  currentMember(state, getters, rootState) {
+    const userId = parseInt(rootState.account.user.id)
+    return state.members.find(member => member.id === userId)
   }
 }
 

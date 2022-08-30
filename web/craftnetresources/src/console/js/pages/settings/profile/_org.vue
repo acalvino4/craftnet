@@ -76,7 +76,7 @@
 
 <script>
 import {mapGetters, mapState} from 'vuex'
-import RemoveOrganization from '../../../components/RemoveOrganization';
+import RemoveOrganization from '../../../components/organizations/RemoveOrganization';
 
 export default {
   components: {RemoveOrganization},
@@ -99,7 +99,7 @@ export default {
 
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner',
+      currentMember: 'organizations/currentMember',
     }),
   },
 
@@ -119,7 +119,7 @@ export default {
   },
 
   mounted() {
-    if (!this.userIsOwner(this.user.id)) {
+    if (!(this.currentMember.role === 'owner' || this.currentMember.role === 'admin')) {
       this.$router.push('/')
     }
 
