@@ -301,6 +301,7 @@ abstract class BaseController extends Controller
         $transformed = $order->getAttributes([
             'id',
             'number',
+            'shortNumber',
             'dateOrdered',
             'datePaid',
             'pdfUrl',
