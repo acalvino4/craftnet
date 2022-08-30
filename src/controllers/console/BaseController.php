@@ -4,12 +4,16 @@ namespace craftnet\controllers\console;
 
 use Craft;
 use craft\commerce\elements\Order;
+use craft\elements\Address;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
+use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use craftnet\Module;
 use craftnet\orgs\MemberRoleEnum;
 use craftnet\orgs\Org;
 use craftnet\plugins\Plugin;
+use Illuminate\Support\Collection;
 use Throwable;
 use yii\base\UserException;
 use yii\helpers\Markdown;
@@ -298,7 +302,9 @@ abstract class BaseController extends Controller
             'id',
             'number',
             'dateOrdered',
+            'datePaid',
             'pdfUrl',
+            'itemTotal',
             'totalPrice',
         ]);
 
@@ -311,6 +317,60 @@ abstract class BaseController extends Controller
                 'approvalRejectedOn' => static::transformUser($order->getApprovalRejectedDate()),
             ];
         }
+
+        return $transformed;
+    }
+
+    protected static function transformAddress(Address $address): array
+    {
+        $orgs = $address->getOrgs()->collect();
+
+        return $address->getAttributes() + [
+                'isPrimaryBilling' => $address->isPrimaryBilling ?? false,
+                'isPrimaryShipping' => $address->isPrimaryShipping ?? false,
+                'orgs' => $orgs->isEmpty() ? null : $address->getOrgs()->collect()
+                    ->map(fn($org) => static::transformOrg($org)),
+            ];
+
+    }
+
+    protected static function transformOrderDetail(Order $order): array
+    {
+        $transformed = static::transformOrder($order);
+        $owner = $order->org ?? $order->customer;
+
+        $transformed['billingAddress'] = $order->billingAddress
+            ? static::transformAddress($order->billingAddress)
+            : null;
+
+        $transformed['lineItems'] = Collection::make($order->lineItems)
+            ->map(fn($lineItem) => $lineItem->getAttributes([
+                'description',
+                'salePrice',
+                'qty',
+                'subtotal',
+            ]));
+
+        $transformed['transactions'] = Collection::make($order->getTransactions())
+            ->map(fn($transaction) => $transaction->getAttributes([
+                'type',
+                'status',
+                'amount',
+                'paymentAmount',
+                'dateCreated',
+            ]) + [
+                'gatewayName' => ($transaction->getGateWay()?->name),
+            ]);
+
+        // CMS licenses
+        $transformed['cmsLicenses'] = Module::getInstance()
+            ->getCmsLicenseManager()
+            ->transformLicensesForOwner($order->cmsLicenses, $owner);
+
+        // Plugin licenses
+        $transformed['pluginLicenses'] = Module::getInstance()
+            ->getPluginLicenseManager()
+            ->transformLicensesForOwner($order->pluginLicenses, $owner);
 
         return $transformed;
     }

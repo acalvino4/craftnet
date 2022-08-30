@@ -12,44 +12,6 @@ use yii\web\Response;
  */
 class InvoicesController extends BaseController
 {
-    // Public Methods
-    // =========================================================================
-
-    /**
-     * Get invoices.
-     *
-     * @return Response
-     */
-    public function actionGetInvoicesForUser(): Response
-    {
-        $owner = $this->getAllowedOrgFromRequest() ?? $this->currentUser;
-        $filter = $this->request->getParam('query');
-        $limit = $this->request->getParam('limit', 10);
-        $page = (int)$this->request->getParam('page', 1);
-        $orderBy = $this->request->getParam('orderBy');
-        $ascending = $this->request->getParam('ascending');
-
-        $invoices = Module::getInstance()
-            ->getInvoiceManager()
-            ->getInvoices($owner, $filter, $limit, $page, $orderBy, $ascending);
-
-        $total = Module::getInstance()->getInvoiceManager()->getTotalInvoices($owner, $filter);
-        return $this->asSuccess(data: $this->formatPagination($invoices, $total, $page, $limit));
-    }
-
-    /**
-     * Get invoice by its number.
-     *
-     * @return Response
-     * @throws \yii\web\BadRequestHttpException
-     */
-    public function actionGetInvoiceByNumber(string $number): Response
-    {
-        $invoice = Module::getInstance()->getInvoiceManager()->getInvoiceByNumber($this->currentUser, $number);
-
-        return $this->asSuccess(data: ['invoice' => $invoice]);
-    }
-
     /**
      * Get invoices.
      *

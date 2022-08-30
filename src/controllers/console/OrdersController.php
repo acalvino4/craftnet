@@ -25,7 +25,7 @@ class OrdersController extends SiteController
             throw new ForbiddenHttpException();
         }
 
-        return $this->asSuccess(data: ['order' => self::transformOrder($order)]);
+        return $this->asSuccess(data: ['order' => self::transformOrderDetail($order)]);
     }
 
     public function actionGetOrders(?int $orgId = null): ?Response
