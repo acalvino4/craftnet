@@ -8,6 +8,12 @@ namespace craft\elements;
  */
 class User {}
 
+/**
+ * @mixin \craftnet\behaviors\AddressBehavior
+ * @mixin \craft\commerce\behaviors\CustomerAddressBehavior
+ */
+class Address {}
+
 // ---------------------------
 
 namespace craft\commerce\elements;
@@ -40,9 +46,11 @@ class PaymentSource {}
 namespace craft\commerce\behaviors;
 
 class CustomerBehavior {}
+class CustomerAddressBehavior {}
 
 // ---------------------------
 
 namespace craftnet\behaviors;
 
 class UserBehavior {}
+class AddressBehavior {}

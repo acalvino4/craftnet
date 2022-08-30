@@ -17,6 +17,7 @@ use Throwable;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -136,22 +137,24 @@ class AddressesController extends BaseController
             $this->asModelFailure($address, 'Could not remove address.');
     }
 
+    public function actionGetAddress(int $addressId): ?Response
+    {
+        $address = Address::find()
+            ->owner($this->currentUser)
+            ->id($addressId)
+            ->one();
+
+        if (!$address) {
+            throw new ForbiddenHttpException();
+        }
+
+        return $this->asSuccess(data: ['address' => static::transformAddress($address)]);
+    }
+
     public function actionGetAddresses(): ?Response
     {
-        /** @var User|UserBehavior $user */
-        $user = $this->getCurrentUser();
-
-        $addresses = Collection::make($user->getAddresses())
-            ->map(function(Address|AddressBehavior $address) {
-                $orgs = $address->getOrgs()->collect();
-
-                return $address->getAttributes() + [
-                        'isPrimaryBilling' => $address->isPrimaryBilling,
-                        'isPrimaryShipping' => $address->isPrimaryShipping,
-                        'orgs' => $orgs->isEmpty() ? null : $address->getOrgs()->collect()
-                            ->map(fn($org) => static::transformOrg($org)),
-                    ];
-            });
+        $addresses = Collection::make($this->currentUser->getAddresses())
+            ->map(fn(Address $address) => static::transformAddress($address));
 
         return $this->asSuccess(data: ['addresses' => $addresses->all()]);
     }
