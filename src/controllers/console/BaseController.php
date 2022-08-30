@@ -204,15 +204,6 @@ abstract class BaseController extends Controller
         return $role;
     }
 
-    public function getElevatedSessionResponse(?string $message = null): ?YiiResponse
-    {
-        $message = $message ?? Craft::t('app', 'This action may only be performed with an elevated session.');
-
-        return $this->asFailure($message, [
-            'requireElevatedSession' => true
-        ]);
-    }
-
     protected function formatPagination(iterable $data, int $total, int $page, int $perPage): array
     {
         $lastPage = ceil($total / $perPage);

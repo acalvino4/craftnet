@@ -126,10 +126,6 @@ class AddressesController extends BaseController
             throw new NotFoundHttpException('Address not found.');
         }
 
-        if ($address->getOrgs()->exists() && !Craft::$app->getUser()->getHasElevatedSession()) {
-            return $this->getElevatedSessionResponse();
-        }
-
         $deleted = Craft::$app->getElements()->deleteElementById($addressId);
 
         return $deleted ?
