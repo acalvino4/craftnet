@@ -76,7 +76,7 @@
 
 <script>
 import {mapGetters, mapState} from 'vuex'
-import RemoveOrganization from '../../../components/RemoveOrganization';
+import RemoveOrganization from '../../../components/organizations/RemoveOrganization';
 
 export default {
   components: {RemoveOrganization},
