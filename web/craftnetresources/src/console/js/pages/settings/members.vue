@@ -129,17 +129,6 @@ export default {
       this.$store.dispatch('organizations/removeMember', {organizationId, memberId})
     }
   },
-
-  mounted() {
-    if (!this.currentOrganization) {
-      this.$router.push({path: '/settings/profile'})
-      return null
-    }
-
-    this.getOrganizationMembers({
-      organizationId: this.currentOrganization.id
-    })
-  },
 }
 </script>
 

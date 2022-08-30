@@ -4,9 +4,8 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import PersonalIndex from './_personal';
-import OrganizationIndex from './_organization';
-import {checkRoute} from '../../../helpers/check-route';
+import UserIndex from './_user';
+import OrgIndex from './_org';
 
 export default {
   computed: {
@@ -16,21 +15,11 @@ export default {
 
     computedComponent() {
       if (this.currentOrganization) {
-        return OrganizationIndex
+        return OrgIndex
       }
 
-      return PersonalIndex
+      return UserIndex
     }
   },
-
-  mounted() {
-    // checkRoute( {
-    //   currentOrganization: this.currentOrganization,
-    //   $router: this.$router,
-    //   $route: this.$route,
-    //   orgRouteName: 'OrgOrders',
-    //   userRouteName: 'UserOrders'
-    // })
-  }
 }
 </script>

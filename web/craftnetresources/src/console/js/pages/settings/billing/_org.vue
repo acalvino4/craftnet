@@ -37,8 +37,8 @@
 
 <script>
 import {mapGetters, mapState} from 'vuex';
-import Spinner from '../../../../common/ui/components/Spinner';
-import PageHeader from '../PageHeader';
+import Spinner from '../../../../../common/ui/components/Spinner';
+import PageHeader from '../../../components/PageHeader';
 
 export default {
   components: {PageHeader, Spinner},

@@ -13,7 +13,6 @@
 import {mapState, mapGetters} from 'vuex'
 import OrganizationProfile from './_org';
 import UserProfile from './_user';
-import {checkRoute} from '../../../helpers/check-route';
 
 export default {
   components: {
@@ -32,14 +31,6 @@ export default {
 
   mounted() {
     this.userDraft = JSON.parse(JSON.stringify(this.user))
-
-    checkRoute( {
-      currentOrganization: this.currentOrganization,
-      $router: this.$router,
-      $route: this.$route,
-      orgRouteName: 'OrgProfile',
-      userRouteName: 'UserProfile'
-    })
   }
 }
 </script>

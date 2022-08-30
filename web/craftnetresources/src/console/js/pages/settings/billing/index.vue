@@ -23,9 +23,8 @@
 // import BillingInvoiceDetails from '../../../components/billing/BillingInvoiceDetails'
 // import BillingAddressForm from '../../../components/billing/BillingAddressForm'
 import {mapGetters} from 'vuex';
-import OrgBilling from '../../../components/billing/OrgBilling';
-import UserBilling from '../../../components/billing/UserBilling';
-import {checkRoute} from '../../../helpers/check-route';
+import OrgBilling from './_org';
+import UserBilling from './_user';
 
 export default {
   components: {
@@ -40,15 +39,5 @@ export default {
       currentOrganization: 'organizations/currentOrganization'
     }),
   },
-
-  mounted() {
-    checkRoute( {
-      currentOrganization: this.currentOrganization,
-      $router: this.$router,
-      $route: this.$route,
-      orgRouteName: 'OrgBilling',
-      userRouteName: 'UserBilling'
-    })
-  }
 }
 </script>

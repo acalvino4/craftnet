@@ -67,7 +67,7 @@ import {mapGetters, mapState} from 'vuex';
 export default {
   computed: {
     ...mapState({
-      pendingOrders: state => state.organizations.pendingOrders,
+      pendingOrders: state => state.orders.pendingOrders,
       user: state => state.account.user,
       members: state => state.organizations.members,
       cart: state => state.cart.cart,
@@ -120,7 +120,7 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('organizations/getPendingOrders', {
+    this.$store.dispatch('orders/getPendingOrders', {
         organizationId: this.currentOrganization.id
       })
 

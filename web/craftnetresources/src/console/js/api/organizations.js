@@ -1,4 +1,5 @@
-/* global VUE_APP_URL_CONSOLE, Craft */
+/* global VUE_APP_URL_CONSOLE */
+
 import axios from './axios';
 import qs from 'qs';
 
@@ -29,11 +30,7 @@ export default {
 
     return axios.post(endpointUrl, qs.stringify(data))
   },
-
-  convertAccountToOrganization() {
-    console.log('TODO: Implement converting an account to an organization. The user can’t convert his account until he leaves all the organizations he’s a member of.')
-  },
-
+  
   getOrders(organizationId) {
     const query = qs.stringify({
       orgId: organizationId,

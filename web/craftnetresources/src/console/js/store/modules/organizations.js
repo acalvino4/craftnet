@@ -7,8 +7,6 @@ const state = {
   organizations: [],
   currentOrgSlug: null,
   members: [],
-  orders: [],
-  pendingOrders: [],
   invitations: [],
 }
 
@@ -26,10 +24,6 @@ const getters = {
 
   userIsOwner(state) {
     return (userId) => {
-      if (!state.members) {
-        return false
-      }
-
       return !!state.members.find(member => {
         return (member.id === userId && member.role === 'owner')
       })
@@ -58,20 +52,6 @@ const actions = {
           reject(response)
         })
     })
-  },
-
-  getOrders({commit}, {organizationId}) {
-    return organizationsApi.getOrders(organizationId)
-      .then((response) => {
-        commit('updateOrders', response.data)
-      })
-  },
-
-  getPendingOrders({commit}, {organizationId}) {
-    return organizationsApi.getPendingOrders(organizationId)
-      .then((response) => {
-        commit('updatePendingOrders', response.data)
-      })
   },
 
   requestOrderApproval(context, {organizationId, orderNumber}) {
@@ -185,14 +165,6 @@ const mutations = {
 
   updateMembers(state, members) {
     state.members = members
-  },
-
-  updateOrders(state, orders) {
-    state.orders = orders
-  },
-
-  updatePendingOrders(state, pendingOrders) {
-    state.pendingOrders = pendingOrders
   },
 
   updateInvitations(state, invitations) {

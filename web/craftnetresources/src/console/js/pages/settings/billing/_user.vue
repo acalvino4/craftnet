@@ -16,9 +16,9 @@
   </div>
 </template>
 <script>
-import BillingCards from './BillingCards';
-import BillingAddresses from './BillingAddresses';
-import PageHeader from '../PageHeader';
+import BillingCards from '../../../components/billing/BillingCards';
+import BillingAddresses from '../../../components/billing/BillingAddresses';
+import PageHeader from '../../../components/PageHeader';
 export default {
   components: {PageHeader, BillingAddresses, BillingCards}
 }

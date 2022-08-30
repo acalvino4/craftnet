@@ -7,7 +7,7 @@
       <template v-slot:number="props">
         <router-link
           :to="getPrefixedTo('/settings/orders/' + props.row.number)">
-          {{ props.row.shortNumber }}
+          {{ props.row.number.substr(0,7) }}
         </router-link>
       </template>
       <template v-slot:price="props">
@@ -31,10 +31,12 @@
 
 import DataTable from '@/console/js/components/DataTable';
 import helpers from '../../mixins/helpers';
+import {mapGetters} from 'vuex';
 
 export default {
   mixins: [helpers],
   components: {DataTable},
+
   data() {
     return {
       vtColumns: ['number', 'price', 'date', 'receipt'],
@@ -47,9 +49,23 @@ export default {
   },
 
   computed: {
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization'
+    }),
+
     apiUrl() {
-      return VUE_APP_URL_CONSOLE + '/invoices'
+      return VUE_APP_URL_CONSOLE + '/orders'
     },
+
+    apiQuery() {
+      if (!this.currentOrganization) {
+        return null
+      }
+
+      return {
+        orgId: this.currentOrganization.id,
+      }
+    }
   },
 }
 </script>

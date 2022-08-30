@@ -1,12 +1,8 @@
-/* global Craft */
+/* global VUE_APP_URL_CONSOLE */
 
 import axios from './axios'
 
 export default {
-  getInvoices() {
-    return axios.get(`${VUE_APP_URL_CONSOLE}/invoices`);
-  },
-
   getInvoiceByNumber(number) {
     return axios.get(`${VUE_APP_URL_CONSOLE}/invoices/${number}`);
   },
