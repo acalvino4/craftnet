@@ -100,6 +100,7 @@ export default {
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
       userIsOwner: 'organizations/userIsOwner',
+      currentMember: 'organizations/currentMember',
     }),
   },
 
@@ -119,7 +120,7 @@ export default {
   },
 
   mounted() {
-    if (!this.userIsOwner(this.user.id)) {
+    if (!(this.currentMember.role === 'owner' || this.currentMember.role === 'admin')) {
       this.$router.push('/')
     }
 
