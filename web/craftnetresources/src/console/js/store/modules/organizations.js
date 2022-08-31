@@ -22,17 +22,13 @@ const getters = {
     return state.organizations.find(o => o.slug === state.currentOrgSlug)
   },
 
-  userIsOwner(state) {
-    return (userId) => {
-      return !!state.members.find(member => {
-        return (member.id === userId && member.role === 'owner')
-      })
-    }
-  },
-
   currentMember(state, getters, rootState) {
     const userId = parseInt(rootState.account.user.id)
     return state.members.find(member => member.id === userId)
+  },
+
+  currentMemberIsOwner(state, getters) {
+    return getters.currentMember && getters.currentMember.role === 'owner'
   }
 }
 

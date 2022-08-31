@@ -19,10 +19,10 @@
             <h2>Order pending approval</h2>
             <p>This order is pending approval.</p>
 
-            <template v-if="isPending && userIsOwner(user.id)">
+            <template v-if="isPending && currentMemberIsOwner">
               <div class="space-x-2">
-                <btn :disabled="!userIsOwner(user.id)" kind="primary" @click="approveRequest(order)">Approve</btn>
-                <btn :disabled="!userIsOwner(user.id)" kind="danger" @click="rejectRequest(order)">Reject</btn>
+                <btn :disabled="!currentMemberIsOwner" kind="primary" @click="approveRequest(order)">Approve</btn>
+                <btn :disabled="!currentMemberIsOwner" kind="danger" @click="rejectRequest(order)">Reject</btn>
               </div>
             </template>
           </alert>
@@ -189,7 +189,7 @@ export default {
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner',
+      currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
 
     isPending() {

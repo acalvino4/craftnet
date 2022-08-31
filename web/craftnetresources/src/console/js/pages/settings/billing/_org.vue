@@ -55,12 +55,11 @@ export default {
     ...mapState({
       addresses: state => state.addresses.addresses,
       paymentMethods: state => state.paymentMethods.paymentMethods,
-      user: state => state.account.user,
     }),
 
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner',
+      currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
 
     addressOptions() {
@@ -130,7 +129,7 @@ export default {
   },
 
   mounted() {
-    if (!this.userIsOwner(this.user.id)) {
+    if (!this.currentMemberIsOwner) {
       this.$router.push('/')
     }
 

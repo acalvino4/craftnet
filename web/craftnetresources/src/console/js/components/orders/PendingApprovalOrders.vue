@@ -34,7 +34,7 @@
             </template>
           </td>
           <td>
-            <template v-if="userIsOwner(user.id)">
+            <template v-if="currentMemberIsOwner">
               <div class="space-x-2">
                 <btn
                   :to="getPrefixedTo('/settings/orders/' + pendingOrder.number + '/review')"
@@ -66,13 +66,10 @@ export default {
   computed: {
     ...mapState({
       pendingOrders: state => state.orders.pendingOrders,
-      user: state => state.account.user,
-      members: state => state.organizations.members,
-      cart: state => state.cart.cart,
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner',
+      currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
   },
 

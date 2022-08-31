@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between">
       <h1 class="m-0">Members</h1>
 
-      <template v-if="userIsOwner(user.id)">
+      <template v-if="currentMemberIsOwner">
         <div>
           <btn
             kind="primary"
@@ -65,7 +65,7 @@
       </table>
     </div>
 
-    <template v-if="userIsOwner(user.id)">
+    <template v-if="currentMemberIsOwner">
       <invitations />
     </template>
 
@@ -106,11 +106,10 @@ export default {
   computed: {
     ...mapState({
       members: state => state.organizations.members,
-      user: state => state.account.user,
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner'
+      currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
   },
 

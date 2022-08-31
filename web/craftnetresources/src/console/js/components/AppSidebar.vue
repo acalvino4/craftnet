@@ -124,7 +124,7 @@
         </router-link>
       </li>
 
-      <template v-if="!currentOrganization || userIsOwner(user.id)">
+      <template v-if="!currentOrganization || currentMemberIsOwner">
         <li>
           <router-link
             @click="$emit('closeSidebar')"
@@ -215,8 +215,8 @@ export default {
 
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner',
-      currentMember: 'organizations/currentMember'
+      currentMember: 'organizations/currentMember',
+      currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
 
     ...mapGetters({
