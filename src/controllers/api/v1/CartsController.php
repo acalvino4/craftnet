@@ -527,20 +527,7 @@ class CartsController extends BaseApiController
         /**
          * @deprecated makePrimary should be set on the top-level payload
          */
-        if ($billingAddress?->makePrimary ?? false) {
-            /** @var Address $userBillingAddress */
-            $userBillingAddress = Craft::$app->getElements()->duplicateElement(
-                $address,
-                ['ownerId' => $customer->id],
-            );
-            $cart->sourceBillingAddressId = $userBillingAddress->id;
-            $cart->makePrimaryBillingAddress = true;
-        }
-
-        /**
-         * @deprecated makePrimary should be set on top-level payload
-         */
-        if (!empty($billingAddress->makePrimary)) {
+        if ($billingAddress?->makePrimary && $customer) {
             /** @var Address $userBillingAddress */
             $userBillingAddress = Craft::$app->getElements()->duplicateElement(
                 $address,
