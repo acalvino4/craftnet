@@ -18,9 +18,13 @@
             <dd>{{ invoice.number }}</dd>
 
             <dt>Date Paid</dt>
-            <dd>{{
-                $filters.parseDate(invoice.datePaid.date).toFormat('ff')
-              }}
+            <dd>
+              <template v-if="invoice.datePaid">
+                {{$filters.parseDate(invoice.datePaid.date).toFormat('ff') }}
+              </template>
+              <template v-else>
+                Not paid
+              </template>
             </dd>
           </dl>
 
