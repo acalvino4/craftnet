@@ -166,9 +166,6 @@ class OrderBehavior extends Behavior
         return $this;
     }
 
-    /**
-     * TODO: Commerce 4.2 may do this for us
-     */
     public function setValidBillingAddress(?Address $address): static
     {
         if (!$address) {

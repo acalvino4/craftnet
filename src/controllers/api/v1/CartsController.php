@@ -235,7 +235,7 @@ class CartsController extends BaseApiController
                 $cart->setOrg(null);
                 $cart->setCustomer($originalCustomer);
 
-                // Pending fix in 4.2
+                // TODO: Pending fix in 4.1.x
                 // $cart->setPaymentSource(null);
                 $cart->setBillingAddress(null);
             } else if ($org) {
