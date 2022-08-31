@@ -17,6 +17,7 @@ use craft\helpers\StringHelper;
 use craftnet\behaviors\OrderBehavior;
 use craftnet\controllers\api\RateLimiterTrait;
 use craftnet\errors\ValidationException;
+use craftnet\paymentmethods\PaymentMethodRecord;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentMethod as StripePaymentMethod;
@@ -174,26 +175,28 @@ class PaymentsController extends CartsController
      */
     private function _populatePaymentForm(Order $cart, \stdClass $payload, StripeGateway $gateway, PaymentForm $paymentForm)
     {
-        // use the payload's token by default
-        $paymentForm->paymentMethodId = $payload->token;
+        if ($cart->getPaymentSource()) {
+            $paymentForm->populateFromPaymentSource($cart->getPaymentSource());
+        } else {
+            $paymentForm->paymentMethodId = $payload->token;
+        }
 
         $commerce = Commerce::getInstance();
         $stripe = Stripe::getInstance();
         $paymentSourcesService = $commerce->getPaymentSources();
         $customersService = $stripe->getCustomers();
-        $user = $this->getCurrentUser(false);
         $makePrimary = $payload->makePrimary ?? false;
-        $address = $cart->getBillingAddress();
+        $billingAddress = $cart->getBillingAddress();
         $customerData = [
             'address' => [
-                'line1' => $address?->addressLine1,
-                'line2' => $address?->addressLine2,
-                'country' => $address?->getCountryCode(),
-                'city' => $address?->getLocality(),
-                'postal_code' => $address?->getPostalCode(),
-                'state' => $address?->getAdministrativeArea(),
+                'line1' => $billingAddress?->addressLine1,
+                'line2' => $billingAddress?->addressLine2,
+                'country' => $billingAddress?->getCountryCode(),
+                'city' => $billingAddress?->getLocality(),
+                'postal_code' => $billingAddress?->getPostalCode(),
+                'state' => $billingAddress?->getAdministrativeArea(),
             ],
-            'name' => $address?->fullName,
+            'name' => $billingAddress?->fullName,
             'email' => $cart->getEmail(),
         ];
 
@@ -210,18 +213,22 @@ class PaymentsController extends CartsController
             }
         }
 
+        // If we had a customer stored on the payment method, no need to tell it to use the payment method
+        if ($stripeCustomerId) {
+            $stripeCustomer = StripeCustomer::update($stripeCustomerId, $customerData);
+
         // If there was no customer stored on payment method
-        if (!$stripeCustomerId) {
+        } else {
+            // TODO: wat?
             $customerData['source'] = $payload->token;
             $customerData['description'] = 'Guest customer created for order #' . $payload->orderNumber;
 
             // If a user is logged in and they wish to store this card
-            if ($user && $makePrimary) {
-                // TODO: update this when we have makePrimaryPaymentSource
-                $cart->makePrimaryBillingAddress = true;
+            if ($this->currentUser && $makePrimary) {
+                // TODO: should we use makePrimaryBillingAddress/makePrimaryPaymentSource when it exists?
 
                 // Fetch a customer
-                $customer = $customersService->getCustomer($gateway->id, $user);
+                $customer = $customersService->getCustomer($gateway->id, $this->currentUser);
 
                 // Update the customer data
                 $stripeCustomer = StripeCustomer::update($customer->reference, $customerData);
@@ -232,15 +239,12 @@ class PaymentsController extends CartsController
                 // Otherwise create an anonymous customer
                 $stripeCustomer = StripeCustomer::create($customerData);
             }
-        } else {
-            // If we had a customer stored on the payment method, no need to tell it to use the payment method
-            $stripeCustomer = StripeCustomer::update($stripeCustomerId, $customerData);
         }
 
         $paymentForm->customer = $stripeCustomer->id;
 
         // If there's no need to make anything primary - bye!
-        if (!$user || !$makePrimary) {
+        if (!$this->currentUser || !$makePrimary) {
             return;
         }
 
@@ -259,9 +263,8 @@ class PaymentsController extends CartsController
         $stripeCustomer->save();
 
         // save it for Commerce
-        // TODO: save as a payment method
         $paymentSource = new PaymentSource([
-            'customerId' => $user->id,
+            'customerId' => $this->currentUser->id,
             'gatewayId' => $gateway->id,
             'token' => $stripeResponse->id,
             'response' => $stripeResponse->toJSON(),
@@ -270,6 +273,22 @@ class PaymentsController extends CartsController
 
         if (!$paymentSourcesService->savePaymentSource($paymentSource)) {
             throw new PaymentSourceException('Could not create the payment method: ' . implode(', ', $paymentSource->getErrorSummary(true)));
+        }
+
+        $paymentMethod = new PaymentMethodRecord();
+        $paymentMethod->paymentSourceId = $paymentSource->id;
+        $paymentMethod->billingAddressId = $billingAddress?->id;
+        $paymentMethod->ownerId = $this->currentUser->id;
+
+        if (!$paymentMethod->save()) {
+            throw new Exception('Unable to save payment method.');
+        }
+
+        $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
+        $this->currentUser->setPrimaryBillingAddressId($billingAddress->id);
+
+        if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
+            throw new Exception('Unable to save user.');
         }
     }
 
