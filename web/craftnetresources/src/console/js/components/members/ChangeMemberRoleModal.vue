@@ -1,7 +1,10 @@
 <template>
   <modal-headless
     :isOpen="showChangeMemberRoleModal"
-    @close="$emit('close')">
+    @close="$emit('close')"
+    @submit="changeRole"
+  >
+
     <h2>Change member role</h2>
     <p class="mt-1 text-gray-500">Change {{member.name}}’s role.</p>
 
@@ -48,7 +51,7 @@
         <spinner />
       </template>
       <btn @click="$emit('close')">Cancel</btn>
-      <btn :disabled="loading || member.role === role" kind="primary" @click="changeRole">Change</btn>
+      <btn :disabled="loading || member.role === role" kind="primary" type="submit">Change</btn>
     </template>
   </modal-headless>
 </template>

@@ -120,9 +120,6 @@ const actions = {
 
   cancelInvitation({dispatch}, {organizationId, userId}) {
     return organizationsApi.cancelInvitation({organizationId, userId})
-      .then(() => {
-        dispatch('getInvitations', {organizationId})
-      })
   },
 
   acceptInvitation({dispatch}, {organizationId}) {
