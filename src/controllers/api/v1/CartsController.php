@@ -250,15 +250,10 @@ class CartsController extends BaseApiController
                     if ($payload?->items ?? null) {
                         throw new ForbiddenHttpException('Orders pending approval cannot be changed.');
                     }
-
                 }
 
                 if (!$org->canPurchase($currentUser)) {
                     throw new ForbiddenHttpException('Member does not have permission to make purchases for this organization.');
-                }
-
-                if (isset($payload->billingAddress) || $makePrimary) {
-                    throw new BadRequestHttpException('Organizations must use their specified billing information.');
                 }
 
                 $cart->setOrg($org);
@@ -276,15 +271,8 @@ class CartsController extends BaseApiController
             }
 
             // billing address
-            $billingAddressId = $payload?->billingAddressId ?? $paymentMethod?->billingAddressId;
-            if ($billingAddressId) {
-                $address = Address::find()->id($billingAddressId)->one();
-
-                if (!$address) {
-                    throw new BadRequestHttpException('Address not found.');
-                }
-
-                $cart->setValidBillingAddress($address);
+            if ($paymentMethod?->billingAddress) {
+                $cart->setValidBillingAddress($paymentMethod->billingAddress);
             } else if (isset($payload->billingAddress)) {
                 $this->_updateCartBillingAddress($cart, $payload->billingAddress, $errors);
             }
