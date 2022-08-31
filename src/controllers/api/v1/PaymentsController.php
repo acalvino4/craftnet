@@ -175,6 +175,7 @@ class PaymentsController extends CartsController
      */
     private function _populatePaymentForm(Order $cart, \stdClass $payload, StripeGateway $gateway, PaymentForm $paymentForm)
     {
+
         if ($cart->getPaymentSource()) {
             $paymentForm->populateFromPaymentSource($cart->getPaymentSource());
         } else {
@@ -185,7 +186,8 @@ class PaymentsController extends CartsController
         $stripe = Stripe::getInstance();
         $paymentSourcesService = $commerce->getPaymentSources();
         $customersService = $stripe->getCustomers();
-        $makePrimary = $payload->makePrimary ?? false;
+        $savePaymentMethod = (bool) ($payload?->savePaymentMethod ?? false);
+        $makePrimary = $savePaymentMethod && ($payload?->makePrimary ?? false);
         $billingAddress = $cart->getBillingAddress();
         $customerData = [
             'address' => [
@@ -244,7 +246,7 @@ class PaymentsController extends CartsController
         $paymentForm->customer = $stripeCustomer->id;
 
         // If there's no need to make anything primary - bye!
-        if (!$this->currentUser || !$makePrimary) {
+        if (!$this->currentUser || !$savePaymentMethod) {
             return;
         }
 
@@ -284,11 +286,13 @@ class PaymentsController extends CartsController
             throw new Exception('Unable to save payment method.');
         }
 
-        $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
-        $this->currentUser->setPrimaryBillingAddressId($billingAddress->id);
+        if ($makePrimary) {
+            $this->currentUser->setPrimaryPaymentSourceId($paymentSource->id);
+            $this->currentUser->setPrimaryBillingAddressId($billingAddress->id);
 
-        if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
-            throw new Exception('Unable to save user.');
+            if (!Craft::$app->getElements()->saveElement($this->currentUser)) {
+                throw new Exception('Unable to save user.');
+            }
         }
     }
 
