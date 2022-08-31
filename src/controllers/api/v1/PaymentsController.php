@@ -227,7 +227,6 @@ class PaymentsController extends CartsController
 
             // If a user is logged in and they wish to store this card
             if ($this->currentUser && $makePrimary) {
-                // TODO: should we use makePrimaryBillingAddress/makePrimaryPaymentSource when it exists?
 
                 // Fetch a customer
                 $customer = $customersService->getCustomer($gateway->id, $this->currentUser);
