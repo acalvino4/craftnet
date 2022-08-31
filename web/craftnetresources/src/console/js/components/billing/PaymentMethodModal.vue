@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import AddressFields from './addresses/AddressFields'
+import AddressFields from './AddressFields'
 import ModalHeadless from '../ModalHeadless'
 import CardElement from '../card/CardElement'
 
