@@ -98,8 +98,12 @@ class ChangelogParser
         // Purify HTML
         $notes = HtmlPurifier::process($notes);
 
-        // Notes/tips
-        $notes = preg_replace('/<blockquote><p>\{(note|tip|warning)\}/', '<blockquote class="note $1"><p>', $notes);
+        // Notes/tips/warnings
+        $notes = preg_replace('/<blockquote><p>\{(note|tip|warning)\}\s*/', '<blockquote class="note $1"><p>', $notes);
+
+        // GitHub-style notes/tips/warnings
+        // (see https://github.com/community/community/discussions/16925)
+        $notes = preg_replace('/<blockquote><p><strong>(note|tip|warning)</strong>\s*/', '<blockquote class="note $1"><p>', $notes); // GitHub style
 
         return $notes;
     }
