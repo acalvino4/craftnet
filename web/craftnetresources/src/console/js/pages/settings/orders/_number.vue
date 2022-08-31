@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="!loading">
-      <template v-if="invoice">
+      <template v-if="order">
         <p>
           <router-link
             class="nav-link"
@@ -10,17 +10,17 @@
             Orders
           </router-link>
         </p>
-        <h1>Order {{ invoice.shortNumber }}</h1>
+        <h1>Order {{ order.shortNumber }}</h1>
 
         <pane>
           <dl>
             <dt>Order Number</dt>
-            <dd>{{ invoice.number }}</dd>
+            <dd>{{ order.number }}</dd>
 
             <dt>Date Paid</dt>
             <dd>
-              <template v-if="invoice.datePaid">
-                {{$filters.parseDate(invoice.datePaid.date).toFormat('ff') }}
+              <template v-if="order.datePaid">
+                {{$filters.parseDate(order.datePaid.date).toFormat('ff') }}
               </template>
               <template v-else>
                 Not paid
@@ -29,7 +29,7 @@
           </dl>
 
           <billing-address
-            :address="invoice.billingAddress"
+            :address="order.billingAddress"
             class="mb-4"></billing-address>
 
           <table class="table">
@@ -43,7 +43,7 @@
             </thead>
             <tbody>
             <tr
-              v-for="(lineItem, lineItemKey) in invoice.lineItems"
+              v-for="(lineItem, lineItemKey) in order.lineItems"
               :key="'line-item-' + lineItemKey">
               <td>{{ lineItem.description }}</td>
               <td>{{ $filters.currency(lineItem.salePrice) }}</td>
@@ -53,7 +53,7 @@
               </td>
             </tr>
             <tr
-              v-for="(adjustment, adjustmentKey) in invoice.adjustments"
+              v-for="(adjustment, adjustmentKey) in order.adjustments"
               :key="'adjustment-' + adjustmentKey">
               <th
                 colspan="3"
@@ -70,7 +70,7 @@
                 class="text-right">Items Price
               </th>
               <td class="text-right">
-                {{ $filters.currency(invoice.itemTotal) }}
+                {{ $filters.currency(order.itemTotal) }}
               </td>
             </tr>
             <tr>
@@ -79,7 +79,7 @@
                 class="text-right">Total Price
               </th>
               <td class="text-right">
-                {{ $filters.currency(invoice.totalPrice) }}
+                {{ $filters.currency(order.totalPrice) }}
               </td>
             </tr>
             </tbody>
@@ -102,7 +102,7 @@
             </thead>
             <tbody>
             <tr
-              v-for="(transaction, transactionKey) in invoice.transactions"
+              v-for="(transaction, transactionKey) in order.transactions"
               :key="'transaction-' + transactionKey">
               <td>{{ transaction.type }}</td>
               <td>{{ transaction.status }}</td>
@@ -121,16 +121,16 @@
           </table>
         </pane>
 
-        <pane v-if="invoice.cmsLicenses && invoice.cmsLicenses.length">
+        <pane v-if="order.cmsLicenses && order.cmsLicenses.length">
           <h3 class="mb-2">CMS Licenses</h3>
           <cms-licenses-table
-            :licenses="invoice.cmsLicenses"></cms-licenses-table>
+            :licenses="order.cmsLicenses"></cms-licenses-table>
         </pane>
 
-        <pane v-if="invoice.pluginLicenses && invoice.pluginLicenses.length">
+        <pane v-if="order.pluginLicenses && order.pluginLicenses.length">
           <h3 class="mb-2">Plugin Licenses</h3>
           <plugin-licenses-table
-            :licenses="invoice.pluginLicenses"></plugin-licenses-table>
+            :licenses="order.pluginLicenses"></plugin-licenses-table>
         </pane>
       </template>
     </template>
@@ -160,7 +160,7 @@ export default {
   data() {
     return {
       loading: false,
-      invoice: null,
+      order: null,
       error: false,
     }
   },
@@ -180,7 +180,7 @@ export default {
 
     ordersApi.getOrder(orderNumber, orgId)
       .then((response) => {
-        this.invoice = response.data.order
+        this.order = response.data.order
         this.loading = false
       })
 
