@@ -7,15 +7,14 @@
           <th>Number</th>
           <th>Date Ordered</th>
           <th>Requested by</th>
-          <th>Rejected by</th>
-          <th>Actions</th>
+          <th></th>
         </tr>
         </thead>
         <tbody>
         <tr v-for="pendingOrder in pendingOrders.data">
           <td>
             <router-link
-              :to="getPrefixedTo('/settings/orders/' + pendingOrder.number)"
+              :to="getPrefixedTo('/settings/orders/' + pendingOrder.number + '/review')"
             >
               {{ pendingOrder.shortNumber }}
             </router-link>
@@ -35,25 +34,16 @@
             </template>
           </td>
           <td>
-            <template v-if="pendingOrder.approvalRejectedBy">
-              <div>{{pendingOrder.approvalRejectedBy.name}}</div>
-              <div>{{pendingOrder.approvalRejectedBy.email}}</div>
-            </template>
-            <template v-else>
-              —
-            </template>
-          </td>
-          <td>
-            <template v-if="userIsOwner(user.id)">
-
-            <div class="space-x-2">
-              <btn :disabled="!userIsOwner(user.id)" kind="primary" @click="approveRequest(pendingOrder)">Approve</btn>
-              <btn :disabled="!userIsOwner(user.id)" kind="danger" @click="rejectRequest(pendingOrder)">Reject</btn>
-            </div>
+            <template v-if="currentMemberIsOwner">
+              <div class="space-x-2">
+                <btn
+                  :to="getPrefixedTo('/settings/orders/' + pendingOrder.number + '/review')"
+                >Review order request</btn>
+              </div>
             </template>
 
             <template v-else>
-              <div class="mt-2">
+              <div>
                 <em>Pending owner approval</em>
               </div>
             </template>
@@ -76,55 +66,11 @@ export default {
   computed: {
     ...mapState({
       pendingOrders: state => state.orders.pendingOrders,
-      user: state => state.account.user,
-      members: state => state.organizations.members,
-      cart: state => state.cart.cart,
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
-      userIsOwner: 'organizations/userIsOwner',
+      currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
-  },
-
-  methods: {
-    approveRequest(pendingOrder) {
-      console.log('approveRequest', pendingOrder);
-      this.$store.dispatch('cart/saveCart', {
-        orgId: this.currentOrganization.id,
-      })
-        .then(() => {
-          this.$store.dispatch('app/displayNotice', 'Cart saved.')
-
-          this.$store.dispatch('cart/checkout', {
-            orderNumber: this.cart.number,
-            // token: this.selectedPaymentMethod.token,
-            // expectedPrice: this.cart.totalPrice,
-            // // makePrimary: this.replaceCard,
-          })
-            .then(() => {
-              this.$store.dispatch('app/displayNotice', 'Checkout success.')
-            })
-            .catch(() => {
-              this.$store.dispatch('app/displayError', 'Couldn’t checkout.')
-            })
-        })
-        .catch(() => {
-          this.$store.dispatch('app/displayError', 'Couldn’t save cart.')
-        })
-
-    },
-    rejectRequest(pendingOrder) {
-      this.$store.dispatch('organizations/rejectRequest', {
-        organizationId: this.currentOrganization.id,
-        orderNumber: pendingOrder.number,
-      })
-        .then(() => {
-          this.$store.dispatch('app/displayNotice', 'Request rejected.')
-        })
-        .catch(() => {
-          this.$store.dispatch('app/displayError', 'Couldn’t reject request.')
-        })
-    },
   },
 
   mounted() {

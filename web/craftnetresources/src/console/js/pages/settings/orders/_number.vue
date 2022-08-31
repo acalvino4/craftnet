@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="!loading">
-      <template v-if="invoice">
+      <template v-if="order">
         <p>
           <router-link
             class="nav-link"
@@ -10,124 +10,146 @@
             Orders
           </router-link>
         </p>
-        <h1>Order {{ invoice.shortNumber }}</h1>
+        <div class="space-y-6">
+          <div class="flex item-center justify-between">
+            <h1 class="m-0">Order {{ order.shortNumber }}</h1>
+          </div>
 
-        <pane>
-          <dl>
-            <dt>Order Number</dt>
-            <dd>{{ invoice.number }}</dd>
+          <alert>
+            <h2>Order pending approval</h2>
+            <p>This order is pending approval.</p>
 
-            <dt>Date Paid</dt>
-            <dd>{{
-                $filters.parseDate(invoice.datePaid.date).toFormat('ff')
-              }}
-            </dd>
-          </dl>
+            <template v-if="isPending && currentMemberIsOwner">
+              <div class="space-x-2">
+                <btn :disabled="!currentMemberIsOwner" kind="primary" @click="approveRequest(order)">Approve</btn>
+                <btn :disabled="!currentMemberIsOwner" kind="danger" @click="rejectRequest(order)">Reject</btn>
+              </div>
+            </template>
+          </alert>
 
-          <billing-address
-            :address="invoice.billingAddress"
-            class="mb-4"></billing-address>
+          <pre>{{order}}</pre>
 
-          <table class="table">
-            <thead>
-            <tr>
-              <th>Item</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr
-              v-for="(lineItem, lineItemKey) in invoice.lineItems"
-              :key="'line-item-' + lineItemKey">
-              <td>{{ lineItem.description }}</td>
-              <td>{{ $filters.currency(lineItem.salePrice) }}</td>
-              <td>{{ lineItem.qty }}</td>
-              <td class="text-right">
-                {{ $filters.currency(lineItem.subtotal) }}
-              </td>
-            </tr>
-            <tr
-              v-for="(adjustment, adjustmentKey) in invoice.adjustments"
-              :key="'adjustment-' + adjustmentKey">
-              <th
-                colspan="3"
-                class="text-right">
-                {{ adjustment.name }}
-              </th>
-              <td class="text-right">
-                {{ $filters.currency(adjustment.amount) }}
-              </td>
-            </tr>
-            <tr>
-              <th
-                colspan="3"
-                class="text-right">Items Price
-              </th>
-              <td class="text-right">
-                {{ $filters.currency(invoice.itemTotal) }}
-              </td>
-            </tr>
-            <tr>
-              <th
-                colspan="3"
-                class="text-right">Total Price
-              </th>
-              <td class="text-right">
-                {{ $filters.currency(invoice.totalPrice) }}
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </pane>
+          <pane>
+            <dl>
+              <dt>Order Number</dt>
+              <dd>{{ order.number }}</dd>
 
-        <pane>
-          <h3 class="mb-2">Transactions</h3>
+              <dt>Date Paid</dt>
+              <dd>
+                <template v-if="!isPending">
+                  {{$filters.parseDate(order.datePaid.date).toFormat('ff') }}
+                </template>
+                <template v-else>
+                  Not paid
+                </template>
+              </dd>
+            </dl>
 
-          <table class="table">
-            <thead>
-            <tr>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Amount</th>
-              <th>Payment Amount</th>
-              <th>Method</th>
-              <th>Date</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr
-              v-for="(transaction, transactionKey) in invoice.transactions"
-              :key="'transaction-' + transactionKey">
-              <td>{{ transaction.type }}</td>
-              <td>{{ transaction.status }}</td>
-              <td>{{ $filters.currency(transaction.amount) }}</td>
-              <td>{{
-                  $filters.currency(transaction.paymentAmount)
-                }}
-              </td>
-              <td>{{ transaction.gatewayName }}</td>
-              <td>{{
-                  $filters.parseDate(transaction.dateCreated.date).toFormat('ff')
-                }}
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </pane>
+            <billing-address
+              :address="order.billingAddress"
+              class="mb-4"></billing-address>
 
-        <pane v-if="invoice.cmsLicenses && invoice.cmsLicenses.length">
-          <h3 class="mb-2">CMS Licenses</h3>
-          <cms-licenses-table
-            :licenses="invoice.cmsLicenses"></cms-licenses-table>
-        </pane>
+            <table class="table">
+              <thead>
+              <tr>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr
+                v-for="(lineItem, lineItemKey) in order.lineItems"
+                :key="'line-item-' + lineItemKey">
+                <td>{{ lineItem.description }}</td>
+                <td>{{ $filters.currency(lineItem.salePrice) }}</td>
+                <td>{{ lineItem.qty }}</td>
+                <td class="text-right">
+                  {{ $filters.currency(lineItem.subtotal) }}
+                </td>
+              </tr>
+              <tr
+                v-for="(adjustment, adjustmentKey) in order.adjustments"
+                :key="'adjustment-' + adjustmentKey">
+                <th
+                  colspan="3"
+                  class="text-right">
+                  {{ adjustment.name }}
+                </th>
+                <td class="text-right">
+                  {{ $filters.currency(adjustment.amount) }}
+                </td>
+              </tr>
+              <tr>
+                <th
+                  colspan="3"
+                  class="text-right">Items Price
+                </th>
+                <td class="text-right">
+                  {{ $filters.currency(order.itemTotal) }}
+                </td>
+              </tr>
+              <tr>
+                <th
+                  colspan="3"
+                  class="text-right">Total Price
+                </th>
+                <td class="text-right">
+                  {{ $filters.currency(order.totalPrice) }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </pane>
 
-        <pane v-if="invoice.pluginLicenses && invoice.pluginLicenses.length">
-          <h3 class="mb-2">Plugin Licenses</h3>
-          <plugin-licenses-table
-            :licenses="invoice.pluginLicenses"></plugin-licenses-table>
-        </pane>
+          <pane>
+            <h3 class="mb-2">Transactions</h3>
+
+            <table class="table">
+              <thead>
+              <tr>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Amount</th>
+                <th>Payment Amount</th>
+                <th>Method</th>
+                <th>Date</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr
+                v-for="(transaction, transactionKey) in order.transactions"
+                :key="'transaction-' + transactionKey">
+                <td>{{ transaction.type }}</td>
+                <td>{{ transaction.status }}</td>
+                <td>{{ $filters.currency(transaction.amount) }}</td>
+                <td>{{
+                    $filters.currency(transaction.paymentAmount)
+                  }}
+                </td>
+                <td>{{ transaction.gatewayName }}</td>
+                <td>{{
+                    $filters.parseDate(transaction.dateCreated.date).toFormat('ff')
+                  }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </pane>
+
+          <pane v-if="order.cmsLicenses && order.cmsLicenses.length">
+            <h3 class="mb-2">CMS Licenses</h3>
+            <cms-licenses-table
+              :licenses="order.cmsLicenses"></cms-licenses-table>
+          </pane>
+
+          <pane v-if="order.pluginLicenses && order.pluginLicenses.length">
+            <h3 class="mb-2">Plugin Licenses</h3>
+            <plugin-licenses-table
+              :licenses="order.pluginLicenses"></plugin-licenses-table>
+          </pane>
+        </div>
       </template>
     </template>
     <template v-else>
@@ -142,7 +164,7 @@ import BillingAddress from '../../../components/billing/BillingAddress'
 import CmsLicensesTable from '../../../components/licenses/CmsLicensesTable'
 import PluginLicensesTable from '../../../components/licenses/PluginLicensesTable'
 import helpers from '../../../mixins/helpers';
-import {mapGetters} from 'vuex';
+import {mapGetters, mapState} from 'vuex';
 
 export default {
   mixins: [helpers],
@@ -156,15 +178,64 @@ export default {
   data() {
     return {
       loading: false,
-      invoice: null,
+      order: null,
       error: false,
     }
   },
 
   computed: {
-    ...mapGetters({
-      currentOrganization: 'organizations/currentOrganization'
+    ...mapState({
+      user: state => state.account.user,
     }),
+    ...mapGetters({
+      currentOrganization: 'organizations/currentOrganization',
+      currentMemberIsOwner: 'organizations/currentMemberIsOwner',
+    }),
+
+    isPending() {
+      return !this.order.datePaid
+    }
+  },
+
+  methods: {
+    approveRequest(pendingOrder) {
+      console.log('approveRequest', pendingOrder);
+      this.$store.dispatch('cart/saveCart', {
+          orgId: this.currentOrganization.id,
+        })
+        .then(() => {
+          this.$store.dispatch('app/displayNotice', 'Cart saved.')
+
+          this.$store.dispatch('cart/checkout', {
+              orderNumber: this.cart.number,
+              // token: this.selectedPaymentMethod.token,
+              // expectedPrice: this.cart.totalPrice,
+              // // makePrimary: this.replaceCard,
+            })
+            .then(() => {
+              this.$store.dispatch('app/displayNotice', 'Checkout success.')
+            })
+            .catch(() => {
+              this.$store.dispatch('app/displayError', 'Couldn’t checkout.')
+            })
+        })
+        .catch(() => {
+          this.$store.dispatch('app/displayError', 'Couldn’t save cart.')
+        })
+
+    },
+    rejectRequest(pendingOrder) {
+      this.$store.dispatch('organizations/rejectRequest', {
+          organizationId: this.currentOrganization.id,
+          orderNumber: pendingOrder.number,
+        })
+        .then(() => {
+          this.$store.dispatch('app/displayNotice', 'Request rejected.')
+        })
+        .catch(() => {
+          this.$store.dispatch('app/displayError', 'Couldn’t reject request.')
+        })
+    },
   },
 
   mounted() {
@@ -176,7 +247,7 @@ export default {
 
     ordersApi.getOrder(orderNumber, orgId)
       .then((response) => {
-        this.invoice = response.data.order
+        this.order = response.data.order
         this.loading = false
       })
 
