@@ -6,18 +6,18 @@
 
     <div class="space-y-6">
       <pane>
-        <billing-cards />
+        <payment-methods />
       </pane>
     </div>
   </div>
 </template>
 <script>
-import BillingCards from '../../../components/billing/BillingCards';
+import PaymentMethods from '../../../components/billing/PaymentMethods';
 import PageHeader from '../../../components/PageHeader';
 export default {
   components: {
     PageHeader,
-    BillingCards
+    PaymentMethods
   }
 }
 </script>

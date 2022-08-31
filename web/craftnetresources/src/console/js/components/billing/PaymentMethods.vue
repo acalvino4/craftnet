@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Credit Cards</h2>
+    <h2>Payment Methods</h2>
 
     <template v-if="loading">
       <spinner class="mt-3"></spinner>
@@ -16,9 +16,9 @@
             <div>
               <icon
                 icon="plus"
-                class="w-4 h-4" />
-
-              Add a credit card
+                class="w-4 h-4"
+              />
+              Add a payment method
             </div>
           </a>
           <template v-for="(paymentMethod, paymentMethodKey) in paymentMethods" :key="paymentMethodKey">
