@@ -121,6 +121,11 @@ const router = createRouter({
       component: () => import('../pages/settings/orders/_number.vue'),
     },
     {
+      path: '/organizations/:orgSlug/settings/orders/:number/review',
+      name: 'OrgOrderReview',
+      component: () => import('../pages/settings/orders/_number.vue'),
+    },
+    {
       path: '/organizations/:orgSlug/settings/plugin-store',
       name: 'SettingsPluginStore',
       component: () => import('../pages/settings/plugin-store.vue'),
