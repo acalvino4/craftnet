@@ -34,38 +34,36 @@
           leave-from="opacity-100 scale-100"
           leave-to="opacity-0 scale-95"
         >
-          <div
+          <form
             class="relative flex flex-col w-full md:max-w-2xl inline-block overflow-hidden text-left align-middle transition-all transform bg-primary md:border md:rounded-xl"
             v-bind="$attrs"
+            @submit.prevent="$emit('submit')"
           >
-            <form @submit.prevent="$emit('submit')">
-
-              <div class="fixed z-10 w-full backdrop-filter backdrop-blur bg-primary bg-opacity-80">
-                <div class="relative p-4">
-                  <button
-                    type="button"
-                    @click="$emit('close')"
-                    class="rounded">
-                    <icon
-                      icon="x"
-                      class="w-6 h-6" />
-                  </button>
-                </div>
+            <div class="fixed z-10 w-full backdrop-filter backdrop-blur bg-primary bg-opacity-80">
+              <div class="relative p-4">
+                <button
+                  type="button"
+                  @click="$emit('close')"
+                  class="rounded">
+                  <icon
+                    icon="x"
+                    class="w-6 h-6" />
+                </button>
               </div>
+            </div>
 
-              <div class="flex-1 overflow-auto p-8">
-                <div class="mt-8">
-                  <slot></slot>
-                </div>
+            <div class="flex-1 overflow-auto p-8">
+              <div class="mt-8">
+                <slot></slot>
               </div>
+            </div>
 
-              <template v-if="$slots.footer">
-                <div class="border-t px-8 py-6 space-x-2 flex justify-end items-center">
-                  <slot name="footer"></slot>
-                </div>
-              </template>
-            </form>
-          </div>
+            <template v-if="$slots.footer">
+              <div class="border-t px-8 py-6 space-x-2 flex justify-end items-center">
+                <slot name="footer"></slot>
+              </div>
+            </template>
+          </form>
         </TransitionChild>
       </div>
     </Dialog>
