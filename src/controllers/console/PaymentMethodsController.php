@@ -172,8 +172,8 @@ class PaymentMethodsController extends BaseController
         return $paymentMethod->getAttributes([
             'id',
             'paymentSourceId',
-            'billingAddressId',
         ]) + [
+            'billingAddress' => $billingAddress ? static::transformAddress($billingAddress) : null,
             'token' => $paymentSource?->token,
             'description' => $paymentSource?->description,
             'card' => $paymentSource?->getCard(),
