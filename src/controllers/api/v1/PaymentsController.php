@@ -125,7 +125,6 @@ class PaymentsController extends CartsController
 
         // only process a payment if there's a price
         if ($totalPrice) {
-            // TODO: support pre-selected card
 
             // get the gateway
             /** @var StripeGateway $gateway */
