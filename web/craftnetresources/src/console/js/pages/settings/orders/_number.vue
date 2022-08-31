@@ -15,17 +15,17 @@
             <h1 class="m-0">Order {{ order.shortNumber }}</h1>
           </div>
 
-          <alert>
-            <h2>Order pending approval</h2>
-            <p>This order is pending approval.</p>
+          <template v-if="isPending && currentMemberIsOwner">
+            <alert>
+              <h2>Order pending approval</h2>
+              <p>This order is pending approval.</p>
 
-            <template v-if="isPending && currentMemberIsOwner">
               <div class="space-x-2">
                 <btn :disabled="!currentMemberIsOwner" kind="primary" @click="approveRequest(order)">Approve</btn>
                 <btn :disabled="!currentMemberIsOwner" kind="danger" @click="rejectRequest(order)">Reject</btn>
               </div>
-            </template>
-          </alert>
+            </alert>
+          </template>
 
           <pane>
             <dl>
@@ -197,28 +197,26 @@ export default {
 
   methods: {
     approveRequest(pendingOrder) {
-      console.log('approveRequest', pendingOrder);
       this.$store.dispatch('cart/saveCart', {
           orgId: this.currentOrganization.id,
         })
         .then(() => {
-          this.$store.dispatch('app/displayNotice', 'Cart saved.')
-
           this.$store.dispatch('cart/checkout', {
-              orderNumber: this.cart.number,
-              // token: this.selectedPaymentMethod.token,
-              // expectedPrice: this.cart.totalPrice,
-              // // makePrimary: this.replaceCard,
+              orderNumber: pendingOrder.number,
+              expectedPrice: pendingOrder.totalPrice,
             })
             .then(() => {
               this.$store.dispatch('app/displayNotice', 'Checkout success.')
+                this.$router.push(this.getPrefixedTo('/settings/orders'))
             })
-            .catch(() => {
+            .catch((error) => {
               this.$store.dispatch('app/displayError', 'Couldn’t checkout.')
+              throw error
             })
         })
-        .catch(() => {
+        .catch((error) => {
           this.$store.dispatch('app/displayError', 'Couldn’t save cart.')
+          throw error
         })
 
     },
