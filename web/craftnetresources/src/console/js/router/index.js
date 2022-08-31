@@ -269,6 +269,12 @@ const router = createRouter({
       component: () => import('../pages/thank-you.vue'),
       meta: {layout: 'checkout'}
     },
+    {
+      path: '/approval-requested',
+      name: 'ApprovalRequested',
+      component: () => import('../pages/approval-requested.vue'),
+      meta: {layout: 'checkout'}
+    },
 
     // Not found
     {

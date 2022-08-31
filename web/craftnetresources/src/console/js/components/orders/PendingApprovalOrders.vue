@@ -5,7 +5,6 @@
         <thead>
         <tr>
           <th>Number</th>
-          <th>Date Ordered</th>
           <th>Requested by</th>
           <th></th>
         </tr>
@@ -18,11 +17,6 @@
             >
               {{ pendingOrder.shortNumber }}
             </router-link>
-          </td>
-          <td>
-            <template v-if="pendingOrder.dateOrdered && pendingOrder.dateOrdered.date">
-              {{ pendingOrder.dateOrdered.date }}
-            </template>
           </td>
           <td>
             <template v-if="pendingOrder.approvalRequestedBy">

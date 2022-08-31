@@ -15,15 +15,17 @@
             <h1 class="m-0">Order {{ order.shortNumber }}</h1>
           </div>
 
-          <template v-if="isPending && currentMemberIsOwner">
+          <template v-if="isPending">
             <alert>
               <h2>Order pending approval</h2>
-              <p>This order is pending approval.</p>
+              <div>This order is pending approval.</div>
 
-              <div class="space-x-2">
-                <btn :disabled="!currentMemberIsOwner" kind="primary" @click="approveRequest(order)">Approve</btn>
-                <btn :disabled="!currentMemberIsOwner" kind="danger" @click="rejectRequest(order)">Reject</btn>
-              </div>
+              <template v-if="currentMemberIsOwner">
+                <div class="space-x-2">
+                  <btn :disabled="!currentMemberIsOwner" kind="primary" @click="approveRequest(order)">Approve</btn>
+                  <btn :disabled="!currentMemberIsOwner" kind="danger" @click="rejectRequest(order)">Reject</btn>
+                </div>
+              </template>
             </alert>
           </template>
 

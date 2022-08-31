@@ -93,10 +93,22 @@
 
       <div class="mt-6 space-x-2">
         <template v-if="!selectedPaymentMethod || !selectedPaymentMethod.org || selectedPaymentMethod.org.canPurchase">
-          <btn kind="primary" large @click="pay">Pay $XX</btn>
+          <btn
+            :disabled="checkoutLoading"
+            :loading="checkoutLoading"
+            kind="primary"
+            large
+            @click="pay"
+          >Pay $XX</btn>
         </template>
         <template v-else>
-          <btn kind="primary" large @click="requestApproval">Submit for approval $XX</btn>
+          <btn
+            :disabled="checkoutLoading"
+            :loading="checkoutLoading"
+            kind="primary"
+            large
+            @click="requestApproval"
+          >Submit for approval $XX</btn>
         </template>
       </div>
 
@@ -154,6 +166,7 @@ export default {
       replaceCard: false,
       cardToken: null,
       billingAddressId: null,
+      checkoutLoading: false,
     }
   },
 
@@ -219,20 +232,23 @@ export default {
 
   methods: {
     pay() {
+      this.checkoutLoading = true
       this.saveBillingInfos()
         .then(() => {
           this.$store.dispatch('cart/checkout', this.payData)
             .then(() => {
               this.$store.dispatch('cart/resetCart')
-              this.$store.dispatch('app/displayNotice', 'Payment success.')
               this.$router.push({path: '/thank-you'})
+              this.checkoutLoading = false
             })
             .catch(() => {
               this.$store.dispatch('app/displayError', 'There was an error processing your payment.')
+              this.checkoutLoading = false
             })
         })
         .catch((error) => {
           this.$store.dispatch('app/displayError', error.response.data && error.response.data.message ? error.response.data.message : 'Couldn’t save billing information.')
+          this.checkoutLoading = false
         })
     },
 
@@ -241,16 +257,19 @@ export default {
     },
 
     requestApproval() {
-      console.log('this.cart', this.cart.number)
+      this.checkoutLoading = true
       this.$store.dispatch('organizations/requestOrderApproval', {
           organizationId: this.selectedPaymentMethod.org.id,
           orderNumber: this.cart.number,
         })
         .then(() => {
-          this.$store.dispatch('app/displayNotice', 'Approval requested.')
+          this.$store.dispatch('cart/resetCart')
+          this.$router.push({path: '/approval-requested'})
+          this.checkoutLoading = false
         })
         .catch(() => {
           this.$store.dispatch('app/displayError', 'Couldn’t request approval.')
+          this.checkoutLoading = false
         })
     }
   },
