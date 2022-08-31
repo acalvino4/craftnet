@@ -56,7 +56,11 @@
             'opacity-50': cardFormloading,
           }"
           >
-            <a href="#" class="text-red-600" @click.prevent="removePaymentMethod(paymentMethod.id)">Remove card</a>
+            <a
+              href="#"
+              class="text-red-600"
+              @click.prevent="removePaymentMethod(paymentMethod.id)"
+            >Remove</a>
           </div>
         </template>
 
@@ -168,7 +172,7 @@ export default {
           }
 
           this.cardFormloading = false
-          this.$store.dispatch('app/displayNotice', 'Card saved.')
+          this.$store.dispatch('app/displayNotice', 'Payment method saved.')
           this.$store.dispatch('paymentMethods/getPaymentMethods')
           this.$emit('close')
         })
@@ -197,7 +201,7 @@ export default {
      * Removes a payment method.
      */
     removePaymentMethod(paymentMethodId) {
-      if (!confirm("Are you sure you want to remove this credit card?")) {
+      if (!confirm("Are you sure you want to remove this payment method?")) {
         return null;
       }
 
@@ -205,12 +209,12 @@ export default {
       this.$store.dispatch('paymentMethods/removePaymentMethod', paymentMethodId)
         .then(() => {
           this.cardFormloading = false
-          this.$store.dispatch('app/displayNotice', 'Card removed.')
+          this.$store.dispatch('app/displayNotice', 'Payment method removed.')
           this.$emit('close')
         })
         .catch((response) => {
           this.cardFormloading = false
-          const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t remove credit card.'
+          const errorMessage = response.data && response.data.error ? response.data.error : 'Couldn’t remove payment method.'
           this.$store.dispatch('app/displayError', errorMessage)
         })
     },
