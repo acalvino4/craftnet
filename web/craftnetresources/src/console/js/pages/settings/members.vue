@@ -14,7 +14,7 @@
       </template>
     </div>
 
-    <div class="mt-6 pb-24">
+    <div class="mt-6">
       <table class="w-full">
         <thead>
         <tr>
@@ -65,8 +65,11 @@
       </table>
     </div>
 
-    <template v-if="currentMemberIsOwner">
-      <invitations />
+    <template v-if="currentMemberIsOwner && invitations.length > 0">
+      <invitations
+        class="mt-6"
+        :invitations="invitations"
+      />
     </template>
 
     <change-member-role-modal
@@ -106,6 +109,7 @@ export default {
   computed: {
     ...mapState({
       members: state => state.organizations.members,
+      invitations: state => state.organizations.invitations,
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
@@ -128,6 +132,12 @@ export default {
       this.$store.dispatch('organizations/removeMember', {organizationId, memberId})
     }
   },
+
+  mounted() {
+    this.$store.dispatch('organizations/getInvitations', {
+      organizationId: this.currentOrganization.id
+    })
+  }
 }
 </script>
 

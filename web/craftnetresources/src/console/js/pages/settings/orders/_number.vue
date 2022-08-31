@@ -27,8 +27,6 @@
             </template>
           </alert>
 
-          <pre>{{order}}</pre>
-
           <pane>
             <dl>
               <dt>Order Number</dt>
