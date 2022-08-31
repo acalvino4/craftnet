@@ -6,10 +6,10 @@
     <div>
       <h2>
         <template v-if="!paymentMethod">
-          Add Card
+          Add a payment method
         </template>
         <template v-else>
-          Edit payment method #{{paymentMethod.id}}
+          Edit payment method
         </template>
       </h2>
 
@@ -35,10 +35,14 @@
         </div>
       </template>
 
-      <h3 class="mt-4">Billing Address</h3>
+      <h3 class="mt-4">Address</h3>
       <div>
-        <billing-address-options
-          v-model:billingAddressId="billingAddressId"
+        <template v-if="billingAddress && billingAddress.locality">
+          {{billingAddress.locality}}
+        </template>
+
+        <address-fields
+          v-model:address="billingAddress"
         />
       </div>
     </div>
@@ -70,13 +74,13 @@
 </template>
 
 <script>
-import ModalHeadless from '../ModalHeadless';
-import CardElement from '../card/CardElement';
-import BillingAddressOptions from './BillingAddressOptions';
+import AddressFields from './addresses/AddressFields'
+import ModalHeadless from '../ModalHeadless'
+import CardElement from '../card/CardElement'
 
 export default {
   components: {
-    BillingAddressOptions,
+    AddressFields,
     ModalHeadless,
     CardElement,
   },
@@ -94,7 +98,7 @@ export default {
 
   watch: {
     paymentMethod(paymentMethod) {
-      this.billingAddressId = paymentMethod ? paymentMethod.billingAddressId : null
+      this.billingAddress = paymentMethod ? JSON.parse(JSON.stringify(paymentMethod.billingAddress)) : null
     }
   },
 
@@ -104,7 +108,7 @@ export default {
       elements: null,
       card: null,
       cardFormloading: false,
-      billingAddressId: null,
+      billingAddress: {},
     }
   },
 
@@ -132,13 +136,13 @@ export default {
             this._savePaymentMethod({
               id: (this.paymentMethod ? this.paymentMethod.id : null),
               paymentMethodId: result.paymentMethod.id,
-              billingAddressId: this.billingAddressId,
+              billingAddress: this.billingAddress,
             })
           })
       } else {
         this._savePaymentMethod({
           id: (this.paymentMethod ? this.paymentMethod.id : null),
-          billingAddressId: this.billingAddressId,
+          billingAddress: this.billingAddress,
         })
       }
     },
@@ -152,6 +156,7 @@ export default {
     },
 
     _savePaymentMethod(payload) {
+      console.log('payload', payload)
       return this.$store.dispatch('paymentMethods/savePaymentMethod', payload)
         .then(() => {
           if (this.$refs.cardElement) {

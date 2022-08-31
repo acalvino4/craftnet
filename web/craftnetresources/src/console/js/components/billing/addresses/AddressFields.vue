@@ -5,7 +5,7 @@
       label="Title"
     >
       <textbox
-        v-model="address.title"
+        v-model="localAddress.title"
       />
 
       <template v-if="countriesLoading">
@@ -18,7 +18,7 @@
       label="Country"
     >
       <dropdown
-        v-model="address.countryCode"
+        v-model="localAddress.countryCode"
         :options="countriesOptions"
         @change="getAddressesInfo"
       />
@@ -34,7 +34,7 @@
         label="Subdivision"
       >
         <dropdown
-          v-model="address.subdivision"
+          v-model="localAddress.subdivision"
           :options="subdivisionOptions"
         />
       </field>
@@ -44,7 +44,7 @@
         label="Subdivision Child"
       >
         <dropdown
-          v-model="address.subdivisionChild"
+          v-model="localAddress.subdivisionChild"
           :options="subdivisionChildrenOptions"
         />
       </field>
@@ -57,7 +57,7 @@
             :required="!!addressInfo.format.requiredFields.find(f => f === usedField)"
           >
             <textbox
-              v-model="address[usedField]"
+              v-model="localAddress[usedField]"
             />
           </field>
         </div>
@@ -76,6 +76,7 @@ export default {
   data() {
     return {
       countriesLoading: false,
+      // localAddress: {},
     }
   },
   computed: {
@@ -83,6 +84,15 @@ export default {
       countries: state => state.addresses.countries,
       addressInfo: state => state.addresses.info,
     }),
+
+    localAddress: {
+      get() {
+        return this.address || {};
+      },
+      set(value) {
+        this.$emit('update:address', value);
+      },
+    },
 
     countriesOptions() {
       const options = [
@@ -114,7 +124,7 @@ export default {
         return null;
       }
 
-      return this.addressInfo.subdivisions[this.address.subdivision];
+      return this.addressInfo.subdivisions[this.localAddress.subdivision];
     },
 
     subdivisionOptions() {
@@ -159,7 +169,7 @@ export default {
   methods: {
     getAddressesInfo() {
       this.$store.dispatch('addresses/getInfo', {
-        parents: [this.address.countryCode]
+        parents: [this.localAddress.countryCode]
       });
     },
   },
