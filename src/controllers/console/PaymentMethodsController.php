@@ -165,7 +165,10 @@ class PaymentMethodsController extends BaseController
     private function _transformPaymentMethod(PaymentMethodRecord $paymentMethod): array
     {
         $paymentSource = $paymentMethod?->getPaymentSource();
+        $billingAddress = $paymentMethod?->getBillingAddress();
+        $billingAddress?->setScenario(Element::SCENARIO_LIVE);
 
+        // TODO: make a model for paymentMethod
         return $paymentMethod->getAttributes([
             'id',
             'paymentSourceId',
@@ -175,6 +178,7 @@ class PaymentMethodsController extends BaseController
             'description' => $paymentSource?->description,
             'card' => $paymentSource?->getCard(),
             'isPrimary' => (bool) $paymentSource?->isPrimary,
+            'isValid' => $paymentSource?->validate() && $billingAddress?->validate(),
         ];
     }
 }
