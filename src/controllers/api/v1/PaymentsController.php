@@ -12,6 +12,7 @@ use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\gateways\PaymentIntents as StripeGateway;
 use craft\commerce\stripe\models\forms\payment\PaymentIntent as PaymentForm;
 use craft\commerce\stripe\Plugin as Stripe;
+use craft\elements\Address;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craftnet\behaviors\OrderBehavior;
@@ -277,9 +278,16 @@ class PaymentsController extends CartsController
             throw new PaymentSourceException('Could not create the payment method: ' . implode(', ', $paymentSource->getErrorSummary(true)));
         }
 
+        $userBillingAddress = $billingAddress ? Craft::$app->getElements()->duplicateElement(
+            $billingAddress,
+            ['ownerId' => $this->currentUser->id],
+        ) : null;
+
+        $cart->sourceBillingAddressId = $billingAddress->id;
+
         $paymentMethod = new PaymentMethodRecord();
         $paymentMethod->paymentSourceId = $paymentSource->id;
-        $paymentMethod->billingAddressId = $billingAddress?->id;
+        $paymentMethod->billingAddressId = $userBillingAddress?->id;
         $paymentMethod->ownerId = $this->currentUser->id;
 
         if (!$paymentMethod->save()) {

@@ -211,7 +211,6 @@ class CartsController extends BaseApiController
             $orgId = $this->request->getBodyParam('orgId', $existingOrgFromCart?->id);
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
             $orgRemoved = !$org && $existingOrgFromCart;
-            $makePrimary = $payload?->makePrimary ?? false;
             $originalCustomer = $cart->customer ?? $currentUser;
             $paymentMethodId = $this->request->getBodyParam('paymentMethodId');
             $paymentMethod = $paymentMethodId ? PaymentMethodRecord::findOne(['id' => $paymentMethodId]) : null;
@@ -275,19 +274,6 @@ class CartsController extends BaseApiController
                 $cart->setValidBillingAddress($paymentMethod->billingAddress);
             } else if (isset($payload->billingAddress)) {
                 $this->_updateCartBillingAddress($cart, $payload->billingAddress, $errors);
-            }
-
-            if ($makePrimary) {
-                // TODO: Commerce 4.2
-                // $cart->makePrimaryPaymentSource = true;
-
-                /** @var Address $userBillingAddress */
-                $userBillingAddress = Craft::$app->getElements()->duplicateElement(
-                    $cart->getBillingAddress(),
-                    ['ownerId' => $currentUser->id],
-                );
-                $cart->sourceBillingAddressId = $userBillingAddress->id;
-                $cart->makePrimaryBillingAddress = true;
             }
 
             // coupon code
