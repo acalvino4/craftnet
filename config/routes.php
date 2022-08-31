@@ -103,11 +103,6 @@ return [
         'POST    payment-methods/<paymentMethodId:\d+>' => 'craftnet/console/payment-methods/save-payment-method',
         'DELETE  payment-methods/<paymentMethodId:\d+>' => 'craftnet/console/payment-methods/delete-payment-method',
 
-        'GET     addresses' => 'craftnet/console/addresses/get-addresses',
-        'POST    addresses' => 'craftnet/console/addresses/save-address',
-        'GET     addresses/<addressId:\d+>' => 'craftnet/console/addresses/get-address',
-        'POST    addresses/<addressId:\d+>' => 'craftnet/console/addresses/save-address',
-        'DELETE  addresses/<addressId:\d+>' => 'craftnet/console/addresses/remove-address',
         'POST    addresses/info' => 'craftnet/console/addresses/get-address-info',
         'GET     addresses/countries' => 'craftnet/console/addresses/get-countries',
 
