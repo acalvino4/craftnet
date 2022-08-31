@@ -97,8 +97,8 @@ export default {
   },
 
   watch: {
-    paymentMethod(paymentMethod) {
-      this.billingAddress = paymentMethod ? JSON.parse(JSON.stringify(paymentMethod.billingAddress)) : null
+    paymentMethodId(paymentMethodId) {
+      this.billingAddress = paymentMethodId ? JSON.parse(JSON.stringify(this.paymentMethod.billingAddress)) : null
     }
   },
 
@@ -120,6 +120,10 @@ export default {
       set(value) {
         this.$emit('update:paymentMethod', value)
       }
+    },
+
+    paymentMethodId() {
+      return this.paymentMethod ? this.paymentMethod.id : null
     }
   },
 
