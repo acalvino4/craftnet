@@ -103,7 +103,7 @@ class ChangelogParser
 
         // GitHub-style notes/tips/warnings
         // (see https://github.com/community/community/discussions/16925)
-        $notes = preg_replace('/<blockquote><p><strong>(note|tip|warning)</strong>\s*/i', '<blockquote class="note $1"><p>', $notes); // GitHub style
+        $notes = preg_replace('/<blockquote><p><strong>(note|tip|warning)<\/strong>\s*/i', '<blockquote class="note $1"><p>', $notes); // GitHub style
 
         return $notes;
     }
