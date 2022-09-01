@@ -64,7 +64,6 @@ class OrgQuery extends ElementQuery
 
     public function hasOwner(null|int|User $value): static
     {
-        $this->joinMembers = true;
         $this->ownerId = $value instanceof User ? $value->id : $value;
 
         return $this;
@@ -110,8 +109,6 @@ class OrgQuery extends ElementQuery
                 'orgsMembers.admin' => true,
             ]);
         }
-
-        // TODO: test owner query/hasOwner
 
         return parent::beforePrepare();
     }

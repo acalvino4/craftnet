@@ -64,10 +64,6 @@ class PaymentMethodsController extends BaseController
             }
         }
 
-        if (!$paymentSource->id) {
-            throw new BadRequestHttpException();
-        }
-
         $billingAddress = $paymentMethod->billingAddress ?? Craft::createObject(Address::class);
 
         if ($billingAddressParam) {
@@ -89,16 +85,12 @@ class PaymentMethodsController extends BaseController
             }
         }
 
-        if (!$billingAddress->id) {
-            throw new BadRequestHttpException();
-        }
-
         $paymentMethod->paymentSourceId = $paymentSource->id;
         $paymentMethod->billingAddressId = $billingAddress->id;
         $paymentMethod->ownerId = $this->currentUser->id;
 
         if (!$paymentMethod->save()) {
-            $this->asFailure();
+            return $this->asModelFailure($paymentMethod);
         }
 
         if ($makePrimary) {
@@ -168,7 +160,6 @@ class PaymentMethodsController extends BaseController
         $billingAddress = $paymentMethod?->getBillingAddress();
         $billingAddress?->setScenario(Element::SCENARIO_LIVE);
 
-        // TODO: make a model for paymentMethod
         return $paymentMethod->getAttributes([
             'id',
             'paymentSourceId',
@@ -178,7 +169,6 @@ class PaymentMethodsController extends BaseController
             'description' => $paymentSource?->description,
             'card' => $paymentSource?->getCard(),
             'isPrimary' => (bool) $paymentSource?->isPrimary,
-            'isValid' => $paymentSource?->validate() && $billingAddress?->validate(),
         ];
     }
 }
