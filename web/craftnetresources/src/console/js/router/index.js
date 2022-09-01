@@ -67,12 +67,14 @@ const router = createRouter({
       path: '/settings/profile',
       name: 'UserProfile',
       component: () => import('../pages/settings/profile'),
+      meta: {orgFallbackRoute: 'OrgProfile'}
     },
 
     {
       path: '/organizations/:orgSlug/settings/profile',
       name: 'OrgProfile',
       component: () => import('../pages/settings/profile'),
+      meta: {userFallbackRoute: 'UserProfile'}
     },
 
     {
@@ -94,21 +96,25 @@ const router = createRouter({
       path: '/settings/orders',
       name: 'UserOrders',
       component: () => import('../pages/settings/orders/index.vue'),
+      meta: {orgFallbackRoute: 'OrgOrders'}
     },
     {
       path: '/organizations/:orgSlug/settings/orders',
       name: 'OrgOrders',
       component: () => import('../pages/settings/orders/index.vue'),
+      meta: {userFallbackRoute: 'UserOrders'}
     },
     {
       path: '/settings/billing',
       name: 'UserBilling',
       component: () => import('../pages/settings/billing'),
+      meta: {orgFallbackRoute: 'OrgBilling'}
     },
     {
       path: '/organizations/:orgSlug/settings/billing',
       name: 'OrgBilling',
       component: () => import('../pages/settings/billing'),
+      meta: {userFallbackRoute: 'UserBilling'}
     },
     {
       path: '/settings/orders/:number',
@@ -203,13 +209,16 @@ const router = createRouter({
     },
     {
       path: '/licenses/cms',
+      name: 'UserCmsLicenses',
       component: () => import('../pages/licenses/cms'),
-      meta: {cmsLicensesRenewAlert: true}
+      meta: {orgFallbackRoute: 'OrgCmsLicenses', cmsLicensesRenewAlert: true}
     },
     {
       path: '/organizations/:orgSlug/licenses/cms',
+      name: 'OrgCmsLicenses',
       component: () => import('../pages/licenses/cms'),
-      meta: {cmsLicensesRenewAlert: true}
+      meta: {userFallbackRoute: 'UserCmsLicenses', cmsLicensesRenewAlert: true}
+
     },
     {
       path: '/licenses/cms/:id',
@@ -221,13 +230,15 @@ const router = createRouter({
     },
     {
       path: '/licenses/plugins',
+      name: 'UserPluginsLicenses',
       component: () => import('../pages/licenses/plugins'),
-      meta: {pluginLicensesRenewAlert: true}
+      meta: {orgFallbackRoute: 'OrgPluginsLicenses', pluginLicensesRenewAlert: true}
     },
     {
       path: '/organizations/:orgSlug/licenses/plugins',
+      name: 'OrgPluginsLicenses',
       component: () => import('../pages/licenses/plugins'),
-      meta: {pluginLicensesRenewAlert: true}
+      meta: {userFallbackRoute: 'UserPluginsLicenses', pluginLicensesRenewAlert: true}
     },
     {
       path: '/licenses/plugins/:id',
@@ -239,11 +250,16 @@ const router = createRouter({
     },
     {
       path: '/licenses/claim',
+      name: 'UserClaimLicenses',
       component: () => import('../pages/licenses/claim.vue'),
+      meta: {orgFallbackRoute: 'OrgClaimLicenses'}
+
     },
     {
       path: '/organizations/:orgSlug/licenses/claim',
+      name: 'OrgClaimLicenses',
       component: () => import('../pages/licenses/claim.vue'),
+      meta: {userFallbackRoute: 'UserClaimLicenses'}
     },
     {
       path: '/identity',

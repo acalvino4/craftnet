@@ -150,24 +150,64 @@ export default {
      * Select an organization.
      */
     selectOrganization(organization) {
-      // this.$store.dispatch('organizations/saveCurrentOrganization', organization)
-      //   .then(() => {
-      //     if (!organization && this.$route.path === '/settings/members') {
-      //       this.$router.push('/settings/profile')
-      //     } else if (organization && this.$route.path === '/settings/organizations') {
-      //       this.$router.push('/settings/profile')
-      //     }
-      //   })
-
       if (organization) {
-        this.$router.push({path:'/organizations/'+organization.slug})
+        if (this.$route.meta) {
+          let routeName = null
+
+          if (this.$route.meta.orgFallbackRoute) {
+            routeName = this.$route.meta.orgFallbackRoute
+          } else if (this.$route.meta.userFallbackRoute) {
+            routeName = this.$route.name
+          }
+
+          if (routeName) {
+            return this.$router.push({
+              name: routeName,
+              params: {
+                orgSlug: organization.slug
+              }
+            })
+          }
+        }
+
+        return this.$router.push({path: '/organizations/' + organization.slug})
       } else {
-        this.$router.push({path: '/'})
+        if (this.$route.meta) {
+          let routeName = null
+
+          if (this.$route.meta.userFallbackRoute) {
+            routeName = this.$route.meta.userFallbackRoute
+          } else if (this.$route.meta.orgFallbackRoute) {
+            routeName = this.$route.name
+          }
+
+          if (routeName) {
+            return this.$router.push({
+              name: routeName,
+            })
+          }
+        }
+
+        return this.$router.push({path: '/'})
       }
     },
 
     newOrganization() {
       this.$router.push({path: '/settings/organizations/new'})
+    },
+
+    routeExists(routeData) {
+      try {
+        const resolveTest = this.$router.resolve(routeData)
+
+        if (!resolveTest) {
+          return false
+        }
+      } catch (error) {
+        return false
+      }
+
+      return true
     }
   },
 }
