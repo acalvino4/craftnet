@@ -13,7 +13,7 @@
     </page-header>
 
     <div class="max-w-md">
-      <h2>Credit Card</h2>
+      <h2>Payment Method</h2>
       <RadioGroup class="mt-4 space-y-4" v-model="selectedPaymentMethodValue">
         <template v-for="paymentMethod in paymentMethodsCheckout">
           <RadioGroupOption
@@ -40,8 +40,8 @@
           v-slot="{ active, checked }"
         >
           <payment-method-option
-            name="New Credit Card"
-            description="Visa, Mastercard, AMEX"
+            name="New Payment Method"
+            description="Add a new payment method"
             :active="active"
             :checked="checked"
           />
@@ -50,7 +50,7 @@
 
       <template v-if="!selectedPaymentMethodValue">
         <div class="mt-6">
-          <h3>Add a new credit card</h3>
+          <h3>Credit Card</h3>
           Enter your new credit card information:
           <div class="mt-2">
             <card-element
@@ -63,7 +63,7 @@
 
       <template v-if="!selectedPaymentMethod">
         <div class="mt-8">
-          <h2>Billing Address</h2>
+          <h3>Billing Address</h3>
 
           <address-fields
             v-model:address="billingAddress"
