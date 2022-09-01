@@ -328,11 +328,13 @@ class OrderBehavior extends Behavior
             return true;
         }
 
-        if ($this->approvalRequestedForOrgId) {
+        $orgId = $this->owner->orgId ?? $this->approvalRequestedForOrgId;
+
+        if ($orgId) {
             return Org::find()
-                ->id($this->approvalRequestedForOrgId)
+                ->id($orgId)
                 ->one()
-                ->canViewOrders($user);
+                ?->canViewOrders($user) ?? false;
         }
 
         return false;
