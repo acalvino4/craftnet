@@ -168,6 +168,10 @@ export default {
 
   methods: {
     getAddressesInfo() {
+      if (!this.localAddress.countryCode) {
+        return;
+      }
+      
       this.$store.dispatch('addresses/getInfo', {
         parents: [this.localAddress.countryCode]
       });
