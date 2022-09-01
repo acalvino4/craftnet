@@ -2,19 +2,6 @@
   <div>
     <field
       :vertical="true"
-      label="Title"
-    >
-      <textbox
-        v-model="localAddress.title"
-      />
-
-      <template v-if="countriesLoading">
-        <spinner class="ml-4 relative top-1" />
-      </template>
-    </field>
-
-    <field
-      :vertical="true"
       label="Country"
     >
       <dropdown
