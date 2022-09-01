@@ -29,7 +29,7 @@ use yii\web\Response as YiiResponse;
  */
 abstract class BaseController extends Controller
 {
-    public function bindActionParams($action, $params): array
+    public static function injectUserIdParam(array $params): array
     {
         $userId = $params['userId'] ?? null;
         $userId = $userId === 'me' ? Craft::$app->getUser()->getId() : $userId;
@@ -38,12 +38,20 @@ abstract class BaseController extends Controller
             $params['userId'] = $userId;
 
             // Inject userId as a body param for Craft's users controllers
-            $this->request->setBodyParams($this->request->getBodyParams() + [
+            Craft::$app->getRequest()->setBodyParams(Craft::$app->getRequest()->getBodyParams() + [
                 'userId' => $userId,
             ]);
         }
 
-        return parent::bindActionParams($action, $params);
+        return $params;
+    }
+
+    public function bindActionParams($action, $params): array
+    {
+        return parent::bindActionParams(
+            $action,
+            static::injectUserIdParam($params)
+        );
     }
 
     // Protected Methods

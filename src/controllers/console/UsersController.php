@@ -2,15 +2,13 @@
 
 namespace craftnet\controllers\console;
 
-class UsersController extends BaseController
+class UsersController extends \craft\controllers\UsersController
 {
-    public function actionSaveUser(int $userId)
+    public function bindActionParams($action, $params): array
     {
-        return $this->run('/users/save-user');
-    }
-
-    public function actionUploadUserPhoto(int $userId)
-    {
-        return $this->run('/users/upload-user-photo');
+        return parent::bindActionParams(
+            $action,
+            BaseController::injectUserIdParam($params)
+        );
     }
 }

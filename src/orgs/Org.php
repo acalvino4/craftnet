@@ -559,7 +559,7 @@ class Org extends Element
 
     public function canManageMembers(User $user): bool
     {
-        return $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
+        return $this->hasOwner($user) || $this->hasAdmin($user);
     }
 
     public function canPurchase(User $user): bool
@@ -571,12 +571,12 @@ class Org extends Element
 
     public function canRejectOrders(User $user): bool
     {
-        return $user->admin || $this->hasOwner($user);
+        return $this->hasOwner($user);
     }
 
     public function canApproveOrders(User $user): bool
     {
-        return $user->admin || $this->hasOwner($user);
+        return $this->hasOwner($user);
     }
 
     public function canViewOrders(User $user): bool
@@ -586,12 +586,12 @@ class Org extends Element
 
     public function canView(User $user): bool
     {
-        return $user->admin || $this->hasOwner($user) || $this->hasMember($user);
+        return $this->admin || $this->hasOwner($user) || $this->hasMember($user);
     }
 
     public function canSave(User $user): bool
     {
-        return !$this->id || $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
+        return !$this->id || $this->admin || $this->hasOwner($user) || $this->hasAdmin($user);
     }
 
     public function canCreateDrafts(User $user): bool

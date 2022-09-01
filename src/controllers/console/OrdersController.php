@@ -22,7 +22,7 @@ class OrdersController extends SiteController
             ->one();
 
         if (!$order || !$order->canViewOrder($this->currentUser)) {
-            throw new ForbiddenHttpException();
+            throw new NotFoundHttpException();
         }
 
         return $this->asSuccess(data: ['order' => self::transformOrderDetail($order)]);
@@ -33,7 +33,7 @@ class OrdersController extends SiteController
         $org = $orgId ? Org::find()->id($orgId)->one() : null;
 
         if ($org && !$org->canViewOrders($this->currentUser)) {
-            throw new ForbiddenHttpException();
+            throw new NotFoundHttpException();
         }
 
         $approvalPending = $this->request->getParam('approvalPending', false);
@@ -82,7 +82,7 @@ class OrdersController extends SiteController
             ->one();
 
         if (!$order) {
-            throw new ForbiddenHttpException();
+            throw new NotFoundHttpException();
         }
 
         try {
@@ -112,7 +112,7 @@ class OrdersController extends SiteController
             ->one();
 
         if (!$order) {
-            throw new ForbiddenHttpException();
+            throw new NotFoundHttpException();
         }
 
         try {
