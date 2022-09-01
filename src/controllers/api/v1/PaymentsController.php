@@ -12,13 +12,12 @@ use craft\commerce\Plugin as Commerce;
 use craft\commerce\stripe\gateways\PaymentIntents as StripeGateway;
 use craft\commerce\stripe\models\forms\payment\PaymentIntent as PaymentForm;
 use craft\commerce\stripe\Plugin as Stripe;
-use craft\elements\Address;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craftnet\behaviors\OrderBehavior;
 use craftnet\controllers\api\RateLimiterTrait;
 use craftnet\errors\ValidationException;
-use craftnet\paymentmethods\PaymentMethodRecord;
+use craftnet\records\PaymentMethod;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Exception\ApiErrorException;
 use Stripe\PaymentMethod as StripePaymentMethod;
@@ -283,7 +282,7 @@ class PaymentsController extends CartsController
 
         $cart->sourceBillingAddressId = $billingAddress->id;
 
-        $paymentMethod = new PaymentMethodRecord();
+        $paymentMethod = new PaymentMethod();
         $paymentMethod->paymentSourceId = $paymentSource->id;
         $paymentMethod->billingAddressId = $userBillingAddress?->id;
         $paymentMethod->ownerId = $this->currentUser->id;

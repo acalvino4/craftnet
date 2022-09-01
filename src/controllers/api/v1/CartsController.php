@@ -22,9 +22,9 @@ use craftnet\errors\LicenseNotFoundException;
 use craftnet\errors\ValidationException;
 use craftnet\helpers\KeyHelper;
 use craftnet\orgs\Org;
-use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginRenewal;
+use craftnet\records\PaymentMethod;
 use Ddeboer\Vatin\Validator;
 use Moccalotto\Eu\CountryInfo;
 use Throwable;
@@ -213,7 +213,7 @@ class CartsController extends BaseApiController
             $orgRemoved = !$org && $existingOrgFromCart;
             $originalCustomer = $cart->customer ?? $currentUser;
             $paymentMethodId = $this->request->getBodyParam('paymentMethodId');
-            $paymentMethod = $paymentMethodId ? PaymentMethodRecord::findOne(['id' => $paymentMethodId]) : null;
+            $paymentMethod = $paymentMethodId ? PaymentMethod::findOne(['id' => $paymentMethodId]) : null;
 
             if ($cart->isPendingApproval() && $cart->approvalRequestedForOrgId && $cart->approvalRequestedForOrgId != $orgId) {
                 throw new ForbiddenHttpException('This order must be purchased for the requested organization.');

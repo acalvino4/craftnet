@@ -16,9 +16,8 @@ use craftnet\developers\FundsManager;
 use craftnet\helpers\KeyHelper;
 use craftnet\orgs\InvitationRecord;
 use craftnet\partners\Partner;
-use craftnet\paymentmethods\PaymentMethod;
-use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
+use craftnet\records\PaymentMethod;
 use Illuminate\Support\Collection;
 use yii\base\Behavior;
 use yii\base\Exception;
@@ -122,12 +121,12 @@ class UserBehavior extends Behavior
 
     public function getPaymentMethods(): Collection
     {
-        $paymentMethods = PaymentMethodRecord::find()
+        $paymentMethods = PaymentMethod::find()
             ->where(['ownerId' => $this->owner->id])
             ->all();
 
         return Collection::make($paymentMethods)
-            ->sortByDesc(fn(PaymentMethodRecord $paymentMethod) => $paymentMethod->paymentSource->isPrimary ? 1 : 0);
+            ->sortByDesc(fn(PaymentMethod $paymentMethod) => $paymentMethod->paymentSource->isPrimary ? 1 : 0);
     }
 
     /**

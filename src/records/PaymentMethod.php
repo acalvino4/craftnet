@@ -5,7 +5,7 @@
  * @license https://craftcms.github.io/license/
  */
 
-namespace craftnet\paymentmethods;
+namespace craftnet\records;
 
 use Craft;
 use craft\commerce\models\PaymentSource;
@@ -24,7 +24,7 @@ use craftnet\orgs\OrgQuery;
  * @property-read \craft\elements\Address|null $billingAddress
  * @property-read null|\craft\commerce\models\PaymentSource $paymentSource
  */
-class PaymentMethodRecord extends ActiveRecord
+class PaymentMethod extends ActiveRecord
 {
     /**
      * @inheritdoc

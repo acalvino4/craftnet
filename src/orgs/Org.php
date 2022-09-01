@@ -16,15 +16,15 @@ use craft\models\FieldLayout;
 use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
 use craftnet\developers\FundsManager;
-use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
+use craftnet\records\PaymentMethod;
 use Throwable;
 use yii\base\InvalidConfigException;
 use yii\base\UserException;
 use yii\db\Exception;
 
 /**
- * @property-read PaymentMethodRecord $paymentMethod
+ * @property-read PaymentMethod $paymentMethod
  * @property-read array $invitations
  * @property-read null|string $invitationUrl
  */
@@ -483,7 +483,7 @@ class Org extends Element
 
         if (
             $this->paymentMethodId &&
-            !PaymentMethodRecord::find()->where([
+            !PaymentMethod::find()->where([
                 'ownerId' => $this->ownerId,
                 'id' => $this->paymentMethodId,
             ])->exists()
@@ -619,10 +619,10 @@ class Org extends Element
         return Craft::$app->getElements()->saveElement($this, ...$args);
     }
 
-    public function getPaymentMethod(): ?PaymentMethodRecord
+    public function getPaymentMethod(): ?PaymentMethod
     {
         return $this->paymentMethodId
-            ? PaymentMethodRecord::findOne(['id' => $this->paymentMethodId])
+            ? PaymentMethod::findOne(['id' => $this->paymentMethodId])
             : null;
     }
 

@@ -6,7 +6,7 @@ use craft\commerce\behaviors\CustomerAddressBehavior;
 use craft\elements\Address;
 use craftnet\orgs\Org;
 use craftnet\orgs\OrgQuery;
-use craftnet\paymentmethods\PaymentMethodRecord;
+use craftnet\records\PaymentMethod;
 use yii\base\Behavior;
 
 /**
@@ -18,7 +18,7 @@ class AddressBehavior extends Behavior
 {
     public function getOrgs(): OrgQuery
     {
-        $paymentMethodIds = PaymentMethodRecord::find()->where([
+        $paymentMethodIds = PaymentMethod::find()->where([
             'billingAddressId' => $this->owner->id,
         ])
             ->select(['id'])

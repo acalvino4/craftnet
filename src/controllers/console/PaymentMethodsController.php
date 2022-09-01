@@ -9,7 +9,7 @@ use craft\commerce\Plugin as Commerce;
 use craft\elements\Address;
 use craft\helpers\App;
 use craftnet\orgs\Org;
-use craftnet\paymentmethods\PaymentMethodRecord;
+use craftnet\records\PaymentMethod;
 use Illuminate\Support\Collection;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
@@ -24,8 +24,8 @@ class PaymentMethodsController extends BaseController
         $billingAddressParam = $this->request->getBodyParam('billingAddress', []);
         $makePrimary = (bool) $this->request->getBodyParam('makePrimary', false);
         $paymentMethod = $isNew
-            ? new PaymentMethodRecord()
-            : PaymentMethodRecord::findOne([
+            ? new PaymentMethod()
+            : PaymentMethod::findOne([
                 'id' => $paymentMethodId,
                 'ownerId' => $this->currentUser->id,
             ]);
@@ -115,7 +115,7 @@ class PaymentMethodsController extends BaseController
 
     public function actionDeletePaymentMethod(int $paymentMethodId): Response
     {
-        $paymentMethod = PaymentMethodRecord::findOne(['id' => $paymentMethodId]);
+        $paymentMethod = PaymentMethod::findOne(['id' => $paymentMethodId]);
 
         if (!$paymentMethod) {
             throw new NotFoundHttpException();
@@ -126,7 +126,7 @@ class PaymentMethodsController extends BaseController
     public function actionGetPaymentMethods(): Response
     {
         $paymentMethods = Collection::make($this->currentUser->getPaymentMethods())
-            ->map(fn(PaymentMethodRecord $paymentMethod) => $this->_transformPaymentMethod($paymentMethod) + [
+            ->map(fn(PaymentMethod $paymentMethod) => $this->_transformPaymentMethod($paymentMethod) + [
                 'orgs' => $paymentMethod->getOrgs()->hasOwner($this->currentUser)
                     ->collect()
                     ->map(fn(Org $org) => static::transformOrg($org)),
@@ -140,10 +140,10 @@ class PaymentMethodsController extends BaseController
         $orgs = Org::find()->hasMember($this->currentUser)->collect();
         $paymentMethods = Collection::make($this->currentUser->getPaymentMethods())
             ->concat($orgs)
-            ->map(function(PaymentMethodRecord|Org $orgOrPaymentMethod) {
+            ->map(function(PaymentMethod|Org $orgOrPaymentMethod) {
                 $org = $orgOrPaymentMethod instanceof Org ? $orgOrPaymentMethod : null;
 
-                /** @var PaymentMethodRecord|null $paymentMethod */
+                /** @var PaymentMethod|null $paymentMethod */
                 $paymentMethod = $org ? $org->getPaymentMethod() : $orgOrPaymentMethod;
 
                 if (!$paymentMethod) {
@@ -162,7 +162,7 @@ class PaymentMethodsController extends BaseController
         return $this->asSuccess(data: ['paymentMethods' => $paymentMethods]);
     }
 
-    private function _transformPaymentMethod(PaymentMethodRecord $paymentMethod): array
+    private function _transformPaymentMethod(PaymentMethod $paymentMethod): array
     {
         $paymentSource = $paymentMethod?->getPaymentSource();
         $billingAddress = $paymentMethod?->getBillingAddress();

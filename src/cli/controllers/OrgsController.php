@@ -13,8 +13,8 @@ use craft\helpers\UrlHelper;
 use craftnet\db\Table;
 use craftnet\orgs\Org;
 use craftnet\partners\Partner;
-use craftnet\paymentmethods\PaymentMethodRecord;
 use craftnet\plugins\Plugin;
+use craftnet\records\PaymentMethod;
 use Illuminate\Support\Collection;
 use nystudio107\retour\Retour;
 use Throwable;
@@ -55,7 +55,7 @@ class OrgsController extends Controller
                     return;
                 }
 
-                $paymentMethod = new PaymentMethodRecord();
+                $paymentMethod = new PaymentMethod();
                 $paymentMethod->paymentSourceId = $user->primaryPaymentSourceId;
                 $paymentMethod->billingAddressId = $user->primaryBillingAddressId;
                 $paymentMethod->ownerId = $user->id;
@@ -113,7 +113,7 @@ class OrgsController extends Controller
                 $org->apiToken = $user->apiToken;
                 $org->balance = $user->balance ?? 0;
                 $org->setOwner($user->id);
-                $org->paymentMethodId = PaymentMethodRecord::findOne([
+                $org->paymentMethodId = PaymentMethod::findOne([
                     'ownerId' => $user->id,
                     'paymentSourceId' => $user->primaryPaymentSourceId,
                 ])?->id;
