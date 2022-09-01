@@ -13,7 +13,7 @@
             class="border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 flex items-center justify-center"
             @click.prevent="showPaymentMethodModal = true"
           >
-            <div>
+            <div class="text-center">
               <icon
                 icon="plus"
                 class="w-4 h-4"
@@ -22,44 +22,11 @@
             </div>
           </a>
           <template v-for="(paymentMethod, paymentMethodKey) in paymentMethods" :key="paymentMethodKey">
-            <div class="border border-gray-200 dark:border-gray-700 rounded-md p-4">
-              <div>
-                <div class="flex">
-                  <div class="mr-4">
-                    <icon
-                      icon="credit-card"
-                      class="w-8 h-8 text-gray-500" />
-                  </div>
-
-                  <div>
-                    <template v-if="paymentMethod.isPrimary">
-                      <div class="mb-2">
-                        <badge>Primary</badge>
-                      </div>
-                    </template>
-
-                    <div>
-                      {{ paymentMethod.card.brand }}
-                    </div>
-
-                    <div>
-                      **** **** **** {{ paymentMethod.card.last4 }}
-                    </div>
-
-                    <div class="text-sm text-gray-600">
-                      {{ paymentMethod.card.exp_month }}/{{ paymentMethod.card.exp_year }}
-                    </div>
-
-                    <div class="mt-4 space-x-4">
-                      <a href="#" @click.prevent="edit(paymentMethod)">Edit</a>
-                      <template v-if="!paymentMethod.isPrimary">
-                        <a href="#" @click.prevent="makePrimary(paymentMethod.id)">Make primary</a>
-                      </template>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <payment-method
+              :paymentMethod="paymentMethod"
+              @edit="edit(paymentMethod)"
+              @makePrimary="makePrimary(paymentMethod.id)"
+            />
           </template>
         </div>
       </div>
@@ -77,9 +44,10 @@
 import {mapState} from 'vuex'
 import helpers from '../../mixins/helpers.js'
 import PaymentMethodModal from './PaymentMethodModal';
+import PaymentMethod from './PaymentMethod';
 
 export default {
-  components: {PaymentMethodModal},
+  components: {PaymentMethod, PaymentMethodModal},
   mixins: [helpers],
 
   data() {

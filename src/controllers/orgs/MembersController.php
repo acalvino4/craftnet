@@ -52,6 +52,7 @@ class MembersController extends SiteController
         $members = $userQuery->ofOrg($org->id)->collect()
             ->map(fn($member) => $this->transformUser($member) + [
                 'role' => $org->getMemberRole($member)->value,
+                'canManageMembers' => $org->canManageMembers($member),
             ]);
 
         return $this->asSuccess(data: $members->all());
@@ -106,7 +107,7 @@ class MembersController extends SiteController
         $org = SiteController::getOrgById($orgId);
 
         if (!$org->hasMember($this->currentUser)) {
-            throw new ForbiddenHttpException();
+            throw new NotFoundHttpException();
         }
 
         /** @var UserQuery|UserQueryBehavior $userQuery */

@@ -4,7 +4,6 @@
     @close="$emit('close')"
     @submit="changeRole"
   >
-
     <h2>Change member role</h2>
     <p class="mt-1 text-gray-500">Change {{member.name}}’s role.</p>
 
@@ -69,7 +68,7 @@ export default {
     },
     member: {
       type: Object,
-      required: true,
+      default: null,
     },
   },
 

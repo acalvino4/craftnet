@@ -24,7 +24,9 @@
           <th class="px-4 py-2 uppercase text-xs font-medium text-gray-400 border-b">
             Role
           </th>
-          <th class="px-4 py-2 uppercase text-xs font-medium text-gray-400 border-b"></th>
+          <template v-if="currentMember.canManageMembers">
+            <th class="px-4 py-2 uppercase text-xs font-medium text-gray-400 border-b"></th>
+          </template>
         </tr>
         </thead>
         <tbody>
@@ -52,14 +54,16 @@
           <td class="border-b px-4 py-3 text-sm">
             {{member.role.charAt(0).toUpperCase() + member.role.slice(1)}}
           </td>
-          <td class="border-b px-4 py-3 text-sm">
-            <template v-if="member.role !== 'owner'">
-              <member-actions
-                @changeRole="changeMemberRole(member)"
-                @removeMember="removeMember(member.id)"
-              />
-            </template>
-          </td>
+          <template v-if="currentMember.canManageMembers">
+            <td class="border-b px-4 py-3 text-sm">
+              <template v-if="member.role !== 'owner'">
+                <member-actions
+                  @changeRole="changeMemberRole(member)"
+                  @removeMember="removeMember(member.id)"
+                />
+              </template>
+            </td>
+          </template>
         </tr>
         </tbody>
       </table>
@@ -113,6 +117,7 @@ export default {
     }),
     ...mapGetters({
       currentOrganization: 'organizations/currentOrganization',
+      currentMember: 'organizations/currentMember',
       currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
   },
@@ -134,9 +139,11 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('organizations/getInvitations', {
-      organizationId: this.currentOrganization.id
-    })
+    if (this.currentMemberIsOwner) {
+      this.$store.dispatch('organizations/getInvitations', {
+        organizationId: this.currentOrganization.id
+      })
+    }
   }
 }
 </script>

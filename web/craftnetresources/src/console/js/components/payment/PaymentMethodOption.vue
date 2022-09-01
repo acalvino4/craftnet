@@ -16,39 +16,36 @@
               :fallback="creditCard.org ? 'org' : 'user'"
             />
           </div>
-          <div class="flex-1 mr-16">
+          <div class="flex-1">
             <div>
-              <strong>
+              <div class="font-bold">
                 <template v-if="creditCard.org">
                   {{ creditCard.org.title }}
                 </template>
                 <template v-else>
                   Personal
                 </template>
-              </strong>
-            </div>
-            <div class="mt-1 text-sm text-gray-600 dark:text-gray-400 leading-snug">
-              <template v-if="creditCard.org">
-                Licenses will be assigned to the {{creditCard.org.title}} organization.
-              </template>
-              <template v-else>
-                Licenses will be assigned to your user.
-              </template>
-            </div>
-          </div>
-        </div>
+              </div>
 
-        <div class="text-right">
-          <icon
-            icon="credit-card"
-            class="w-5 h-5 text-gray-500"
-          />
+              <div class="text-sm text-gray-600 dark:text-gray-400 leading-snug">
+                <template v-if="creditCard.org">
+                  Licenses will be assigned to the {{creditCard.org.title}} organization.
+                </template>
+                <template v-else>
+                  Licenses will be assigned to your user.
+                </template>
+              </div>
 
-          <div>
-            {{ creditCard.card.brand }} {{ creditCard.card.last4 }}
-          </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">
-            {{ creditCard.card.exp_month }}/{{ creditCard.card.exp_year }}
+              <div class="mt-4 font-mono">
+                <div>
+                  <span class="uppercase">{{ creditCard.card.brand }}</span> **** **** **** {{ creditCard.card.last4 }}
+                </div>
+
+                <div class="text-sm text-gray-500">
+                  {{ creditCard.card.exp_month }}/{{ creditCard.card.exp_year }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </template>

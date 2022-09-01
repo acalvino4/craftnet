@@ -42,7 +42,7 @@ class PaymentMethod extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['paymentSourceId', 'ownerId'], 'required'],
+            [['paymentSourceId', 'billingAddressId', 'ownerId'], 'required'],
         ];
     }
 
