@@ -141,29 +141,7 @@ export default {
         return this.currentOrganization.title
       }
 
-      if (this.user && (this.user.firstName || this.user.lastName)) {
-        let name = ''
-
-        if (this.user.firstName) {
-          name += this.user.firstName
-        }
-
-        if (this.user.firstName && this.user.lastName) {
-          name += ' '
-        }
-
-        if (this.user.lastName) {
-          name += this.user.lastName
-        }
-
-        return name
-      }
-
-      if (this.user && this.user.developerName) {
-        return this.user.developerName
-      }
-
-      return null
+      return this.user.name
     }
   },
 
