@@ -134,9 +134,11 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('organizations/getInvitations', {
-      organizationId: this.currentOrganization.id
-    })
+    if (this.currentMemberIsOwner) {
+      this.$store.dispatch('organizations/getInvitations', {
+        organizationId: this.currentOrganization.id
+      })
+    }
   }
 }
 </script>
