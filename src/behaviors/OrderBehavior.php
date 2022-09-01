@@ -35,7 +35,7 @@ use yii\db\Exception;
  */
 class OrderBehavior extends Behavior
 {
-    private ?int $orgId = null;
+    public ?int $orgId = null;
     private ?int $creatorId = null;
     private ?int $purchaserId = null;
     public ?int $approvalRequestedForOrgId = null;
@@ -183,11 +183,6 @@ class OrderBehavior extends Behavior
         }
 
         return $this;
-    }
-
-    public function getOrgId(?int $orgId): ?int
-    {
-        return $this->orgId;
     }
 
     public function setOrgId(?int $orgId): static
