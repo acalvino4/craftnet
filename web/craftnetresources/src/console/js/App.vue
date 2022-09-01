@@ -102,10 +102,13 @@ export default {
           .then(() => {
             this.loadCurrentOrg(to)
               .then(() => {
-                this.$store.commit('app/updateLoading', false)
                 this.handleRoute(to, from, next)
               })
           })
+      })
+
+      this.$router.afterEach(() => {
+        this.$store.commit('app/updateLoading', false)
       })
     },
 
