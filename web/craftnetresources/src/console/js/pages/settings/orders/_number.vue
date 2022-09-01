@@ -18,12 +18,22 @@
           <template v-if="order.isPendingApproval">
             <alert>
               <h2>Pending Approval</h2>
-              <div class="mt-1"><strong>{{ order.approvalRequestedBy.name }}</strong> is asking your approval for this order.</div>
+              <div class="mt-1"><strong>{{ order.approvalRequestedBy.name }}</strong> is asking approval for this order.</div>
 
               <template v-if="currentMemberIsOwner">
                 <div class="mt-4 space-x-2">
-                  <btn :disabled="!currentMemberIsOwner" kind="primary" @click="approveRequest(order)">Approve</btn>
-                  <btn :disabled="!currentMemberIsOwner" kind="danger" @click="rejectRequest(order)">Reject</btn>
+                  <btn
+                    :disabled="approveLoading || rejectLoading"
+                    :loading="approveLoading"
+                    kind="primary"
+                    @click="approveRequest(order)"
+                  >Approve</btn>
+                  <btn
+                    :disabled="approveLoading || rejectLoading"
+                    :loading="rejectLoading"
+                    kind="danger"
+                    @click="rejectRequest(order)"
+                  >Reject</btn>
                 </div>
               </template>
             </alert>
@@ -177,6 +187,8 @@ export default {
 
   data() {
     return {
+      approveLoading: false,
+      rejectLoading: false,
       loading: false,
       order: null,
       error: false,
@@ -195,6 +207,7 @@ export default {
 
   methods: {
     approveRequest(pendingOrder) {
+      this.approveLoading = true
       this.$store.dispatch('cart/saveCart', {
           orgId: this.currentOrganization.id,
         })
@@ -204,29 +217,36 @@ export default {
               expectedPrice: pendingOrder.totalPrice,
             })
             .then(() => {
+              this.approveLoading = false
               this.$store.dispatch('app/displayNotice', 'Checkout success.')
-                this.$router.push(this.getPrefixedTo('/settings/orders'))
+              this.$router.push(this.getPrefixedTo('/settings/orders'))
             })
             .catch((error) => {
+              this.approveLoading = false
               this.$store.dispatch('app/displayError', 'Couldn’t checkout.')
               throw error
             })
         })
         .catch((error) => {
+          this.approveLoading = false
           this.$store.dispatch('app/displayError', 'Couldn’t save cart.')
           throw error
         })
 
     },
     rejectRequest(pendingOrder) {
+      this.rejectLoading = true
       this.$store.dispatch('organizations/rejectRequest', {
           organizationId: this.currentOrganization.id,
           orderNumber: pendingOrder.number,
         })
         .then(() => {
+          this.rejectLoading = false
           this.$store.dispatch('app/displayNotice', 'Request rejected.')
+          this.$router.push(this.getPrefixedTo('/settings/orders'))
         })
         .catch(() => {
+          this.rejectLoading = false
           this.$store.dispatch('app/displayError', 'Couldn’t reject request.')
         })
     },
