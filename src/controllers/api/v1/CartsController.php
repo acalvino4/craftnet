@@ -208,7 +208,7 @@ class CartsController extends BaseApiController
 
             $currentUser = $this->getCurrentUser(false);
             $existingOrgFromCart = $cart->getOrg();
-            $orgId = $this->request->getBodyParam('orgId', $existingOrgFromCart?->id);
+            $orgId = $this->request->getBodyParam('orgId');
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
             $orgRemoved = !$org && $existingOrgFromCart;
             $originalCustomer = $cart->customer ?? $currentUser;
