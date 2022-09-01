@@ -31,7 +31,8 @@ use yii\db\Exception;
 
 /**
  * @property Order $owner
- * @property Org $org
+ * @property ?Org $org
+ * @property ?Org $approvalRequestedForOrg
  */
 class OrderBehavior extends Behavior
 {
@@ -164,6 +165,13 @@ class OrderBehavior extends Behavior
         $this->orgId = $org instanceof Org ? $org->id : $org;
 
         return $this;
+    }
+
+    public function getApprovalRequestedForOrg(): ?Org
+    {
+        return $this->approvalRequestedForOrgId
+            ? Org::find()->id($this->approvalRequestedForOrgId)->one()
+            : null;
     }
 
     public function setValidBillingAddress(?Address $address): static

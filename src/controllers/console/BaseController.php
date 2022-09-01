@@ -225,9 +225,9 @@ abstract class BaseController extends Controller
         ];
     }
 
-    protected static function transformOrg(Org $org): array
+    protected static function transformOrg(?Org $org): ?array
     {
-        return $org->getAttributes([
+        return $org ? $org->getAttributes([
                 'id',
                 'title',
                 'requireOrderApproval',
@@ -236,7 +236,7 @@ abstract class BaseController extends Controller
                 'uri',
             ]) + [
                 'orgLogo' => $org->orgLogo->one()?->getAttributes(['id', 'url']),
-            ];
+            ] : null;
     }
 
     /**
@@ -299,6 +299,7 @@ abstract class BaseController extends Controller
             'itemTotal',
             'totalPrice',
         ]) + [
+            'approvalRequestedForOrg' => static::transformOrg($order->approvalRequestedForOrg),
             'isPendingApproval' => $order->isPendingApproval(),
             'purchasedBy' => static::transformUser($order->getPurchaser()),
             'createdBy' => static::transformUser($order->getCreator()),
