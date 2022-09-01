@@ -1,16 +1,18 @@
 <template>
   <div
     :class="{'has-sidebar': (!$route.meta.layout || $route.meta.layout !== 'no-sidebar')}">
-    <auth-manager ref="authManager"></auth-manager>
+    <auth-manager ref="authManager" />
 
     <template v-if="notification">
       <div
         id="notifications-wrapper"
-        :class="{'hide': !notification }">
+        :class="{'hide': !notification }"
+      >
         <div id="notifications">
           <div
             class="notification"
-            :class="notification.type">
+            :class="notification.type"
+          >
             {{ notification.message }}
           </div>
         </div>
@@ -21,12 +23,13 @@
       <div class="mt-24 text-center">
         <spinner
           size="lg"
-          class="mt-8"></spinner>
+          class="mt-8"
+        />
       </div>
     </template>
 
     <template v-else>
-      <component :is="layoutComponent"></component>
+      <component :is="layoutComponent" />
     </template>
   </div>
 </template>
