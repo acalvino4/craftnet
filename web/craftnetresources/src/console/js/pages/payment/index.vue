@@ -71,13 +71,23 @@
         </div>
       </template>
 
-      <h2 class="mt-8">More</h2>
       <checkbox
         class="mt-6"
-        id="replaceCard"
-        label="Save as your primary billing information"
-        v-model="replaceCard"
+        id="savePaymentMethod"
+        label="Save payment method"
+        v-model="savePaymentMethod"
       />
+
+      <template v-if="savePaymentMethod">
+        <checkbox
+          class="mt-6"
+          id="replaceCard"
+          label="Save as your primary payment method"
+          v-model="replaceCard"
+        />
+      </template>
+
+      <h2 class="mt-8">More</h2>
 
       <field
         :vertical="true"
@@ -163,6 +173,7 @@ export default {
       billingAddress: {},
       errors: {},
       replaceCard: false,
+      savePaymentMethod: false,
       cardToken: null,
       checkoutLoading: false,
     }
