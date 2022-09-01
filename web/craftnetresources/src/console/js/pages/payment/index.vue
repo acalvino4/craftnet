@@ -61,13 +61,12 @@
         </div>
       </template>
 
-      <template v-if="!selectedPaymentMethod || !selectedPaymentMethod.org">
+      <template v-if="!selectedPaymentMethod">
         <div class="mt-8">
           <h2>Billing Address</h2>
 
-          <billing-address-options
-            class="mt-4"
-            v-model:billingAddressId="billingAddressId"
+          <address-fields
+            v-model:address="billingAddress"
           />
         </div>
       </template>
@@ -99,7 +98,7 @@
             kind="primary"
             large
             @click="pay"
-          >Pay $XX</btn>
+          >Pay ${{ cart.totalPrice }}</btn>
         </template>
         <template v-else>
           <btn
@@ -108,18 +107,18 @@
             kind="primary"
             large
             @click="requestApproval"
-          >Submit for approval $XX</btn>
+          >Submit for approval ${{ cart.totalPrice }}</btn>
         </template>
       </div>
 
       <div class="mt-16 border rounded-md p-4">
         <div>
-          <h3>Cart Data</h3>
+          <h3>Update cart request data</h3>
           <pre>{{cartData}}</pre>
         </div>
         <hr>
         <div>
-          <h3>Pay Data</h3>
+          <h3>Payment request data</h3>
           <pre>{{payData}}</pre>
         </div>
       </div>
@@ -135,11 +134,11 @@ import PaymentMethodOption from '../../components/payment/PaymentMethodOption';
 import CardElement from '../../components/card/CardElement';
 import PageHeader from '../../components/PageHeader';
 import {mapState} from 'vuex';
-import BillingAddressOptions from '../../components/billing/BillingAddressOptions';
+import AddressFields from '../../components/billing/AddressFields';
 
 export default {
   components: {
-    BillingAddressOptions,
+    AddressFields,
     RadioGroup, RadioGroupOption,
     PaymentMethodOption,
     CardElement,
@@ -165,14 +164,7 @@ export default {
       errors: {},
       replaceCard: false,
       cardToken: null,
-      billingAddressId: null,
       checkoutLoading: false,
-    }
-  },
-
-  watch: {
-    selectedPaymentMethod() {
-      this.billingAddressId = this.selectedPaymentMethod && this.selectedPaymentMethod.billingAddressId ? this.selectedPaymentMethod.billingAddressId : null;
     }
   },
 
@@ -200,16 +192,16 @@ export default {
     cartData() {
       let cartData = {}
 
-      if (this.billingAddressId) {
-        cartData.billingAddressId = parseInt(this.billingAddressId)
-      }
-
       if (this.selectedPaymentMethod) {
         if (this.selectedPaymentMethod.org) {
           cartData.orgId = this.selectedPaymentMethod.org.id
         } else {
           cartData.paymentSourceId = this.selectedPaymentMethod.id;
         }
+
+        cartData.billingAddress = this.selectedPaymentMethod.billingAddress
+      } else {
+        cartData.billingAddress = this.billingAddress
       }
 
       if (this.user) {
