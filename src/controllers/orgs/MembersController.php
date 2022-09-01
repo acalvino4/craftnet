@@ -52,6 +52,7 @@ class MembersController extends SiteController
         $members = $userQuery->ofOrg($org->id)->collect()
             ->map(fn($member) => $this->transformUser($member) + [
                 'role' => $org->getMemberRole($member)->value,
+                'canManageMembers' => $org->canManageMembers($member),
             ]);
 
         return $this->asSuccess(data: $members->all());
