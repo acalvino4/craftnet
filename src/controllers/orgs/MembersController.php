@@ -107,7 +107,7 @@ class MembersController extends SiteController
         $org = SiteController::getOrgById($orgId);
 
         if (!$org->hasMember($this->currentUser)) {
-            throw new ForbiddenHttpException();
+            throw new NotFoundHttpException();
         }
 
         /** @var UserQuery|UserQueryBehavior $userQuery */
