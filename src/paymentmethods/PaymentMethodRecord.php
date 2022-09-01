@@ -55,7 +55,9 @@ class PaymentMethodRecord extends ActiveRecord
 
     public function getBillingAddress(): ?Address
     {
-        return Address::find()->id($this->billingAddressId)->one();
+        return $this->billingAddressId
+            ? Address::find()->id($this->billingAddressId)->one()
+            : null;
     }
 
     public function getOrgs(): OrgQuery
