@@ -28,6 +28,11 @@ use yii\base\Exception;
  * @property EmailVerifier $emailVerifier
  * @property FundsManager $fundsManager
  * @property User $owner
+ * @property-read \Illuminate\Support\Collection $paymentMethods
+ * @property null|\craftnet\records\PaymentMethod $primaryPaymentMethod
+ * @property-read \craftnet\partners\Partner $partner
+ * @property-read array $orgInvitations
+ * @property-read array $paymentSources
  * @property Plugin[] $plugins
  * @mixin CustomFieldBehavior
  */
@@ -127,6 +132,22 @@ class UserBehavior extends Behavior
 
         return Collection::make($paymentMethods)
             ->sortByDesc(fn(PaymentMethod $paymentMethod) => $paymentMethod->paymentSource->isPrimary ? 1 : 0);
+    }
+
+    public function getPrimaryPaymentMethod(): ?PaymentMethod
+    {
+        return PaymentMethod::findOne([
+            'ownerId' => $this->owner->id,
+            'paymentSourceId' => $this->owner->primaryPaymentSourceId,
+        ]);
+    }
+
+    public function setPrimaryPaymentMethod(PaymentMethod $paymentMethod): User
+    {
+        $this->owner->primaryPaymentSourceId = $paymentMethod->paymentSourceId;
+        $this->owner->primaryBillingAddressId = $paymentMethod->billingAddressId;
+
+        return $this->owner;
     }
 
     /**
