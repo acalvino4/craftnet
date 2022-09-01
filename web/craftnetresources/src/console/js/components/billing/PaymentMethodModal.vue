@@ -157,10 +157,11 @@ export default {
 
     _saveCard() {
       return this.$refs.cardElement.save()
-        // .catch(() => {
-        //   this.cardFormloading = false
-        //   this.$store.dispatch('app/displayError', 'Couldn’t save credit card.')
-        // })
+        .catch((error) => {
+          this.cardFormloading = false
+          this.$store.dispatch('app/displayError', 'Couldn’t save credit card.')
+          throw error
+        })
     },
 
     _savePaymentMethod(payload) {
@@ -176,11 +177,12 @@ export default {
           this.$store.dispatch('paymentMethods/getPaymentMethods')
           this.$emit('close')
         })
-        // .catch((response) => {
-        //   this.cardFormloading = false
-        //   const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
-        //   this.$store.dispatch('app/displayError', errorMessage)
-        // })
+        .catch((response) => {
+          this.cardFormloading = false
+          const errorMessage = response && response.data && response.data.error ? response.data.error : 'Couldn’t save credit card.'
+          this.$store.dispatch('app/displayError', errorMessage)
+          throw response
+        })
     },
 
     /**
