@@ -6,21 +6,21 @@
             active ? "group-focus-visible:ring group-focus-visible:ring-3 group-focus-visible:ring-offset-1 group-focus-visible:ring-blue-600/30" : ""
           ]'
     >
-      <template v-if="creditCard">
+      <template v-if="paymentMethod">
         <div class="flex-1 flex">
           <div>
             <profile-photo
               class="mr-4"
               size="md"
               :photo-url="null"
-              :fallback="creditCard.org ? 'org' : 'user'"
+              :fallback="paymentMethod.org ? 'org' : 'user'"
             />
           </div>
           <div class="flex-1">
             <div>
               <div class="font-bold">
-                <template v-if="creditCard.org">
-                  {{ creditCard.org.title }}
+                <template v-if="paymentMethod.org">
+                  {{ paymentMethod.org.title }}
                 </template>
                 <template v-else>
                   Personal
@@ -28,8 +28,8 @@
               </div>
 
               <div class="text-sm text-gray-600 dark:text-gray-400 leading-snug">
-                <template v-if="creditCard.org">
-                  Licenses will be assigned to the {{creditCard.org.title}} organization.
+                <template v-if="paymentMethod.org">
+                  Licenses will be assigned to the {{paymentMethod.org.title}} organization.
                 </template>
                 <template v-else>
                   Licenses will be assigned to your user.
@@ -38,11 +38,11 @@
 
               <div class="mt-4 font-mono">
                 <div>
-                  <span class="uppercase">{{ creditCard.card.brand }}</span> **** **** **** {{ creditCard.card.last4 }}
+                  <span class="uppercase">{{ paymentMethod.card.brand }}</span> **** **** **** {{ paymentMethod.card.last4 }}
                 </div>
 
                 <div class="text-sm text-gray-500">
-                  {{ creditCard.card.exp_month }}/{{ creditCard.card.exp_year }}
+                  {{ paymentMethod.card.exp_month }}/{{ paymentMethod.card.exp_year }}
                 </div>
               </div>
             </div>
@@ -90,7 +90,7 @@ export default {
       type: String,
       required: false,
     },
-    creditCard: {
+    paymentMethod: {
       type: Object,
       required: false,
     },

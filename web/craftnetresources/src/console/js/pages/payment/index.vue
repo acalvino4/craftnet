@@ -26,7 +26,7 @@
               :description=" paymentMethod.card.exp_month + '/' + paymentMethod.card.exp_year"
               :info="(paymentMethod.org ? paymentMethod.org.name : null)"
               :value="(paymentMethod.org ? 'org-' : '') + paymentMethod.id"
-              :credit-card="paymentMethod"
+              :payment-method="paymentMethod"
               :active="active"
               :checked="checked"
             />
