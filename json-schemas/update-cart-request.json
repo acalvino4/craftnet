@@ -22,8 +22,7 @@
         "businessId": {"type": ["string", "null"]},
         "businessTaxId": {"type": ["string", "null"]},
         "makePrimary": {"type": "boolean"}
-      },
-      "required": ["firstName", "lastName"]
+      }
     },
     "items": {
       "type": "array",

@@ -207,7 +207,7 @@ export default {
         if (this.selectedPaymentMethod.org) {
           cartData.orgId = this.selectedPaymentMethod.org.id
         } else {
-          cartData.paymentSourceId = this.selectedPaymentMethod.id;
+          cartData.paymentMethodId = this.selectedPaymentMethod.id;
         }
 
         cartData.billingAddress = this.selectedPaymentMethod.billingAddress

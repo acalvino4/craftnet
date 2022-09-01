@@ -208,7 +208,7 @@ class CartsController extends BaseApiController
 
             $currentUser = $this->getCurrentUser(false);
             $existingOrgFromCart = $cart->getOrg();
-            $orgId = $this->request->getBodyParam('orgId', $existingOrgFromCart?->id);
+            $orgId = $this->request->getBodyParam('orgId');
             $org = $orgId ? Org::find()->id($orgId)->hasMember($currentUser)->one() : null;
             $orgRemoved = !$org && $existingOrgFromCart;
             $originalCustomer = $cart->customer ?? $currentUser;
@@ -406,6 +406,10 @@ class CartsController extends BaseApiController
         $country = null;
         $state = null;
 
+        $billingAddress->firstName = $billingAddress->firstName ?? null;
+        $billingAddress->lastName = $billingAddress->lastName ?? null;
+        $billingAddress->makePrimary = $billingAddress->makePrimary ?? null;
+
         /** @var User|CustomerBehavior $customer */
         $customer = $cart->getCustomer();
 
@@ -513,7 +517,7 @@ class CartsController extends BaseApiController
         /**
          * @deprecated makePrimary should be set on the top-level payload
          */
-        if ($billingAddress?->makePrimary && $customer) {
+        if ($billingAddress->makePrimary && $customer) {
             /** @var Address $userBillingAddress */
             $userBillingAddress = Craft::$app->getElements()->duplicateElement(
                 $address,
