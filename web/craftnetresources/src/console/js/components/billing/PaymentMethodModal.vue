@@ -37,10 +37,6 @@
 
       <h3 class="mt-4">Address</h3>
       <div>
-        <template v-if="billingAddress && billingAddress.locality">
-          {{billingAddress.locality}}
-        </template>
-
         <address-fields
           v-model:address="billingAddress"
         />
