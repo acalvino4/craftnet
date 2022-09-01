@@ -6,7 +6,7 @@
         <tr>
           <th>Number</th>
           <th>Requested by</th>
-          <th class="w-px"></th>
+          <th></th>
         </tr>
         </thead>
         <tbody>
