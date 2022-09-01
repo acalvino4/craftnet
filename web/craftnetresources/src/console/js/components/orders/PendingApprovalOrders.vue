@@ -6,7 +6,7 @@
         <tr>
           <th>Number</th>
           <th>Requested by</th>
-          <th></th>
+          <th class="w-px"></th>
         </tr>
         </thead>
         <tbody>
@@ -38,7 +38,7 @@
 
             <template v-else>
               <div>
-                <em>Pending owner approval</em>
+                <em class="text-gray-500">Pending owner approval</em>
               </div>
             </template>
           </td>

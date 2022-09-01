@@ -15,13 +15,13 @@
             <h1 class="m-0">Order {{ order.shortNumber }}</h1>
           </div>
 
-          <template v-if="isPending">
+          <template v-if="order.isPendingApproval">
             <alert>
-              <h2>Order pending approval</h2>
-              <div>This order is pending approval.</div>
+              <h2>Pending Approval</h2>
+              <div class="mt-1"><strong>{{ order.approvalRequestedBy.name }}</strong> is asking your approval for this order.</div>
 
               <template v-if="currentMemberIsOwner">
-                <div class="space-x-2">
+                <div class="mt-4 space-x-2">
                   <btn :disabled="!currentMemberIsOwner" kind="primary" @click="approveRequest(order)">Approve</btn>
                   <btn :disabled="!currentMemberIsOwner" kind="danger" @click="rejectRequest(order)">Reject</btn>
                 </div>
@@ -36,7 +36,7 @@
 
               <dt>Date Paid</dt>
               <dd>
-                <template v-if="!isPending">
+                <template v-if="!order.isPendingApproval">
                   {{$filters.parseDate(order.datePaid.date).toFormat('ff') }}
                 </template>
                 <template v-else>
@@ -191,10 +191,6 @@ export default {
       currentOrganization: 'organizations/currentOrganization',
       currentMemberIsOwner: 'organizations/currentMemberIsOwner',
     }),
-
-    isPending() {
-      return !this.order.datePaid
-    }
   },
 
   methods: {
