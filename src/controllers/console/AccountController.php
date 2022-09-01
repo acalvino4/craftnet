@@ -64,6 +64,7 @@ class AccountController extends BaseController
                 'photoUrl' => $photoUrl,
                 'hasApiToken' => $user->apiToken !== null,
                 'payPalEmail' => $user->payPalEmail,
+                'name' => $user->getName(),
             ],
 
             // TODO: Implement organizations
