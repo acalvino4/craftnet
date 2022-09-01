@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-50/50 border border-gray-300 dark:border-gray-700 rounded-md p-6 relative">
+  <div class="bg-gray-50/50 border dark:bg-gray-800/50 border-gray-300 dark:border-gray-700 rounded-md p-6 relative">
     <template v-if="paymentMethod.isPrimary">
       <div class="absolute top-6 right-6">
         <badge type="success">Primary</badge>

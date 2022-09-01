@@ -6,7 +6,7 @@
                 'px-2.5 py-0.5 leading-5 text-sm': large,
 
                 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-100': type === 'default',
-                'bg-green-100 text-green-600 dark:text-green-100': type === 'success',
+                'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-100': type === 'success',
                 'bg-blue-100 dark:bg-blue-600 text-blue-600 dark:text-blue-100': type === 'info',
                 'bg-yellow-100 dark:bg-yellow-600 text-yellow-600 dark:text-yellow-100': type === 'warning',
                 'bg-red-100 text-red-600 dark:text-red-100': type === 'danger',
