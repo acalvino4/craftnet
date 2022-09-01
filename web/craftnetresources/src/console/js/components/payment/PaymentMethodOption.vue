@@ -12,7 +12,7 @@
             <profile-photo
               class="mr-4"
               size="md"
-              :photo-url="null"
+              :photo-url="photoUrl"
               :fallback="paymentMethod.org ? 'org' : 'user'"
             />
           </div>
@@ -75,6 +75,7 @@
 <script>
 
 import ProfilePhoto from '../ProfilePhoto';
+import {mapState} from 'vuex';
 export default {
   components: {ProfilePhoto},
   props: {
@@ -102,6 +103,28 @@ export default {
       type: Boolean,
       required: false,
     },
+  },
+
+  computed: {
+    ...mapState({
+      user: state => state.account.user,
+    }),
+
+    photoUrl() {
+      if (this.paymentMethod.org) {
+        if (!this.paymentMethod.org.orgLogo) {
+          return null
+        }
+
+        return this.paymentMethod.org.orgLogo.url
+      }
+
+      if (!this.user.photoUrl) {
+        return null
+      }
+
+      return this.user.photoUrl
+    }
   }
 }
 </script>
