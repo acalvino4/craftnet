@@ -278,12 +278,16 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('paymentMethods/getPaymentMethodsCheckout')
-      .catch(() => {
-        this.$store.dispatch('app/displayError', 'Couldn’t get payment methods.')
-      })
+    if (this.cart.lineItems.length === 0) {
+      this.$router.push({path: '/cart'})
+    } else {
+      this.$store.dispatch('paymentMethods/getPaymentMethodsCheckout')
+        .catch(() => {
+          this.$store.dispatch('app/displayError', 'Couldn’t get payment methods.')
+        })
 
-    this.$store.dispatch('cart/getCart')
+      this.$store.dispatch('cart/getCart')
+    }
   }
 }
 </script>
