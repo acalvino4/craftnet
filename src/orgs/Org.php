@@ -586,12 +586,12 @@ class Org extends Element
 
     public function canView(User $user): bool
     {
-        return $this->admin || $this->hasOwner($user) || $this->hasMember($user);
+        return $user->admin || $this->hasOwner($user) || $this->hasMember($user);
     }
 
     public function canSave(User $user): bool
     {
-        return !$this->id || $this->admin || $this->hasOwner($user) || $this->hasAdmin($user);
+        return !$this->id || $user->admin || $this->hasOwner($user) || $this->hasAdmin($user);
     }
 
     public function canCreateDrafts(User $user): bool
