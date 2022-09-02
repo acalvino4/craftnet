@@ -4,25 +4,7 @@
   "properties": {
     "email": {"type": "string", "format": "email"},
     "billingAddress": {
-      "type": "object",
-      "properties": {
-        "firstName": {"type": "string"},
-        "lastName": {"type": "string"},
-        "attention": {"type": ["string", "null"]},
-        "title": {"type": ["string", "null"]},
-        "address1": {"type": ["string", "null"]},
-        "address2": {"type": ["string", "null"]},
-        "city": {"type": ["string", "null"]},
-        "state": {"type": ["string", "null"]},
-        "country": {"type": "string", "pattern": "^([A-Z][A-Z])?$"},
-        "zipCode": {"type": ["string", "null"]},
-        "phone": {"type": ["string", "null"]},
-        "alternativePhone": {"type": ["string", "null"]},
-        "businessName": {"type": ["string", "null"]},
-        "businessId": {"type": ["string", "null"]},
-        "businessTaxId": {"type": ["string", "null"]},
-        "makePrimary": {"type": "boolean"}
-      }
+      "type": "object"
     },
     "items": {
       "type": "array",
