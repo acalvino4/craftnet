@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b2120b3fea44632cba6a40fc7e6a71b4",
+    "content-hash": "dc0401f7ff1a2eb3ddf04c9e0b6c87e0",
     "packages": [
         {
             "name": "adam-paterson/oauth2-stripe",
@@ -117,16 +117,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.235.5",
+            "version": "3.235.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "3b002b92369dbcb8d86f32546cb324eabcd19a4e"
+                "reference": "d7c649ff9d55eb8099cac97c5a37a5ed2720d06b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/3b002b92369dbcb8d86f32546cb324eabcd19a4e",
-                "reference": "3b002b92369dbcb8d86f32546cb324eabcd19a4e",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/d7c649ff9d55eb8099cac97c5a37a5ed2720d06b",
+                "reference": "d7c649ff9d55eb8099cac97c5a37a5ed2720d06b",
                 "shasum": ""
             },
             "require": {
@@ -203,9 +203,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.235.5"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.235.6"
             },
-            "time": "2022-09-09T18:19:38+00:00"
+            "time": "2022-09-12T18:15:48+00:00"
         },
         {
             "name": "bugsnag/bugsnag",
@@ -3816,53 +3816,6 @@
                 "source": "https://github.com/thephpleague/oauth2-server/tree/master"
             },
             "time": "2017-12-23T23:33:42+00:00"
-        },
-        {
-            "name": "logtail/monolog-logtail",
-            "version": "v0.1.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/logtail/monolog-logtail.git",
-                "reference": "6a9f30e72b77d0f8044b84a86a557e15de7e47f9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/logtail/monolog-logtail/zipball/6a9f30e72b77d0f8044b84a86a557e15de7e47f9",
-                "reference": "6a9f30e72b77d0f8044b84a86a557e15de7e47f9",
-                "shasum": ""
-            },
-            "require": {
-                "monolog/monolog": "^2",
-                "php": "^7.3 || ^8"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^8"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Logtail\\Monolog\\": "src/Monolog"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "ISC"
-            ],
-            "description": "Logtail handler for Monolog",
-            "homepage": "https://github.com/logtail/logtail-php",
-            "keywords": [
-                "handler",
-                "log",
-                "logger",
-                "logging",
-                "monolog",
-                "php"
-            ],
-            "support": {
-                "issues": "https://github.com/logtail/monolog-logtail/issues",
-                "source": "https://github.com/logtail/monolog-logtail/tree/v0.1.3"
-            },
-            "time": "2022-01-27T19:07:53+00:00"
         },
         {
             "name": "masterminds/html5",
