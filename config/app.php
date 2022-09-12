@@ -109,7 +109,7 @@ return [
                         $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING;
                     }
 
-                    $dispatcher->targets[] = [
+                    $dispatcher->targets['db'] = [
                         [
                             'class' => craftnet\logs\DbTarget::class,
                             'logTable' => 'apilog.logs',
