@@ -2,13 +2,13 @@
 
 use craft\helpers\App;
 use craft\log\Dispatcher;
+use craft\log\MonologTarget;
+use craftnet\logs\PhpShutdownStrategy;
 use craftnet\services\Oauth;
+use Illuminate\Support\Collection;
+use Logtail\Monolog\LogtailHandler;
 use MeadSteve\MonoSnag\BugsnagHandler;
-use Monolog\Logger;
-use samdark\log\PsrTarget;
-use yii\i18n\PhpMessageSource;
 use yii\web\Application as WebApplication;
-use yii\web\HttpException;
 
 return [
     '*' => [
@@ -83,40 +83,40 @@ return [
                 'cliScriptName' => 'craft',
             ],
             'log' => static function() {
+                $dispatcher = new Dispatcher();
+
+                Collection::make($dispatcher->targets)
+                    ->each(function(MonologTarget $target) {
+                        $logtailToken = App::env('LOGTAIL_TOKEN');
+                        $bugsnagApiKey = App::env('BUGSNAG_API_KEY');
+
+                        if ($logtailToken) {
+                            $target->getLogger()->pushHandler((new LogtailHandler($logtailToken)));
+                        }
+
+                        if ($bugsnagApiKey) {
+                            $bugsnagClient = Bugsnag\Client::make($bugsnagApiKey);
+                            $bugsnagClient->setReleaseStage(App::env('CRAFT_ENVIRONMENT'));
+                            $shutdownStrategy = new PhpShutdownStrategy();
+                            $shutdownStrategy->registerShutdownStrategy($bugsnagClient);
+                            $target->getLogger()->pushHandler((new BugsnagHandler($bugsnagClient)));
+                        }
+                    });
+
                 if (YII_DEBUG) {
                     $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING | yii\log\Logger::LEVEL_INFO | yii\log\Logger::LEVEL_TRACE | yii\log\Logger::LEVEL_PROFILE;
                 } else {
                     $levels = yii\log\Logger::LEVEL_ERROR | yii\log\Logger::LEVEL_WARNING;
                 }
 
-                $targets = [
-                    [
-                        'class' => craftnet\logs\DbTarget::class,
-                        'logTable' => 'apilog.logs',
-                        'levels' => $levels,
-                        'enabled' => App::env('CRAFT_ENVIRONMENT') === 'prod',
-                    ]
-                ];
-
-                if ($bugsnagApiKey = App::env('BUGSNAG_API_KEY')) {
-                    $bugsnagClient = Bugsnag\Client::make($bugsnagApiKey);
-                    $bugsnagClient->setReleaseStage(App::env('CRAFT_ENVIRONMENT'));
-                    $shutdownStrategy = new \craftnet\logs\PhpShutdownStrategy();
-                    $shutdownStrategy->registerShutdownStrategy($bugsnagClient);
-
-                    $targets[] = [
-                        'class' => PsrTarget::class,
-                        'logger' => (new Logger('bugsnag'))->pushHandler(new BugsnagHandler($bugsnagClient)),
-                        'except' => [
-                            PhpMessageSource::class . ':*',
-                            HttpException::class . ':404',
-                        ],
-                    ];
-                }
-                return Craft::createObject([
-                    'class' => Dispatcher::class,
-                    'targets' => $targets,
+                $dispatcher->targets['db'] = Craft::createObject([
+                    'class' => craftnet\logs\DbTarget::class,
+                    'logTable' => 'apilog.logs',
+                    'levels' => $levels,
+                    'enabled' => App::env('CRAFT_ENVIRONMENT') === 'prod',
                 ]);
+
+                return $dispatcher;
             },
         ],
     ],
