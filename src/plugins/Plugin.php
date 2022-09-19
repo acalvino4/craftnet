@@ -8,6 +8,7 @@ use craft\db\Query;
 use craft\elements\actions\SetStatus;
 use craft\elements\Asset;
 use craft\elements\Category;
+use craft\elements\conditions\ElementConditionInterface;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
@@ -18,6 +19,7 @@ use craftnet\behaviors\UserBehavior;
 use craftnet\composer\Package;
 use craftnet\db\Table;
 use craftnet\Module;
+use craftnet\plugins\conditions\PluginCondition;
 use craftnet\records\Plugin as PluginRecord;
 use DateTime;
 use yii\base\InvalidArgumentException;
@@ -75,6 +77,15 @@ class Plugin extends Element
     public static function find(): ElementQueryInterface
     {
         return new PluginQuery(static::class);
+    }
+
+    /**
+     * @inheritdoc
+     * @return PluginCondition
+     */
+    public static function createCondition(): ElementConditionInterface
+    {
+        return Craft::createObject(PluginCondition::class, [static::class]);
     }
 
     /**
