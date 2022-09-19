@@ -13,6 +13,7 @@ use craftnet\behaviors\UserQueryBehavior;
 use craftnet\db\Table;
 use craftnet\plugins\Plugin;
 use craftnet\plugins\PluginQuery;
+use yii\db\Expression;
 
 class DeveloperConditionRule extends BaseSelectConditionRule implements ElementConditionRuleInterface
 {
@@ -29,7 +30,12 @@ class DeveloperConditionRule extends BaseSelectConditionRule implements ElementC
     protected function options(): array
     {
         return User::find()
-            ->innerJoin(['plugins' => Table::PLUGINS], '[[plugins.developerId]] = [[users.id]]')
+            ->where([
+                'exists',
+                (new Query())
+                    ->from(Table::PLUGINS)
+                    ->where(['developerId' => new Expression('[[elements.id]]')])
+            ])
             ->collect()
             ->map(fn(User|UserBehavior $user) => [
                 'label' => $user->getDeveloperName(),
