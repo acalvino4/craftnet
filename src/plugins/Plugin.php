@@ -687,7 +687,9 @@ class Plugin extends Element
                 return null;
             }
 
-            $this->_icon = Asset::find()->id($this->iconId)->one();
+            /** @var Asset|null $icon */
+            $icon = Asset::find()->id($this->iconId)->one();
+            $this->_icon = $icon;
         }
 
         return $this->_icon ?: null;

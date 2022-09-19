@@ -463,6 +463,7 @@ class PluginStoreController extends BaseApiController
             'id' => $featuredSectionEntry->id,
             'slug' => $featuredSectionEntry->slug,
             'title' => $featuredSectionEntry->title,
+            /** @phpstan-ignore-next-line */
             'limit' => $featuredSectionEntry->limit,
         ];
     }
