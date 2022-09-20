@@ -54,6 +54,11 @@ class Plugin extends Element
         return 'Plugin';
     }
 
+    public static function pluralDisplayName(): string
+    {
+        return 'Plugins';
+    }
+
     public static function hasStatuses(): bool
     {
         return true;
