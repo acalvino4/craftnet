@@ -4,6 +4,7 @@ namespace craftnet\plugins\conditions;
 
 use craft\base\conditions\BaseSelectConditionRule;
 use craft\base\ElementInterface;
+use craft\db\Query;
 use craft\elements\conditions\ElementConditionRuleInterface;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\UserQuery;
