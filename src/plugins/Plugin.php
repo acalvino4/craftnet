@@ -257,6 +257,7 @@ class Plugin extends Element
             'latestVersion' => 'Version',
             'latestVersionTime' => 'Last Update',
             'activeInstalls' => 'Installs',
+            'abandoned' => 'Abandoned',
             'keywords' => 'Keywords',
         ];
     }

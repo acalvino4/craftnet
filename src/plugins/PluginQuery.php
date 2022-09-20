@@ -46,6 +46,11 @@ class PluginQuery extends ElementQuery
     public $packageId;
 
     /**
+     * @var bool|null Whether to fetch abandoned plugins.
+     */
+    public ?bool $abandoned = null;
+
+    /**
      * @var bool Whether info about the latest release should be included
      */
     public $withLatestReleaseInfo = false;
@@ -154,6 +159,18 @@ class PluginQuery extends ElementQuery
     }
 
     /**
+     * Sets the [[abandoned]] property.
+     *
+     * @param bool|null $value The property value
+     * @return static self reference
+     */
+    public function abandoned(?bool $value = true): static
+    {
+        $this->abandoned = $value;
+        return $this;
+    }
+
+    /**
      * Sets the [[withLatestReleaseInfo]], [[cmsVersion]], and [[minStability]] properties.
      *
      * @param bool $withLatestReleaseInfo
@@ -233,6 +250,10 @@ class PluginQuery extends ElementQuery
 
         if ($this->packageId) {
             $this->subQuery->andWhere(Db::parseParam(Table::PLUGINS . '.packageId', $this->packageId));
+        }
+
+        if ($this->abandoned !== null) {
+            $this->subQuery->andWhere([Table::PLUGINS . '.abandoned' => $this->abandoned]);
         }
 
         if ($this->categoryId) {
