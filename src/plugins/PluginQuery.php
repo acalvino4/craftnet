@@ -56,9 +56,9 @@ class PluginQuery extends ElementQuery
     public $withLatestReleaseInfo = false;
 
     /**
-     * @var string|null Craft version the latest release must be compatible with
+     * @var string|string[]|null Craft version the latest release must be compatible with
      */
-    public $cmsVersion;
+    public string|array|null $cmsVersion = null;
 
     /**
      * @var string|null Minimum stability the latest release must have
@@ -174,14 +174,14 @@ class PluginQuery extends ElementQuery
      * Sets the [[withLatestReleaseInfo]], [[cmsVersion]], and [[minStability]] properties.
      *
      * @param bool $withLatestReleaseInfo
-     * @param string|null $cmsVersion
+     * @param string|array|null $cmsVersion
      * @param string|null $minStability
      * @param bool $preferStable
      * @return static self reference
      */
     public function withLatestReleaseInfo(
         bool $withLatestReleaseInfo = true,
-        ?string $cmsVersion = null,
+        string|array|null $cmsVersion = null,
         ?string $minStability = null,
         bool $preferStable = true,
     ): static {
@@ -195,10 +195,10 @@ class PluginQuery extends ElementQuery
     /**
      * Sets the [[cmsVersion]] property.
      *
-     * @param string|null $value
+     * @param string|string[]|null $value
      * @return static self reference
      */
-    public function cmsVersion(?string $value): static
+    public function cmsVersion(string|array|null $value): static
     {
         $this->withLatestReleaseInfo = true;
         $this->cmsVersion = $value;
@@ -307,19 +307,25 @@ class PluginQuery extends ElementQuery
                 ->select(["max([[s_vo.{$maxCol}]])"])
                 ->from(['s_vo' => Table::PLUGINVERSIONORDER])
                 ->innerJoin(['s_v' => Table::PACKAGEVERSIONS], '[[s_v.id]] = [[s_vo.versionId]]')
+                ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
                 ->where('[[s_v.packageId]] = [[craftnet_plugins.packageId]]')
                 ->groupBy(['s_v.packageId']);
 
             $packageManager = Module::getInstance()->getPackageManager();
 
             if ($this->cmsVersion) {
-                $cmsRelease = $packageManager->getRelease('craftcms/cms', $this->cmsVersion);
-                if (!$cmsRelease) {
+                $cmsReleaseIds = [];
+                foreach ((array)$this->cmsVersion as $cmsVersion) {
+                    $cmsReleaseId = $packageManager->getRelease('craftcms/cms', $cmsVersion)?->id;
+                    if ($cmsReleaseId) {
+                        $cmsReleaseIds[] = $cmsReleaseId;
+                    }
+                }
+                if (empty($cmsReleaseIds)) {
                     return false;
                 }
                 $latestReleaseQuery
-                    ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
-                    ->andWhere(['s_vc.cmsVersionId' => $cmsRelease->id]);
+                    ->andWhere(['s_vc.cmsVersionId' => count($cmsReleaseIds) === 1 ? $cmsReleaseIds[0] : $cmsReleaseIds]);
             }
 
             if ($this->minStability) {
@@ -369,7 +375,7 @@ class PluginQuery extends ElementQuery
      */
     public function afterPopulate(array $elements): array
     {
-        if ($this->cmsVersion) {
+        if ($this->cmsVersion && !is_array($this->cmsVersion)) {
             foreach ($elements as $element) {
                 if ($element instanceof Plugin) {
                     $element->compatibleCmsVersion = $this->cmsVersion;

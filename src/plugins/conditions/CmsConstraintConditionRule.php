@@ -77,8 +77,23 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
         return !$compatible;
     }
 
-    private function cmsVersion(): string
+    /**
+     * @return string|string[]
+     */
+    private function cmsVersion(): string|array
     {
-        return Module::getInstance()->getPackageManager()->getLatestVersion('craftcms/cms', null, $this->value) ?? '0.0';
+        $constraints = array_filter(array_map('trim', explode('|', $this->value)));
+        $cmsVersions = [];
+        $packageManager = Module::getInstance()->getPackageManager();
+        foreach ($constraints as $constraint) {
+            $cmsVersion = $packageManager->getLatestVersion('craftcms/cms', null, $constraint);
+            if ($cmsVersion) {
+                $cmsVersions[] = $cmsVersion;
+            }
+        }
+        if (empty($cmsVersions)) {
+            return '0.0';
+        }
+        return count($cmsVersions) === 1 ? $cmsVersions[0] : $cmsVersions;
     }
 }
