@@ -261,7 +261,7 @@ class PluginQuery extends ElementQuery
             $packageManager = Module::getInstance()->getPackageManager();
 
             if ($this->cmsVersion || $this->excludedCmsVersion) {
-                $cmsRelease = $packageManager->getRelease('craftcms/cms', $this->cmsVersion);
+                $cmsRelease = $packageManager->getRelease('craftcms/cms', $this->cmsVersion || $this->excludedCmsVersion);
                 if (!$cmsRelease) {
                     return false;
                 }
