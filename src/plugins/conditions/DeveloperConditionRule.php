@@ -58,11 +58,7 @@ class DeveloperConditionRule extends BaseSelectConditionRule implements ElementC
 
     public function matchElement(ElementInterface $element): bool
     {
-        if (!$this->value) {
-            return true;
-        }
-
         /** @var Plugin $element */
-        return $element->developerId == $this->value;
+        return $this->matchValue($element->developerId);
     }
 }

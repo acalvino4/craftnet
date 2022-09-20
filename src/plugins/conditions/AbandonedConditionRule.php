@@ -30,6 +30,6 @@ class AbandonedConditionRule extends BaseLightswitchConditionRule implements Ele
     public function matchElement(ElementInterface $element): bool
     {
         /** @var Plugin $element */
-        return $element->abandoned === $this->value;
+        return $this->matchValue($element->abandoned);
     }
 }
