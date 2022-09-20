@@ -290,11 +290,11 @@ class PluginQuery extends ElementQuery
         }
 
         if ($this->developerId) {
-            $this->subQuery->andWhere(Db::parseParam(Table::PLUGINS . '.developerId', $this->developerId));
+            $this->subQuery->andWhere(Db::parseNumericParam(Table::PLUGINS . '.developerId', $this->developerId));
         }
 
         if ($this->packageId) {
-            $this->subQuery->andWhere(Db::parseParam(Table::PLUGINS . '.packageId', $this->packageId));
+            $this->subQuery->andWhere(Db::parseNumericParam(Table::PLUGINS . '.packageId', $this->packageId));
         }
 
         if ($this->abandoned !== null) {
