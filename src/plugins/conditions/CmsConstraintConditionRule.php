@@ -48,7 +48,12 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
         if ($this->operator === self::OPERATOR_EQ) {
             $query->withLatestReleaseInfo(cmsVersion: $this->cmsVersion());
         } else {
-            $query->withLatestReleaseInfo(excludeCmsVersion: $this->cmsVersion());
+            $compatiblePluginIds = (clone $query)
+                ->withLatestReleaseInfo(cmsVersion: $this->cmsVersion())
+                ->ids();
+            if ($compatiblePluginIds) {
+                $query->id(['not'] + $compatiblePluginIds);
+            }
         }
     }
 
@@ -58,19 +63,17 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
             return true;
         }
 
-        $query = Plugin::find();
-
-        if ($this->operator === self::OPERATOR_EQ) {
-            $query->withLatestReleaseInfo(cmsVersion: $this->cmsVersion());
-        } else {
-            $query->withLatestReleaseInfo(excludeCmsVersion: $this->cmsVersion());
-        }
-
-        /** @var Plugin $element */
-        return $query
+        $compatible = Plugin::find()
+            ->withLatestReleaseInfo(cmsVersion: $this->cmsVersion())
             ->id($element->id)
             ->status(null)
             ->exists();
+
+        if ($this->operator === self::OPERATOR_EQ) {
+            return $compatible;
+        }
+
+        return !$compatible;
     }
 
     private function cmsVersion(): string

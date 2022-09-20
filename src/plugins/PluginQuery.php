@@ -56,11 +56,6 @@ class PluginQuery extends ElementQuery
     public $cmsVersion;
 
     /**
-     * @var string|null Craft version that no releases may be compatible with
-     */
-    public $excludedCmsVersion;
-
-    /**
      * @var string|null Minimum stability the latest release must have
      */
     public $minStability;
@@ -165,7 +160,6 @@ class PluginQuery extends ElementQuery
      * @param string|null $cmsVersion
      * @param string|null $minStability
      * @param bool $preferStable
-     * @param string|null $excludeCmsVersion
      * @return static self reference
      */
     public function withLatestReleaseInfo(
@@ -173,13 +167,11 @@ class PluginQuery extends ElementQuery
         ?string $cmsVersion = null,
         ?string $minStability = null,
         $preferStable = true,
-        ?string $excludeCmsVersion = null,
     ) {
         $this->withLatestReleaseInfo = $withLatestReleaseInfo;
         $this->cmsVersion = $cmsVersion;
         $this->minStability = $minStability;
         $this->preferStable = $preferStable;
-        $this->excludedCmsVersion = $excludeCmsVersion;
         return $this;
     }
 
@@ -260,21 +252,14 @@ class PluginQuery extends ElementQuery
 
             $packageManager = Module::getInstance()->getPackageManager();
 
-            if ($this->cmsVersion || $this->excludedCmsVersion) {
-                $cmsRelease = $packageManager->getRelease('craftcms/cms', $this->cmsVersion ?: $this->excludedCmsVersion);
+            if ($this->cmsVersion) {
+                $cmsRelease = $packageManager->getRelease('craftcms/cms', $this->cmsVersion);
                 if (!$cmsRelease) {
                     return false;
                 }
-                if ($this->cmsVersion) {
-                    $latestReleaseQuery
-                        ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
-                        ->andWhere(['s_vc.cmsVersionId' => $cmsRelease->id]);
-                } else {
-                    $latestReleaseQuery
-                        ->leftJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
-                        ->andWhere(['s_vc.cmsVersionId' => $cmsRelease->id])
-                        ->andWhere(['s_vc.pluginVersionId' => null]);
-                }
+                $latestReleaseQuery
+                    ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
+                    ->andWhere(['s_vc.cmsVersionId' => $cmsRelease->id]);
             }
 
             if ($this->minStability) {
