@@ -307,7 +307,6 @@ class PluginQuery extends ElementQuery
                 ->select(["max([[s_vo.{$maxCol}]])"])
                 ->from(['s_vo' => Table::PLUGINVERSIONORDER])
                 ->innerJoin(['s_v' => Table::PACKAGEVERSIONS], '[[s_v.id]] = [[s_vo.versionId]]')
-                ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
                 ->where('[[s_v.packageId]] = [[craftnet_plugins.packageId]]')
                 ->groupBy(['s_v.packageId']);
 
@@ -325,6 +324,7 @@ class PluginQuery extends ElementQuery
                     return false;
                 }
                 $latestReleaseQuery
+                    ->innerJoin(['s_vc' => Table::PLUGINVERSIONCOMPAT], '[[s_vc.pluginVersionId]] = [[s_v.id]]')
                     ->andWhere(['s_vc.cmsVersionId' => count($cmsReleaseIds) === 1 ? $cmsReleaseIds[0] : $cmsReleaseIds]);
             }
 
