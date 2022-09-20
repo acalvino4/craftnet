@@ -50,6 +50,7 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
         } else {
             $compatiblePluginIds = (clone $query)
                 ->withLatestReleaseInfo(cmsVersion: $this->cmsVersion())
+                ->limit(null)
                 ->ids();
             if ($compatiblePluginIds) {
                 $query->id(['not'] + $compatiblePluginIds);
