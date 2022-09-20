@@ -51,9 +51,9 @@ class PluginQuery extends ElementQuery
     public ?bool $abandoned = null;
 
     /**
-     * @var bool Whether info about the latest release should be included
+     * @var bool|null Whether info about the latest release should be included
      */
-    public $withLatestReleaseInfo = false;
+    public ?bool $withLatestReleaseInfo = false;
 
     /**
      * @var string|string[]|null Craft version the latest release must be compatible with
@@ -173,14 +173,14 @@ class PluginQuery extends ElementQuery
     /**
      * Sets the [[withLatestReleaseInfo]], [[cmsVersion]], and [[minStability]] properties.
      *
-     * @param bool $withLatestReleaseInfo
+     * @param bool|null $withLatestReleaseInfo
      * @param string|array|null $cmsVersion
      * @param string|null $minStability
      * @param bool $preferStable
      * @return static self reference
      */
     public function withLatestReleaseInfo(
-        bool $withLatestReleaseInfo = true,
+        ?bool $withLatestReleaseInfo = true,
         string|array|null $cmsVersion = null,
         ?string $minStability = null,
         bool $preferStable = true,
@@ -200,7 +200,9 @@ class PluginQuery extends ElementQuery
      */
     public function cmsVersion(string|array|null $value): static
     {
-        $this->withLatestReleaseInfo = true;
+        if ($this->withLatestReleaseInfo === false) {
+            $this->withLatestReleaseInfo = true;
+        }
         $this->cmsVersion = $value;
         return $this;
     }
@@ -213,7 +215,9 @@ class PluginQuery extends ElementQuery
      */
     public function minStability(?string $value): static
     {
-        $this->withLatestReleaseInfo = true;
+        if ($this->withLatestReleaseInfo === false) {
+            $this->withLatestReleaseInfo = true;
+        }
         $this->minStability = $value;
         return $this;
     }
@@ -226,7 +230,9 @@ class PluginQuery extends ElementQuery
      */
     public function preferStable(bool $value = true): static
     {
-        $this->withLatestReleaseInfo = true;
+        if ($this->withLatestReleaseInfo === false) {
+            $this->withLatestReleaseInfo = true;
+        }
         $this->preferStable = $value;
         return $this;
     }
@@ -301,7 +307,7 @@ class PluginQuery extends ElementQuery
                 ->andWhere(Db::parseParam('pc.categoryId', $this->categoryId));
         }
 
-        if ($this->withLatestReleaseInfo) {
+        if ($this->withLatestReleaseInfo !== false) {
             $maxCol = $this->preferStable ? 'stableOrder' : 'order';
             $latestReleaseQuery = (new Query())
                 ->select(["max([[s_vo.{$maxCol}]])"])
@@ -334,15 +340,20 @@ class PluginQuery extends ElementQuery
                 ]);
             }
 
+            $joinType = $this->withLatestReleaseInfo ? 'INNER JOIN' : 'LEFT JOIN';
+
             $this->subQuery
                 ->addSelect([
                     'latestVersionId' => 'v.id',
                     'latestVersion' => 'v.version',
                     'latestVersionTime' => 'v.time',
                 ])
-                ->innerJoin(['v' => Table::PACKAGEVERSIONS], '[[v.packageId]] = [[craftnet_plugins.packageId]]')
-                ->innerJoin(['vo' => Table::PLUGINVERSIONORDER], '[[vo.versionId]] = [[v.id]]')
-                ->andWhere(["vo.{$maxCol}" => $latestReleaseQuery]);
+                ->join($joinType, ['v' => Table::PACKAGEVERSIONS], '[[v.packageId]] = [[craftnet_plugins.packageId]]')
+                ->join($joinType, ['vo' => Table::PLUGINVERSIONORDER], '[[vo.versionId]] = [[v.id]]')
+                ->andWhere($this->withLatestReleaseInfo
+                    ? ["vo.{$maxCol}" => $latestReleaseQuery]
+                    : ['or', ["vo.{$maxCol}" => $latestReleaseQuery], ["v.id" => null]]
+                );
             $this->query
                 ->addSelect(['latestVersionId', 'latestVersion', 'latestVersionTime']);
         }

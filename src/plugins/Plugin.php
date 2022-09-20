@@ -106,12 +106,29 @@ class Plugin extends Element
      */
     public static function indexHtml(ElementQueryInterface $elementQuery, ?array $disabledElementIds = null, array $viewState, ?string $sourceKey = null, ?string $context = null, bool $includeContainer, bool $showCheckboxes): string
     {
-        /** @var PluginQuery $elementQuery */
-        $elementQuery
-            ->preferStable(false)
-            ->with(['icon', 'primaryCategory']);
+        // Always eager-load the icons
+        $elementQuery->with('icon');
 
         return parent::indexHtml($elementQuery, $disabledElementIds, $viewState, $sourceKey, $context, $includeContainer, $showCheckboxes);
+    }
+
+    protected static function prepElementQueryForTableAttribute(ElementQueryInterface $elementQuery, string $attribute): void
+    {
+        /** @var PluginQuery $elementQuery */
+        switch ($attribute) {
+            case 'latestVersion':
+            case 'latestVersionTime':
+                if ($elementQuery->withLatestReleaseInfo === false) {
+                    $elementQuery->withLatestReleaseInfo = null;
+                }
+                $elementQuery->preferStable = false;
+                break;
+            case 'primaryCategory':
+                $elementQuery->andWith('primaryCategory');
+                break;
+            default:
+                parent::prepElementQueryForTableAttribute($elementQuery, $attribute);
+        }
     }
 
     /**
