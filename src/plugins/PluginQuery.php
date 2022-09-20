@@ -183,12 +183,51 @@ class PluginQuery extends ElementQuery
         bool $withLatestReleaseInfo = true,
         ?string $cmsVersion = null,
         ?string $minStability = null,
-        $preferStable = true,
-    ) {
+        bool $preferStable = true,
+    ): static {
         $this->withLatestReleaseInfo = $withLatestReleaseInfo;
         $this->cmsVersion = $cmsVersion;
         $this->minStability = $minStability;
         $this->preferStable = $preferStable;
+        return $this;
+    }
+
+    /**
+     * Sets the [[cmsVersion]] property.
+     *
+     * @param string|null $value
+     * @return static self reference
+     */
+    public function cmsVersion(?string $value): static
+    {
+        $this->withLatestReleaseInfo = true;
+        $this->cmsVersion = $value;
+        return $this;
+    }
+
+    /**
+     * Sets the [[minStability]] property.
+     *
+     * @param string|null $value
+     * @return static self reference
+     */
+    public function minStability(?string $value): static
+    {
+        $this->withLatestReleaseInfo = true;
+        $this->minStability = $value;
+        return $this;
+    }
+
+    /**
+     * Sets the [[preferStable]] property.
+     *
+     * @param bool $value
+     * @return static self reference
+     */
+    public function preferStable(bool $value = true): static
+    {
+        $this->withLatestReleaseInfo = true;
+        $this->preferStable = $value;
         return $this;
     }
 

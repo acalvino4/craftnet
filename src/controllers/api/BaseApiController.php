@@ -925,7 +925,7 @@ EOL;
                     $latestCmsVersion = $packageManager->getLatestVersion('craftcms/cms', 'dev', $cmsConstraint);
                     if ($latestCmsVersion) {
                         $compatible = Plugin::find()
-                            ->withLatestReleaseInfo(cmsVersion: $latestCmsVersion)
+                            ->cmsVersion($latestCmsVersion)
                             ->id($plugin->id)
                             ->exists();
                         if ($compatible) {

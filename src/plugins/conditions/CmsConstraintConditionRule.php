@@ -46,10 +46,10 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
 
         /** @var PluginQuery $query */
         if ($this->operator === self::OPERATOR_EQ) {
-            $query->withLatestReleaseInfo(cmsVersion: $this->cmsVersion());
+            $query->cmsVersion($this->cmsVersion());
         } else {
             $compatiblePluginIds = (clone $query)
-                ->withLatestReleaseInfo(cmsVersion: $this->cmsVersion())
+                ->cmsVersion($this->cmsVersion())
                 ->limit(null)
                 ->ids();
             if ($compatiblePluginIds) {
@@ -65,7 +65,7 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
         }
 
         $compatible = Plugin::find()
-            ->withLatestReleaseInfo(cmsVersion: $this->cmsVersion())
+            ->cmsVersion($this->cmsVersion())
             ->id($element->id)
             ->status(null)
             ->exists();

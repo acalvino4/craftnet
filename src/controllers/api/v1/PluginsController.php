@@ -43,7 +43,7 @@ class PluginsController extends BaseApiController
     private function _getPluginQuery()
     {
         return Plugin::find()
-            ->withLatestReleaseInfo(true, $this->cmsVersionForPluginQueries())
+            ->cmsVersion($this->cmsVersionForPluginQueries())
             ->with(['developer', 'categories', 'icon'])
             ->indexBy('id');
     }

@@ -63,7 +63,7 @@ class PluginStoreController extends BaseApiController
             foreach ($this->_createFeaturedSectionQuery()->all() as $entry) {
                 try {
                     $pluginIds = $this->_createFeaturedPluginQuery($entry)
-                        ->withLatestReleaseInfo(true, $this->cmsVersionForPluginQueries())
+                        ->cmsVersion($this->cmsVersionForPluginQueries())
                         ->ids();
                 } catch (InvalidArgumentException $e) {
                     continue;
@@ -536,7 +536,7 @@ class PluginStoreController extends BaseApiController
      */
     private function _preparePluginQuery(PluginQuery $query, bool $withEagerLoading = true)
     {
-        $query->withLatestReleaseInfo(true, $this->cmsVersionForPluginQueries());
+        $query->cmsVersion($this->cmsVersionForPluginQueries());
         if ($withEagerLoading) {
             $query->with(['developer', 'categories', 'icon', 'editions']);
         }

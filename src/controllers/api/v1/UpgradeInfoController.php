@@ -50,7 +50,7 @@ class UpgradeInfoController extends BaseApiController
         // Get the plugins which are compatible with the target Craft version
         /** @var Plugin[] $compatiblePlugins */
         $compatiblePlugins = Plugin::find()
-            ->withLatestReleaseInfo(cmsVersion: $cmsVersion)
+            ->cmsVersion($cmsVersion)
             ->id(array_map(fn(Plugin $plugin) => $plugin->id, $this->plugins))
             ->indexBy('id')
             ->all();

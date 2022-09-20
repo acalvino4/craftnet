@@ -103,7 +103,7 @@ class Plugin extends Element
     {
         /** @var PluginQuery $elementQuery */
         $elementQuery
-            ->withLatestReleaseInfo(true, null, null, false)
+            ->preferStable(false)
             ->with(['icon', 'primaryCategory']);
 
         return parent::indexHtml($elementQuery, $disabledElementIds, $viewState, $sourceKey, $context, $includeContainer, $showCheckboxes);
