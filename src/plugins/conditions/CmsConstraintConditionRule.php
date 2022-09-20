@@ -24,7 +24,18 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
 
     protected function operators(): array
     {
-        return [self::OPERATOR_EQ];
+        return [
+            self::OPERATOR_EQ,
+            self::OPERATOR_NE,
+        ];
+    }
+
+    protected function operatorLabel(string $operator): string
+    {
+        return match ($operator) {
+            self::OPERATOR_EQ => 'compatible with',
+            self::OPERATOR_NE => 'not compatible with',
+        };
     }
 
     public function modifyQuery(ElementQueryInterface $query): void
@@ -34,7 +45,11 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
         }
 
         /** @var PluginQuery $query */
-        $query->withLatestReleaseInfo(cmsVersion: $this->cmsVersion());
+        if ($this->operator === self::OPERATOR_EQ) {
+            $query->withLatestReleaseInfo(cmsVersion: $this->cmsVersion());
+        } else {
+            $query->withLatestReleaseInfo(excludeCmsVersion: $this->cmsVersion());
+        }
     }
 
     public function matchElement(ElementInterface $element): bool
@@ -43,9 +58,16 @@ class CmsConstraintConditionRule extends BaseTextConditionRule implements Elemen
             return true;
         }
 
+        $query = Plugin::find();
+
+        if ($this->operator === self::OPERATOR_EQ) {
+            $query->withLatestReleaseInfo(cmsVersion: $this->cmsVersion());
+        } else {
+            $query->withLatestReleaseInfo(excludeCmsVersion: $this->cmsVersion());
+        }
+
         /** @var Plugin $element */
-        return Plugin::find()
-            ->withLatestReleaseInfo(cmsVersion: $this->cmsVersion())
+        return $query
             ->id($element->id)
             ->status(null)
             ->exists();
