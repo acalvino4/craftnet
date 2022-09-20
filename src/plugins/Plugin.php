@@ -214,7 +214,6 @@ class Plugin extends Element
             ->group('pluginCategories')
             ->with('icon')
             ->all();
-        $assetsService = Craft::$app->getAssets();
 
         foreach ($categories as $category) {
             $sources[] = [
