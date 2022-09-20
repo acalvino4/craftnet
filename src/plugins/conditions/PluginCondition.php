@@ -10,8 +10,12 @@ class PluginCondition extends ElementCondition
     {
         return array_merge(parent::conditionRuleTypes(), [
             AbandonedConditionRule::class,
+            ActiveInstallsConditionRule::class,
             CmsConstraintConditionRule::class,
             DeveloperConditionRule::class,
+            HandleConditionRule::class,
+            LicenseConditionRule::class,
+            PackageNameConditionRule::class,
         ]);
     }
 }

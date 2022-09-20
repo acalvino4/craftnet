@@ -31,6 +31,11 @@ class PluginQuery extends ElementQuery
     public $license;
 
     /**
+     * @var int|string|int[]|null The number of active installs the resulting plugins must have.
+     */
+    public int|string|array|null $activeInstalls = null;
+
+    /**
      * @var int|int[]|null The category ID(s) that the resulting plugins must have.
      */
     public $categoryId;
@@ -44,6 +49,11 @@ class PluginQuery extends ElementQuery
      * @var int|int[]|null The Composer package ID(s) that the resulting plugins must be associated with.
      */
     public $packageId;
+
+    /**
+     * @var string|string[]|null The Composer package name(s) that the resulting plugins must be associated with.
+     */
+    public $packageName;
 
     /**
      * @var bool|null Whether to fetch abandoned plugins.
@@ -120,6 +130,19 @@ class PluginQuery extends ElementQuery
     }
 
     /**
+     * Sets the [[activeInstalls]] property.
+     *
+     * @param int|int[]|null $value The property value
+     *
+     * @return static self reference
+     */
+    public function activeInstalls($value)
+    {
+        $this->activeInstalls = $value;
+        return $this;
+    }
+
+    /**
      * Sets the [[categoryId]] property.
      *
      * @param int|int[]|null $value The property value
@@ -155,6 +178,19 @@ class PluginQuery extends ElementQuery
     public function packageId($value)
     {
         $this->packageId = $value;
+        return $this;
+    }
+
+    /**
+     * Sets the [[packageName]] property.
+     *
+     * @param string|string[]|null $value The property value
+     *
+     * @return static self reference
+     */
+    public function packageName(string|array|null $value): static
+    {
+        $this->packageName = $value;
         return $this;
     }
 
@@ -289,12 +325,20 @@ class PluginQuery extends ElementQuery
             $this->subQuery->andWhere(Db::parseParam(Table::PLUGINS . '.license', $this->license));
         }
 
+        if ($this->activeInstalls !== null) {
+            $this->subQuery->andWhere(Db::parseNumericParam(Table::PLUGINS . '.activeInstalls', $this->activeInstalls));
+        }
+
         if ($this->developerId) {
             $this->subQuery->andWhere(Db::parseNumericParam(Table::PLUGINS . '.developerId', $this->developerId));
         }
 
         if ($this->packageId) {
             $this->subQuery->andWhere(Db::parseNumericParam(Table::PLUGINS . '.packageId', $this->packageId));
+        }
+
+        if ($this->packageName) {
+            $this->subQuery->andWhere(Db::parseParam(Table::PLUGINS . '.packageName', $this->packageName));
         }
 
         if ($this->abandoned !== null) {
