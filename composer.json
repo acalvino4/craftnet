@@ -3,7 +3,7 @@
     "adam-paterson/oauth2-stripe": "^2.0.1",
     "aws/aws-sdk-php": "^3.233",
     "craftcms/aws-s3": "2.0.1",
-    "craftcms/cms": "4.3.x-dev#2905432ead3f9628f0ca20344ca915b94262a3af as 4.3.0-alpha",
+    "craftcms/cms": "4.3.x-dev#fc5d0ef5d008f97b449ba93cf67d14533f09b59f as 4.3.0-alpha",
     "craftcms/commerce": "4.1.0",
     "craftcms/commerce-stripe": "3.0.1",
     "craftcms/postmark": "3.0.0",
