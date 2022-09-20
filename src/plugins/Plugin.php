@@ -268,7 +268,6 @@ class Plugin extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'name' => 'Name',
             'handle' => 'Handle',
             'packageName' => 'Package Name',
             'repository' => 'Repository',
@@ -286,7 +285,6 @@ class Plugin extends Element
     protected static function defineDefaultTableAttributes(string $source): array
     {
         return [
-            'name',
             'handle',
             'packageName',
             'repository',
