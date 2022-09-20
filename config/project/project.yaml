@@ -1,4 +1,4 @@
-dateModified: 1660321464
+dateModified: 1663695612
 elementSources:
   craft\elements\Asset:
     -
@@ -31,6 +31,225 @@ elementSources:
       type: heading
     -
       key: 'folder:0fc223c5-f072-4d62-b283-8f78b1d08ad1'
+      type: native
+  craftnet\plugins\Plugin:
+    -
+      disabled: false
+      key: '*'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      heading: Compatibility
+      type: heading
+    -
+      condition:
+        class: craftnet\plugins\conditions\PluginCondition
+        conditionRules:
+          -
+            class: craftnet\plugins\conditions\CmsConstraintConditionRule
+            operator: '='
+            uid: bc26238e-eb7e-453f-b47d-ba805e078e9c
+            value: ^3.0
+        elementType: craftnet\plugins\Plugin
+        fieldContext: global
+      key: 'custom:95d2b530-f69e-44ba-8cbd-1973f2a3d91c'
+      label: 'Craft 3'
+      tableAttributes:
+        - handle
+        - packageName
+        - license
+        - latestVersion
+        - activeInstalls
+        - abandoned
+      type: custom
+    -
+      condition:
+        class: craftnet\plugins\conditions\PluginCondition
+        conditionRules:
+          -
+            class: craftnet\plugins\conditions\CmsConstraintConditionRule
+            operator: '='
+            uid: 57acf1b8-4db1-4d24-a328-b0ec7bf02be8
+            value: ^4.0
+        elementType: craftnet\plugins\Plugin
+        fieldContext: global
+      key: 'custom:f15f3f22-3ec2-4ab2-b5ac-2bf2873853fb'
+      label: 'Craft 4'
+      tableAttributes:
+        - handle
+        - packageName
+        - license
+        - latestVersion
+        - activeInstalls
+        - abandoned
+      type: custom
+    -
+      heading: Categories
+      type: heading
+    -
+      disabled: false
+      key: 'category:23'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:256903'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:22'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:323'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:135'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:394'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:24'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:343'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:161'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:209'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:154'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:324'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:136'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:393'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:402'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
+      type: native
+    -
+      disabled: false
+      key: 'category:344'
+      tableAttributes:
+        - handle
+        - packageName
+        - repository
+        - license
+        - primaryCategory
       type: native
 email:
   fromEmail: support@pixelandtonic.com
