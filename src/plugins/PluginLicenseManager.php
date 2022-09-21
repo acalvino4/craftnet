@@ -234,11 +234,12 @@ class PluginLicenseManager extends Component
      * @param int|null $offset
      * @param int|null $limit
      * @param int|null $total
+     * @param bool $includeTrials
      * @return PluginLicense[]
      */
-    public function getLicensesByDeveloper(int $developerId, int $offset = null, int $limit = null, int &$total = null): array
+    public function getLicensesByDeveloper(int $developerId, int $offset = null, int $limit = null, int &$total = null, bool $includeTrials = false): array
     {
-        $query = $this->_createLicenseQuery()
+        $query = $this->_createLicenseQuery(includeTrials: $includeTrials)
             ->innerJoin(['p' => Table::PLUGINS], '[[p.id]] = [[l.pluginId]]')
             ->andWhere(['p.developerId' => $developerId]);
 
