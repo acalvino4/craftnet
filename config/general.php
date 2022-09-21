@@ -54,6 +54,5 @@ return [
     'dev' => [
         'devMode' => true,
         'allowUpdates' => true,
-        'enableBasicHttpAuth' => true,
     ],
 ];
