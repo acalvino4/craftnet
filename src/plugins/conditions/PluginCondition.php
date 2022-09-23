@@ -12,6 +12,7 @@ class PluginCondition extends ElementCondition
             AbandonedConditionRule::class,
             ActiveInstallsConditionRule::class,
             CmsConstraintConditionRule::class,
+            DateApprovedConditionRule::class,
             DeveloperConditionRule::class,
             HandleConditionRule::class,
             LicenseConditionRule::class,

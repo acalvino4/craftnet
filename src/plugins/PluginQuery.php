@@ -56,6 +56,11 @@ class PluginQuery extends ElementQuery
     public $packageName;
 
     /**
+     * @var mixed When the resulting plugins must have been approved.
+     */
+    public mixed $dateApproved = null;
+
+    /**
      * @var bool|null Whether to fetch abandoned plugins.
      */
     public ?bool $abandoned = null;
@@ -191,6 +196,19 @@ class PluginQuery extends ElementQuery
     public function packageName(string|array|null $value): static
     {
         $this->packageName = $value;
+        return $this;
+    }
+
+    /**
+     * Sets the [[dateApproved]] property.
+     *
+     * @param mixed $value The property value
+     *
+     * @return static self reference
+     */
+    public function dateApproved(mixed $value): static
+    {
+        $this->dateApproved = $value;
         return $this;
     }
 
@@ -339,6 +357,10 @@ class PluginQuery extends ElementQuery
 
         if ($this->packageName) {
             $this->subQuery->andWhere(Db::parseParam(Table::PLUGINS . '.packageName', $this->packageName));
+        }
+
+        if ($this->dateApproved) {
+            $this->subQuery->andWhere(Db::parseDateParam(Table::PLUGINS . '.dateApproved', $this->dateApproved));
         }
 
         if ($this->abandoned !== null) {
