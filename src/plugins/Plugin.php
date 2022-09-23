@@ -997,6 +997,30 @@ class Plugin extends Element
     /**
      * @inheritdoc
      */
+    public function canView(User $user): bool
+    {
+        return $this->developerId === $user->id || $user->can('craftnet:managePlugins');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canSave(User $user): bool
+    {
+        return $this->canView($user);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDelete(User $user): bool
+    {
+        return $user->can('craftnet:managePlugins');
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function afterSave(bool $isNew): void
     {
         $packageManager = Module::getInstance()->getPackageManager();

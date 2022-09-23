@@ -43,18 +43,6 @@ class PluginsController extends Controller
     // =========================================================================
 
     /**
-     * @inheritdoc
-     */
-    public function beforeAction($action): bool
-    {
-        if (!parent::beforeAction($action)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * @param string $repository
      *
      * @return Response
@@ -718,6 +706,8 @@ JS;
      */
     public function actionDelete()
     {
+        $this->requirePermission('craftnet:managePlugins');
+
         $pluginId = $this->request->getBodyParam('pluginId');
         /** @var Plugin|null $plugin */
         $plugin = Plugin::find()->id($pluginId)->status(null)->one();
@@ -725,7 +715,6 @@ JS;
         if (!$plugin) {
             throw new NotFoundHttpException('Plugin not found');
         }
-
 
         // Delete icon
 
