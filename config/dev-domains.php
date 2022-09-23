@@ -114,6 +114,7 @@ return [
     'ontwikkeling.site',
     'onyep.dev',
     'our-staging-server.net',
+    'patmos.dev',
     'pc-web.dev',
     'pennystamps.dev',
     'ploi.link',
